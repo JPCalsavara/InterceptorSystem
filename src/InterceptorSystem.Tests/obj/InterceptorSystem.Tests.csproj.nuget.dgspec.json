@@ -1,0 +1,200 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/InterceptorSystem.Tests.csproj": {}
+  },
+  "projects": {
+    "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj",
+        "projectName": "InterceptorSystem.Application",
+        "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj",
+        "packagesPath": "/home/jpcalsavara/.nuget/packages/",
+        "outputPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/jpcalsavara/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {
+                "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.121/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
+        "projectName": "InterceptorSystem.Domain",
+        "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
+        "packagesPath": "/home/jpcalsavara/.nuget/packages/",
+        "outputPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/jpcalsavara/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.121/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/InterceptorSystem.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/InterceptorSystem.Tests.csproj",
+        "projectName": "InterceptorSystem.Tests",
+        "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/InterceptorSystem.Tests.csproj",
+        "packagesPath": "/home/jpcalsavara/.nuget/packages/",
+        "outputPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/jpcalsavara/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj": {
+                "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj"
+              },
+              "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {
+                "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.6.0, )"
+            },
+            "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.4.2, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.4.5, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.121/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

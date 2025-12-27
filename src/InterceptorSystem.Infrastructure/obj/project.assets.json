@@ -1,0 +1,111 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "InterceptorSystem.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "InterceptorSystem.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/InterceptorSystem.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/InterceptorSystem.Application.dll": {}
+        }
+      },
+      "InterceptorSystem.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/InterceptorSystem.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/InterceptorSystem.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "InterceptorSystem.Application/1.0.0": {
+      "type": "project",
+      "path": "../InterceptorSystem.Application/InterceptorSystem.Application.csproj",
+      "msbuildProject": "../InterceptorSystem.Application/InterceptorSystem.Application.csproj"
+    },
+    "InterceptorSystem.Domain/1.0.0": {
+      "type": "project",
+      "path": "../InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
+      "msbuildProject": "../InterceptorSystem.Domain/InterceptorSystem.Domain.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "InterceptorSystem.Application >= 1.0.0",
+      "InterceptorSystem.Domain >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/home/jpcalsavara/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/InterceptorSystem.Infrastructure.csproj",
+      "projectName": "InterceptorSystem.Infrastructure",
+      "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/InterceptorSystem.Infrastructure.csproj",
+      "packagesPath": "/home/jpcalsavara/.nuget/packages/",
+      "outputPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/jpcalsavara/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj": {
+              "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/InterceptorSystem.Application.csproj"
+            },
+            "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {
+              "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.121/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
