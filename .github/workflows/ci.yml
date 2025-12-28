@@ -1,0 +1,58 @@
+name: CI - Build & Test
+
+# Quando rodar? (Gatilhos)
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # --- SERVIÇOS (O Pulo do Gato para Testes de Integração) ---
+    # O GitHub Actions sobe um Postgres isolado só para esta execução.
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          # Mesmas credenciais do seu appsettings.Development.json
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: interceptor_db
+        ports:
+          # Mapeia a porta 5432 do container para a 5432 da máquina virtual do GitHub
+          - 5432:5432
+        # Healthcheck: Garante que o passo seguinte só inicie quando o banco estiver pronto
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Instala o .NET 8
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      
+      # 3. Restaura dependências (NuGet)
+      # Aponta para o .sln que está dentro da pasta src
+      - name: Restore dependencies
+        run: dotnet restore src/InterceptorSystem.sln
+      
+      # 4. Compila o projeto (Build)
+      # Verifica se há erros de sintaxe ou referências quebradas
+      - name: Build
+        run: dotnet build src/InterceptorSystem.sln --no-restore --configuration Release
+      
+      # 5. Roda os Testes (Unitários + Integração)
+      # Como subimos o serviço 'postgres' acima, os testes de integração vão passar!
+      - name: Test
+        run: dotnet test src/InterceptorSystem.sln --no-build --configuration Release --verbosity normal
