@@ -1,0 +1,15 @@
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/bin/Debug/net8.0/InterceptorSystem.Application.deps.json
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/bin/Debug/net8.0/InterceptorSystem.Application.dll
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/bin/Debug/net8.0/InterceptorSystem.Application.pdb
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/bin/Debug/net8.0/InterceptorSystem.Domain.dll
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/bin/Debug/net8.0/InterceptorSystem.Domain.pdb
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.csproj.AssemblyReference.cache
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.GeneratedMSBuildEditorConfig.editorconfig
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.AssemblyInfoInputs.cache
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.AssemblyInfo.cs
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.csproj.CoreCompileInputs.cache
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.csproj.CopyComplete
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.dll
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/refint/InterceptorSystem.Application.dll
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/InterceptorSystem.Application.pdb
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Application/obj/Debug/net8.0/ref/InterceptorSystem.Application.dll

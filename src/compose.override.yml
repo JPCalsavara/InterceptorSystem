@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: InterceptorSystem.Api/Dockerfile
+      target: build  # <--- O PULO DO GATO: Para na etapa de SDK, ignorando a etapa 'final'
+    
+    # Monta seu código local dentro do container para o 'watch' ver as mudanças
+    volumes:
+      - .:/src
+    
+    # Define a pasta onde o comando deve rodar (onde está o .csproj da API)
+    working_dir: /src/InterceptorSystem.Api
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # Essencial para o Docker no Linux perceber mudanças de arquivo rapidamente
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+    
+    # Substitui o "dotnet InterceptorSystem.Api.dll" pelo modo Watch
+    command: ["dotnet", "watch", "run", "--no-launch-profile"]
