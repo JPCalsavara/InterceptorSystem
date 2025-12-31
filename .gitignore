@@ -1,0 +1,15 @@
+bin/
+obj/
+*.user
+*.DotSettings.user
+*.suo
+*.userosscache
+*.sln.docstates
+/.vs/
+/TestResults/
+launchSettings.json
+appsettings.*.local.json
+.env
+.env.*
+*.env
+
