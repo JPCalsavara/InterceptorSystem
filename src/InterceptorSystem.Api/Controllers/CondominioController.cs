@@ -1,4 +1,5 @@
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using Microsoft.AspNetCore.Mvc;
 

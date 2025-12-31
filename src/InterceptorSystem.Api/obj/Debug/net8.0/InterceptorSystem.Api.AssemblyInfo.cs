@@ -13,10 +13,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InterceptorSystem.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4b127d09ba5a18b73a306c258ba2fc2699bec418")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c3f427a83570f251a32faf094101cf0854f3294")]
 [assembly: System.Reflection.AssemblyProductAttribute("InterceptorSystem.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InterceptorSystem.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("InterceptorSystem.Tests")]
 
 // Gerado pela classe WriteCodeFragment do MSBuild.
 

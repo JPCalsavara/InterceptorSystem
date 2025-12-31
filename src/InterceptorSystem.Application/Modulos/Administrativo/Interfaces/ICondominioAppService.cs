@@ -1,7 +1,6 @@
-
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
-namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
+namespace InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 
 public interface ICondominioAppService
 {

@@ -1,5 +1,6 @@
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 

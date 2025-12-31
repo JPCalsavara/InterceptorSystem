@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/tsM5iDX7TRv+89RR/ASbklY2q3M9L5H+KANzSdymnrQPPGSA8+nCEVsAf/xIZ/+dFMtKfR+cj+P2z5vDyqzDg==",
+  "dgSpecHash": "YYR4FyHX5IjDK4PFB4cFmwvP+G6G+wTR4ZNbGSu3U68FVPYGpqxdfvfSiNro833ZMThAbGfnyH3fHE2kSKGw9Q==",
   "success": true,
   "projectFilePath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/InterceptorSystem.Api.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.0/microsoft.entityframeworkcore.abstractions.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.0/microsoft.entityframeworkcore.analyzers.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.design/9.0.0/microsoft.entityframeworkcore.design.9.0.0.nupkg.sha512",
+    "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.inmemory/9.0.0/microsoft.entityframeworkcore.inmemory.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.0/microsoft.entityframeworkcore.relational.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.0/microsoft.extensions.caching.abstractions.9.0.0.nupkg.sha512",

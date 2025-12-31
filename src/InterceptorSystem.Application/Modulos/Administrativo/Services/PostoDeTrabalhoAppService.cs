@@ -1,19 +1,10 @@
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
-
-public interface IPostoDeTrabalhoAppService
-{
-    Task<PostoDeTrabalhoDto> CreateAsync(CreatePostoInput input);
-    Task<PostoDeTrabalhoDto> UpdateAsync(Guid id, UpdatePostoInput input);
-    Task DeleteAsync(Guid id);
-    Task<PostoDeTrabalhoDto?> GetByIdAsync(Guid id);
-    Task<IEnumerable<PostoDeTrabalhoDto>> GetAllAsync();
-    Task<IEnumerable<PostoDeTrabalhoDto>> GetByCondominioIdAsync(Guid condominioId);
-}
 
 public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
 {

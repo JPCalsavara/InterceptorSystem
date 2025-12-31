@@ -6,7 +6,7 @@ using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using Moq;
 
-namespace InterceptorSystem.Tests;
+namespace InterceptorSystem.Tests.Unity;
 
 public class PostoDeTrabalhoAppServiceTests
 {
