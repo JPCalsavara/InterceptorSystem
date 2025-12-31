@@ -1,4 +1,5 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/bin/Debug/net8.0/InterceptorSystem.Infrastructure.deps.json
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/bin/Debug/net8.0/InterceptorSystem.Infrastructure.runtimeconfig.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/bin/Debug/net8.0/InterceptorSystem.Infrastructure.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/bin/Debug/net8.0/InterceptorSystem.Infrastructure.pdb
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/bin/Debug/net8.0/InterceptorSystem.Application.dll
@@ -14,6 +15,5 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/Debug/net8.0/InterceptorSystem.Infrastructure.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/Debug/net8.0/refint/InterceptorSystem.Infrastructure.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/Debug/net8.0/InterceptorSystem.Infrastructure.pdb
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/Debug/net8.0/ref/InterceptorSystem.Infrastructure.dll
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/bin/Debug/net8.0/InterceptorSystem.Infrastructure.runtimeconfig.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/Debug/net8.0/InterceptorSystem.Infrastructure.genruntimeconfig.cache
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Infrastructure/obj/Debug/net8.0/ref/InterceptorSystem.Infrastructure.dll

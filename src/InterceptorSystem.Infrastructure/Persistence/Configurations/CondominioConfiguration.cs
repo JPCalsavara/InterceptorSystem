@@ -19,22 +19,16 @@ public class CondominioConfiguration : IEntityTypeConfiguration<Condominio>
 
         builder.Property(c => c.Cnpj)
             .IsRequired()
-            .HasMaxLength(18); // Formato com pontuação
+            .HasMaxLength(18);
             
         // Índice único para CNPJ (Regra de banco)
         builder.HasIndex(c => c.Cnpj).IsUnique();
 
         // Configuração do Multi-tenancy (EmpresaId é obrigatório)
         builder.Property(c => c.EmpresaId).IsRequired();
-
-        // Relacionamento 1:N com Postos (Comportamento de Agregado)
-        builder.HasMany(c => c.Postos)
-            .WithOne()
-            .HasForeignKey(p => p.CondominioId)
-            .OnDelete(DeleteBehavior.Cascade);
         
         builder.HasIndex(c => c.Nome);
         builder.HasIndex(c => c.EmpresaId);
-        builder.HasIndex(c => c.Cnpj);
     }
 }
+

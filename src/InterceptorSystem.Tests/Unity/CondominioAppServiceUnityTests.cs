@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
@@ -6,7 +9,7 @@ using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using Moq;
 
-namespace InterceptorSystem.Tests;
+namespace InterceptorSystem.Tests.Unity;
 
 public class CondominioAppServiceTests
 {
@@ -332,73 +335,6 @@ public class CondominioAppServiceTests
     }
 
     #endregion
-
-    #region AddPostoAsync Tests
-
-    [Fact(DisplayName = "AddPostoAsync - Deve adicionar posto com dados válidos")]
-    public async Task AddPostoAsync_DeveAdicionar_QuandoDadosValidos()
-    {
-        // --- ARRANGE ---
-        var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X");
-        
-        var input = new CreatePostoInput("Portaria Principal", new TimeSpan(8, 0, 0), new TimeSpan(20, 0, 0));
-
-        _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
-        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
-
-        // --- ACT ---
-        var result = await _service.AddPostoAsync(condominioId, input);
-
-        // --- ASSERT ---
-        Assert.NotNull(result);
-        Assert.Equal("Portaria Principal", result.Descricao);
-        Assert.Contains("08:00", result.Horario);
-        Assert.Contains("20:00", result.Horario);
-        
-        _mockRepo.Verify(r => r.Update(condominio), Times.Once);
-        _mockUow.Verify(u => u.CommitAsync(), Times.Once);
-    }
-
-    [Fact(DisplayName = "AddPostoAsync - Deve lançar exceção quando condomínio não existe")]
-    public async Task AddPostoAsync_DeveFalhar_QuandoCondominioNaoExiste()
-    {
-        // --- ARRANGE ---
-        var condominioId = Guid.NewGuid();
-        var input = new CreatePostoInput("Portaria", new TimeSpan(8, 0, 0), new TimeSpan(20, 0, 0));
-
-        _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync((Condominio?)null);
-
-        // --- ACT & ASSERT ---
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.AddPostoAsync(condominioId, input));
-        Assert.Contains("Condomínio não encontrado", exception.Message);
-
-        _mockRepo.Verify(r => r.Update(It.IsAny<Condominio>()), Times.Never);
-    }
-
-    [Fact(DisplayName = "AddPostoAsync - Deve lançar exceção quando posto duplicado")]
-    public async Task AddPostoAsync_DeveFalhar_QuandoPostoDuplicado()
-    {
-        // --- ARRANGE ---
-        var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X");
-        
-        // Adiciona o primeiro posto
-        condominio.AdicionarPosto("Portaria Principal", new TimeSpan(8, 0, 0), new TimeSpan(20, 0, 0));
-
-        // Tenta adicionar posto com mesmo nome
-        var input = new CreatePostoInput("Portaria Principal", new TimeSpan(9, 0, 0), new TimeSpan(21, 0, 0));
-
-        _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
-
-        // --- ACT & ASSERT ---
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.AddPostoAsync(condominioId, input));
-        Assert.Contains("já existe", exception.Message);
-
-        _mockRepo.Verify(r => r.Update(It.IsAny<Condominio>()), Times.Never);
-    }
-
-    #endregion
 }
+
+

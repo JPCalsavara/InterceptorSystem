@@ -2,6 +2,7 @@ using InterceptorSystem.Api.Services;
 using InterceptorSystem.Application;
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Infrastructure;
+using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 // --- CONFIGURAÇÃO DE SERVIÇOS (DI) ---
 
 // 1. Camadas da Arquitetura (Extension Methods)
-builder.Services.AddInfrastructure(builder.Configuration);
+// Em testes de integração, evitamos registrar o provider Npgsql da Infrastructure
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    // Registra apenas ApplicationDbContext com InMemory para testes
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseInMemoryDatabase("IntegrationTestsDb"));
+}
+else
+{
+    builder.Services.AddInfrastructure(builder.Configuration);
+}
+
 builder.Services.AddApplication();
 
 // 2. Serviços da API (Presentation Layer)
@@ -28,10 +40,10 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<InterceptorSystem.Infrastructure.Persistence.Contexts.ApplicationDbContext>();
+        var context = services.GetRequiredService<ApplicationDbContext>();
         
-        // Aplica migrações pendentes automaticamente ao iniciar
-        if (context.Database.GetPendingMigrations().Any())
+        // Em testes, o InMemory não usa migrações
+        if (!builder.Environment.IsEnvironment("Testing") && context.Database.GetPendingMigrations().Any())
         {
             context.Database.Migrate();
         }
@@ -56,3 +68,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Torna a classe Program acessível para testes de integração
+public partial class Program { }
+

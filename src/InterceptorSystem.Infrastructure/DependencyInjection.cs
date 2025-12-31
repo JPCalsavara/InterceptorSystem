@@ -19,6 +19,7 @@ public static class DependencyInjection
 
         // 2. Registro dos Repositórios
         services.AddScoped<ICondominioRepository, CondominioRepository>();
+        services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
         
         // Dica: Podemos usar reflection aqui no futuro para registrar todos os repositórios de uma vez
         

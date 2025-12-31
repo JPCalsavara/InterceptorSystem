@@ -75,38 +75,33 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid");
 
                     b.Property<TimeSpan>("HorarioFim")
-                        .HasColumnType("interval");
+                        .HasColumnType("time");
 
                     b.Property<TimeSpan>("HorarioInicio")
-                        .HasColumnType("interval");
+                        .HasColumnType("time");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CondominioId");
 
-                    b.ToTable("PostosDeTrabalho");
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("PostosDeTrabalho", (string)null);
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", null)
-                        .WithMany("Postos")
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", "Condominio")
+                        .WithMany()
                         .HasForeignKey("CondominioId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", b =>
-                {
-                    b.Navigation("Postos");
+                    b.Navigation("Condominio");
                 });
 #pragma warning restore 612, 618
         }

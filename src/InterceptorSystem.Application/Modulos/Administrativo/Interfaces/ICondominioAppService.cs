@@ -1,7 +1,6 @@
-
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
-namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
+namespace InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 
 public interface ICondominioAppService
 {
@@ -10,6 +9,5 @@ public interface ICondominioAppService
     Task DeleteAsync(Guid id);
     Task<CondominioDtoOutput?> GetByIdAsync(Guid id);
     Task<IEnumerable<CondominioDtoOutput>> GetAllAsync();
-    
-    Task<PostoDeTrabalhoDto> AddPostoAsync(Guid condominioId, CreatePostoInput input);
 }
+

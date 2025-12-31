@@ -1,3 +1,4 @@
+using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,9 +10,11 @@ public static class DependencyInjection
     {
         // Registro dos Services de Aplicação
         services.AddScoped<ICondominioAppService, CondominioAppService>();
+        services.AddScoped<IPostoDeTrabalhoAppService, PostoDeTrabalhoAppService>();
         
         // Aqui também entra: AutoMapper, MediatR, FluentValidation se formos usar
         
         return services;
     }
 }
+
