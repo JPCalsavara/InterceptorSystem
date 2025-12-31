@@ -19,9 +19,7 @@ public class CondominioRepository : ICondominioRepository
     
     public async Task<Condominio?> GetByIdAsync(Guid id)
     {
-        return await  _context.Condominios
-            .Include(c=> c.Postos)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        return await _context.Condominios.FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<IEnumerable<Condominio>> GetAllAsync()

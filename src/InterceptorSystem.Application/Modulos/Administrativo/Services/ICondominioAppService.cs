@@ -10,6 +10,5 @@ public interface ICondominioAppService
     Task DeleteAsync(Guid id);
     Task<CondominioDtoOutput?> GetByIdAsync(Guid id);
     Task<IEnumerable<CondominioDtoOutput>> GetAllAsync();
-    
-    Task<PostoDeTrabalhoDto> AddPostoAsync(Guid condominioId, CreatePostoInput input);
 }
+

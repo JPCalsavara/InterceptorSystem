@@ -5,20 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace InterceptorSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/condominios")]
-public class CondominiosController : ControllerBase
+[Route("api/postos-de-trabalho")]
+public class PostosDeTrabalhoController : ControllerBase
 {
-    private readonly ICondominioAppService _service;
+    private readonly IPostoDeTrabalhoAppService _service;
 
-    public CondominiosController(ICondominioAppService service)
+    public PostosDeTrabalhoController(IPostoDeTrabalhoAppService service)
     {
         _service = service;
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(CondominioDtoOutput), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(PostoDeTrabalhoDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(CreateCondominioDtoInput input)
+    public async Task<IActionResult> Create(CreatePostoInput input)
     {
         try
         {
@@ -29,7 +29,7 @@ public class CondominiosController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(CondominioDtoOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PostoDeTrabalhoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid id)
     {
@@ -38,18 +38,26 @@ public class CondominiosController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<CondominioDtoOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<PostoDeTrabalhoDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         var result = await _service.GetAllAsync();
         return Ok(result);
     }
 
+    [HttpGet("condominio/{condominioId}")]
+    [ProducesResponseType(typeof(IEnumerable<PostoDeTrabalhoDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByCondominio(Guid condominioId)
+    {
+        var result = await _service.GetByCondominioIdAsync(condominioId);
+        return Ok(result);
+    }
+
     [HttpPut("{id}")]
-    [ProducesResponseType(typeof(CondominioDtoOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PostoDeTrabalhoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update(Guid id, UpdateCondominioDtoInput input)
+    public async Task<IActionResult> Update(Guid id, UpdatePostoInput input)
     {
         try 
         {
