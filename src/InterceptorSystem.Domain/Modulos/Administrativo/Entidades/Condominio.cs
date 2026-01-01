@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 
@@ -5,10 +6,13 @@ namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
 public class Condominio : Entity, IAggregateRoot
 {
-    public string Nome { get; private set; }
-    public string Cnpj { get; private set; }
-    public string Endereco { get; private set; }
+    public string Nome { get; private set; } = null!;
+    public string Cnpj { get; private set; } = null!;
+    public string Endereco { get; private set; } = null!;
     public bool Ativo { get; private set; }
+
+    public ICollection<PostoDeTrabalho> PostosDeTrabalho { get; private set; } = new List<PostoDeTrabalho>();
+    public ICollection<Funcionario> Funcionarios { get; private set; } = new List<Funcionario>();
 
     // Construtor vazio para o EF Core
     protected Condominio() { }
@@ -39,4 +43,3 @@ public class Condominio : Entity, IAggregateRoot
         Ativo = false;
     }
 }
-

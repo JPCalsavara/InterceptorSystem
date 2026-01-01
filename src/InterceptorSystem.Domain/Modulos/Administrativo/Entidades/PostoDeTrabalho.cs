@@ -14,6 +14,7 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
 
     // Navigation Properties
     public Condominio? Condominio { get; private set; }
+    public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
 
     // Construtor vazio para o EF Core
     protected PostoDeTrabalho() { }
@@ -51,4 +52,3 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
         HorarioFim = fim;
     }
 }
-

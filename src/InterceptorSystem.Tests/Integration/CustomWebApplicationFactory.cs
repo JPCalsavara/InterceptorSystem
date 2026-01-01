@@ -48,6 +48,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             // Registra repositórios necessários para os services
             services.AddScoped<ICondominioRepository, CondominioRepository>();
             services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
+            services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
 
             // Garante que o banco de dados seja criado
             var sp = services.BuildServiceProvider();

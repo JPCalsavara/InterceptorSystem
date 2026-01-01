@@ -15,9 +15,7 @@ namespace InterceptorSystem.Infrastructure.Migrations
                 name: "FK_PostosDeTrabalho_Condominios_CondominioId",
                 table: "PostosDeTrabalho");
 
-            migrationBuilder.DropColumn(
-                name: "Descricao",
-                table: "PostosDeTrabalho");
+            migrationBuilder.Sql("ALTER TABLE \"PostosDeTrabalho\" DROP COLUMN IF EXISTS \"Descricao\";");
 
             migrationBuilder.AlterColumn<TimeSpan>(
                 name: "HorarioInicio",
@@ -34,6 +32,8 @@ namespace InterceptorSystem.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(TimeSpan),
                 oldType: "interval");
+
+            migrationBuilder.Sql("DROP INDEX IF EXISTS \"IX_PostosDeTrabalho_EmpresaId\";");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostosDeTrabalho_EmpresaId",
@@ -56,9 +56,14 @@ namespace InterceptorSystem.Infrastructure.Migrations
                 name: "FK_PostosDeTrabalho_Condominios_CondominioId",
                 table: "PostosDeTrabalho");
 
-            migrationBuilder.DropIndex(
-                name: "IX_PostosDeTrabalho_EmpresaId",
-                table: "PostosDeTrabalho");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS \"IX_PostosDeTrabalho_EmpresaId\";");
+
+            migrationBuilder.AddColumn<string>(
+                name: "Descricao",
+                table: "PostosDeTrabalho",
+                type: "text",
+                nullable: false,
+                defaultValue: "");
 
             migrationBuilder.AlterColumn<TimeSpan>(
                 name: "HorarioInicio",
@@ -76,12 +81,6 @@ namespace InterceptorSystem.Infrastructure.Migrations
                 oldClrType: typeof(TimeSpan),
                 oldType: "time");
 
-            migrationBuilder.AddColumn<string>(
-                name: "Descricao",
-                table: "PostosDeTrabalho",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_PostosDeTrabalho_Condominios_CondominioId",

@@ -1,0 +1,24 @@
+{
+  "create": {
+    "condominioId": "00000000-0000-0000-0000-000000000000",
+    "nome": "João da Silva",
+    "cpf": "98765432100",
+    "celular": "+5511999999999",
+    "statusFuncionario": "ATIVO",
+    "tipoEscala": "DOZE_POR_TRINTA_SEIS",
+    "tipoFuncionario": "CLT",
+    "salarioMensal": 2500.00,
+    "valorTotalBeneficiosMensal": 450.00,
+    "valorDiariasFixas": 100.00
+  },
+  "update": {
+    "nome": "João da Silva Junior",
+    "celular": "+5511888888888",
+    "statusFuncionario": "ATIVO",
+    "tipoEscala": "SEMANAL_COMERCIAL",
+    "tipoFuncionario": "TERCEIRIZADO",
+    "salarioMensal": 3200.00,
+    "valorTotalBeneficiosMensal": 500.00,
+    "valorDiariasFixas": 80.00
+  }
+}

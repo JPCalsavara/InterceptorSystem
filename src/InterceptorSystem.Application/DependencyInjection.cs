@@ -11,10 +11,11 @@ public static class DependencyInjection
         // Registro dos Services de Aplicação
         services.AddScoped<ICondominioAppService, CondominioAppService>();
         services.AddScoped<IPostoDeTrabalhoAppService, PostoDeTrabalhoAppService>();
+        services.AddScoped<IFuncionarioAppService, FuncionarioAppService>();
+        services.AddScoped<IAlocacaoAppService, AlocacaoAppService>();
         
         // Aqui também entra: AutoMapper, MediatR, FluentValidation se formos usar
         
         return services;
     }
 }
-

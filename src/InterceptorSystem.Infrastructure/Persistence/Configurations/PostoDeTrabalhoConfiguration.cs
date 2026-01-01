@@ -29,7 +29,7 @@ public class PostoDeTrabalhoConfiguration : IEntityTypeConfiguration<PostoDeTrab
 
         // Relacionamento 1:N com Condomínio
         builder.HasOne(p => p.Condominio)
-            .WithMany()
+            .WithMany(c => c.PostosDeTrabalho)
             .HasForeignKey(p => p.CondominioId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -38,4 +38,3 @@ public class PostoDeTrabalhoConfiguration : IEntityTypeConfiguration<PostoDeTrab
         builder.HasIndex(p => p.CondominioId);
     }
 }
-

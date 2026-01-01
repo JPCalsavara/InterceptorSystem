@@ -1,0 +1,12 @@
+{
+  "create": {
+    "condominioId": "00000000-0000-0000-0000-000000000000",
+    "horarioInicio": "06:00:00",
+    "horarioFim": "18:00:00"
+  },
+  "update": {
+    "horarioInicio": "18:00:00",
+    "horarioFim": "06:00:00"
+  }
+}
+

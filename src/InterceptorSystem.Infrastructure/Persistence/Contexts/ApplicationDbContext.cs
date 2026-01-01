@@ -22,7 +22,8 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     // --- DbSets (Tabelas) ---
     public DbSet<Condominio> Condominios { get; set; }
     public DbSet<PostoDeTrabalho> PostosDeTrabalho { get; set; }
-    // Futuros: Funcionarios, Alocacoes, etc.
+    public DbSet<Funcionario> Funcionarios { get; set; }
+    public DbSet<Alocacao> Alocacoes { get; set; }
 
     // --- Configuração do Modelo (Filtros de Leitura) ---
     protected override void OnModelCreating(ModelBuilder builder)
