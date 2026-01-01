@@ -1,6 +1,7 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/appsettings.Development.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/appsettings.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/InterceptorSystem.Api
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/appsettings.Testing.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/InterceptorSystem.Api.deps.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/InterceptorSystem.Api.runtimeconfig.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/InterceptorSystem.Api.dll
@@ -17,6 +18,7 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Design.dll
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.Extensions.Caching.Abstractions.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
@@ -138,5 +140,3 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/obj/Debug/net8.0/InterceptorSystem.Api.pdb
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/obj/Debug/net8.0/InterceptorSystem.Api.genruntimeconfig.cache
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/obj/Debug/net8.0/ref/InterceptorSystem.Api.dll
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/appsettings.Testing.json
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Api/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll

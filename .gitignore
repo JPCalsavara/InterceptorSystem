@@ -13,3 +13,5 @@ appsettings.*.local.json
 .env.*
 *.env
 
+src/.env
+/.idea/

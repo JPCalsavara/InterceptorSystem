@@ -1,4 +1,7 @@
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +20,13 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
         Factory = factory;
         Client = factory.CreateClient();
     }
+
+    protected static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    protected Task<T?> ReadAsAsync<T>(HttpResponseMessage response) => response.Content.ReadFromJsonAsync<T>(JsonOptions);
 
     /// <summary>
     /// Limpa o banco de dados entre os testes
@@ -39,4 +49,3 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
         return scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
 }
-

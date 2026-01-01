@@ -4,6 +4,7 @@ using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Infrastructure;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,12 @@ else
 builder.Services.AddApplication();
 
 // 2. Serviços da API (Presentation Layer)
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
@@ -71,4 +77,3 @@ app.Run();
 
 // Torna a classe Program acessível para testes de integração
 public partial class Program { }
-
