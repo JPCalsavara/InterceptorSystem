@@ -22,6 +22,48 @@ namespace InterceptorSystem.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Data")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FuncionarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PostoDeTrabalhoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("StatusAlocacao")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TipoAlocacao")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("FuncionarioId", "Data");
+
+                    b.HasIndex("PostoDeTrabalhoId", "Data");
+
+                    b.ToTable("Alocacoes", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", b =>
                 {
                     b.Property<Guid>("Id")
@@ -63,6 +105,72 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.ToTable("Condominios", (string)null);
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Celular")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<Guid>("CondominioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<decimal>("SalarioMensal")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("StatusFuncionario")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TipoEscala")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TipoFuncionario")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("ValorDiariasFixas")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("ValorTotalBeneficiosMensal")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CondominioId");
+
+                    b.HasIndex("Cpf")
+                        .IsUnique();
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("Funcionarios", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
                 {
                     b.Property<Guid>("Id")
@@ -93,15 +201,62 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.ToTable("PostosDeTrabalho", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", "Funcionario")
+                        .WithMany("Alocacoes")
+                        .HasForeignKey("FuncionarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", "PostoDeTrabalho")
+                        .WithMany("Alocacoes")
+                        .HasForeignKey("PostoDeTrabalhoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Funcionario");
+
+                    b.Navigation("PostoDeTrabalho");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
                 {
                     b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", "Condominio")
-                        .WithMany()
+                        .WithMany("Funcionarios")
                         .HasForeignKey("CondominioId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Condominio");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", "Condominio")
+                        .WithMany("PostosDeTrabalho")
+                        .HasForeignKey("CondominioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Condominio");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", b =>
+                {
+                    b.Navigation("Funcionarios");
+
+                    b.Navigation("PostosDeTrabalho");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
+                {
+                    b.Navigation("Alocacoes");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
+                {
+                    b.Navigation("Alocacoes");
                 });
 #pragma warning restore 612, 618
         }

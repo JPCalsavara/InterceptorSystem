@@ -3,6 +3,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -35,6 +36,13 @@ public class AlocacaoAppService : IAlocacaoAppService
         var posto = await _postoRepository.GetByIdAsync(input.PostoDeTrabalhoId)
             ?? throw new KeyNotFoundException("Posto de Trabalho não encontrado para alocação.");
 
+        if (funcionario.CondominioId != posto.CondominioId)
+        {
+            throw new InvalidOperationException("Funcionário e Posto devem pertencer ao mesmo condomínio.");
+        }
+
+        await ValidarRegrasDeConsecutividade(funcionario.Id, input.Data, input.TipoAlocacao);
+
         var alocacao = new Alocacao(
             empresaId,
             funcionario.Id,
@@ -53,6 +61,8 @@ public class AlocacaoAppService : IAlocacaoAppService
     {
         var alocacao = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Alocação não encontrada.");
+
+        await ValidarRegrasDeConsecutividade(alocacao.FuncionarioId, alocacao.Data, input.TipoAlocacao, alocacaoIdIgnorado: id);
 
         alocacao.AtualizarStatus(input.StatusAlocacao, input.TipoAlocacao);
 
@@ -93,5 +103,24 @@ public class AlocacaoAppService : IAlocacaoAppService
     {
         var posto = await _postoRepository.GetByIdAsync(postoId);
         return posto != null;
+    }
+
+    private async Task ValidarRegrasDeConsecutividade(Guid funcionarioId, DateOnly data, TipoAlocacao tipoSolicitado, Guid? alocacaoIdIgnorado = null)
+    {
+        if (tipoSolicitado == TipoAlocacao.DOBRA_PROGRAMADA)
+        {
+            return;
+        }
+
+        var alocacoesFuncionario = await _repository.GetByFuncionarioAsync(funcionarioId);
+        var existeAdjacente = alocacoesFuncionario.Any(a =>
+            a.Id != alocacaoIdIgnorado &&
+            (a.Data == data.AddDays(-1) || a.Data == data.AddDays(1)) &&
+            a.TipoAlocacao != TipoAlocacao.DOBRA_PROGRAMADA);
+
+        if (existeAdjacente)
+        {
+            throw new InvalidOperationException("Não é permitido duas alocações em dias consecutivos, exceto em dobra programada.");
+        }
     }
 }

@@ -4,6 +4,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -44,6 +45,7 @@ public class FuncionarioAppService : IFuncionarioAppService
             input.CondominioId,
             input.Nome,
             input.Cpf,
+            input.Celular,
             input.StatusFuncionario,
             input.TipoEscala,
             input.TipoFuncionario,
@@ -67,6 +69,7 @@ public class FuncionarioAppService : IFuncionarioAppService
 
         funcionario.AtualizarDados(
             input.Nome,
+            input.Celular,
             input.StatusFuncionario,
             input.TipoEscala,
             input.TipoFuncionario,

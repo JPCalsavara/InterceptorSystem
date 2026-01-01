@@ -1,4 +1,5 @@
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,9 +16,29 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.Property(f => f.Cpf).IsRequired().HasMaxLength(14);
         builder.HasIndex(f => f.Cpf).IsUnique();
 
-        builder.Property(f => f.StatusFuncionario).IsRequired().HasMaxLength(50);
-        builder.Property(f => f.TipoEscala).IsRequired().HasMaxLength(50);
-        builder.Property(f => f.TipoFuncionario).IsRequired().HasMaxLength(50);
+        builder.Property(f => f.Celular).IsRequired().HasMaxLength(30);
+
+        builder.Property(f => f.StatusFuncionario)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<StatusFuncionario>(v))
+            .HasMaxLength(50);
+
+        builder.Property(f => f.TipoEscala)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<TipoEscala>(v))
+            .HasMaxLength(50);
+
+        builder.Property(f => f.TipoFuncionario)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<TipoFuncionario>(v))
+            .HasMaxLength(50);
+
         builder.Property(f => f.SalarioMensal).HasColumnType("decimal(10,2)");
         builder.Property(f => f.ValorTotalBeneficiosMensal).HasColumnType("decimal(10,2)");
         builder.Property(f => f.ValorDiariasFixas).HasColumnType("decimal(10,2)");
@@ -34,4 +55,3 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.HasIndex(f => f.CondominioId);
     }
 }
-

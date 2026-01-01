@@ -1,5 +1,6 @@
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
@@ -8,9 +9,10 @@ public class Funcionario : Entity, IAggregateRoot
     public Guid CondominioId { get; private set; }
     public string Nome { get; private set; } = null!;
     public string Cpf { get; private set; } = null!;
-    public string StatusFuncionario { get; private set; } = null!;
-    public string TipoEscala { get; private set; } = null!;
-    public string TipoFuncionario { get; private set; } = null!;
+    public string Celular { get; private set; } = null!;
+    public StatusFuncionario StatusFuncionario { get; private set; }
+    public TipoEscala TipoEscala { get; private set; }
+    public TipoFuncionario TipoFuncionario { get; private set; }
     public decimal SalarioMensal { get; private set; }
     public decimal ValorTotalBeneficiosMensal { get; private set; }
     public decimal ValorDiariasFixas { get; private set; }
@@ -25,9 +27,10 @@ public class Funcionario : Entity, IAggregateRoot
         Guid condominioId,
         string nome,
         string cpf,
-        string statusFuncionario,
-        string tipoEscala,
-        string tipoFuncionario,
+        string celular,
+        StatusFuncionario statusFuncionario,
+        TipoEscala tipoEscala,
+        TipoFuncionario tipoFuncionario,
         decimal salarioMensal,
         decimal valorTotalBeneficiosMensal,
         decimal valorDiariasFixas)
@@ -36,9 +39,10 @@ public class Funcionario : Entity, IAggregateRoot
         CheckRule(condominioId == Guid.Empty, "O funcionário deve estar vinculado a um condomínio.");
         CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(statusFuncionario), "Status do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(tipoEscala), "Tipo de escala é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(tipoFuncionario), "Tipo de funcionário é obrigatório.");
+        CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
+        CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
+        CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
+        CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
         CheckRule(salarioMensal < 0, "Salário não pode ser negativo.");
         CheckRule(valorTotalBeneficiosMensal < 0, "Benefícios não podem ser negativos.");
         CheckRule(valorDiariasFixas < 0, "Diárias não podem ser negativas.");
@@ -47,6 +51,7 @@ public class Funcionario : Entity, IAggregateRoot
         CondominioId = condominioId;
         Nome = nome;
         Cpf = cpf;
+        Celular = celular;
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
@@ -57,22 +62,25 @@ public class Funcionario : Entity, IAggregateRoot
 
     public void AtualizarDados(
         string nome,
-        string statusFuncionario,
-        string tipoEscala,
-        string tipoFuncionario,
+        string celular,
+        StatusFuncionario statusFuncionario,
+        TipoEscala tipoEscala,
+        TipoFuncionario tipoFuncionario,
         decimal salarioMensal,
         decimal valorTotalBeneficiosMensal,
         decimal valorDiariasFixas)
     {
         CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(statusFuncionario), "Status do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(tipoEscala), "Tipo de escala é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(tipoFuncionario), "Tipo de funcionário é obrigatório.");
+        CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
+        CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
+        CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
+        CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
         CheckRule(salarioMensal < 0, "Salário não pode ser negativo.");
         CheckRule(valorTotalBeneficiosMensal < 0, "Benefícios não podem ser negativos.");
         CheckRule(valorDiariasFixas < 0, "Diárias não podem ser negativas.");
 
         Nome = nome;
+        Celular = celular;
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;

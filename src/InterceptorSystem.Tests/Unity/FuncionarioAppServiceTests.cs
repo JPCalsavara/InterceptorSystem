@@ -7,6 +7,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using Moq;
 
@@ -26,9 +27,10 @@ public class FuncionarioAppServiceTests
         condominioId,
         "João",
         CpfValido,
-        "Ativo",
-        "12x36",
-        "Porteiro",
+        "+5511999999999",
+        StatusFuncionario.ATIVO,
+        TipoEscala.DOZE_POR_TRINTA_SEIS,
+        TipoFuncionario.CLT,
         2000,
         300,
         100);
@@ -43,7 +45,7 @@ public class FuncionarioAppServiceTests
     public async Task CreateAsync_DeveCriarFuncionario()
     {
         var empresaId = Guid.NewGuid();
-        var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), "João", "123", "Ativo", "12x36", "Porteiro", 2000, 300, 100);
+        var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua"));
         _funcionarioRepo.Setup(r => r.GetByCpfAsync(input.Cpf)).ReturnsAsync((Funcionario?)null);
@@ -75,7 +77,7 @@ public class FuncionarioAppServiceTests
         var input = CriarInputValido(condominioId);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua"));
-        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, "Outro", CpfValido, "Ativo", "12x36", "Porteiro", 2000, 300, 100));
+        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
     }
@@ -84,7 +86,7 @@ public class FuncionarioAppServiceTests
     public async Task UpdateAsync_DeveFalhar_QuandoFuncionarioNaoExiste()
     {
         var id = Guid.NewGuid();
-        var input = new UpdateFuncionarioDtoInput("Jose", "Ativo", "12x36", "Porteiro", 2100, 320, 110);
+        var input = new UpdateFuncionarioDtoInput("Jose", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2100, 320, 110);
         _funcionarioRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Funcionario?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, input));
@@ -105,8 +107,8 @@ public class FuncionarioAppServiceTests
         var empresaId = Guid.NewGuid();
         var lista = new List<Funcionario>
         {
-            new Funcionario(empresaId, Guid.NewGuid(), "João", "111", "Ativo", "12x36", "Porteiro", 2000, 300, 100),
-            new Funcionario(empresaId, Guid.NewGuid(), "Maria", "222", "Inativo", "5x2", "Supervisor", 3000, 500, 0)
+            new Funcionario(empresaId, Guid.NewGuid(), "João", "111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100),
+            new Funcionario(empresaId, Guid.NewGuid(), "Maria", "222", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 3000, 500, 0)
         };
         _funcionarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
 

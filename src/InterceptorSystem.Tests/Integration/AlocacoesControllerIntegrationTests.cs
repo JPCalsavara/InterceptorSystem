@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
 namespace InterceptorSystem.Tests.Integration;
 
@@ -17,16 +18,26 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         var input = new CreateCondominioDtoInput("Condomínio Aloc", $"{DateTime.Now.Ticks % 100000000:00000000}/0001-66", "Rua Aloc");
         var response = await Client.PostAsJsonAsync("/api/condominios", input);
         response.EnsureSuccessStatusCode();
-        var dto = await response.Content.ReadFromJsonAsync<CondominioDtoOutput>();
+        var dto = await ReadAsAsync<CondominioDtoOutput>(response);
         return dto!.Id;
     }
 
     private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
     {
-        var input = new CreateFuncionarioDtoInput(condominioId, "Funcionario Teste", Guid.NewGuid().ToString(), "Ativo", "12x36", "Porteiro", 2500, 400, 100);
+        var input = new CreateFuncionarioDtoInput(
+            condominioId,
+            "Funcionario Teste",
+            Guid.NewGuid().ToString(),
+            "+5511999999999",
+            StatusFuncionario.ATIVO,
+            TipoEscala.DOZE_POR_TRINTA_SEIS,
+            TipoFuncionario.CLT,
+            2500,
+            400,
+            100);
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<FuncionarioDtoOutput>() ?? throw new InvalidOperationException();
+        return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();
     }
 
     private async Task<PostoDeTrabalhoDto> CriarPostoAsync(Guid condominioId)
@@ -34,15 +45,20 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         var input = new CreatePostoInput(condominioId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
         var response = await Client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>() ?? throw new InvalidOperationException();
+        return await ReadAsAsync<PostoDeTrabalhoDto>(response) ?? throw new InvalidOperationException();
     }
 
     private async Task<AlocacaoDtoOutput> CriarAlocacaoAsync(Guid funcionarioId, Guid postoId)
     {
-        var input = new CreateAlocacaoDtoInput(funcionarioId, postoId, DateOnly.FromDateTime(DateTime.Today), "Ativo", "Regular");
+        var input = new CreateAlocacaoDtoInput(
+            funcionarioId,
+            postoId,
+            DateOnly.FromDateTime(DateTime.Today),
+            StatusAlocacao.CONFIRMADA,
+            TipoAlocacao.REGULAR);
         var response = await Client.PostAsJsonAsync("/api/alocacoes", input);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<AlocacaoDtoOutput>() ?? throw new InvalidOperationException();
+        return await ReadAsAsync<AlocacaoDtoOutput>(response) ?? throw new InvalidOperationException();
     }
 
     [Fact(DisplayName = "POST /api/alocacoes - Deve criar alocação quando dados válidos")]
@@ -52,7 +68,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         var funcionario = await CriarFuncionarioAsync(condominioId);
         var posto = await CriarPostoAsync(condominioId);
 
-        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), "Ativo", "Regular");
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
         var response = await Client.PostAsJsonAsync("/api/alocacoes", input);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -63,7 +79,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     {
         var condominioId = await CriarCondominioAsync();
         var posto = await CriarPostoAsync(condominioId);
-        var input = new CreateAlocacaoDtoInput(Guid.NewGuid(), posto.Id, DateOnly.FromDateTime(DateTime.Today), "Ativo", "Regular");
+        var input = new CreateAlocacaoDtoInput(Guid.NewGuid(), posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
 
         var response = await Client.PostAsJsonAsync("/api/alocacoes", input);
 
@@ -75,7 +91,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     {
         var condominioId = await CriarCondominioAsync();
         var funcionario = await CriarFuncionarioAsync(condominioId);
-        var input = new CreateAlocacaoDtoInput(funcionario.Id, Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), "Ativo", "Regular");
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
 
         var response = await Client.PostAsJsonAsync("/api/alocacoes", input);
 
@@ -124,7 +140,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         var posto = await CriarPostoAsync(condominioId);
         var alocacao = await CriarAlocacaoAsync(funcionario.Id, posto.Id);
 
-        var input = new UpdateAlocacaoDtoInput("Inativo", "Reserva");
+        var input = new UpdateAlocacaoDtoInput(StatusAlocacao.CANCELADA, TipoAlocacao.SUBSTITUICAO);
         var response = await Client.PutAsJsonAsync($"/api/alocacoes/{alocacao.Id}", input);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -133,7 +149,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "PUT /api/alocacoes/{id} - Deve retornar 404 quando alocação não existe")]
     public async Task Put_DeveRetornar404()
     {
-        var input = new UpdateAlocacaoDtoInput("Inativo", "Reserva");
+        var input = new UpdateAlocacaoDtoInput(StatusAlocacao.CANCELADA, TipoAlocacao.SUBSTITUICAO);
 
         var response = await Client.PutAsJsonAsync($"/api/alocacoes/{Guid.NewGuid()}", input);
 

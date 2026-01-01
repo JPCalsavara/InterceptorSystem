@@ -3,12 +3,11 @@
     "funcionarioId": "00000000-0000-0000-0000-000000000000",
     "postoDeTrabalhoId": "00000000-0000-0000-0000-000000000000",
     "data": "2025-01-01",
-    "statusAlocacao": "ATIVO",
+    "statusAlocacao": "CONFIRMADA",
     "tipoAlocacao": "REGULAR"
   },
   "update": {
-    "statusAlocacao": "INATIVO",
-    "tipoAlocacao": "RESERVA"
+    "statusAlocacao": "CANCELADA",
+    "tipoAlocacao": "SUBSTITUICAO"
   }
 }
-

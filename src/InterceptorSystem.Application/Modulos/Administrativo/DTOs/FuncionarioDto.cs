@@ -1,21 +1,25 @@
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+
 namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
 public record CreateFuncionarioDtoInput(
     Guid CondominioId,
     string Nome,
     string Cpf,
-    string StatusFuncionario,
-    string TipoEscala,
-    string TipoFuncionario,
+    string Celular,
+    StatusFuncionario StatusFuncionario,
+    TipoEscala TipoEscala,
+    TipoFuncionario TipoFuncionario,
     decimal SalarioMensal,
     decimal ValorTotalBeneficiosMensal,
     decimal ValorDiariasFixas);
 
 public record UpdateFuncionarioDtoInput(
     string Nome,
-    string StatusFuncionario,
-    string TipoEscala,
-    string TipoFuncionario,
+    string Celular,
+    StatusFuncionario StatusFuncionario,
+    TipoEscala TipoEscala,
+    TipoFuncionario TipoFuncionario,
     decimal SalarioMensal,
     decimal ValorTotalBeneficiosMensal,
     decimal ValorDiariasFixas);
@@ -25,9 +29,10 @@ public record FuncionarioDtoOutput(
     Guid CondominioId,
     string Nome,
     string Cpf,
-    string StatusFuncionario,
-    string TipoEscala,
-    string TipoFuncionario,
+    string Celular,
+    StatusFuncionario StatusFuncionario,
+    TipoEscala TipoEscala,
+    TipoFuncionario TipoFuncionario,
     decimal SalarioMensal,
     decimal ValorTotalBeneficiosMensal,
     decimal ValorDiariasFixas,
@@ -41,6 +46,7 @@ public record FuncionarioDtoOutput(
             entity.CondominioId,
             entity.Nome,
             entity.Cpf,
+            entity.Celular,
             entity.StatusFuncionario,
             entity.TipoEscala,
             entity.TipoFuncionario,
@@ -50,4 +56,3 @@ public record FuncionarioDtoOutput(
             true);
     }
 }
-

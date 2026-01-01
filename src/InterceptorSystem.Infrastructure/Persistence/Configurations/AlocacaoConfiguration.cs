@@ -1,4 +1,5 @@
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,8 +13,20 @@ public class AlocacaoConfiguration : IEntityTypeConfiguration<Alocacao>
         builder.HasKey(a => a.Id);
 
         builder.Property(a => a.Data).IsRequired();
-        builder.Property(a => a.StatusAlocacao).IsRequired().HasMaxLength(50);
-        builder.Property(a => a.TipoAlocacao).IsRequired().HasMaxLength(50);
+
+        builder.Property(a => a.StatusAlocacao)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<StatusAlocacao>(v))
+            .HasMaxLength(50);
+
+        builder.Property(a => a.TipoAlocacao)
+            .IsRequired()
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<TipoAlocacao>(v))
+            .HasMaxLength(50);
 
         builder.Property(a => a.EmpresaId).IsRequired();
         builder.Property(a => a.FuncionarioId).IsRequired();
@@ -34,4 +47,3 @@ public class AlocacaoConfiguration : IEntityTypeConfiguration<Alocacao>
         builder.HasIndex(a => new { a.PostoDeTrabalhoId, a.Data });
     }
 }
-

@@ -8,6 +8,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using Moq;
 
 namespace InterceptorSystem.Tests.Unity;
@@ -31,16 +32,17 @@ public class AlocacaoAppServiceTests
         funcionarioId,
         postoId,
         DateOnly.FromDateTime(DateTime.Today),
-        "Ativo",
-        "Regular");
+        StatusAlocacao.CONFIRMADA,
+        TipoAlocacao.REGULAR);
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
     public async Task CreateAsync_DeveCriarAlocacao()
     {
         var empresaId = Guid.NewGuid();
-        var funcionario = new Funcionario(empresaId, Guid.NewGuid(), "João", "123", "Ativo", "12x36", "Porteiro", 2000, 300, 100);
-        var posto = new PostoDeTrabalho(Guid.NewGuid(), empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
-        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), "Ativo", "Regular");
+        var condominioId = Guid.NewGuid();
+        var funcionario = new Funcionario(empresaId, condominioId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
@@ -70,7 +72,7 @@ public class AlocacaoAppServiceTests
     public async Task CreateAsync_DeveFalhar_QuandoPostoNaoExiste()
     {
         var empresaId = Guid.NewGuid();
-        var funcionario = new Funcionario(empresaId, Guid.NewGuid(), "João", "123", "Ativo", "12x36", "Porteiro", 2000, 300, 100);
+        var funcionario = new Funcionario(empresaId, Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
         var postoId = Guid.NewGuid();
         var input = CriarInputValido(funcionario.Id, postoId);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
@@ -84,7 +86,7 @@ public class AlocacaoAppServiceTests
     public async Task UpdateAsync_DeveFalhar_QuandoAlocacaoNaoExiste()
     {
         var id = Guid.NewGuid();
-        var input = new UpdateAlocacaoDtoInput("Inativo", "Reserva");
+        var input = new UpdateAlocacaoDtoInput(StatusAlocacao.CANCELADA, TipoAlocacao.SUBSTITUICAO);
         _alocacaoRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Alocacao?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, input));
@@ -105,8 +107,8 @@ public class AlocacaoAppServiceTests
         var empresaId = Guid.NewGuid();
         var lista = new List<Alocacao>
         {
-            new Alocacao(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), "Ativo", "Regular"),
-            new Alocacao(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), "Pendente", "Reserva")
+            new Alocacao(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR),
+            new Alocacao(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CANCELADA, TipoAlocacao.SUBSTITUICAO)
         };
         _alocacaoRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
 
