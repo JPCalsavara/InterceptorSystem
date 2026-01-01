@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InterceptorSystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c3f427a83570f251a32faf094101cf0854f3294")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0d01b8ada7e233cfcf7390d7d48e18a59a2c3887")]
 [assembly: System.Reflection.AssemblyProductAttribute("InterceptorSystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InterceptorSystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
