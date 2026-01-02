@@ -35,6 +35,15 @@ public class AlocacaoAppServiceTests
         StatusAlocacao.CONFIRMADA,
         TipoAlocacao.REGULAR);
 
+    private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId) =>
+        new(empresaId, condominioId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+
+    private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) =>
+        new(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
+
+    private static Alocacao CriarAlocacao(Guid empresaId, Guid funcionarioId, Guid postoId, DateOnly data, TipoAlocacao tipo) =>
+        new(empresaId, funcionarioId, postoId, data, StatusAlocacao.CONFIRMADA, tipo);
+
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
     public async Task CreateAsync_DeveCriarAlocacao()
     {
@@ -82,6 +91,74 @@ public class AlocacaoAppServiceTests
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
     }
 
+    [Fact(DisplayName = "CreateAsync - Falha quando tenant não está definido")]
+    public async Task CreateAsync_DeveFalhar_QuandoTenantNaoDefinido()
+    {
+        var funcionarioId = Guid.NewGuid();
+        var postoId = Guid.NewGuid();
+        var input = CriarInputValido(funcionarioId, postoId);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        _alocacaoRepo.Verify(r => r.Add(It.IsAny<Alocacao>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Falha quando funcionário e posto são de condomínios diferentes")]
+    public async Task CreateAsync_DeveFalhar_QuandoCondominiosDiferentes()
+    {
+        var empresaId = Guid.NewGuid();
+        var funcionario = CriarFuncionario(empresaId, Guid.NewGuid());
+        var posto = CriarPosto(Guid.NewGuid(), empresaId);
+        var input = CriarInputValido(funcionario.Id, posto.Id);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        _alocacaoRepo.Verify(r => r.Add(It.IsAny<Alocacao>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Falha quando há alocação consecutiva sem dobra programada")]
+    public async Task CreateAsync_DeveFalhar_QuandoConsecutivaSemDobra()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var funcionario = CriarFuncionario(empresaId, condominioId);
+        var posto = CriarPosto(condominioId, empresaId);
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
+        var alocacaoAnterior = CriarAlocacao(empresaId, funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today.AddDays(-1)), TipoAlocacao.REGULAR);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(new[] { alocacaoAnterior });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        _alocacaoRepo.Verify(r => r.Add(It.IsAny<Alocacao>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Permite consecutiva quando tipo é Dobra Programada")]
+    public async Task CreateAsync_DevePermitirConsecutivaQuandoDobra()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var funcionario = CriarFuncionario(empresaId, condominioId);
+        var posto = CriarPosto(condominioId, empresaId);
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.DOBRA_PROGRAMADA);
+        var alocacaoAnterior = CriarAlocacao(empresaId, funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today.AddDays(-1)), TipoAlocacao.REGULAR);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(new[] { alocacaoAnterior });
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        var result = await _service.CreateAsync(input);
+
+        Assert.Equal(TipoAlocacao.DOBRA_PROGRAMADA, result.TipoAlocacao);
+        _alocacaoRepo.Verify(r => r.Add(It.IsAny<Alocacao>()), Times.Once);
+    }
+
     [Fact(DisplayName = "UpdateAsync - Falha quando alocação não existe")]
     public async Task UpdateAsync_DeveFalhar_QuandoAlocacaoNaoExiste()
     {
@@ -115,5 +192,40 @@ public class AlocacaoAppServiceTests
         var result = await _service.GetAllAsync();
 
         Assert.Equal(2, result.Count());
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Sucesso quando dados válidos")]
+    public async Task UpdateAsync_DeveAtualizarAlocacao()
+    {
+        var id = Guid.NewGuid();
+        var funcionarioId = Guid.NewGuid();
+        var postoId = Guid.NewGuid();
+        var input = new UpdateAlocacaoDtoInput(StatusAlocacao.CANCELADA, TipoAlocacao.SUBSTITUICAO);
+        var alocacaoExistente = new Alocacao(Guid.NewGuid(), funcionarioId, postoId, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
+
+        _alocacaoRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(alocacaoExistente);
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        var result = await _service.UpdateAsync(id, input);
+
+        Assert.Equal(input.StatusAlocacao, result.StatusAlocacao);
+        Assert.Equal(input.TipoAlocacao, result.TipoAlocacao);
+        _alocacaoRepo.Verify(r => r.Update(It.IsAny<Alocacao>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Falha quando regra de consecutividade violada")]
+    public async Task UpdateAsync_DeveFalhar_QuandoConsecutivaSemDobra()
+    {
+        var empresaId = Guid.NewGuid();
+        var funcionarioId = Guid.NewGuid();
+        var postoId = Guid.NewGuid();
+        var alocacao = CriarAlocacao(empresaId, funcionarioId, postoId, DateOnly.FromDateTime(DateTime.Today), TipoAlocacao.REGULAR);
+        var input = new UpdateAlocacaoDtoInput(StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
+        var adjacente = CriarAlocacao(empresaId, funcionarioId, postoId, DateOnly.FromDateTime(DateTime.Today.AddDays(1)), TipoAlocacao.REGULAR);
+
+        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacao.Id)).ReturnsAsync(alocacao);
+        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionarioId)).ReturnsAsync(new[] { adjacente });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(alocacao.Id, input));
     }
 }

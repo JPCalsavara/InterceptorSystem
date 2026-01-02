@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<IPostoDeTrabalhoAppService, PostoDeTrabalhoAppService>();
         services.AddScoped<IFuncionarioAppService, FuncionarioAppService>();
         services.AddScoped<IAlocacaoAppService, AlocacaoAppService>();
+        services.AddScoped<IContratoAppService, ContratoAppService>();
         
         // Aqui também entra: AutoMapper, MediatR, FluentValidation se formos usar
         

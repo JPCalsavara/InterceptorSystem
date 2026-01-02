@@ -13,6 +13,7 @@ public class Condominio : Entity, IAggregateRoot
 
     public ICollection<PostoDeTrabalho> PostosDeTrabalho { get; private set; } = new List<PostoDeTrabalho>();
     public ICollection<Funcionario> Funcionarios { get; private set; } = new List<Funcionario>();
+    public ICollection<Contrato> Contratos { get; private set; } = new List<Contrato>();
 
     // Construtor vazio para o EF Core
     protected Condominio() { }

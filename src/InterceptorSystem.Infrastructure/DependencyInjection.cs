@@ -22,6 +22,8 @@ public static class DependencyInjection
         services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
         services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
         services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
+        services.AddScoped<IContratoRepository, ContratoRepository>();
+        
 
         // Dica: Podemos usar reflection aqui no futuro para registrar todos os repositórios de uma vez
 

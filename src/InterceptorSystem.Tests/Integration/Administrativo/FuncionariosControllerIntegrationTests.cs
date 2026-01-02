@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
-namespace InterceptorSystem.Tests.Integration;
+namespace InterceptorSystem.Tests.Integration.Administrativo;
 
 public class FuncionariosControllerIntegrationTests : IntegrationTestBase
 {
