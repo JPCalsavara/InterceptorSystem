@@ -105,6 +105,52 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.ToTable("Condominios", (string)null);
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CondominioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("DataFim")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DataInicio")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("ValorDiariaCobrada")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("ValorTotal")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("CondominioId", "Status");
+
+                    b.ToTable("Contratos", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -220,6 +266,17 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Navigation("PostoDeTrabalho");
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", "Condominio")
+                        .WithMany("Contratos")
+                        .HasForeignKey("CondominioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Condominio");
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
                 {
                     b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", "Condominio")
@@ -244,6 +301,8 @@ namespace InterceptorSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", b =>
                 {
+                    b.Navigation("Contratos");
+
                     b.Navigation("Funcionarios");
 
                     b.Navigation("PostosDeTrabalho");

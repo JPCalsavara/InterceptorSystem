@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InterceptorSystem.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e1a43ea94d6a226e56a91082bf8ecc2cf937a55")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea68de8d2089dda2c3283e05ed00f53e93103870")]
 [assembly: System.Reflection.AssemblyProductAttribute("InterceptorSystem.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InterceptorSystem.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

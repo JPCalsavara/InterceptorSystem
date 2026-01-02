@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     public DbSet<PostoDeTrabalho> PostosDeTrabalho { get; set; }
     public DbSet<Funcionario> Funcionarios { get; set; }
     public DbSet<Alocacao> Alocacoes { get; set; }
+    public DbSet<Contrato> Contratos => Set<Contrato>();
 
     // --- Configuração do Modelo (Filtros de Leitura) ---
     protected override void OnModelCreating(ModelBuilder builder)

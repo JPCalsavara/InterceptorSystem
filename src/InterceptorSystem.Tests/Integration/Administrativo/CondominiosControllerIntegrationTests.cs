@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace InterceptorSystem.Tests.Integration;
+namespace InterceptorSystem.Tests.Integration.Administrativo;
 
 /// <summary>
 /// Testes de Integração do CondominiosController

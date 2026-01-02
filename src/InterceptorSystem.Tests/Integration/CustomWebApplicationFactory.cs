@@ -50,6 +50,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
             services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
             services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
+            services.AddScoped<IContratoRepository, ContratoRepository>();
 
             // Garante que o banco de dados seja criado
             var sp = services.BuildServiceProvider();

@@ -35,6 +35,11 @@ public class FuncionarioAppServiceTests
         300,
         100);
 
+    private static Condominio CriarCondominio(Guid empresaId) => new(empresaId, "Cond", "123", "Rua");
+
+    private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId) =>
+        new(empresaId, condominioId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+
     public FuncionarioAppServiceTests()
     {
         _funcionarioRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
@@ -82,6 +87,29 @@ public class FuncionarioAppServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
     }
 
+    [Fact(DisplayName = "CreateAsync - Falha quando Empresa (tenant) não está no contexto")]
+    public async Task CreateAsync_DeveFalhar_QuandoTenantNaoDefinido()
+    {
+        var input = CriarInputValido(Guid.NewGuid());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Falha quando valores financeiros inválidos")]
+    public async Task CreateAsync_DeveFalhar_QuandoSalarioNegativo()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var input = new CreateFuncionarioDtoInput(condominioId, "João", CpfValido, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, -10, -1, -5);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(CriarCondominio(empresaId));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);
+    }
+
     [Fact(DisplayName = "UpdateAsync - Falha quando funcionário não existe")]
     public async Task UpdateAsync_DeveFalhar_QuandoFuncionarioNaoExiste()
     {
@@ -92,6 +120,21 @@ public class FuncionarioAppServiceTests
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, input));
     }
 
+    [Fact(DisplayName = "UpdateAsync - Sucesso quando dados válidos")]
+    public async Task UpdateAsync_DeveAtualizarFuncionario()
+    {
+        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid());
+        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 2100, 320, 110);
+
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        var result = await _service.UpdateAsync(funcionario.Id, input);
+
+        Assert.Equal(input.Nome, result.Nome);
+        Assert.Equal(input.StatusFuncionario, result.StatusFuncionario);
+    }
+
     [Fact(DisplayName = "DeleteAsync - Falha quando funcionário inexistente")]
     public async Task DeleteAsync_DeveFalhar_QuandoFuncionarioNaoExiste()
     {
@@ -99,6 +142,18 @@ public class FuncionarioAppServiceTests
         _funcionarioRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Funcionario?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(id));
+    }
+
+    [Fact(DisplayName = "DeleteAsync - Sucesso quando funcionário existe")]
+    public async Task DeleteAsync_DeveExcluirFuncionarioQuandoExiste()
+    {
+        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid());
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        await _service.DeleteAsync(funcionario.Id);
+
+        _funcionarioRepo.Verify(r => r.Remove(funcionario), Times.Once);
     }
 
     [Fact(DisplayName = "GetAllAsync - Deve retornar lista")]
@@ -115,5 +170,27 @@ public class FuncionarioAppServiceTests
         var result = await _service.GetAllAsync();
 
         Assert.Equal(2, result.Count());
+    }
+
+    [Fact(DisplayName = "GetByIdAsync - Retorna funcionário quando existe")]
+    public async Task GetByIdAsync_DeveRetornarFuncionario()
+    {
+        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid());
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+
+        var result = await _service.GetByIdAsync(funcionario.Id);
+
+        Assert.NotNull(result);
+        Assert.Equal(funcionario.Id, result!.Id);
+    }
+
+    [Fact(DisplayName = "GetByIdAsync - Retorna nulo quando funcionário não existe")]
+    public async Task GetByIdAsync_DeveRetornarNulo_QuandoNaoExiste()
+    {
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Funcionario?)null);
+
+        var result = await _service.GetByIdAsync(Guid.NewGuid());
+
+        Assert.Null(result);
     }
 }
