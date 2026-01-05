@@ -29,14 +29,14 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
             .IsRequired()
             .HasConversion(
                 v => v.ToString(),
-                v => Enum.Parse<TipoEscala>(v))
+                v => Enum.Parse<TipoEscala>(NormalizeTipoEscala(v)))
             .HasMaxLength(50);
 
         builder.Property(f => f.TipoFuncionario)
             .IsRequired()
             .HasConversion(
                 v => v.ToString(),
-                v => Enum.Parse<TipoFuncionario>(v))
+                v => Enum.Parse<TipoFuncionario>(NormalizeTipoFuncionario(v)))
             .HasMaxLength(50);
 
         builder.Property(f => f.SalarioMensal).HasColumnType("decimal(10,2)");
@@ -53,5 +53,25 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
 
         builder.HasIndex(f => f.EmpresaId);
         builder.HasIndex(f => f.CondominioId);
+    }
+
+    private static string NormalizeTipoEscala(string value)
+    {
+        return value switch
+        {
+            "12x36" => nameof(TipoEscala.DOZE_POR_TRINTA_SEIS),
+            "5x2" => nameof(TipoEscala.SEMANAL_COMERCIAL),
+            _ => value
+        };
+    }
+
+    private static string NormalizeTipoFuncionario(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "PORTEIRO" => nameof(TipoFuncionario.CLT),
+            "PORTEIROS" => nameof(TipoFuncionario.CLT),
+            _ => value.ToUpperInvariant()
+        };
     }
 }

@@ -1,0 +1,145 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/condominios">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>{{ isEdit() ? '✏️ Editar Condomínio' : '➕ Novo Condomínio' }}</h1>
+      <p class="subtitle">
+        {{
+          isEdit()
+            ? 'Atualize as informações do condomínio'
+            : 'Preencha os dados para cadastrar um novo condomínio'
+        }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+  <div class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ error() }}
+  </div>
+  }
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-card">
+      <!-- Nome -->
+      <div class="form-group">
+        <label for="nome" class="form-label">
+          Nome do Condomínio <span class="required">*</span>
+        </label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          class="form-input"
+          [class.error]="hasError('nome')"
+          placeholder="Ex: Condomínio Horizonte Verde"
+        />
+        @if (hasError('nome')) {
+        <span class="error-message">{{ getErrorMessage('nome') }}</span>
+        }
+      </div>
+
+      <!-- CNPJ -->
+      <div class="form-group">
+        <label for="cnpj" class="form-label"> CNPJ <span class="required">*</span> </label>
+        <input
+          id="cnpj"
+          type="text"
+          formControlName="cnpj"
+          class="form-input"
+          [class.error]="hasError('cnpj')"
+          placeholder="Ex: 12.345.678/0001-90"
+        />
+        @if (hasError('cnpj')) {
+        <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
+        }
+        <span class="help-text">Formato: 00.000.000/0000-00</span>
+      </div>
+
+      <!-- Endereço -->
+      <div class="form-group">
+        <label for="endereco" class="form-label"> Endereço <span class="required">*</span> </label>
+        <textarea
+          id="endereco"
+          formControlName="endereco"
+          class="form-input"
+          [class.error]="hasError('endereco')"
+          rows="3"
+          placeholder="Ex: Rua das Flores, 123 - Centro - São Paulo/SP"
+        ></textarea>
+        @if (hasError('endereco')) {
+        <span class="error-message">{{ getErrorMessage('endereco') }}</span>
+        }
+      </div>
+
+      <!-- Telefone -->
+      <div class="form-group">
+        <label for="telefone" class="form-label"> Telefone </label>
+        <input
+          id="telefone"
+          type="text"
+          formControlName="telefone"
+          class="form-input"
+          [class.error]="hasError('telefone')"
+          placeholder="Ex: (11) 99999-9999"
+        />
+        @if (hasError('telefone')) {
+        <span class="error-message">{{ getErrorMessage('telefone') }}</span>
+        }
+        <span class="help-text">Formato: (00) 00000-0000</span>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label"> Email </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-input"
+          [class.error]="hasError('email')"
+          placeholder="Ex: contato@condominio.com"
+        />
+        @if (hasError('email')) {
+        <span class="error-message">{{ getErrorMessage('email') }}</span>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
+        <div class="button-group">
+          <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            @if (loading()) {
+            <span class="spinner-small"></span>
+            Salvando... } @else {
+            {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

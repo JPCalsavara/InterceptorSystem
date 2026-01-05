@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InterceptorSystem.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea68de8d2089dda2c3283e05ed00f53e93103870")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e459f80282b8d1b0759ea00c14ce82165a1d652c")]
 [assembly: System.Reflection.AssemblyProductAttribute("InterceptorSystem.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InterceptorSystem.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

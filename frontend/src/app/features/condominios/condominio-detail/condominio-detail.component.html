@@ -1,0 +1,240 @@
+<div class="page-container">
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando dashboard...</p>
+  </div>
+  } @if (error()) {
+  <div class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ error() }}
+  </div>
+  } @if (!loading() && condominio()) {
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/condominios">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>🏢 {{ condominio()?.nome }}</h1>
+      <p class="subtitle">{{ condominio()?.endereco }}</p>
+    </div>
+    <button class="btn-primary" [routerLink]="['/condominios', condominio()?.id, 'editar']">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+        />
+      </svg>
+      Editar Condomínio
+    </button>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="info-section">
+    <div class="info-card">
+      <div class="info-icon info-icon-primary">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+      </div>
+      <div class="info-content">
+        <p class="info-label">Custo Total Contratos</p>
+        <h3 class="info-value">{{ custoTotal() | currency : 'BRL' }}</h3>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon info-icon-success">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+          />
+        </svg>
+      </div>
+      <div class="info-content">
+        <p class="info-label">Custo Estimado Mensal</p>
+        <h3 class="info-value">{{ custoEstimadoMensal() | currency : 'BRL' }}</h3>
+        <p class="info-description">Salários + Benefícios</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon info-icon-warning">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </div>
+      <div class="info-content">
+        <p class="info-label">Valor Diária Média</p>
+        <h3 class="info-value">{{ valorDiariaMedia() | currency : 'BRL' }}</h3>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon info-icon-info">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+      </div>
+      <div class="info-content">
+        <p class="info-label">Total de Funcionários</p>
+        <h3 class="info-value">{{ totalFuncionarios() }}</h3>
+        <p class="info-description">Ativos</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon info-icon-error">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+      <div class="info-content">
+        <p class="info-label">Total de Faltas</p>
+        <h3 class="info-value">{{ totalFaltas() }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Postos de Trabalho -->
+  <div class="section">
+    <h2 class="section-title">📍 Postos de Trabalho</h2>
+    @if (postos().length === 0) {
+    <div class="empty-state-small">
+      <p>Nenhum posto de trabalho cadastrado</p>
+    </div>
+    } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Horário</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (posto of postos(); track posto.id) {
+          <tr>
+            <td>{{ posto.horario }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+
+  <!-- Alocações com Problema -->
+  <div class="section">
+    <h2 class="section-title">⚠️ Alocações com Problema</h2>
+    @if (alocacoesComProblema().length === 0) {
+    <div class="empty-state-small success">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <p>Nenhuma alocação com problema! 🎉</p>
+    </div>
+    } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Funcionário</th>
+            <th>Posto</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (alocacao of alocacoesComProblema(); track alocacao.id) {
+          <tr>
+            <td>{{ alocacao.data }}</td>
+            <td>{{ getFuncionarioNome(alocacao.funcionarioId) }}</td>
+            <td>{{ getPostoHorario(alocacao.postoDeTrabalhoId) }}</td>
+            <td>
+              <span class="badge badge-error">
+                {{ getStatusLabel(alocacao.statusAlocacao) }}
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+
+  <!-- Funcionários -->
+  <div class="section">
+    <h2 class="section-title">👥 Funcionários Ativos</h2>
+    @if (funcionarios().length === 0) {
+    <div class="empty-state-small">
+      <p>Nenhum funcionário cadastrado</p>
+    </div>
+    } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Celular</th>
+            <th>Salário</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (func of funcionarios(); track func.id) { @if (func.statusFuncionario === 0) {
+          <tr>
+            <td>{{ func.nome }}</td>
+            <td>{{ func.cpf }}</td>
+            <td>{{ func.celular }}</td>
+            <td>{{ func.salarioMensal | currency : 'BRL' }}</td>
+          </tr>
+          } }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+  }
+</div>

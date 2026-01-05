@@ -1,0 +1,45 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>InterceptorSystem</h1>
+    <p class="subtitle">Sistema de Gestão de Segurança Patrimonial</p>
+  </header>
+
+  <div class="cards-grid">
+    @for (card of cards; track card.route) {
+    <div class="card" [style.border-left-color]="card.color">
+      <div class="card-header">
+        <span class="card-icon">{{ card.icon }}</span>
+        <h2 class="card-title">{{ card.title }}</h2>
+      </div>
+
+      <p class="card-description">{{ card.description }}</p>
+
+      @if (card.stats) {
+      <div class="card-stats">
+        <span class="stats-label">{{ card.stats.label }}:</span>
+        <span class="stats-value">{{ card.stats.value }}</span>
+      </div>
+      }
+
+      <a [routerLink]="card.route" class="card-button" [style.background-color]="card.color">
+        Acessar →
+      </a>
+    </div>
+    }
+  </div>
+
+  <div class="info-section">
+    <div class="info-card">
+      <h3>🎯 Multi-Tenant</h3>
+      <p>Sistema isolado por empresa com filtros automáticos</p>
+    </div>
+    <div class="info-card">
+      <h3>✅ Clean Architecture</h3>
+      <p>Backend .NET 8 + Frontend Angular 19</p>
+    </div>
+    <div class="info-card">
+      <h3>🧪 Alta Cobertura</h3>
+      <p>124+ testes unitários e de integração</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,244 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/funcionarios">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>{{ isEdit() ? '✏️ Editar Funcionário' : '➕ Novo Funcionário' }}</h1>
+      <p class="subtitle">
+        {{
+          isEdit()
+            ? 'Atualize as informações do funcionário'
+            : 'Preencha os dados para cadastrar um novo funcionário'
+        }}
+      </p>
+    </div>
+  </div>
+
+  @if (error()) {
+  <div class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ error() }}
+  </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-card">
+      <h3 class="section-title">Dados Pessoais</h3>
+
+      <div class="form-group">
+        <label for="condominioId" class="form-label">
+          Condomínio <span class="required">*</span>
+        </label>
+        <select
+          id="condominioId"
+          formControlName="condominioId"
+          class="form-input"
+          [class.error]="hasError('condominioId')"
+          [disabled]="isEdit()"
+        >
+          <option value="">Selecione um condomínio</option>
+          @for (cond of condominios(); track cond.id) {
+          <option [value]="cond.id">{{ cond.nome }}</option>
+          }
+        </select>
+        @if (hasError('condominioId')) {
+        <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="nome" class="form-label"> Nome Completo <span class="required">*</span> </label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          class="form-input"
+          [class.error]="hasError('nome')"
+          placeholder="Ex: João Silva Santos"
+        />
+        @if (hasError('nome')) {
+        <span class="error-message">{{ getErrorMessage('nome') }}</span>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cpf" class="form-label"> CPF <span class="required">*</span> </label>
+          <input
+            id="cpf"
+            type="text"
+            formControlName="cpf"
+            class="form-input"
+            [class.error]="hasError('cpf')"
+            placeholder="12345678901 (somente números)"
+            maxlength="11"
+          />
+          @if (hasError('cpf')) {
+          <span class="error-message">{{ getErrorMessage('cpf') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="celular" class="form-label"> Celular <span class="required">*</span> </label>
+          <input
+            id="celular"
+            type="text"
+            formControlName="celular"
+            class="form-input"
+            [class.error]="hasError('celular')"
+            placeholder="11987654321 (somente números)"
+            maxlength="11"
+          />
+          @if (hasError('celular')) {
+          <span class="error-message">{{ getErrorMessage('celular') }}</span>
+          }
+        </div>
+      </div>
+
+      <h3 class="section-title">Informações Profissionais</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipoFuncionario" class="form-label">
+            Tipo de Contrato <span class="required">*</span>
+          </label>
+          <select
+            id="tipoFuncionario"
+            formControlName="tipoFuncionario"
+            class="form-input"
+            [class.error]="hasError('tipoFuncionario')"
+          >
+            @for (opt of tipoOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          @if (hasError('tipoFuncionario')) {
+          <span class="error-message">{{ getErrorMessage('tipoFuncionario') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="tipoEscala" class="form-label">
+            Escala de Trabalho <span class="required">*</span>
+          </label>
+          <select
+            id="tipoEscala"
+            formControlName="tipoEscala"
+            class="form-input"
+            [class.error]="hasError('tipoEscala')"
+          >
+            @for (opt of escalaOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          @if (hasError('tipoEscala')) {
+          <span class="error-message">{{ getErrorMessage('tipoEscala') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="salarioMensal" class="form-label">
+            Salário Mensal <span class="required">*</span>
+          </label>
+          <input
+            id="salarioMensal"
+            type="number"
+            formControlName="salarioMensal"
+            class="form-input"
+            [class.error]="hasError('salarioMensal')"
+            placeholder="0.00"
+            step="0.01"
+          />
+          @if (hasError('salarioMensal')) {
+          <span class="error-message">{{ getErrorMessage('salarioMensal') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="valorTotalBeneficiosMensal" class="form-label"> Benefícios Mensais </label>
+          <input
+            id="valorTotalBeneficiosMensal"
+            type="number"
+            formControlName="valorTotalBeneficiosMensal"
+            class="form-input"
+            [class.error]="hasError('valorTotalBeneficiosMensal')"
+            placeholder="0.00"
+            step="0.01"
+          />
+          @if (hasError('valorTotalBeneficiosMensal')) {
+          <span class="error-message">{{ getErrorMessage('valorTotalBeneficiosMensal') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="valorDiariasFixas" class="form-label"> Valor Diárias Fixas </label>
+          <input
+            id="valorDiariasFixas"
+            type="number"
+            formControlName="valorDiariasFixas"
+            class="form-input"
+            [class.error]="hasError('valorDiariasFixas')"
+            placeholder="0.00"
+            step="0.01"
+          />
+          @if (hasError('valorDiariasFixas')) {
+          <span class="error-message">{{ getErrorMessage('valorDiariasFixas') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="statusFuncionario" class="form-label">
+            Status <span class="required">*</span>
+          </label>
+          <select
+            id="statusFuncionario"
+            formControlName="statusFuncionario"
+            class="form-input"
+            [class.error]="hasError('statusFuncionario')"
+          >
+            @for (opt of statusOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          @if (hasError('statusFuncionario')) {
+          <span class="error-message">{{ getErrorMessage('statusFuncionario') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
+        <div class="button-group">
+          <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            @if (loading()) {
+            <span class="spinner-small"></span>
+            Salvando... } @else {
+            {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
