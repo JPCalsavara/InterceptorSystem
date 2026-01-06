@@ -30,6 +30,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             "Contrato Teste",
             10000,
             500,
+            0.2m,
+            800,
+            0.18m,
+            10,
+            0.15m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
             StatusContrato.PENDENTE);
@@ -48,6 +54,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             "Contrato Segurança",
             20000,
             800,
+            0.2m,
+            1200,
+            0.2m,
+            20,
+            0.2m,
+            0.08m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
             StatusContrato.PENDENTE);
@@ -69,6 +81,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             "Contrato Atualizado",
             25000,
             900,
+            0.25m,
+            1300,
+            0.22m,
+            22,
+            0.25m,
+            0.1m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(10)),
             StatusContrato.PAGO);
@@ -121,4 +139,3 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
         Assert.Equal(contrato.Id, result!.Id);
     }
 }
-

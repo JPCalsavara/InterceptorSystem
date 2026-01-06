@@ -66,13 +66,12 @@ public class CondominioAppService : ICondominioAppService
     public async Task<CondominioDtoOutput?> GetByIdAsync(Guid id)
     {
         var condominio = await _repository.GetByIdAsync(id);
-        return condominio == null ? null : CondominioDtoOutput.FromEntity(condominio);
+        return CondominioDtoOutput.FromEntity(condominio);
     }
 
     public async Task<IEnumerable<CondominioDtoOutput>> GetAllAsync()
     {
         var lista = await _repository.GetAllAsync();
-        return lista.Select(CondominioDtoOutput.FromEntity);    
+        return lista.Select(c => CondominioDtoOutput.FromEntity(c)!);    
     }
 }
-

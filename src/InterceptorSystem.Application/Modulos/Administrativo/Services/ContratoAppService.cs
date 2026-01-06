@@ -33,8 +33,14 @@ public class ContratoAppService : IContratoAppService
             empresaId,
             input.CondominioId,
             input.Descricao,
-            input.ValorTotal,
+            input.ValorTotalMensal,
             input.ValorDiariaCobrada,
+            input.PercentualAdicionalNoturno,
+            input.ValorBeneficiosExtrasMensal,
+            input.PercentualImpostos,
+            input.QuantidadeFuncionarios,
+            input.MargemLucroPercentual,
+            input.MargemCoberturaFaltasPercentual,
             input.DataInicio,
             input.DataFim,
             input.Status);
@@ -52,8 +58,14 @@ public class ContratoAppService : IContratoAppService
 
         contrato.AtualizarDados(
             input.Descricao,
-            input.ValorTotal,
+            input.ValorTotalMensal,
             input.ValorDiariaCobrada,
+            input.PercentualAdicionalNoturno,
+            input.ValorBeneficiosExtrasMensal,
+            input.PercentualImpostos,
+            input.QuantidadeFuncionarios,
+            input.MargemLucroPercentual,
+            input.MargemCoberturaFaltasPercentual,
             input.DataInicio,
             input.DataFim);
 
@@ -86,4 +98,3 @@ public class ContratoAppService : IContratoAppService
         return contratos.Select(ContratoDtoOutput.FromEntity)!;
     }
 }
-

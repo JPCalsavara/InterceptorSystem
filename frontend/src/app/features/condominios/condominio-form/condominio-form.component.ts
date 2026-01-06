@@ -43,8 +43,6 @@ export class CondominioFormComponent implements OnInit {
         [Validators.required, Validators.pattern(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/)],
       ],
       endereco: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(300)]],
-      telefone: ['', [Validators.pattern(/^\(?\d{2}\)?\s?9?\d{4}-?\d{4}$/)]],
-      email: ['', [Validators.email]],
     });
   }
 
@@ -57,8 +55,6 @@ export class CondominioFormComponent implements OnInit {
           nome: data.nome,
           cnpj: data.cnpj,
           endereco: data.endereco,
-          telefone: data.telefone || '',
-          email: data.email || '',
         });
         this.loading.set(false);
       },

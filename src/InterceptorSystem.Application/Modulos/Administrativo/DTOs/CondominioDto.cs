@@ -8,10 +8,13 @@ public record CondominioDtoOutput(Guid Id, string Nome, string Cnpj, string Ende
 {
     // SIMULAÇÃO AUTOMAPPER (Manual Mapping)
     // Método estático factory para converter Entidade -> DTO
-    public static CondominioDtoOutput FromEntity(Domain.Modulos.Administrativo.Entidades.Condominio entity)
+    public static CondominioDtoOutput? FromEntity(Domain.Modulos.Administrativo.Entidades.Condominio? entity)
     {
-        if (entity == null) return null;
+        if (entity == null)
+        {
+            return null;
+        }
+
         return new CondominioDtoOutput(entity.Id, entity.Nome, entity.Cnpj, entity.Endereco, entity.Ativo);
     }
 }
-

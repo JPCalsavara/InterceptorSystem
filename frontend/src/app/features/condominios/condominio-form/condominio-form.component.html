@@ -91,39 +91,6 @@
         }
       </div>
 
-      <!-- Telefone -->
-      <div class="form-group">
-        <label for="telefone" class="form-label"> Telefone </label>
-        <input
-          id="telefone"
-          type="text"
-          formControlName="telefone"
-          class="form-input"
-          [class.error]="hasError('telefone')"
-          placeholder="Ex: (11) 99999-9999"
-        />
-        @if (hasError('telefone')) {
-        <span class="error-message">{{ getErrorMessage('telefone') }}</span>
-        }
-        <span class="help-text">Formato: (00) 00000-0000</span>
-      </div>
-
-      <!-- Email -->
-      <div class="form-group">
-        <label for="email" class="form-label"> Email </label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="form-input"
-          [class.error]="hasError('email')"
-          placeholder="Ex: contato@condominio.com"
-        />
-        @if (hasError('email')) {
-        <span class="error-message">{{ getErrorMessage('email') }}</span>
-        }
-      </div>
-
       <!-- Footer -->
       <div class="form-footer">
         <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>

@@ -76,28 +76,12 @@
         }
       </div>
 
+      <h3 class="section-title">💰 Valores Base</h3>
+
       <div class="form-row">
         <div class="form-group">
-          <label for="valorTotal" class="form-label">
-            Valor Total <span class="required">*</span>
-          </label>
-          <input
-            id="valorTotal"
-            type="number"
-            formControlName="valorTotal"
-            class="form-input"
-            [class.error]="hasError('valorTotal')"
-            placeholder="0.00"
-            step="0.01"
-          />
-          @if (hasError('valorTotal')) {
-          <span class="error-message">{{ getErrorMessage('valorTotal') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
           <label for="valorDiariaCobrada" class="form-label">
-            Valor Diária <span class="required">*</span>
+            Valor Diária por Funcionário <span class="required">*</span>
           </label>
           <input
             id="valorDiariaCobrada"
@@ -112,7 +96,140 @@
           <span class="error-message">{{ getErrorMessage('valorDiariaCobrada') }}</span>
           }
         </div>
+
+        <div class="form-group">
+          <label for="quantidadeFuncionarios" class="form-label">
+            Quantidade de Funcionários <span class="required">*</span>
+          </label>
+          <input
+            id="quantidadeFuncionarios"
+            type="number"
+            formControlName="quantidadeFuncionarios"
+            class="form-input"
+            [class.error]="hasError('quantidadeFuncionarios')"
+            placeholder="0"
+            step="1"
+            min="1"
+          />
+          @if (hasError('quantidadeFuncionarios')) {
+          <span class="error-message">{{ getErrorMessage('quantidadeFuncionarios') }}</span>
+          }
+        </div>
       </div>
+
+      <div class="form-group">
+        <label for="valorBeneficiosExtrasMensal" class="form-label">
+          Benefícios Extras Mensais <span class="required">*</span>
+        </label>
+        <input
+          id="valorBeneficiosExtrasMensal"
+          type="number"
+          formControlName="valorBeneficiosExtrasMensal"
+          class="form-input"
+          [class.error]="hasError('valorBeneficiosExtrasMensal')"
+          placeholder="0.00"
+          step="0.01"
+        />
+        @if (hasError('valorBeneficiosExtrasMensal')) {
+        <span class="error-message">{{ getErrorMessage('valorBeneficiosExtrasMensal') }}</span>
+        }
+      </div>
+
+      <!-- Valor Total Mensal Calculado -->
+      <div class="calculation-display">
+        <div class="calc-label">Valor Total Mensal (Base Calculada)</div>
+        <div class="calc-value">{{ valorTotalMensalCalculado | currency : 'BRL' }}</div>
+      </div>
+
+      <h3 class="section-title">📊 Percentuais e Margens</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="percentualAdicionalNoturno" class="form-label">
+            Adicional Noturno (%) <span class="required">*</span>
+          </label>
+          <input
+            id="percentualAdicionalNoturno"
+            type="number"
+            formControlName="percentualAdicionalNoturno"
+            class="form-input"
+            [class.error]="hasError('percentualAdicionalNoturno')"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            max="100"
+          />
+          @if (hasError('percentualAdicionalNoturno')) {
+          <span class="error-message">{{ getErrorMessage('percentualAdicionalNoturno') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="percentualImpostos" class="form-label">
+            Impostos (%) <span class="required">*</span>
+          </label>
+          <input
+            id="percentualImpostos"
+            type="number"
+            formControlName="percentualImpostos"
+            class="form-input"
+            [class.error]="hasError('percentualImpostos')"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            max="100"
+          />
+          @if (hasError('percentualImpostos')) {
+          <span class="error-message">{{ getErrorMessage('percentualImpostos') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="margemLucroPercentual" class="form-label">
+            Margem de Lucro (%) <span class="required">*</span>
+          </label>
+          <input
+            id="margemLucroPercentual"
+            type="number"
+            formControlName="margemLucroPercentual"
+            class="form-input"
+            [class.error]="hasError('margemLucroPercentual')"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            max="100"
+          />
+          @if (hasError('margemLucroPercentual')) {
+          <span class="error-message">{{ getErrorMessage('margemLucroPercentual') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="margemCoberturaFaltasPercentual" class="form-label">
+            Margem Cobertura de Faltas (%) <span class="required">*</span>
+          </label>
+          <input
+            id="margemCoberturaFaltasPercentual"
+            type="number"
+            formControlName="margemCoberturaFaltasPercentual"
+            class="form-input"
+            [class.error]="hasError('margemCoberturaFaltasPercentual')"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            max="100"
+          />
+          @if (hasError('margemCoberturaFaltasPercentual')) {
+          <span class="error-message">{{
+            getErrorMessage('margemCoberturaFaltasPercentual')
+          }}</span>
+          }
+        </div>
+      </div>
+
+      <h3 class="section-title">📅 Período do Contrato</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -161,6 +278,29 @@
         @if (hasError('status')) {
         <span class="error-message">{{ getErrorMessage('status') }}</span>
         }
+      </div>
+
+      <!-- Valor Total Calculado -->
+      <div class="calculation-result">
+        <div class="result-card">
+          <div class="result-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="result-content">
+            <p class="result-label">Valor Total do Contrato (Calculado)</p>
+            <h2 class="result-value">{{ valorTotalCalculado | currency : 'BRL' }}</h2>
+            <p class="result-info">
+              Base + Benefícios + Adicional Noturno (50%) + Margem Faltas + Margem Lucro + Impostos
+            </p>
+          </div>
+        </div>
       </div>
 
       <div class="form-footer">

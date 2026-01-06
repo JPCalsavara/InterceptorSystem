@@ -6,16 +6,28 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 public record CreateContratoDtoInput(
     Guid CondominioId,
     string Descricao,
-    decimal ValorTotal,
+    decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
+    decimal PercentualAdicionalNoturno,
+    decimal ValorBeneficiosExtrasMensal,
+    decimal PercentualImpostos,
+    int QuantidadeFuncionarios,
+    decimal MargemLucroPercentual,
+    decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status);
 
 public record UpdateContratoDtoInput(
     string Descricao,
-    decimal ValorTotal,
+    decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
+    decimal PercentualAdicionalNoturno,
+    decimal ValorBeneficiosExtrasMensal,
+    decimal PercentualImpostos,
+    int QuantidadeFuncionarios,
+    decimal MargemLucroPercentual,
+    decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status);
@@ -24,8 +36,14 @@ public record ContratoDtoOutput(
     Guid Id,
     Guid CondominioId,
     string Descricao,
-    decimal ValorTotal,
+    decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
+    decimal PercentualAdicionalNoturno,
+    decimal ValorBeneficiosExtrasMensal,
+    decimal PercentualImpostos,
+    int QuantidadeFuncionarios,
+    decimal MargemLucroPercentual,
+    decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status)
@@ -37,11 +55,16 @@ public record ContratoDtoOutput(
             entity.Id,
             entity.CondominioId,
             entity.Descricao,
-            entity.ValorTotal,
+            entity.ValorTotalMensal,
             entity.ValorDiariaCobrada,
+            entity.PercentualAdicionalNoturno,
+            entity.ValorBeneficiosExtrasMensal,
+            entity.PercentualImpostos,
+            entity.QuantidadeFuncionarios,
+            entity.MargemLucroPercentual,
+            entity.MargemCoberturaFaltasPercentual,
             entity.DataInicio,
             entity.DataFim,
             entity.Status);
     }
 }
-

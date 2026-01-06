@@ -69,18 +69,31 @@ export interface Contrato {
   id: string;
   condominioId: string;
   descricao: string;
-  valorTotal: number;
+  valorTotalMensal: number;
   valorDiariaCobrada: number;
+  percentualAdicionalNoturno: number;
+  valorBeneficiosExtrasMensal: number;
+  percentualImpostos: number;
+  quantidadeFuncionarios: number;
+  margemLucroPercentual: number;
+  margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
+  valorTotalContrato?: number; // Calculado
 }
 
 export interface CreateContratoDto {
   condominioId: string;
   descricao: string;
-  valorTotal: number;
+  valorTotalMensal: number;
   valorDiariaCobrada: number;
+  percentualAdicionalNoturno: number;
+  valorBeneficiosExtrasMensal: number;
+  percentualImpostos: number;
+  quantidadeFuncionarios: number;
+  margemLucroPercentual: number;
+  margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
@@ -88,8 +101,14 @@ export interface CreateContratoDto {
 
 export interface UpdateContratoDto {
   descricao: string;
-  valorTotal: number;
+  valorTotalMensal: number;
   valorDiariaCobrada: number;
+  percentualAdicionalNoturno: number;
+  valorBeneficiosExtrasMensal: number;
+  percentualImpostos: number;
+  quantidadeFuncionarios: number;
+  margemLucroPercentual: number;
+  margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;

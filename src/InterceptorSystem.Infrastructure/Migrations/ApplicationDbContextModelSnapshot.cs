@@ -131,15 +131,33 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("MargemCoberturaFaltasPercentual")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<decimal>("MargemLucroPercentual")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<decimal>("PercentualAdicionalNoturno")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<decimal>("PercentualImpostos")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("QuantidadeFuncionarios")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<decimal>("ValorBeneficiosExtrasMensal")
+                        .HasColumnType("decimal(12,2)");
+
                     b.Property<decimal>("ValorDiariaCobrada")
                         .HasColumnType("decimal(12,2)");
 
-                    b.Property<decimal>("ValorTotal")
+                    b.Property<decimal>("ValorTotalMensal")
                         .HasColumnType("decimal(12,2)");
 
                     b.HasKey("Id");

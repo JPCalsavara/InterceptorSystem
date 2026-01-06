@@ -13,8 +13,14 @@ public class ContratoConfiguration : IEntityTypeConfiguration<Contrato>
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Descricao).IsRequired().HasMaxLength(300);
-        builder.Property(c => c.ValorTotal).HasColumnType("decimal(12,2)").IsRequired();
+        builder.Property(c => c.ValorTotalMensal).HasColumnType("decimal(12,2)").IsRequired();
         builder.Property(c => c.ValorDiariaCobrada).HasColumnType("decimal(12,2)").IsRequired();
+        builder.Property(c => c.PercentualAdicionalNoturno).HasColumnType("decimal(5,4)").IsRequired();
+        builder.Property(c => c.ValorBeneficiosExtrasMensal).HasColumnType("decimal(12,2)").IsRequired();
+        builder.Property(c => c.PercentualImpostos).HasColumnType("decimal(5,4)").IsRequired();
+        builder.Property(c => c.QuantidadeFuncionarios).IsRequired();
+        builder.Property(c => c.MargemLucroPercentual).HasColumnType("decimal(5,4)").IsRequired();
+        builder.Property(c => c.MargemCoberturaFaltasPercentual).HasColumnType("decimal(5,4)").IsRequired();
         builder.Property(c => c.DataInicio).IsRequired();
         builder.Property(c => c.DataFim).IsRequired();
         builder.Property(c => c.Status)
@@ -36,4 +42,3 @@ public class ContratoConfiguration : IEntityTypeConfiguration<Contrato>
         builder.HasIndex(c => new { c.CondominioId, c.Status });
     }
 }
-
