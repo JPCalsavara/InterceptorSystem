@@ -1,1 +1,114 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Variáveis CSS globais */
+:root {
+  // Beige-forward light palette
+  --bg-primary: #fef7ef;
+  --bg-secondary: #f8ecdf;
+  --bg-tertiary: #f1e1d1;
+  --surface-card: #fff8f0;
+  --surface-muted: #f6eade;
+  --text-primary: #1f1a16;
+  --text-secondary: #5f4e43;
+  --text-tertiary: #8a776b;
+  --border-subtle: #e3d5c6;
+  --border-strong: #cbb69f;
+  --shadow-sm: 0 1px 2px rgba(31, 26, 22, 0.08);
+  --shadow-md: 0 4px 10px rgba(31, 26, 22, 0.12);
+  --shadow-lg: 0 12px 30px rgba(31, 26, 22, 0.16);
+}
+
+/* Dark Mode global */
+body.dark-mode {
+  // Cool gray palette for dark mode
+  --bg-primary: #101216;
+  --bg-secondary: #161a20;
+  --bg-tertiary: #1d222b;
+  --surface-card: #1f2530;
+  --surface-muted: #181c24;
+  --text-primary: #f5f7fb;
+  --text-secondary: #c3cad9;
+  --text-tertiary: #959fb3;
+  --border-subtle: #2c323f;
+  --border-strong: #3a4151;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilos do body */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* Scrollbar personalizada para dark mode */
+body.dark-mode {
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1f2937;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 6px;
+
+    &:hover {
+      background: #6b7280;
+    }
+  }
+}
+
+body,
+.app-layout,
+main,
+section,
+article {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.card,
+.panel,
+.table-card,
+.form-section,
+.summary-tile,
+.widget {
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+input,
+select,
+textarea,
+.mat-input-element {
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+hr,
+.divider,
+.rule,
+.table-divider {
+  border-color: var(--border-subtle);
+}
+
+.text-muted {
+  color: var(--text-secondary) !important;
+}

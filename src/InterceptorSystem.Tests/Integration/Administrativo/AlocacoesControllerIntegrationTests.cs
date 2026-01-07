@@ -40,7 +40,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
 
     private async Task<PostoDeTrabalhoDto> CriarPostoAsync(Guid condominioId)
     {
-        var input = new CreatePostoInput(condominioId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
+        var input = new CreatePostoInput(condominioId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
         var response = await Client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<PostoDeTrabalhoDto>(response) ?? throw new InvalidOperationException();

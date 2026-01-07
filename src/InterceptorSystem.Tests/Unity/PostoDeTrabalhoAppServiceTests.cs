@@ -42,7 +42,9 @@ public class PostoDeTrabalhoAppServiceTests
         var input = new CreatePostoInput(
             condominioId,
             new TimeSpan(6, 0, 0),
-            new TimeSpan(18, 0, 0)
+            new TimeSpan(18, 0, 0),
+            2,
+            true
         );
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
@@ -77,7 +79,9 @@ public class PostoDeTrabalhoAppServiceTests
         var input = new CreatePostoInput(
             condominioId,
             new TimeSpan(18, 0, 0),
-            new TimeSpan(6, 0, 0)
+            new TimeSpan(6, 0, 0),
+            3,
+            false
         );
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
@@ -99,7 +103,7 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync((Condominio?)null);
@@ -119,7 +123,7 @@ public class PostoDeTrabalhoAppServiceTests
         var condominioId = Guid.NewGuid();
         var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X");
         
-        var input = new CreatePostoInput(condominioId, new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0)); // 8 horas
+        var input = new CreatePostoInput(condominioId, new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), 2, false); // 8 horas
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
@@ -140,9 +144,9 @@ public class PostoDeTrabalhoAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
-        var input = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0));
+        var input = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 3, true);
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -164,7 +168,7 @@ public class PostoDeTrabalhoAppServiceTests
     {
         // Arrange
         var postoId = Guid.NewGuid();
-        var input = new UpdatePostoInput(new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var input = new UpdatePostoInput(new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync((PostoDeTrabalho?)null);
 
@@ -182,9 +186,9 @@ public class PostoDeTrabalhoAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
-        var input = new UpdatePostoInput(new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0)); // 8 horas
+        var input = new UpdatePostoInput(new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), 2, false); // 8 horas
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
 
@@ -206,7 +210,7 @@ public class PostoDeTrabalhoAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -244,7 +248,7 @@ public class PostoDeTrabalhoAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
 
@@ -285,9 +289,9 @@ public class PostoDeTrabalhoAppServiceTests
         var condominioId = Guid.NewGuid();
         var postos = new List<PostoDeTrabalho>
         {
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0)),
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0)),
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0))
+            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true),
+            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 2, true),
+            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0), 1, false)
         };
 
         _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(postos);
@@ -328,8 +332,8 @@ public class PostoDeTrabalhoAppServiceTests
         var condominioId = Guid.NewGuid();
         var postos = new List<PostoDeTrabalho>
         {
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0)),
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0))
+            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true),
+            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 2, true)
         };
 
         _mockRepo.Setup(r => r.GetByCondominioIdAsync(condominioId)).ReturnsAsync(postos);

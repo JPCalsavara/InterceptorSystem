@@ -2,6 +2,7 @@ using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
@@ -29,6 +30,13 @@ public class ContratoAppService : IContratoAppService
         var condominio = await _condominioRepository.GetByIdAsync(input.CondominioId)
             ?? throw new KeyNotFoundException("Condomínio não encontrado para o contrato.");
 
+        // Validar se já existe um contrato vigente para este condomínio
+        var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(input.CondominioId);
+        if (existeContratoVigente)
+        {
+            throw new InvalidOperationException("Já existe um contrato vigente para este condomínio.");
+        }
+
         var contrato = new Contrato(
             empresaId,
             input.CondominioId,
@@ -55,6 +63,17 @@ public class ContratoAppService : IContratoAppService
     {
         var contrato = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Contrato não encontrado.");
+
+        // Validar se não há contrato vigente quando alterando status para PAGO ou PENDENTE
+        if ((input.Status == StatusContrato.PAGO || input.Status == StatusContrato.PENDENTE) && 
+            contrato.Status == StatusContrato.INATIVO)
+        {
+            var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(contrato.CondominioId, id);
+            if (existeContratoVigente)
+            {
+                throw new InvalidOperationException("Já existe um contrato vigente para este condomínio.");
+            }
+        }
 
         contrato.AtualizarDados(
             input.Descricao,

@@ -39,7 +39,7 @@ public class AlocacaoAppServiceTests
         new(empresaId, condominioId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
 
     private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) =>
-        new(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
+        new(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
 
     private static Alocacao CriarAlocacao(Guid empresaId, Guid funcionarioId, Guid postoId, DateOnly data, TipoAlocacao tipo) =>
         new(empresaId, funcionarioId, postoId, data, StatusAlocacao.CONFIRMADA, tipo);
@@ -50,7 +50,7 @@ public class AlocacaoAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var funcionario = new Funcionario(empresaId, condominioId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
-        var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
+        var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
         var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
@@ -227,5 +227,73 @@ public class AlocacaoAppServiceTests
         _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionarioId)).ReturnsAsync(new[] { adjacente });
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(alocacao.Id, input));
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando funcionário já tem alocação na mesma data")]
+    public async Task CreateAsync_DeveFalharQuandoFuncionarioJaTemAlocacaoMesmaData()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var funcionario = CriarFuncionario(empresaId, condominioId);
+        var posto = CriarPosto(condominioId, empresaId);
+        var data = DateOnly.FromDateTime(DateTime.Today);
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, data, StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        _alocacaoRepo.Setup(r => r.ExisteAlocacaoNaDataAsync(funcionario.Id, data, null)).ReturnsAsync(true);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("Funcionário já possui alocação neste período", exception.Message);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve permitir DOBRA_PROGRAMADA após alocação regular")]
+    public async Task CreateAsync_DevePermitirDobraProgramadaAposAlocacaoRegular()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var funcionario = CriarFuncionario(empresaId, condominioId);
+        var posto = CriarPosto(condominioId, empresaId);
+        var dataHoje = DateOnly.FromDateTime(DateTime.Today);
+        var dataAmanha = dataHoje.AddDays(1);
+        
+        var alocacaoExistente = CriarAlocacao(empresaId, funcionario.Id, posto.Id, dataHoje, TipoAlocacao.REGULAR);
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, dataAmanha, StatusAlocacao.CONFIRMADA, TipoAlocacao.DOBRA_PROGRAMADA);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        _alocacaoRepo.Setup(r => r.ExisteAlocacaoNaDataAsync(funcionario.Id, dataAmanha, null)).ReturnsAsync(false);
+        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(new[] { alocacaoExistente });
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        var result = await _service.CreateAsync(input);
+
+        Assert.NotNull(result);
+        Assert.Equal(TipoAlocacao.DOBRA_PROGRAMADA, result.TipoAlocacao);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando funcionário tenta trabalhar após DOBRA_PROGRAMADA")]
+    public async Task CreateAsync_DeveFalharQuandoFuncionarioTentaTrabalharAposDobraProgramada()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var funcionario = CriarFuncionario(empresaId, condominioId);
+        var posto = CriarPosto(condominioId, empresaId);
+        var dataOntem = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+        var dataHoje = DateOnly.FromDateTime(DateTime.Today);
+        
+        var dobraOntem = CriarAlocacao(empresaId, funcionario.Id, posto.Id, dataOntem, TipoAlocacao.DOBRA_PROGRAMADA);
+        var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, dataHoje, StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        _alocacaoRepo.Setup(r => r.ExisteAlocacaoNaDataAsync(funcionario.Id, dataHoje, null)).ReturnsAsync(false);
+        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(new[] { dobraOntem });
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("Funcionário deve descansar após dobra programada", exception.Message);
     }
 }

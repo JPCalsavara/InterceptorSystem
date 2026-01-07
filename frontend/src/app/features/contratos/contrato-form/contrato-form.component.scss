@@ -11,12 +11,12 @@
   h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-primary);
     margin: 1rem 0 0.5rem 0;
   }
 
   .subtitle {
-    color: #6b7280;
+    color: var(--text-secondary);
     margin: 0;
   }
 }
@@ -27,7 +27,7 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: transparent;
-  color: #2196f3;
+  color: #135fb0;
   border: none;
   border-radius: 6px;
   font-weight: 500;
@@ -35,7 +35,7 @@
   transition: background 0.2s;
 
   &:hover {
-    background: #e3f2fd;
+    background: #d9ecff;
   }
 }
 
@@ -49,7 +49,7 @@
   animation: slideDown 0.3s ease-out;
 
   &-error {
-    background: #fee2e2;
+    background: #ffd6d6;
     color: #991b1b;
     border-left: 4px solid #ef4444;
   }
@@ -72,7 +72,7 @@
 
 .form-container {
   .form-card {
-    background: white;
+    background: var(--surface-card);
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -96,10 +96,10 @@
 .section-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 2rem 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border-subtle);
 
   &:first-of-type {
     margin-top: 0;
@@ -110,7 +110,7 @@
   display: block;
   font-weight: 600;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 
   .required {
@@ -121,16 +121,16 @@
 .form-input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border-subtle);
   border-radius: 8px;
   font-size: 1rem;
-  color: #111827;
+  color: var(--text-primary);
   transition: all 0.2s;
   font-family: inherit;
 
   &:focus {
     outline: none;
-    border-color: #2196f3;
+    border-color: #135fb0;
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
   }
 
@@ -147,7 +147,7 @@
   }
 
   &:disabled {
-    background: #f3f4f6;
+    background: var(--surface-muted);
     cursor: not-allowed;
   }
 }
@@ -171,7 +171,7 @@ select.form-input {
 .form-footer {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -184,7 +184,7 @@ select.form-input {
 }
 
 .required-note {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   margin: 0;
 
@@ -216,7 +216,7 @@ select.form-input {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  background: linear-gradient(135deg, #135fb0 0%, #1976d2 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -243,9 +243,9 @@ select.form-input {
 
 .btn-secondary {
   padding: 0.75rem 1.5rem;
-  background: white;
-  color: #6b7280;
-  border: 2px solid #e5e7eb;
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  border: 2px solid var(--border-subtle);
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -253,7 +253,7 @@ select.form-input {
   min-width: 120px;
 
   &:hover:not(:disabled) {
-    background: #f9fafb;
+    background: var(--bg-secondary);
     border-color: #d1d5db;
   }
 
@@ -282,7 +282,7 @@ select.form-input {
 .calculation-result {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid #e5e7eb;
+  border-top: 2px solid var(--border-subtle);
 }
 
 .calculation-display {

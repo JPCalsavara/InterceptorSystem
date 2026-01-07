@@ -254,6 +254,123 @@ public class ContratoAppServiceTests
         _contratoRepo.Verify(r => r.Remove(It.IsAny<Contrato>()), Times.Never);
     }
 
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando já existe contrato vigente")]
+    public async Task CreateAsync_DeveFalharQuandoJaExisteContratoVigente()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Teste", "12345678000100", "Rua A, 123, Centro, São Paulo-SP");
+        
+        var input = new CreateContratoDtoInput(
+            condominioId,
+            "Contrato novo",
+            2000,
+            150,
+            0.25m,
+            400,
+            0.2m,
+            12,
+            0.2m,
+            0.08m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(30)),
+            StatusContrato.PENDENTE);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, null)).ReturnsAsync(true);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("Já existe um contrato vigente para este condomínio", exception.Message);
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Deve falhar quando tentar ativar contrato com outro vigente")]
+    public async Task UpdateAsync_DeveFalharQuandoTentarAtivarContratoComOutroVigente()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contrato = new Contrato(
+            empresaId,
+            condominioId,
+            "Contrato inativo",
+            1000,
+            100,
+            0.2m,
+            300,
+            0.15m,
+            8,
+            0.1m,
+            0.05m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
+            StatusContrato.INATIVO);
+
+        var input = new UpdateContratoDtoInput(
+            "Contrato reativado",
+            1500,
+            120,
+            0.22m,
+            350,
+            0.16m,
+            10,
+            0.12m,
+            0.06m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
+            StatusContrato.PAGO);
+
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(true);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(contrato.Id, input));
+        Assert.Contains("Já existe um contrato vigente para este condomínio", exception.Message);
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Deve permitir ativar contrato quando não há outro vigente")]
+    public async Task UpdateAsync_DevePermitirAtivarContratoQuandoNaoHaOutroVigente()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contrato = new Contrato(
+            empresaId,
+            condominioId,
+            "Contrato inativo",
+            1000,
+            100,
+            0.2m,
+            300,
+            0.15m,
+            8,
+            0.1m,
+            0.05m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
+            StatusContrato.INATIVO);
+
+        var input = new UpdateContratoDtoInput(
+            "Contrato ativado",
+            1500,
+            120,
+            0.22m,
+            350,
+            0.16m,
+            10,
+            0.12m,
+            0.06m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
+            StatusContrato.PAGO);
+
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(false);
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        var result = await _service.UpdateAsync(contrato.Id, input);
+
+        Assert.NotNull(result);
+        Assert.Equal(StatusContrato.PAGO, result.Status);
+    }
+
     private static Contrato CriarContratoValido()
     {
         return new Contrato(

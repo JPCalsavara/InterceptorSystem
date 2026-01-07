@@ -35,7 +35,9 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
             input.CondominioId,
             empresaId,
             input.HorarioInicio,
-            input.HorarioFim
+            input.HorarioFim,
+            input.QuantidadeIdealFuncionarios,
+            input.PermiteDobrarEscala
         );
 
         _repository.Add(posto);
@@ -50,7 +52,7 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
         if (posto == null)
             throw new KeyNotFoundException("Posto de Trabalho não encontrado.");
 
-        posto.AtualizarHorario(input.HorarioInicio, input.HorarioFim);
+        posto.AtualizarHorario(input.HorarioInicio, input.HorarioFim, input.QuantidadeIdealFuncionarios, input.PermiteDobrarEscala);
 
         _repository.Update(posto);
         await _repository.UnitOfWork.CommitAsync();
@@ -86,4 +88,3 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
         return lista.Select(PostoDeTrabalhoDto.FromEntity);
     }
 }
-

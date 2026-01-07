@@ -11,11 +11,9 @@ namespace InterceptorSystem.Tests.Integration.Administrativo;
 public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
-    private readonly CustomWebApplicationFactory _factory;
 
     public PostosDeTrabalhoControllerIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _factory = factory;
         _client = factory.CreateClient();
     }
 
@@ -44,9 +42,11 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         // Arrange
         var condominioId = await CriarCondominioTeste();
         var input = new CreatePostoInput(
-            CondominioId: condominioId,
-            HorarioInicio: new TimeSpan(6, 0, 0),
-            HorarioFim: new TimeSpan(18, 0, 0)
+            condominioId,
+            new TimeSpan(6, 0, 0),
+            new TimeSpan(18, 0, 0),
+            2,
+            true
         );
 
         // Act
@@ -69,9 +69,11 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         // Arrange
         var condominioId = await CriarCondominioTeste();
         var input = new CreatePostoInput(
-            CondominioId: condominioId,
-            HorarioInicio: new TimeSpan(18, 0, 0),
-            HorarioFim: new TimeSpan(6, 0, 0)
+            condominioId,
+            new TimeSpan(18, 0, 0),
+            new TimeSpan(6, 0, 0),
+            3,
+            false
         );
 
         // Act
@@ -94,7 +96,9 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         var input = new CreatePostoInput(
             CondominioId: condominioInexistente,
             HorarioInicio: new TimeSpan(6, 0, 0),
-            HorarioFim: new TimeSpan(18, 0, 0)
+            HorarioFim: new TimeSpan(18, 0, 0),
+            QuantidadeIdealFuncionarios: 1,
+            PermiteDobrarEscala: false
         );
 
         // Act
@@ -115,7 +119,9 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         var input = new CreatePostoInput(
             CondominioId: condominioId,
             HorarioInicio: new TimeSpan(8, 0, 0),
-            HorarioFim: new TimeSpan(16, 0, 0) // 8 horas
+            HorarioFim: new TimeSpan(16, 0, 0),
+            QuantidadeIdealFuncionarios: 1,
+            PermiteDobrarEscala: false
         );
 
         // Act
@@ -137,7 +143,7 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
     {
         // Arrange - Cria posto primeiro
         var condominioId = await CriarCondominioTeste();
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
         var createResponse = await _client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
 
@@ -188,8 +194,8 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         // Arrange - Cria alguns postos
         var condominioId = await CriarCondominioTeste();
         
-        var input1 = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
-        var input2 = new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0));
+        var input1 = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
+        var input2 = new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 2, true);
         
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", input1);
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", input2);
@@ -226,9 +232,9 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         var condominioId = await CriarCondominioTeste();
         
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0)));
+            new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true));
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0)));
+            new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 2, true));
 
         // Act
         var response = await _client.GetAsync("/api/postos-de-trabalho");
@@ -253,13 +259,11 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         
         // Postos do condomínio 1
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId1, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0)));
+            new CreatePostoInput(condominioId1, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true));
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId1, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0)));
-        
-        // Posto do condomínio 2
+            new CreatePostoInput(condominioId1, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 2, true));
         await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId2, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0)));
+            new CreatePostoInput(condominioId2, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0), 1, false));
 
         // Act
         var response = await _client.GetAsync($"/api/postos-de-trabalho/condominio/{condominioId1}");
@@ -316,11 +320,11 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
     {
         // Arrange
         var condominioId = await CriarCondominioTeste();
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0),2,true);
         var createResponse = await _client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
 
-        var updateInput = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0));
+        var updateInput = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 3, true);
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/postos-de-trabalho/{created!.Id}", updateInput);
@@ -339,7 +343,7 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
     {
         // Arrange
         var idInexistente = Guid.NewGuid();
-        var updateInput = new UpdatePostoInput(new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var updateInput = new UpdatePostoInput(new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/postos-de-trabalho/{idInexistente}", updateInput);
@@ -353,11 +357,11 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
     {
         // Arrange
         var condominioId = await CriarCondominioTeste();
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0),3,true);
         var createResponse = await _client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
 
-        var updateInput = new UpdatePostoInput(new TimeSpan(8, 0, 0), new TimeSpan(14, 0, 0)); // 6 horas
+        var updateInput = new UpdatePostoInput(new TimeSpan(8, 0, 0), new TimeSpan(14, 0, 0), 2, false); // 6 horas
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/postos-de-trabalho/{created!.Id}", updateInput);
@@ -375,7 +379,7 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
     {
         // Arrange
         var condominioId = await CriarCondominioTeste();
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0),2,true);
         var createResponse = await _client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
 
@@ -410,11 +414,11 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         var condominioId = await CriarCondominioTeste();
         
         var createResponse1 = await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0)));
+            new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true));
         var posto1 = await createResponse1.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
-        
+
         var createResponse2 = await _client.PostAsJsonAsync("/api/postos-de-trabalho", 
-            new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0)));
+            new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 2, true));
         var posto2 = await createResponse2.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
 
         // Act - Deleta apenas o primeiro
@@ -436,7 +440,7 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         var condominioId = await CriarCondominioTeste();
 
         // 1. CREATE - Turno Diurno
-        var createInput = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0));
+        var createInput = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), 2, true);
         var createResponse = await _client.PostAsJsonAsync("/api/postos-de-trabalho", createInput);
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDeTrabalhoDto>();
@@ -453,7 +457,7 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         Assert.Contains(postosDoCondo!, p => p.Id == created.Id);
 
         // 4. UPDATE - Mudar para Turno Noturno
-        var updateInput = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0));
+        var updateInput = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), 3, true);
         var updateResponse = await _client.PutAsJsonAsync($"/api/postos-de-trabalho/{created.Id}", updateInput);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
 

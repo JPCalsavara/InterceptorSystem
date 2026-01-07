@@ -256,6 +256,14 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<TimeSpan>("HorarioInicio")
                         .HasColumnType("time");
 
+                    b.Property<bool>("PermiteDobrarEscala")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("QuantidadeIdealFuncionarios")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CondominioId");

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {}
+    "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {}
   },
   "projects": {
-    "/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {
+    "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
+        "projectUniqueName": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
         "projectName": "InterceptorSystem.Domain",
-        "projectPath": "/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/InterceptorSystem.Domain/obj/",
+        "projectPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
+        "packagesPath": "/home/jpcalsavara/.nuget/packages/",
+        "outputPath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/home/jpcalsavara/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -58,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.413/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.122/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

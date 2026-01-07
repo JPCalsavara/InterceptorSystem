@@ -29,8 +29,17 @@ public class AlocacaoRepository : IAlocacaoRepository
     public async Task<IEnumerable<Alocacao>> GetByPostoAsync(Guid postoId)
         => await _context.Alocacoes.Where(a => a.PostoDeTrabalhoId == postoId).ToListAsync();
 
+    public async Task<IEnumerable<Alocacao>> GetByPostoEDataAsync(Guid postoId, DateOnly data)
+        => await _context.Alocacoes.Where(a => a.PostoDeTrabalhoId == postoId && a.Data == data).ToListAsync();
+
+    public async Task<bool> ExisteAlocacaoNaDataAsync(Guid funcionarioId, DateOnly data, Guid? alocacaoIdIgnorada = null)
+        => await _context.Alocacoes
+            .Where(a => a.FuncionarioId == funcionarioId && 
+                       a.Data == data &&
+                       (alocacaoIdIgnorada == null || a.Id != alocacaoIdIgnorada))
+            .AnyAsync();
+
     public void Add(Alocacao entity) => _context.Alocacoes.Add(entity);
     public void Update(Alocacao entity) => _context.Alocacoes.Update(entity);
     public void Remove(Alocacao entity) => _context.Alocacoes.Remove(entity);
 }
-
