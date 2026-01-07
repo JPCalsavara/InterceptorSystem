@@ -29,10 +29,16 @@ public class CondominioAppService : ICondominioAppService
             throw new InvalidOperationException("Já existe um condomínio cadastrado com este CNPJ.");
         }
         
-        var condominio = new Condominio(empresaId: empresaId,
-                                        nome: input.Nome,
-                                        cnpj: input.Cnpj,
-                                        endereco: input.Endereco);
+        var condominio = new Condominio(
+            empresaId: empresaId,
+            nome: input.Nome,
+            cnpj: input.Cnpj,
+            endereco: input.Endereco,
+            quantidadeFuncionariosIdeal: input.QuantidadeFuncionariosIdeal,
+            horarioTrocaTurno: input.HorarioTrocaTurno,
+            emailGestor: input.EmailGestor,
+            telefoneEmergencia: input.TelefoneEmergencia);
+        
         _repository.Add(condominio);
         await _repository.UnitOfWork.CommitAsync();
         
@@ -46,6 +52,11 @@ public class CondominioAppService : ICondominioAppService
             throw new KeyNotFoundException("Condomínio não encontrado.");
         
         condominio.AtualizarDados(input.Nome, input.Endereco);
+        condominio.AtualizarConfiguracoesOperacionais(
+            input.QuantidadeFuncionariosIdeal,
+            input.HorarioTrocaTurno,
+            input.EmailGestor,
+            input.TelefoneEmergencia);
         
         _repository.Update(condominio);
         await  _repository.UnitOfWork.CommitAsync();

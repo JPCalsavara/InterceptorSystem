@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Xc+Cf3zU0dIw0d6qzCoRY29mh3VeSWf2h8EVmm5LOIVM/8uuoXOktY95A90YwZxeCWkc6mG+rc4yOn5iPLa+eg==",
+  "dgSpecHash": "VegOMp70XYA=",
   "success": true,
-  "projectFilePath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
+  "projectFilePath": "/src/InterceptorSystem.Domain/InterceptorSystem.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

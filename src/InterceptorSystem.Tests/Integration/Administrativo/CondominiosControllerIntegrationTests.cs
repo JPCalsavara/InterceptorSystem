@@ -26,7 +26,11 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var input = new CreateCondominioDtoInput(
             Nome: $"Condomínio Teste {DateTime.Now.Ticks}",
             Cnpj: cnpjCustomizado ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
-            Endereco: "Rua Teste, 123"
+            Endereco: "Rua Teste, 123",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6),
+            EmailGestor: "gestor@teste.com.br",
+            TelefoneEmergencia: "(11) 98765-4321"
         );
         
         var response = await _client.PostAsJsonAsync("/api/condominios", input);
@@ -45,7 +49,11 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var input = new CreateCondominioDtoInput(
             Nome: "Condomínio Residencial Solar",
             Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-90",
-            Endereco: "Av. Paulista, 1000"
+            Endereco: "Av. Paulista, 1000",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6),
+            EmailGestor: "gestor@solar.com.br",
+            TelefoneEmergencia: "(11) 98765-4321"
         );
 
         // Act
@@ -60,6 +68,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         Assert.Equal(input.Nome, result.Nome);
         Assert.Equal(input.Cnpj, result.Cnpj);
         Assert.Equal(input.Endereco, result.Endereco);
+        Assert.Equal(10, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal("06:00:00", result.HorarioTrocaTurno);
+        Assert.Equal("gestor@solar.com.br", result.EmailGestor);
         Assert.True(result.Ativo);
 
         // Verifica Location Header
@@ -75,7 +86,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var input1 = new CreateCondominioDtoInput(
             Nome: "Primeiro Condomínio",
             Cnpj: cnpjDuplicado,
-            Endereco: "Rua A, 123"
+            Endereco: "Rua A, 123",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         await _client.PostAsJsonAsync("/api/condominios", input1);
 
@@ -83,7 +96,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var input2 = new CreateCondominioDtoInput(
             Nome: "Segundo Condomínio",
             Cnpj: cnpjDuplicado,
-            Endereco: "Rua B, 456"
+            Endereco: "Rua B, 456",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
 
         // Act
@@ -227,7 +242,11 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
 
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Condomínio Atualizado",
-            Endereco: "Rua Atualizada, 999"
+            Endereco: "Rua Atualizada, 999",
+            QuantidadeFuncionariosIdeal: 15,
+            HorarioTrocaTurno: TimeSpan.FromHours(7),
+            EmailGestor: "novogestor@atualizado.com.br",
+            TelefoneEmergencia: "(11) 99999-8888"
         );
 
         // Act
@@ -241,6 +260,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         Assert.Equal(condominioId, result.Id);
         Assert.Equal(updateInput.Nome, result.Nome);
         Assert.Equal(updateInput.Endereco, result.Endereco);
+        Assert.Equal(15, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal("07:00:00", result.HorarioTrocaTurno);
+        Assert.Equal("novogestor@atualizado.com.br", result.EmailGestor);
     }
 
     [Fact(DisplayName = "PUT /api/condominios/{id} - Deve retornar 404 quando condomínio não existe")]
@@ -250,7 +272,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var idInexistente = Guid.NewGuid();
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Nome Qualquer",
-            Endereco: "Endereço Qualquer"
+            Endereco: "Endereço Qualquer",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
 
         // Act
@@ -269,7 +293,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
 
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Nome Atualizado",
-            Endereco: "Endereço Atualizado"
+            Endereco: "Endereço Atualizado",
+            QuantidadeFuncionariosIdeal: 12,
+            HorarioTrocaTurno: TimeSpan.FromHours(7)
         );
 
         // Act
@@ -340,7 +366,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var createInput = new CreateCondominioDtoInput(
             Nome: "Condomínio Fluxo Completo",
             Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-77",
-            Endereco: "Rua Fluxo, 100"
+            Endereco: "Rua Fluxo, 100",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         var createResponse = await _client.PostAsJsonAsync("/api/condominios", createInput);
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
@@ -356,7 +384,9 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         // 3. UPDATE
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Condomínio Fluxo Atualizado",
-            Endereco: "Rua Fluxo Atualizada, 200"
+            Endereco: "Rua Fluxo Atualizada, 200",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         var updateResponse = await _client.PutAsJsonAsync($"/api/condominios/{created.Id}", updateInput);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);

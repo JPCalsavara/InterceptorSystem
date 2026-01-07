@@ -37,7 +37,7 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X");
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
         
         var input = new CreatePostoInput(
             condominioId,
@@ -74,7 +74,7 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X");
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
         
         var input = new CreatePostoInput(
             condominioId,
@@ -121,7 +121,7 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X");
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
         
         var input = new CreatePostoInput(condominioId, new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), 2, false); // 8 horas
 

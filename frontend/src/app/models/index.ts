@@ -159,17 +159,26 @@ export interface PostoDeTrabalho {
   id: string;
   condominioId: string;
   horario: string;
+  quantidadeIdealFuncionarios: number;
+  permiteDobrarEscala: boolean;
+  capacidadeMaximaPorDobras: number;
 }
 
 export interface CreatePostoDeTrabalhoDto {
   condominioId: string;
   horarioInicio: string;
   horarioFim: string;
+  quantidadeIdealFuncionarios: number;
+  permiteDobrarEscala?: boolean;
+  capacidadeMaximaExtraPorTerceiros?: number;
 }
 
 export interface UpdatePostoDeTrabalhoDto {
   horarioInicio: string;
   horarioFim: string;
+  quantidadeIdealFuncionarios: number;
+  permiteDobrarEscala?: boolean;
+  capacidadeMaximaExtraPorTerceiros?: number;
 }
 
 // Alocacao

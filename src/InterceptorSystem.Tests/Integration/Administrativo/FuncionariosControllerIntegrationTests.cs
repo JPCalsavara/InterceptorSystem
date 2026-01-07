@@ -13,7 +13,13 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
 
     private async Task<Guid> CriarCondominioAsync()
     {
-        var input = new CreateCondominioDtoInput("Condomínio Func", $"{DateTime.Now.Ticks % 100000000:00000000}/0001-55", "Rua Func");
+        var input = new CreateCondominioDtoInput(
+            "Condomínio Func", 
+            $"{DateTime.Now.Ticks % 100000000:00000000}/0001-55", 
+            "Rua Func",
+            10,
+            TimeSpan.FromHours(6)
+        );
         var response = await Client.PostAsJsonAsync("/api/condominios", input);
         response.EnsureSuccessStatusCode();
         var dto = await ReadAsAsync<CondominioDtoOutput>(response);

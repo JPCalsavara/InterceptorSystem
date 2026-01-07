@@ -24,7 +24,9 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
         var input = new CreateCondominioDtoInput(
             Nome: $"Condomínio Teste {DateTime.Now.Ticks}",
             Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
-            Endereco: "Rua Teste"
+            Endereco: "Rua Teste",
+            QuantidadeFuncionariosIdeal: 10,
+            HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         
         var response = await _client.PostAsJsonAsync("/api/condominios", input);

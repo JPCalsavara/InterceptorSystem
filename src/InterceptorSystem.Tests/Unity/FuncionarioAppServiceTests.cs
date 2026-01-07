@@ -35,7 +35,7 @@ public class FuncionarioAppServiceTests
         300,
         100);
 
-    private static Condominio CriarCondominio(Guid empresaId) => new(empresaId, "Cond", "123", "Rua");
+    private static Condominio CriarCondominio(Guid empresaId) => new(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6));
 
     private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId) =>
         new(empresaId, condominioId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
@@ -52,7 +52,7 @@ public class FuncionarioAppServiceTests
         var empresaId = Guid.NewGuid();
         var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua"));
+        _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
         _funcionarioRepo.Setup(r => r.GetByCpfAsync(input.Cpf)).ReturnsAsync((Funcionario?)null);
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
@@ -81,7 +81,7 @@ public class FuncionarioAppServiceTests
         var condominioId = Guid.NewGuid();
         var input = CriarInputValido(condominioId);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua"));
+        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
         _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));

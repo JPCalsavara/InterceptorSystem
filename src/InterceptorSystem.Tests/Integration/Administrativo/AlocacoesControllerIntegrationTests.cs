@@ -13,7 +13,13 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
 
     private async Task<Guid> CriarCondominioAsync()
     {
-        var input = new CreateCondominioDtoInput("Condomínio Aloc", $"{DateTime.Now.Ticks % 100000000:00000000}/0001-66", "Rua Aloc");
+        var input = new CreateCondominioDtoInput(
+            "Condomínio Aloc", 
+            $"{DateTime.Now.Ticks % 100000000:00000000}/0001-66", 
+            "Rua Aloc",
+            10,
+            TimeSpan.FromHours(6)
+        );
         var response = await Client.PostAsJsonAsync("/api/condominios", input);
         response.EnsureSuccessStatusCode();
         var dto = await ReadAsAsync<CondominioDtoOutput>(response);

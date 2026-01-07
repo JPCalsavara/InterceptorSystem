@@ -16,7 +16,10 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
         var input = new CreateCondominioDtoInput(
             $"Condomínio Contrato {DateTime.Now.Ticks}",
             $"{DateTime.Now.Ticks % 100000000:00000000}/0001-55",
-            "Rua Contrato, 1");
+            "Rua Contrato, 1",
+            10,
+            TimeSpan.FromHours(6)
+        );
         var response = await Client.PostAsJsonAsync("/api/condominios", input);
         response.EnsureSuccessStatusCode();
         var dto = await ReadAsAsync<CondominioDtoOutput>(response);

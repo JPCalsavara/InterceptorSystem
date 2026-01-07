@@ -45,7 +45,7 @@ public class ContratoAppServiceTests
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua"));
+            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua", 10, TimeSpan.FromHours(6)));
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(input);
@@ -124,7 +124,7 @@ public class ContratoAppServiceTests
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua"));
+            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua", 10, TimeSpan.FromHours(6)));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
@@ -259,7 +259,7 @@ public class ContratoAppServiceTests
     {
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Teste", "12345678000100", "Rua A, 123, Centro, São Paulo-SP");
+        var condominio = new Condominio(empresaId, "Teste", "12345678000100", "Rua A, 123, Centro, São Paulo-SP", 10, TimeSpan.FromHours(6));
         
         var input = new CreateContratoDtoInput(
             condominioId,

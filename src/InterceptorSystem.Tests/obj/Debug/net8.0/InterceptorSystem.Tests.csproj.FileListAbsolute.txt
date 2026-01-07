@@ -1,11 +1,5 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/.msCoverageSourceRootsMapping_InterceptorSystem.Tests
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_InterceptorSystem.Tests
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.csproj.AssemblyReference.cache
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/MvcTestingAppManifest.json
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.GeneratedMSBuildEditorConfig.editorconfig
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.AssemblyInfoInputs.cache
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.AssemblyInfo.cs
-/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.csproj.CoreCompileInputs.cache
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/InterceptorSystem.Api.deps.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/InterceptorSystem.Api.runtimeconfig.json
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/appsettings.Development.json
@@ -423,6 +417,12 @@
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/InterceptorSystem.Application.pdb
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/InterceptorSystem.Domain.pdb
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/bin/Debug/net8.0/InterceptorSystem.Infrastructure.pdb
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.csproj.AssemblyReference.cache
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/MvcTestingAppManifest.json
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.GeneratedMSBuildEditorConfig.editorconfig
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.AssemblyInfoInputs.cache
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.AssemblyInfo.cs
+/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.csproj.CoreCompileInputs.cache
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.csproj.CopyComplete
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/InterceptorSystem.Tests.dll
 /home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/obj/Debug/net8.0/refint/InterceptorSystem.Tests.dll
