@@ -118,49 +118,53 @@ VALUES
 
 -- ========================================
 -- 3. POSTOS DE TRABALHO (2 turnos por condomínio)
+-- FASE 4: QuantidadeIdealFuncionarios agora é calculado do Condomínio
 -- ========================================
 
 INSERT INTO "PostosDeTrabalho" (
     "Id", "EmpresaId", "CondominioId", 
-    "HorarioInicio", "HorarioFim", "NumeroFaltasAcumuladas",
-    "QuantidadeIdealFuncionarios", "QuantidadeMaximaFuncionarios", "PermiteDobrarEscala"
+    "HorarioInicio", "HorarioFim", 
+    "PermiteDobrarEscala", "QuantidadeMaximaFaltas"
 )
 VALUES 
 -- Residencial Solar - Turno Diurno (6h às 18h)
+-- QuantidadeIdealFuncionarios = 12 / 2 postos = 6 (calculado automaticamente)
 ('44444444-4444-4444-4444-444444444441',
  '11111111-1111-1111-1111-111111111111',
  '22222222-2222-2222-2222-222222222221',
- '06:00:00', '18:00:00', 0, 6, 8, true),
+ '06:00:00', '18:00:00', true, 3),
 
 -- Residencial Solar - Turno Noturno (18h às 6h)
 ('44444444-4444-4444-4444-444444444442',
  '11111111-1111-1111-1111-111111111111',
  '22222222-2222-2222-2222-222222222221',
- '18:00:00', '06:00:00', 0, 6, 8, true),
+ '18:00:00', '06:00:00', true, 3),
 
 -- Horizonte Verde - Turno Diurno (7h às 19h)
+-- QuantidadeIdealFuncionarios = 8 / 2 postos = 4 (calculado automaticamente)
 ('44444444-4444-4444-4444-444444444443',
  '11111111-1111-1111-1111-111111111111',
  '22222222-2222-2222-2222-222222222222',
- '07:00:00', '19:00:00', 0, 4, 6, true),
+ '07:00:00', '19:00:00', true, 2),
 
 -- Horizonte Verde - Turno Noturno (19h às 7h)
 ('44444444-4444-4444-4444-444444444444',
  '11111111-1111-1111-1111-111111111111',
  '22222222-2222-2222-2222-222222222222',
- '19:00:00', '07:00:00', 0, 4, 6, true),
+ '19:00:00', '07:00:00', true, 2),
 
 -- Torres do Parque - Turno Diurno (6:30h às 18:30h)
+-- QuantidadeIdealFuncionarios = 15 / 2 postos = 7.5 → 7 ou 8 (calculado automaticamente)
 ('44444444-4444-4444-4444-444444444445',
  '11111111-1111-1111-1111-111111111111',
  '22222222-2222-2222-2222-222222222223',
- '06:30:00', '18:30:00', 0, 8, 10, true),
+ '06:30:00', '18:30:00', true, 4),
 
 -- Torres do Parque - Turno Noturno (18:30h às 6:30h)
 ('44444444-4444-4444-4444-444444444446',
  '11111111-1111-1111-1111-111111111111',
  '22222222-2222-2222-2222-222222222223',
- '18:30:00', '06:30:00', 0, 7, 10, true);
+ '18:30:00', '06:30:00', true, 4);
 
 -- ========================================
 -- 4. FUNCIONÁRIOS (35 funcionários distribuídos nos contratos)

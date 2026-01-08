@@ -39,11 +39,45 @@ public class AlocacaoAppServiceTests
     private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId) =>
         new(empresaId, condominioId, Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
-    private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) =>
-        new(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
+    // FASE 4: Sem QuantidadeIdealFuncionarios (calculado do Condomínio)
+    private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) 
+    {
+        // FASE 4: Criar Condominio mock para cálculo de QuantidadeIdealFuncionarios
+        var condominio = new Condominio(
+            empresaId, 
+            "Condominio Teste", 
+            "12345678000190", 
+            "Rua Teste", 
+            12, // 12 funcionários ideais
+            TimeSpan.FromHours(6),
+            "test@test.com",
+            "+5511999999999");
+        
+        var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
+        
+        // Usar reflection para configurar a propriedade de navegação Condominio
+        var condominioProperty = typeof(PostoDeTrabalho).GetProperty("Condominio");
+        condominioProperty?.SetValue(posto, condominio);
+        
+        // Adicionar o posto à coleção de postos do condomínio para o cálculo funcionar
+        condominio.GetType().GetProperty("PostosDeTrabalho")?.SetValue(condominio, new List<PostoDeTrabalho> { posto });
+        
+        return posto;
+    }
 
     private static Alocacao CriarAlocacao(Guid empresaId, Guid funcionarioId, Guid postoId, DateOnly data, TipoAlocacao tipo) =>
         new(empresaId, funcionarioId, postoId, data, StatusAlocacao.CONFIRMADA, tipo);
+
+    // FASE 4: Helper para configurar mocks comuns de validação de capacidade
+    private void ConfigurarMocksBasicos(Guid empresaId, Funcionario funcionario, PostoDeTrabalho posto, IEnumerable<Alocacao>? alocacoesExistentes = null)
+    {
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(alocacoesExistentes ?? Array.Empty<Alocacao>());
+        _alocacaoRepo.Setup(r => r.GetByPostoEDataAsync(posto.Id, It.IsAny<DateOnly>())).ReturnsAsync(alocacoesExistentes ?? Array.Empty<Alocacao>());
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+    }
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
     public async Task CreateAsync_DeveCriarAlocacao()
@@ -51,15 +85,11 @@ public class AlocacaoAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var contratoId = Guid.NewGuid();
-        // FASE 3: Sem parâmetros de salário
         var funcionario = new Funcionario(empresaId, condominioId, contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
-        var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
+        var posto = CriarPosto(condominioId, empresaId);
         var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
 
-        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        ConfigurarMocksBasicos(empresaId, funcionario, posto);
 
         var result = await _service.CreateAsync(input);
 
@@ -152,11 +182,7 @@ public class AlocacaoAppServiceTests
         var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.DOBRA_PROGRAMADA);
         var alocacaoAnterior = CriarAlocacao(empresaId, funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today.AddDays(-1)), TipoAlocacao.REGULAR);
 
-        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
-        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(new[] { alocacaoAnterior });
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        ConfigurarMocksBasicos(empresaId, funcionario, posto, new[] { alocacaoAnterior });
 
         var result = await _service.CreateAsync(input);
 
@@ -266,12 +292,8 @@ public class AlocacaoAppServiceTests
         var alocacaoExistente = CriarAlocacao(empresaId, funcionario.Id, posto.Id, dataHoje, TipoAlocacao.REGULAR);
         var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, dataAmanha, StatusAlocacao.CONFIRMADA, TipoAlocacao.DOBRA_PROGRAMADA);
 
-        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
+        ConfigurarMocksBasicos(empresaId, funcionario, posto, new[] { alocacaoExistente });
         _alocacaoRepo.Setup(r => r.ExisteAlocacaoNaDataAsync(funcionario.Id, dataAmanha, null)).ReturnsAsync(false);
-        _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(new[] { alocacaoExistente });
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(input);
 

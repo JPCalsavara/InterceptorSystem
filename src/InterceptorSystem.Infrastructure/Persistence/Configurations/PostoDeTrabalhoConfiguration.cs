@@ -37,11 +37,15 @@ public class PostoDeTrabalhoConfiguration : IEntityTypeConfiguration<PostoDeTrab
         builder.HasIndex(p => p.EmpresaId);
         builder.HasIndex(p => p.CondominioId);
 
-        builder.Property(p => p.QuantidadeIdealFuncionarios)
-            .IsRequired();
+        // FASE 4: QuantidadeIdealFuncionarios removido (calculado automaticamente)
+        // Propriedade marcada como [NotMapped] na entidade
 
         builder.Property(p => p.PermiteDobrarEscala)
             .HasDefaultValue(true)
             .IsRequired();
+
+        // FASE 4: Nova propriedade para controle de faltas
+        builder.Property(p => p.QuantidadeMaximaFaltas)
+            .IsRequired(false);
     }
 }

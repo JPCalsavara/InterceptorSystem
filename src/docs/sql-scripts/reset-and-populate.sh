@@ -7,7 +7,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DB_HOST="${DB_HOST:-localhost}"
-DB_USER="${DB_USER:-postgres}"
+DB_USER="${DB_USER:-admin}"
 DB_NAME="${DB_NAME:-interceptor_db}"
 
 echo "========================================="
@@ -16,6 +16,11 @@ echo "========================================="
 echo "Host: $DB_HOST"
 echo "Database: $DB_NAME"
 echo "User: $DB_USER"
+echo ""
+echo "📋 Fases implementadas:"
+echo "  ✅ FASE 2: Vínculo Funcionário ↔ Contrato"
+echo "  ✅ FASE 3: Salários calculados automaticamente"
+echo "  ✅ FASE 4: QuantidadeIdeal calculada do Condomínio"
 echo ""
 
 # Verificar se psql está disponível

@@ -18,10 +18,10 @@ Scripts SQL para facilitar testes manuais no frontend após implementações de 
 
 ```bash
 # Executar via psql
-psql -h localhost -U postgres -d interceptor_db -f 00-reset-database.sql
+psql -h localhost -U admin -d interceptor_db -f 00-reset-database.sql
 
 # Ou via Docker
-docker exec -i interceptor_db psql -U postgres -d interceptor_db < 00-reset-database.sql
+docker exec -i interceptor_db psql -U admin -d interceptor_db < 00-reset-database.sql
 ```
 
 **⚠️ ATENÇÃO:** Este script apaga TODOS os dados!
@@ -33,10 +33,10 @@ docker exec -i interceptor_db psql -U postgres -d interceptor_db < 00-reset-data
 
 ```bash
 # Executar via psql
-psql -h localhost -U postgres -d interceptor_db -f 01-popular-dados-teste.sql
+psql -h localhost -U admin -d interceptor_db -f 01-popular-dados-teste.sql
 
 # Ou via Docker
-docker exec -i interceptor_db psql -U postgres -d interceptor_db < 01-popular-dados-teste.sql
+docker exec -i interceptor_db psql -U admin -d interceptor_db < 01-popular-dados-teste.sql
 ```
 
 #### 📦 Dados Inseridos:
@@ -45,9 +45,27 @@ docker exec -i interceptor_db psql -U postgres -d interceptor_db < 01-popular-da
 |----------|------------|-----------|
 | **Condomínios** | 3 | Residencial Solar, Horizonte Verde, Torres do Parque |
 | **Contratos** | 3 | 1 contrato vigente por condomínio (FASE 2) |
-| **Postos de Trabalho** | 6 | 2 turnos (diurno/noturno) por condomínio |
-| **Funcionários** | 35 | 12 + 8 + 15 distribuídos nos contratos |
+| **Postos de Trabalho** | 6 | 2 turnos (diurno/noturno) por condomínio *(FASE 4)* |
+| **Funcionários** | 35 | 12 + 8 + 15 distribuídos nos contratos *(FASE 3)* |
 | **Alocações** | 12 | Alocações de exemplo para Janeiro/2026 |
+
+---
+
+### 3️⃣ `02-fase3-remover-salarios.sql`
+**FASE 3:** Remove colunas de salário de Funcionarios (agora calculados do Contrato).
+
+```bash
+docker exec -i interceptor_db psql -U admin -d interceptor_db < 02-fase3-remover-salarios.sql
+```
+
+---
+
+### 4️⃣ `03-fase4-simplificar-postos.sql`
+**FASE 4:** Remove `QuantidadeIdealFuncionarios` de PostosDeTrabalho (agora calculado do Condomínio).
+
+```bash
+docker exec -i interceptor_db psql -U admin -d interceptor_db < 03-fase4-simplificar-postos.sql
+```
 
 ---
 
@@ -125,6 +143,27 @@ Alocações:                    66666666-6666-6666-6666-666666666601 a 12
 - ✅ Campo `ContratoId` obrigatório na tabela `Funcionarios`
 - ✅ Validação automática de contrato vigente ao criar funcionário
 - ✅ Foreign Key entre `Funcionarios` → `Contratos`
+
+**Novidade da FASE 3:**
+- ✅ **Salários calculados automaticamente!** Campos removidos de `Funcionarios`:
+  - ❌ `SalarioMensal` (removido)
+  - ❌ `ValorBeneficiosMensal` (removido)
+  - ❌ `ValorDiariasFixas` (removido)
+- ✅ Propriedades calculadas em tempo real:
+  - `SalarioBase` = Contrato.ValorTotalMensal / Contrato.QuantidadeFuncionarios
+  - `AdicionalNoturno` = 30% do base (para escala 12x36)
+  - `Beneficios` = Contrato.ValorBeneficiosExtrasMensal / Contrato.QuantidadeFuncionarios
+  - `SalarioTotal` = SalarioBase + AdicionalNoturno + Beneficios
+
+**Novidade da FASE 4:**
+- ✅ **QuantidadeIdealFuncionarios calculado automaticamente!** Campos removidos de `PostosDeTrabalho`:
+  - ❌ `QuantidadeIdealFuncionarios` (removido - agora calculado)
+  - ❌ `QuantidadeMaximaFuncionarios` (removido)
+  - ❌ `NumeroFaltasAcumuladas` (removido)
+- ✅ Nova propriedade calculada:
+  - `QuantidadeIdealFuncionarios` = Condominio.QuantidadeFuncionariosIdeal / TotalPostos
+- ✅ Novo campo opcional:
+  - `QuantidadeMaximaFaltas` (controle de faltas antes de dobrar escala)
 
 ---
 

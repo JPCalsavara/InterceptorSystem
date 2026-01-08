@@ -31,13 +31,14 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
         if (condominio == null)
             throw new InvalidOperationException("Condomínio não encontrado.");
 
+        // FASE 4: Sem QuantidadeIdealFuncionarios (calculado automaticamente)
         var posto = new PostoDeTrabalho(
             input.CondominioId,
             empresaId,
             input.HorarioInicio,
             input.HorarioFim,
-            input.QuantidadeIdealFuncionarios,
-            input.PermiteDobrarEscala
+            input.PermiteDobrarEscala,
+            input.QuantidadeMaximaFaltas
         );
 
         _repository.Add(posto);
@@ -52,7 +53,8 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
         if (posto == null)
             throw new KeyNotFoundException("Posto de Trabalho não encontrado.");
 
-        posto.AtualizarHorario(input.HorarioInicio, input.HorarioFim, input.QuantidadeIdealFuncionarios, input.PermiteDobrarEscala);
+        // FASE 4: Sem QuantidadeIdealFuncionarios (calculado automaticamente)
+        posto.AtualizarHorario(input.HorarioInicio, input.HorarioFim, input.PermiteDobrarEscala, input.QuantidadeMaximaFaltas);
 
         _repository.Update(posto);
         await _repository.UnitOfWork.CommitAsync();
