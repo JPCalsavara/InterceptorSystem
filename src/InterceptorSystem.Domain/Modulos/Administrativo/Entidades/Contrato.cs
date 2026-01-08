@@ -114,6 +114,43 @@ public class Contrato : Entity, IAggregateRoot
         Status = status;
     }
 
+    // FASE 3: Métodos de Cálculo Financeiro
+    
+    /// <summary>
+    /// Calcula o salário base por funcionário (divisão igualitária)
+    /// Fórmula: (ValorTotalMensal - Impostos - Benefícios) / QuantidadeFuncionarios
+    /// </summary>
+    public decimal CalcularSalarioBasePorFuncionario()
+    {
+        if (QuantidadeFuncionarios == 0)
+            throw new InvalidOperationException("Contrato sem funcionários definidos.");
+        
+        // Valor total - impostos - benefícios = salário líquido total
+        var valorImpostos = ValorTotalMensal * PercentualImpostos;
+        var valorLiquidoTotal = ValorTotalMensal - valorImpostos - ValorBeneficiosExtrasMensal;
+        
+        return Math.Round(valorLiquidoTotal / QuantidadeFuncionarios, 2);
+    }
+    
+    /// <summary>
+    /// Calcula adicional noturno baseado no salário base
+    /// </summary>
+    public decimal CalcularAdicionalNoturno(decimal salarioBase)
+    {
+        return Math.Round(salarioBase * PercentualAdicionalNoturno, 2);
+    }
+    
+    /// <summary>
+    /// Calcula benefícios por funcionário (divisão igualitária)
+    /// </summary>
+    public decimal CalcularBeneficiosPorFuncionario()
+    {
+        if (QuantidadeFuncionarios == 0)
+            throw new InvalidOperationException("Contrato sem funcionários definidos.");
+        
+        return Math.Round(ValorBeneficiosExtrasMensal / QuantidadeFuncionarios, 2);
+    }
+
     private static void CheckPercentual(decimal valor, string mensagem)
     {
         if (valor < 0m || valor > 1m)

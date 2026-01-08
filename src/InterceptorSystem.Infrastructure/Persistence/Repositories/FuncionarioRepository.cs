@@ -17,17 +17,18 @@ public class FuncionarioRepository : IFuncionarioRepository
 
     public IUnitOfWork UnitOfWork => _context;
 
+    // FASE 3: Sempre carregar Contrato para cálculo de salário
     public async Task<Funcionario?> GetByIdAsync(Guid id)
-        => await _context.Funcionarios.FirstOrDefaultAsync(f => f.Id == id);
+        => await _context.Funcionarios.Include(f => f.Contrato).FirstOrDefaultAsync(f => f.Id == id);
 
     public async Task<IEnumerable<Funcionario>> GetAllAsync()
-        => await _context.Funcionarios.ToListAsync();
+        => await _context.Funcionarios.Include(f => f.Contrato).ToListAsync();
 
     public async Task<Funcionario?> GetByCpfAsync(string cpf)
-        => await _context.Funcionarios.FirstOrDefaultAsync(f => f.Cpf == cpf);
+        => await _context.Funcionarios.Include(f => f.Contrato).FirstOrDefaultAsync(f => f.Cpf == cpf);
 
     public async Task<IEnumerable<Funcionario>> GetByCondominioAsync(Guid condominioId)
-        => await _context.Funcionarios.Where(f => f.CondominioId == condominioId).ToListAsync();
+        => await _context.Funcionarios.Include(f => f.Contrato).Where(f => f.CondominioId == condominioId).ToListAsync();
 
     public void Add(Funcionario entity) => _context.Funcionarios.Add(entity);
     public void Update(Funcionario entity) => _context.Funcionarios.Update(entity);

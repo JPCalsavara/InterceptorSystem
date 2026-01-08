@@ -39,13 +39,13 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
                 v => Enum.Parse<TipoFuncionario>(NormalizeTipoFuncionario(v)))
             .HasMaxLength(50);
 
-        builder.Property(f => f.SalarioMensal).HasColumnType("decimal(10,2)");
-        builder.Property(f => f.ValorTotalBeneficiosMensal).HasColumnType("decimal(10,2)");
-        builder.Property(f => f.ValorDiariasFixas).HasColumnType("decimal(10,2)");
+        // FASE 3: Campos de salário removidos - agora são calculados automaticamente
+        // As propriedades SalarioBase, AdicionalNoturno, Beneficios e SalarioTotal
+        // estão marcadas como [NotMapped] e são calculadas em tempo real do Contrato
 
         builder.Property(f => f.EmpresaId).IsRequired();
         builder.Property(f => f.CondominioId).IsRequired();
-        builder.Property(f => f.ContratoId).IsRequired(); // FASE 2: ContratoId obrigatório
+        builder.Property(f => f.ContratoId).IsRequired();
 
         builder.HasOne(f => f.Condominio)
             .WithMany(c => c.Funcionarios)

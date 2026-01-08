@@ -24,23 +24,22 @@ public class FuncionarioAppServiceTests
 
     private const string CpfValido = "12345678901";
 
+    // FASE 3: Sem parâmetros de salário (calculados automaticamente)
     private static CreateFuncionarioDtoInput CriarInputValido(Guid condominioId, Guid contratoId) => new(
         condominioId,
-        contratoId, // FASE 2: Adicionar ContratoId
+        contratoId,
         "João",
         CpfValido,
         "+5511999999999",
         StatusFuncionario.ATIVO,
         TipoEscala.DOZE_POR_TRINTA_SEIS,
-        TipoFuncionario.CLT,
-        2000,
-        300,
-        100);
+        TipoFuncionario.CLT);
 
     private static Condominio CriarCondominio(Guid empresaId) => new(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6));
 
+    // FASE 3: Sem parâmetros de salário (calculados automaticamente)
     private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId, Guid contratoId) =>
-        new(empresaId, condominioId, contratoId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        new(empresaId, condominioId, contratoId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
     public FuncionarioAppServiceTests()
     {
@@ -54,7 +53,8 @@ public class FuncionarioAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
         var contratoId = Guid.NewGuid();
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        // FASE 3: Sem parâmetros de salário
+        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
@@ -105,7 +105,8 @@ public class FuncionarioAppServiceTests
             StatusContrato.PAGO);
         _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
         
-        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100));
+        // FASE 3: Sem parâmetros de salário
+        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
     }
@@ -119,33 +120,14 @@ public class FuncionarioAppServiceTests
         _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);
     }
 
-    [Fact(DisplayName = "CreateAsync - Falha quando valores financeiros inválidos")]
-    public async Task CreateAsync_DeveFalhar_QuandoSalarioNegativo()
-    {
-        var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        var contratoId = Guid.NewGuid();
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "João", CpfValido, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, -10, -1, -5);
-
-        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(CriarCondominio(empresaId));
-        
-        // FASE 2: Mock de contrato vigente
-        var contrato = new Contrato(empresaId, condominioId, "Contrato Teste", 10000m, 100m, 0.30m, 500m, 0.15m, 5, 0.20m, 0.10m, 
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
-            StatusContrato.PAGO);
-        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
-        _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);
-    }
+    // FASE 3: Teste de salário negativo removido - não há mais campos de salário manual
 
     [Fact(DisplayName = "UpdateAsync - Falha quando funcionário não existe")]
     public async Task UpdateAsync_DeveFalhar_QuandoFuncionarioNaoExiste()
     {
         var id = Guid.NewGuid();
-        var input = new UpdateFuncionarioDtoInput("Jose", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2100, 320, 110);
+        // FASE 3: Sem parâmetros de salário
+        var input = new UpdateFuncionarioDtoInput("Jose", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
         _funcionarioRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Funcionario?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, input));
@@ -155,7 +137,8 @@ public class FuncionarioAppServiceTests
     public async Task UpdateAsync_DeveAtualizarFuncionario()
     {
         var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
-        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 2100, 320, 110);
+        // FASE 3: Sem parâmetros de salário
+        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO);
 
         _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -191,10 +174,11 @@ public class FuncionarioAppServiceTests
     public async Task GetAllAsync_DeveRetornarLista()
     {
         var empresaId = Guid.NewGuid();
+        // FASE 3: Sem parâmetros de salário
         var lista = new List<Funcionario>
         {
-            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100),
-            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "222", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 3000, 500, 0)
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT),
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "222", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO)
         };
         _funcionarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
 

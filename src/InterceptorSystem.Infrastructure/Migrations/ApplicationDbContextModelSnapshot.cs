@@ -216,9 +216,6 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<decimal>("SalarioMensal")
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<string>("StatusFuncionario")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -233,12 +230,6 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<decimal>("ValorDiariasFixas")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("ValorTotalBeneficiosMensal")
-                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 

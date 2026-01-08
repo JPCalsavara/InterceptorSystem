@@ -66,19 +66,17 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new InvalidOperationException("Já existe um funcionário cadastrado com este CPF.");
         }
 
+        // FASE 3: Funcionário sem parâmetros de salário (calculados automaticamente)
         var funcionario = new Funcionario(
             empresaId,
             input.CondominioId,
-            input.ContratoId, // FASE 2: Passar ContratoId
+            input.ContratoId,
             input.Nome,
             input.Cpf,
             input.Celular,
             input.StatusFuncionario,
             input.TipoEscala,
-            input.TipoFuncionario,
-            input.SalarioMensal,
-            input.ValorTotalBeneficiosMensal,
-            input.ValorDiariasFixas);
+            input.TipoFuncionario);
 
         _repository.Add(funcionario);
         await _repository.UnitOfWork.CommitAsync();
@@ -94,15 +92,13 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new KeyNotFoundException("Funcionário não encontrado.");
         }
 
+        // FASE 3: Atualizar sem parâmetros de salário (calculados automaticamente)
         funcionario.AtualizarDados(
             input.Nome,
             input.Celular,
             input.StatusFuncionario,
             input.TipoEscala,
-            input.TipoFuncionario,
-            input.SalarioMensal,
-            input.ValorTotalBeneficiosMensal,
-            input.ValorDiariasFixas);
+            input.TipoFuncionario);
 
         _repository.Update(funcionario);
         await _repository.UnitOfWork.CommitAsync();

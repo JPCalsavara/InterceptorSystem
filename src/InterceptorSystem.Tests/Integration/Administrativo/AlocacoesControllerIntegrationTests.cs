@@ -52,21 +52,18 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
 
     private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
     {
-        // FASE 2: Criar contrato vigente antes de criar funcionário
         var contratoId = await CriarContratoAsync(condominioId);
         
+        // FASE 3: Sem parâmetros de salário (calculados automaticamente)
         var input = new CreateFuncionarioDtoInput(
             condominioId,
-            contratoId, // FASE 2: Usar contrato real e vigente
+            contratoId,
             "Funcionario Teste",
             Guid.NewGuid().ToString(),
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
-            TipoFuncionario.CLT,
-            2500,
-            400,
-            100);
+            TipoFuncionario.CLT);
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();

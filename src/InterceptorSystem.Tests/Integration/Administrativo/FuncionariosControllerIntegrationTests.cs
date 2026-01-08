@@ -52,21 +52,18 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
 
     private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
     {
-        // FASE 2: Criar contrato vigente antes de criar funcionário
         var contratoId = await CriarContratoAsync(condominioId);
         
+        // FASE 3: Sem parâmetros de salário (calculados automaticamente)
         var input = new CreateFuncionarioDtoInput(
             condominioId,
-            contratoId, // FASE 2: Usar contrato real e vigente
+            contratoId,
             "Funcionario Teste",
             Guid.NewGuid().ToString(),
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
-            TipoFuncionario.CLT,
-            2500,
-            400,
-            100);
+            TipoFuncionario.CLT);
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();
@@ -86,7 +83,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     public async Task Post_DeveCriarFuncionario()
     {
         var (condominioId, contratoId) = await CriarCondominioComContratoAsync();
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", Guid.NewGuid().ToString(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2500, 400, 100);
+        // FASE 3: Sem parâmetros de salário
+        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", Guid.NewGuid().ToString(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
 
@@ -98,7 +96,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     {
         var (condominioId, contratoId) = await CriarCondominioComContratoAsync();
         var cpf = GerarCpfFake();
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", cpf, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2500, 400, 100);
+        // FASE 3: Sem parâmetros de salário
+        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", cpf, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
         await Client.PostAsJsonAsync("/api/funcionarios", input);
 
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
@@ -109,7 +108,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "POST /api/funcionarios - Deve retornar 404 quando condomínio inexistente")]
     public async Task Post_DeveFalhar_QuandoCondominioNaoExiste()
     {
-        var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), Guid.NewGuid(), "Funcionario Teste", GerarCpfFake(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2500, 400, 100);
+        // FASE 3: Sem parâmetros de salário
+        var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), Guid.NewGuid(), "Funcionario Teste", GerarCpfFake(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
 
@@ -151,7 +151,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     {
         var condominioId = await CriarCondominioAsync();
         var funcionario = await CriarFuncionarioAsync(condominioId);
-        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2600, 420, 110);
+        // FASE 3: Sem parâmetros de salário
+        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
         var response = await Client.PutAsJsonAsync($"/api/funcionarios/{funcionario.Id}", input);
 
@@ -161,7 +162,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "PUT /api/funcionarios/{id} - Deve retornar 404 quando funcionário não existe")]
     public async Task Put_DeveRetornar404_QuandoFuncionarioNaoExiste()
     {
-        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2600, 420, 110);
+        // FASE 3: Sem parâmetros de salário
+        var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
         var response = await Client.PutAsJsonAsync($"/api/funcionarios/{Guid.NewGuid()}", input);
 
