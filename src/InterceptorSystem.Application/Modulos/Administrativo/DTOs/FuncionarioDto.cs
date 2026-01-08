@@ -4,6 +4,7 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
 public record CreateFuncionarioDtoInput(
     Guid CondominioId,
+    Guid ContratoId, // FASE 2: Novo campo obrigatório
     string Nome,
     string Cpf,
     string Celular,
@@ -27,6 +28,7 @@ public record UpdateFuncionarioDtoInput(
 public record FuncionarioDtoOutput(
     Guid Id,
     Guid CondominioId,
+    Guid ContratoId, // FASE 2: Novo campo no output
     string Nome,
     string Cpf,
     string Celular,
@@ -44,6 +46,7 @@ public record FuncionarioDtoOutput(
         return new FuncionarioDtoOutput(
             entity.Id,
             entity.CondominioId,
+            entity.ContratoId, // FASE 2: Incluir ContratoId
             entity.Nome,
             entity.Cpf,
             entity.Celular,

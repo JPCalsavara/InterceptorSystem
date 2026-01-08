@@ -12,15 +12,18 @@ public class FuncionarioAppService : IFuncionarioAppService
 {
     private readonly IFuncionarioRepository _repository;
     private readonly ICondominioRepository _condominioRepository;
+    private readonly IContratoRepository _contratoRepository; // FASE 2: Novo repositório
     private readonly ICurrentTenantService _tenantService;
 
     public FuncionarioAppService(
         IFuncionarioRepository repository,
         ICondominioRepository condominioRepository,
+        IContratoRepository contratoRepository, // FASE 2: Injetar repositório de contrato
         ICurrentTenantService tenantService)
     {
         _repository = repository;
         _condominioRepository = condominioRepository;
+        _contratoRepository = contratoRepository; // FASE 2: Atribuir repositório
         _tenantService = tenantService;
     }
 
@@ -34,6 +37,29 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new KeyNotFoundException("Condomínio não encontrado para o funcionário.");
         }
 
+        // FASE 2: Validar se o contrato existe e está vigente
+        var contrato = await _contratoRepository.GetByIdAsync(input.ContratoId);
+        if (contrato == null)
+        {
+            throw new KeyNotFoundException("Contrato não encontrado.");
+        }
+
+        if (contrato.CondominioId != input.CondominioId)
+        {
+            throw new InvalidOperationException("O contrato não pertence ao condomínio informado.");
+        }
+
+        var dataAtual = DateOnly.FromDateTime(DateTime.Now);
+        if (contrato.Status != StatusContrato.PAGO && contrato.Status != StatusContrato.PENDENTE)
+        {
+            throw new InvalidOperationException($"Não é possível vincular funcionário a um contrato com status {contrato.Status}.");
+        }
+
+        if (dataAtual < contrato.DataInicio || dataAtual > contrato.DataFim)
+        {
+            throw new InvalidOperationException("O contrato não está vigente. Funcionários só podem ser vinculados a contratos vigentes.");
+        }
+
         var cpfExistente = await _repository.GetByCpfAsync(input.Cpf);
         if (cpfExistente != null)
         {
@@ -43,6 +69,7 @@ public class FuncionarioAppService : IFuncionarioAppService
         var funcionario = new Funcionario(
             empresaId,
             input.CondominioId,
+            input.ContratoId, // FASE 2: Passar ContratoId
             input.Nome,
             input.Cpf,
             input.Celular,

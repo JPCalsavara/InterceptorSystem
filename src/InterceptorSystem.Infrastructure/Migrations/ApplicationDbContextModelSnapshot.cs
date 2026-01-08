@@ -197,6 +197,9 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<Guid>("CondominioId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Cpf")
                         .IsRequired()
                         .HasMaxLength(14)
@@ -240,6 +243,8 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CondominioId");
+
+                    b.HasIndex("ContratoId");
 
                     b.HasIndex("Cpf")
                         .IsUnique();
@@ -325,7 +330,15 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", "Contrato")
+                        .WithMany("Funcionarios")
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Condominio");
+
+                    b.Navigation("Contrato");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
@@ -346,6 +359,11 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Navigation("Funcionarios");
 
                     b.Navigation("PostosDeTrabalho");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+                {
+                    b.Navigation("Funcionarios");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>

@@ -26,10 +26,38 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         return dto!.Id;
     }
 
+    // FASE 2: Criar contrato vigente para vincular funcionários
+    private async Task<Guid> CriarContratoAsync(Guid condominioId)
+    {
+        var input = new CreateContratoDtoInput(
+            condominioId,
+            "Contrato Teste Alocações",
+            10000m,  // ValorTotalMensal
+            100m,    // ValorDiariaCobrada
+            0.30m,   // PercentualAdicionalNoturno (30% = 0.30)
+            500m,    // ValorBeneficiosExtrasMensal
+            0.15m,   // PercentualImpostos (15% = 0.15)
+            5,       // QuantidadeFuncionarios
+            0.20m,   // MargemLucroPercentual (20% = 0.20)
+            0.10m,   // MargemCoberturaFaltasPercentual (10% = 0.10)
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)),
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
+            StatusContrato.PAGO
+        );
+        var response = await Client.PostAsJsonAsync("/api/contratos", input);
+        response.EnsureSuccessStatusCode();
+        var dto = await ReadAsAsync<ContratoDtoOutput>(response);
+        return dto!.Id;
+    }
+
     private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
     {
+        // FASE 2: Criar contrato vigente antes de criar funcionário
+        var contratoId = await CriarContratoAsync(condominioId);
+        
         var input = new CreateFuncionarioDtoInput(
             condominioId,
+            contratoId, // FASE 2: Usar contrato real e vigente
             "Funcionario Teste",
             Guid.NewGuid().ToString(),
             "+5511999999999",

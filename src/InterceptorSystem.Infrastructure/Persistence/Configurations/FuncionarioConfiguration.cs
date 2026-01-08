@@ -45,14 +45,22 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
 
         builder.Property(f => f.EmpresaId).IsRequired();
         builder.Property(f => f.CondominioId).IsRequired();
+        builder.Property(f => f.ContratoId).IsRequired(); // FASE 2: ContratoId obrigatório
 
         builder.HasOne(f => f.Condominio)
             .WithMany(c => c.Funcionarios)
             .HasForeignKey(f => f.CondominioId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // FASE 2: Relacionamento com Contrato
+        builder.HasOne(f => f.Contrato)
+            .WithMany(c => c.Funcionarios)
+            .HasForeignKey(f => f.ContratoId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(f => f.EmpresaId);
         builder.HasIndex(f => f.CondominioId);
+        builder.HasIndex(f => f.ContratoId); // FASE 2: Índice para performance
     }
 
     private static string NormalizeTipoEscala(string value)

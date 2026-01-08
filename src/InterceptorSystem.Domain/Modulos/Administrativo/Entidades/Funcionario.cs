@@ -7,17 +7,21 @@ namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 public class Funcionario : Entity, IAggregateRoot
 {
     public Guid CondominioId { get; private set; }
+    public Guid ContratoId { get; private set; } // FASE 2: Vínculo com contrato
     public string Nome { get; private set; } = null!;
     public string Cpf { get; private set; } = null!;
     public string Celular { get; private set; } = null!;
     public StatusFuncionario StatusFuncionario { get; private set; }
     public TipoEscala TipoEscala { get; private set; }
     public TipoFuncionario TipoFuncionario { get; private set; }
+    
+    // FASE 2: Campos mantidos temporariamente (serão removidos na FASE 3 - Cálculo Automático)
     public decimal SalarioMensal { get; private set; }
     public decimal ValorTotalBeneficiosMensal { get; private set; }
     public decimal ValorDiariasFixas { get; private set; }
 
     public Condominio? Condominio { get; private set; }
+    public Contrato? Contrato { get; private set; } // FASE 2: Navegação para contrato
     public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
 
     protected Funcionario() { }
@@ -25,6 +29,7 @@ public class Funcionario : Entity, IAggregateRoot
     public Funcionario(
         Guid empresaId,
         Guid condominioId,
+        Guid contratoId, // FASE 2: Novo parâmetro obrigatório
         string nome,
         string cpf,
         string celular,
@@ -37,6 +42,7 @@ public class Funcionario : Entity, IAggregateRoot
     {
         CheckRule(empresaId == Guid.Empty, "O funcionário deve pertencer a uma empresa.");
         CheckRule(condominioId == Guid.Empty, "O funcionário deve estar vinculado a um condomínio.");
+        CheckRule(contratoId == Guid.Empty, "O funcionário deve estar vinculado a um contrato."); // FASE 2: Nova validação
         CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
@@ -49,6 +55,7 @@ public class Funcionario : Entity, IAggregateRoot
 
         EmpresaId = empresaId;
         CondominioId = condominioId;
+        ContratoId = contratoId; // FASE 2: Atribuir ContratoId
         Nome = nome;
         Cpf = cpf;
         Celular = celular;

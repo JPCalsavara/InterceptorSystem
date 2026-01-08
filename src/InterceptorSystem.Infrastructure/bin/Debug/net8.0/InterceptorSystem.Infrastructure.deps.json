@@ -565,18 +565,12 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0"
         },
         "runtime": {
-          "InterceptorSystem.Application.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "InterceptorSystem.Application.dll": {}
         }
       },
       "InterceptorSystem.Domain/1.0.0": {
         "runtime": {
-          "InterceptorSystem.Domain.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "InterceptorSystem.Domain.dll": {}
         }
       }
     }

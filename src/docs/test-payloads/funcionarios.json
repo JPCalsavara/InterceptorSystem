@@ -1,6 +1,7 @@
 {
   "create": {
-    "condominioId": "00000000-0000-0000-0000-000000000000",
+    "condominioId": "22222222-2222-2222-2222-222222222221",
+    "contratoId": "33333333-3333-3333-3333-333333333331",
     "nome": "João da Silva",
     "cpf": "98765432100",
     "celular": "+5511999999999",
@@ -20,5 +21,16 @@
     "salarioMensal": 3200.00,
     "valorTotalBeneficiosMensal": 500.00,
     "valorDiariasFixas": 80.00
+  },
+  "_nota": {
+    "fase2": "ContratoId agora é obrigatório",
+    "exemplo_ids": {
+      "condominioSolar": "22222222-2222-2222-2222-222222222221",
+      "contratoSolar": "33333333-3333-3333-3333-333333333331",
+      "condominioHorizonte": "22222222-2222-2222-2222-222222222222",
+      "contratoHorizonte": "33333333-3333-3333-3333-333333333332",
+      "condominioTorres": "22222222-2222-2222-2222-222222222223",
+      "contratoTorres": "33333333-3333-3333-3333-333333333333"
+    }
   }
 }

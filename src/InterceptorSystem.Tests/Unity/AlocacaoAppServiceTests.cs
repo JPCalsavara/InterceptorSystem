@@ -36,7 +36,7 @@ public class AlocacaoAppServiceTests
         TipoAlocacao.REGULAR);
 
     private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId) =>
-        new(empresaId, condominioId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        new(empresaId, condominioId, Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
 
     private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) =>
         new(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
@@ -49,7 +49,8 @@ public class AlocacaoAppServiceTests
     {
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var funcionario = new Funcionario(empresaId, condominioId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        var contratoId = Guid.NewGuid();
+        var funcionario = new Funcionario(empresaId, condominioId, contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
         var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true);
         var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
 
@@ -81,7 +82,8 @@ public class AlocacaoAppServiceTests
     public async Task CreateAsync_DeveFalhar_QuandoPostoNaoExiste()
     {
         var empresaId = Guid.NewGuid();
-        var funcionario = new Funcionario(empresaId, Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        var contratoId = Guid.NewGuid();
+        var funcionario = new Funcionario(empresaId, Guid.NewGuid(), contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
         var postoId = Guid.NewGuid();
         var input = CriarInputValido(funcionario.Id, postoId);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);

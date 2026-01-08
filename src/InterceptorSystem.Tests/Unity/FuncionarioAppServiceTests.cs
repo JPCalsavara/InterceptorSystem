@@ -17,14 +17,16 @@ public class FuncionarioAppServiceTests
 {
     private readonly Mock<IFuncionarioRepository> _funcionarioRepo = new();
     private readonly Mock<ICondominioRepository> _condominioRepo = new();
+    private readonly Mock<IContratoRepository> _contratoRepo = new(); // FASE 2: Adicionar mock
     private readonly Mock<ICurrentTenantService> _tenantService = new();
     private readonly Mock<IUnitOfWork> _uow = new();
     private readonly FuncionarioAppService _service;
 
     private const string CpfValido = "12345678901";
 
-    private static CreateFuncionarioDtoInput CriarInputValido(Guid condominioId) => new(
+    private static CreateFuncionarioDtoInput CriarInputValido(Guid condominioId, Guid contratoId) => new(
         condominioId,
+        contratoId, // FASE 2: Adicionar ContratoId
         "João",
         CpfValido,
         "+5511999999999",
@@ -37,22 +39,33 @@ public class FuncionarioAppServiceTests
 
     private static Condominio CriarCondominio(Guid empresaId) => new(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6));
 
-    private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId) =>
-        new(empresaId, condominioId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+    private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId, Guid contratoId) =>
+        new(empresaId, condominioId, contratoId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
 
     public FuncionarioAppServiceTests()
     {
         _funcionarioRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        _service = new FuncionarioAppService(_funcionarioRepo.Object, _condominioRepo.Object, _tenantService.Object);
+        _service = new FuncionarioAppService(_funcionarioRepo.Object, _condominioRepo.Object, _contratoRepo.Object, _tenantService.Object); // FASE 2: Adicionar contratoRepo
     }
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
     public async Task CreateAsync_DeveCriarFuncionario()
     {
         var empresaId = Guid.NewGuid();
-        var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100);
+        
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
+        
+        // FASE 2: Mock de contrato vigente
+        var contrato = new Contrato(empresaId, condominioId, "Contrato Teste", 10000m, 100m, 0.30m, 500m, 0.15m, 5, 0.20m, 0.10m, 
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
+            StatusContrato.PAGO);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        
         _funcionarioRepo.Setup(r => r.GetByCpfAsync(input.Cpf)).ReturnsAsync((Funcionario?)null);
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
@@ -67,7 +80,7 @@ public class FuncionarioAppServiceTests
     {
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var input = CriarInputValido(condominioId);
+        var input = CriarInputValido(condominioId, Guid.NewGuid());
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync((Condominio?)null);
 
@@ -79,10 +92,20 @@ public class FuncionarioAppServiceTests
     {
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var input = CriarInputValido(condominioId);
+        var contratoId = Guid.NewGuid();
+        var input = CriarInputValido(condominioId, contratoId);
+        
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
-        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100));
+        
+        // FASE 2: Mock de contrato vigente
+        var contrato = new Contrato(empresaId, condominioId, "Contrato Teste", 10000m, 100m, 0.30m, 500m, 0.15m, 5, 0.20m, 0.10m, 
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
+            StatusContrato.PAGO);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        
+        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
     }
@@ -90,7 +113,7 @@ public class FuncionarioAppServiceTests
     [Fact(DisplayName = "CreateAsync - Falha quando Empresa (tenant) não está no contexto")]
     public async Task CreateAsync_DeveFalhar_QuandoTenantNaoDefinido()
     {
-        var input = CriarInputValido(Guid.NewGuid());
+        var input = CriarInputValido(Guid.NewGuid(), Guid.NewGuid());
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);
@@ -101,10 +124,18 @@ public class FuncionarioAppServiceTests
     {
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var input = new CreateFuncionarioDtoInput(condominioId, "João", CpfValido, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, -10, -1, -5);
+        var contratoId = Guid.NewGuid();
+        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "João", CpfValido, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, -10, -1, -5);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(CriarCondominio(empresaId));
+        
+        // FASE 2: Mock de contrato vigente
+        var contrato = new Contrato(empresaId, condominioId, "Contrato Teste", 10000m, 100m, 0.30m, 500m, 0.15m, 5, 0.20m, 0.10m, 
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
+            StatusContrato.PAGO);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);
@@ -123,7 +154,7 @@ public class FuncionarioAppServiceTests
     [Fact(DisplayName = "UpdateAsync - Sucesso quando dados válidos")]
     public async Task UpdateAsync_DeveAtualizarFuncionario()
     {
-        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid());
+        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 2100, 320, 110);
 
         _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
@@ -147,7 +178,7 @@ public class FuncionarioAppServiceTests
     [Fact(DisplayName = "DeleteAsync - Sucesso quando funcionário existe")]
     public async Task DeleteAsync_DeveExcluirFuncionarioQuandoExiste()
     {
-        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid());
+        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
@@ -162,8 +193,8 @@ public class FuncionarioAppServiceTests
         var empresaId = Guid.NewGuid();
         var lista = new List<Funcionario>
         {
-            new Funcionario(empresaId, Guid.NewGuid(), "João", "111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100),
-            new Funcionario(empresaId, Guid.NewGuid(), "Maria", "222", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 3000, 500, 0)
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT, 2000, 300, 100),
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "222", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO, 3000, 500, 0)
         };
         _funcionarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
 
@@ -175,7 +206,7 @@ public class FuncionarioAppServiceTests
     [Fact(DisplayName = "GetByIdAsync - Retorna funcionário quando existe")]
     public async Task GetByIdAsync_DeveRetornarFuncionario()
     {
-        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid());
+        var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
 
         var result = await _service.GetByIdAsync(funcionario.Id);

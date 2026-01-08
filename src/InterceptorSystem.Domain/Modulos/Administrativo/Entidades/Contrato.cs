@@ -21,6 +21,7 @@ public class Contrato : Entity, IAggregateRoot
     public StatusContrato Status { get; private set; }
 
     public Condominio? Condominio { get; private set; }
+    public ICollection<Funcionario> Funcionarios { get; private set; } = new List<Funcionario>(); // FASE 2: Navegação para funcionários
 
     protected Contrato() { }
 

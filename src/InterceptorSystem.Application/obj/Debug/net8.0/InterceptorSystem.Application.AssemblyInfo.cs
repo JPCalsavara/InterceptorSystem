@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InterceptorSystem.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+40b8a5bba0cfccf55c6ac2088f6518f7fe1a77fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fce2b5caa219f1fb536c0a5710d581b5ec566ec4")]
 [assembly: System.Reflection.AssemblyProductAttribute("InterceptorSystem.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InterceptorSystem.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
