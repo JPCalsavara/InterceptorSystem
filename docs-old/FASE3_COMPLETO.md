@@ -18,8 +18,11 @@ decimal CalcularAdicionalNoturno(decimal salarioBase)
 decimal CalcularBeneficiosPorFuncionario()
 ```
 
-**Fórmulas:**
-- **Salário Base**: `(ValorTotalMensal - Impostos - Benefícios) / QuantidadeFuncionarios`
+**Fórmulas (CORRIGIDAS):**
+- **Salário Base**: `(ValorTotalMensal - Impostos - MargemLucro - MargemFaltas - Benefícios) / QuantidadeFuncionarios`
+  - Impostos = `ValorTotalMensal × PercentualImpostos`
+  - MargemLucro = `ValorTotalMensal × MargemLucroPercentual` ✅ **AGORA INCLUSO**
+  - MargemFaltas = `ValorTotalMensal × MargemCoberturaFaltasPercentual` ✅ **AGORA INCLUSO**
 - **Adicional Noturno**: `SalarioBase * PercentualAdicionalNoturno` (apenas 12x36)
 - **Benefícios**: `ValorBeneficiosExtrasMensal / QuantidadeFuncionarios`
 
@@ -120,26 +123,31 @@ ALTER TABLE "Funcionarios" DROP COLUMN "ValorDiariasFixas";
 
 ## 📊 Exemplo Prático
 
-### **Cenário:** Condomínio com 5 funcionários
+### **Cenário:** Condomínio com 12 funcionários
 
 **Contrato:**
 ```json
 {
-  "valorTotalMensal": 10000,
-  "percentualImpostos": 0.15,      // 15%
-  "valorBeneficiosExtrasMensal": 500,
-  "percentualAdicionalNoturno": 0.30,  // 30%
-  "quantidadeFuncionarios": 5
+  "valorTotalMensal": 36000,
+  "percentualImpostos": 0.15,              // 15%
+  "margemLucroPercentual": 0.20,           // 20% ← AGORA CONSIDERADO!
+  "margemCoberturaFaltasPercentual": 0.10, // 10% ← AGORA CONSIDERADO!
+  "valorBeneficiosExtrasMensal": 3600,
+  "percentualAdicionalNoturno": 0.30,      // 30%
+  "quantidadeFuncionarios": 12
 }
 ```
 
-**Cálculo Automático:**
-1. **Impostos**: `10000 * 0.15 = 1500`
-2. **Valor Líquido Total**: `10000 - 1500 - 500 = 8000`
-3. **Salário Base por Funcionário**: `8000 / 5 = 1600.00`
-4. **Adicional Noturno** (12x36): `1600 * 0.30 = 480.00`
-5. **Benefícios por Funcionário**: `500 / 5 = 100.00`
-6. **Salário Total**: `1600 + 480 + 100 = 2180.00`
+**Cálculo Automático (CORRIGIDO):**
+1. **Impostos**: `36000 × 0.15 = R$ 5.400,00`
+2. **Margem de Lucro**: `36000 × 0.20 = R$ 7.200,00` ✅
+3. **Margem para Faltas**: `36000 × 0.10 = R$ 3.600,00` ✅
+4. **Benefícios Totais**: `R$ 3.600,00`
+5. **Base para Salários**: `36000 - 5400 - 7200 - 3600 - 3600 = R$ 16.200,00`
+6. **Salário Base por Funcionário**: `16200 / 12 = R$ 1.350,00`
+7. **Adicional Noturno** (12x36): `1350 × 0.30 = R$ 405,00`
+8. **Benefícios por Funcionário**: `3600 / 12 = R$ 300,00`
+9. **Salário Total**: `1350 + 405 + 300 = R$ 2.055,00`
 
 **Resposta da API:**
 ```json
@@ -147,12 +155,22 @@ ALTER TABLE "Funcionarios" DROP COLUMN "ValorDiariasFixas";
   "id": "...",
   "nome": "João Silva",
   "tipoEscala": "DOZE_POR_TRINTA_SEIS",
-  "salarioBase": 1600.00,
-  "adicionalNoturno": 480.00,
-  "beneficios": 100.00,
-  "salarioTotal": 2180.00
+  "salarioBase": 1350.00,
+  "adicionalNoturno": 405.00,
+  "beneficios": 300.00,
+  "salarioTotal": 2055.00
 }
 ```
+
+### 💰 **Distribuição do Valor Total (R$ 36.000,00):**
+| Item | Valor | % do Total |
+|------|-------|------------|
+| **Impostos** | R$ 5.400,00 | 15% |
+| **Margem de Lucro** | R$ 7.200,00 | 20% |
+| **Margem para Faltas** | R$ 3.600,00 | 10% |
+| **Benefícios** | R$ 3.600,00 | 10% |
+| **Salários (12 funcionários)** | R$ 16.200,00 | 45% |
+| **TOTAL** | **R$ 36.000,00** | **100%** |
 
 ---
 

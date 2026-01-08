@@ -15,6 +15,9 @@ public static class DependencyInjection
         services.AddScoped<IAlocacaoAppService, AlocacaoAppService>();
         services.AddScoped<IContratoAppService, ContratoAppService>();
         
+        // FASE 5: Serviço Orquestrador para Criação em Cascata
+        services.AddScoped<ICondominioOrquestradorService, CondominioOrquestradorService>();
+        
         // Aqui também entra: AutoMapper, MediatR, FluentValidation se formos usar
         
         return services;

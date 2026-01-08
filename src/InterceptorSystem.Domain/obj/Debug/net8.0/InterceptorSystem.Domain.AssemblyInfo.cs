@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InterceptorSystem.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+069b98badde1f555e1b6abbcbb575bfe5845d630")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a5aa8cb990fb9299f785eb594ef73960b7dd0d28")]
 [assembly: System.Reflection.AssemblyProductAttribute("InterceptorSystem.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InterceptorSystem.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

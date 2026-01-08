@@ -118,18 +118,44 @@ public class Contrato : Entity, IAggregateRoot
     
     /// <summary>
     /// Calcula o salário base por funcionário (divisão igualitária)
-    /// Fórmula: (ValorTotalMensal - Impostos - Benefícios) / QuantidadeFuncionarios
+    /// Fórmula: (ValorTotalMensal - Impostos - MargemLucro - MargemFaltas - Benefícios) / QuantidadeFuncionarios
+    /// 
+    /// CORREÇÃO CRÍTICA: Agora considera as margens de lucro e cobertura de faltas!
+    /// 
+    /// Exemplo:
+    /// - ValorTotalMensal: R$ 36.000,00
+    /// - Impostos (15%):   R$  5.400,00
+    /// - Lucro (20%):      R$  7.200,00
+    /// - Faltas (10%):     R$  3.600,00
+    /// - Benefícios:       R$  3.600,00
+    /// = Base Salários:    R$ 16.200,00
+    /// / 12 funcionários = R$  1.350,00 cada
     /// </summary>
     public decimal CalcularSalarioBasePorFuncionario()
     {
         if (QuantidadeFuncionarios == 0)
             throw new InvalidOperationException("Contrato sem funcionários definidos.");
         
-        // Valor total - impostos - benefícios = salário líquido total
+        // 1. Calcular deduções do valor total
         var valorImpostos = ValorTotalMensal * PercentualImpostos;
-        var valorLiquidoTotal = ValorTotalMensal - valorImpostos - ValorBeneficiosExtrasMensal;
+        var valorMargemLucro = ValorTotalMensal * MargemLucroPercentual;
+        var valorMargemFaltas = ValorTotalMensal * MargemCoberturaFaltasPercentual;
         
-        return Math.Round(valorLiquidoTotal / QuantidadeFuncionarios, 2);
+        // 2. Base disponível para salários = Valor Total - Todas as deduções
+        var baseParaSalarios = ValorTotalMensal 
+            - valorImpostos 
+            - valorMargemLucro 
+            - valorMargemFaltas 
+            - ValorBeneficiosExtrasMensal;
+        
+        // 3. Validar se base é positiva
+        if (baseParaSalarios <= 0)
+            throw new InvalidOperationException(
+                $"Base para salários é negativa ou zero (R$ {baseParaSalarios:N2}). " +
+                "Verifique os percentuais de impostos, margens e benefícios.");
+        
+        // 4. Dividir igualmente entre funcionários
+        return Math.Round(baseParaSalarios / QuantidadeFuncionarios, 2);
     }
     
     /// <summary>
