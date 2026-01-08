@@ -28,7 +28,7 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.Property(f => f.TipoEscala)
             .IsRequired()
             .HasConversion(
-                v => v.ToString(),
+                v => ConvertTipoEscalaToDb(v),
                 v => Enum.Parse<TipoEscala>(NormalizeTipoEscala(v)))
             .HasMaxLength(50);
 
@@ -61,6 +61,16 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.HasIndex(f => f.EmpresaId);
         builder.HasIndex(f => f.CondominioId);
         builder.HasIndex(f => f.ContratoId); // FASE 2: Índice para performance
+    }
+
+    private static string ConvertTipoEscalaToDb(TipoEscala tipoEscala)
+    {
+        return tipoEscala switch
+        {
+            TipoEscala.DOZE_POR_TRINTA_SEIS => "DOZE_POR_TRINTA_SEIS",
+            TipoEscala.SEMANAL_COMERCIAL => "SEMANAL_COMERCIAL",
+            _ => tipoEscala.ToString()
+        };
     }
 
     private static string NormalizeTipoEscala(string value)
