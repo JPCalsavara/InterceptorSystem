@@ -24,6 +24,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'criar-completo',
+        loadComponent: () =>
+          import('./features/condominios/condominio-wizard/condominio-wizard.component').then(
+            (m) => m.CondominioWizardComponent
+          ),
+      },
+      {
         path: ':id/editar',
         loadComponent: () =>
           import('./features/condominios/condominio-form/condominio-form.component').then(
@@ -89,6 +96,13 @@ export const routes: Routes = [
             (m) => m.FuncionarioFormComponent
           ),
       },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/funcionarios/funcionario-detail/funcionario-detail.component').then(
+            (m) => m.FuncionarioDetailComponent
+          ),
+      },
     ],
   },
   {
@@ -97,12 +111,24 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./features/postos/posto-list.component').then((m) => m.PostoListComponent),
+          import('./features/postos/posto-list/posto-list.component').then((m) => m.PostoListComponent),
       },
       {
         path: 'novo',
         loadComponent: () =>
-          import('./features/postos/postos.component').then((m) => m.PostosComponent),
+          import('./features/postos/posto-form/posto-form.component').then((m) => m.PostoFormComponent),
+      },
+      {
+        path: ':id/editar',
+        loadComponent: () =>
+          import('./features/postos/posto-form/posto-form.component').then((m) => m.PostoFormComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/postos/posto-detail/posto-detail.component').then(
+            (m) => m.PostoDetailComponent
+          ),
       },
     ],
   },
@@ -112,14 +138,26 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./features/alocacoes/alocacao-list.component').then(
+          import('./features/alocacoes/alocacao-list/alocacao-list.component').then(
             (m) => m.AlocacaoListComponent
           ),
       },
       {
         path: 'novo',
         loadComponent: () =>
-          import('./features/alocacoes/alocacoes.component').then((m) => m.AlocacoesComponent),
+          import('./features/alocacoes/alocacao-form/alocacao-form.component').then((m) => m.AlocacaoFormComponent),
+      },
+      {
+        path: ':id/editar',
+        loadComponent: () =>
+          import('./features/alocacoes/alocacao-form/alocacao-form.component').then((m) => m.AlocacaoFormComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/alocacoes/alocacao-detail/alocacao-detail.component').then(
+            (m) => m.AlocacaoDetailComponent
+          ),
       },
     ],
   },

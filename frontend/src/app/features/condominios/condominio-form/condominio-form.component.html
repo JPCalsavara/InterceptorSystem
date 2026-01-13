@@ -91,6 +91,116 @@
         }
       </div>
 
+      <h3 class="section-title">⚙️ Configurações Operacionais</h3>
+
+      <!-- Número de Postos e Funcionários por Posto -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="numeroPostos" class="form-label">
+            Número de Postos de Trabalho <span class="required">*</span>
+          </label>
+          <input
+            id="numeroPostos"
+            type="number"
+            formControlName="numeroPostos"
+            class="form-input"
+            [class.error]="hasError('numeroPostos')"
+            placeholder="Ex: 2"
+            min="1"
+            max="10"
+            (input)="calcularQuantidadeFuncionarios()"
+          />
+          @if (hasError('numeroPostos')) {
+          <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
+          }
+          <span class="help-text">Quantidade de postos (1-10)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="funcionariosPorPosto" class="form-label">
+            Funcionários por Posto <span class="required">*</span>
+          </label>
+          <input
+            id="funcionariosPorPosto"
+            type="number"
+            formControlName="funcionariosPorPosto"
+            class="form-input"
+            [class.error]="hasError('funcionariosPorPosto')"
+            placeholder="Ex: 2"
+            min="1"
+            max="5"
+            (input)="calcularQuantidadeFuncionarios()"
+          />
+          @if (hasError('funcionariosPorPosto')) {
+          <span class="error-message">{{ getErrorMessage('funcionariosPorPosto') }}</span>
+          }
+          <span class="help-text">Funcionários por posto (1-5)</span>
+        </div>
+      </div>
+
+      <!-- Quantidade Total (Calculada) -->
+      <div class="form-group">
+        <label class="form-label">Quantidade Total de Funcionários</label>
+        <div class="calculated-value">
+          <span class="value-display">{{ quantidadeTotalFuncionarios() }}</span>
+          <span class="help-text">
+            = {{ form.get('numeroPostos')?.value || 0 }} postos ×
+            {{ form.get('funcionariosPorPosto')?.value || 0 }} funcionários
+          </span>
+        </div>
+      </div>
+
+      <!-- Horário Troca Turno -->
+      <div class="form-group">
+        <label for="horarioTrocaTurno" class="form-label">
+          Horário de Troca de Turno <span class="required">*</span>
+        </label>
+        <input
+          id="horarioTrocaTurno"
+          type="time"
+          formControlName="horarioTrocaTurno"
+          class="form-input"
+          [class.error]="hasError('horarioTrocaTurno')"
+        />
+        @if (hasError('horarioTrocaTurno')) {
+        <span class="error-message">{{ getErrorMessage('horarioTrocaTurno') }}</span>
+        }
+        <span class="help-text">Ex: 06:00 (horário de início do turno diurno)</span>
+      </div>
+
+      <!-- Email Gestor e Telefone Emergência -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
+          <input
+            id="emailGestor"
+            type="email"
+            formControlName="emailGestor"
+            class="form-input"
+            [class.error]="hasError('emailGestor')"
+            placeholder="gestor@condominio.com.br"
+          />
+          @if (hasError('emailGestor')) {
+          <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
+          <input
+            id="telefoneEmergencia"
+            type="tel"
+            formControlName="telefoneEmergencia"
+            class="form-input"
+            [class.error]="hasError('telefoneEmergencia')"
+            placeholder="(11) 98765-4321"
+          />
+          @if (hasError('telefoneEmergencia')) {
+          <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
+          }
+        </div>
+      </div>
+
       <!-- Footer -->
       <div class="form-footer">
         <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>

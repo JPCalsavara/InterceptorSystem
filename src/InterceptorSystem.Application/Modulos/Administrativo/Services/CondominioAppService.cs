@@ -42,7 +42,7 @@ public class CondominioAppService : ICondominioAppService
         _repository.Add(condominio);
         await _repository.UnitOfWork.CommitAsync();
         
-        return CondominioDtoOutput.FromEntity(condominio);
+        return CondominioDtoOutput.FromEntity(condominio)!;
     }
 
     public async Task<CondominioDtoOutput> UpdateAsync(Guid id, UpdateCondominioDtoInput input)
@@ -61,7 +61,7 @@ public class CondominioAppService : ICondominioAppService
         _repository.Update(condominio);
         await  _repository.UnitOfWork.CommitAsync();
         
-        return CondominioDtoOutput.FromEntity(condominio);
+        return CondominioDtoOutput.FromEntity(condominio)!;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -77,12 +77,12 @@ public class CondominioAppService : ICondominioAppService
     public async Task<CondominioDtoOutput?> GetByIdAsync(Guid id)
     {
         var condominio = await _repository.GetByIdAsync(id);
-        return CondominioDtoOutput.FromEntity(condominio);
+        return condominio != null ? CondominioDtoOutput.FromEntity(condominio) : null;
     }
 
     public async Task<IEnumerable<CondominioDtoOutput>> GetAllAsync()
     {
         var lista = await _repository.GetAllAsync();
-        return lista.Select(c => CondominioDtoOutput.FromEntity(c)!);    
+        return lista.Select(c => CondominioDtoOutput.FromEntity(c)).Where(dto => dto != null)!;    
     }
 }

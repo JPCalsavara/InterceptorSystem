@@ -29,7 +29,8 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
 
     public async Task<CondominioCompletoDtoOutput> CriarCondominioCompletoAsync(CreateCondominioCompletoDtoInput input)
     {
-        var empresaId = _tenantService.EmpresaId 
+        // Validar tenant
+        _ = _tenantService.EmpresaId 
             ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
         // Validação prévia
@@ -86,14 +87,14 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
         }
     }
 
-    public async Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateCondominioCompletoDtoInput input)
+    public Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateCondominioCompletoDtoInput input)
     {
         // Validação 1: Quantidade de funcionários do contrato deve bater com o ideal do condomínio
         if (input.Contrato.QuantidadeFuncionarios != input.Condominio.QuantidadeFuncionariosIdeal)
         {
-            return (false, 
+            return Task.FromResult<(bool, string?)>((false, 
                 $"Quantidade de funcionários do contrato ({input.Contrato.QuantidadeFuncionarios}) " +
-                $"deve ser igual à quantidade ideal do condomínio ({input.Condominio.QuantidadeFuncionariosIdeal}).");
+                $"deve ser igual à quantidade ideal do condomínio ({input.Condominio.QuantidadeFuncionariosIdeal})."));
         }
 
         // Validação 2: Número de postos deve ser divisor da quantidade de funcionários
@@ -101,9 +102,9 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
         {
             if (input.Condominio.QuantidadeFuncionariosIdeal % input.NumeroDePostos != 0)
             {
-                return (false,
+                return Task.FromResult<(bool, string?)>((false,
                     $"Quantidade de funcionários ({input.Condominio.QuantidadeFuncionariosIdeal}) " +
-                    $"deve ser divisível pelo número de postos ({input.NumeroDePostos}).");
+                    $"deve ser divisível pelo número de postos ({input.NumeroDePostos})."));
             }
         }
 
@@ -111,19 +112,19 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
         var hoje = DateOnly.FromDateTime(DateTime.Today);
         if (input.Contrato.DataInicio < hoje)
         {
-            return (false, "Data de início do contrato não pode ser no passado.");
+            return Task.FromResult<(bool, string?)>((false, "Data de início do contrato não pode ser no passado."));
         }
 
         // Validação 4: Data de fim deve ser posterior à data de início
         if (input.Contrato.DataFim <= input.Contrato.DataInicio)
         {
-            return (false, "Data de fim do contrato deve ser posterior à data de início.");
+            return Task.FromResult<(bool, string?)>((false, "Data de fim do contrato deve ser posterior à data de início."));
         }
 
         // Validação 5: CNPJ não pode estar duplicado (verificar no service)
         // Essa validação já é feita no CondominioAppService
 
-        return (true, null);
+        return Task.FromResult<(bool, string?)>((true, null));
     }
 
     /// <summary>
@@ -157,8 +158,7 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
                 CondominioId: condominioId,
                 HorarioInicio: inicio,
                 HorarioFim: fim,
-                PermiteDobrarEscala: true,
-                QuantidadeMaximaFaltas: 3 // Padrão: 3 faltas antes de precisar dobrar
+                PermiteDobrarEscala: true
             );
 
             var posto = await _postoService.CreateAsync(postoInput);

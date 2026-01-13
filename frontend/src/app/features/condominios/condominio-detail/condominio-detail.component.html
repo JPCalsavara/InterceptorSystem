@@ -1,434 +1,301 @@
-<div class="page-container">
+<div class="detail-container">
+  <!-- Loading State -->
   @if (loading()) {
   <div class="loading-container">
     <div class="spinner"></div>
-    <p>Carregando dashboard...</p>
+    <p>Carregando dados do condomínio...</p>
   </div>
-  } @if (error()) {
-  <div class="alert alert-error">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        clip-rule="evenodd"
-      />
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="error-container">
+    <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
     </svg>
-    {{ error() }}
+    <h3>{{ error() }}</h3>
+    <a [routerLink]="['/condominios']" class="btn-back">← Voltar para lista</a>
   </div>
-  } @if (!loading() && condominio()) {
-  <!-- Header -->
-  <div class="page-header">
+  }
+
+  <!-- Content -->
+  @if (!loading() && !error() && condominio()) {
+
+  <!-- Header do Condomínio -->
+  <header class="detail-header">
+    <div class="header-top">
+      <a [routerLink]="['/condominios']" class="btn-back">← Voltar</a>
+      <div class="header-actions">
+        <a [routerLink]="['/condominios', condominio()!.id, 'editar']" class="btn-edit">✏️ Editar</a>
+      </div>
+    </div>
+
     <div class="header-content">
-      <button class="btn-back" routerLink="/condominios">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fill-rule="evenodd"
-            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-            clip-rule="evenodd"
-          />
-        </svg>
-        Voltar
-      </button>
-      <h1>🏢 {{ condominio()?.nome }}</h1>
-      <div class="condominio-info">
-        <div class="info-item">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fill-rule="evenodd"
-              d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3.586l-.707-.707A1 1 0 0011 17h-2a1 1 0 00-.707.293l-.707.707H4a1 1 0 110-2V4zm3 1h6v4H7V5zm6 6H7v2h6v-2z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <span>CNPJ: {{ condominio()?.cnpj }}</span>
-        </div>
-        @if (condominio()?.telefone) {
-        <div class="info-item">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"
-            />
-          </svg>
-          <span>{{ condominio()?.telefone }}</span>
-        </div>
-        } @if (condominio()?.email) {
-        <div class="info-item">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-          </svg>
-          <span>{{ condominio()?.email }}</span>
-        </div>
-        }
-        <div class="info-item">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fill-rule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <span>{{ condominio()?.endereco }}</span>
+      <div class="header-info">
+        <h1>{{ condominio()!.nome }}</h1>
+        <div class="header-meta">
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
+            </svg>
+            CNPJ: {{ condominio()!.cnpj }}
+          </span>
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            {{ condominio()!.endereco }}
+          </span>
         </div>
       </div>
-    </div>
-    <button class="btn-primary" [routerLink]="['/condominios', condominio()?.id, 'editar']">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-        />
-      </svg>
-      Editar Condomínio
-    </button>
-  </div>
 
-  <!-- Info Cards -->
-  <!-- Linha 1: Custos Absolutos -->
-  <div class="info-section">
-    <div class="info-card">
-      <div class="info-icon info-icon-primary">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Faturamento Total</p>
-        <h3 class="info-value">{{ faturamentoTotal() | currency : 'BRL' }}</h3>
-        <p class="info-description">Contratos pagos</p>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon info-icon-info">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Custo Fixo Mensal</p>
-        <h3 class="info-value">{{ custoEstimadoMensal() | currency : 'BRL' }}</h3>
-        <p class="info-description">Salários + Benefícios</p>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon info-icon-error">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Custo Extra com Faltas</p>
-        <h3 class="info-value">{{ custoExtraFaltas() | currency : 'BRL' }}</h3>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon" [ngClass]="lucro() >= 0 ? 'info-icon-success' : 'info-icon-error'">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Lucro</p>
-        <h3 class="info-value">{{ lucro() | currency : 'BRL' }}</h3>
-        <p class="info-description">Faturamento - Custos</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Linha 2: Fatores -->
-  <div class="info-section">
-    <div class="info-card">
-      <div class="info-icon info-icon-warning">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Valor Diária Média</p>
-        <h3 class="info-value">{{ valorDiariaMedia() | currency : 'BRL' }}</h3>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon info-icon-success">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Total de Benefícios</p>
-        <h3 class="info-value">{{ totalBeneficios() | currency : 'BRL' }}</h3>
-        <p class="info-description">Mensal - Ativos</p>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon info-icon-warning">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Adicional Noturno</p>
-        <h3 class="info-value">{{ totalAdicionalNoturno() | currency : 'BRL' }}</h3>
-        <p class="info-description">Estimativa 20%</p>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon info-icon-info">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Custo Médio/Funcionário</p>
-        <h3 class="info-value">{{ custoMedioFuncionario() | currency : 'BRL' }}</h3>
-      </div>
-    </div>
-  </div>
-
-  <!-- Linha 3: Quantidades -->
-  <div class="info-section">
-    <div class="info-card">
-      <div class="info-icon info-icon-info">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Total de Funcionários</p>
-        <h3 class="info-value">{{ totalFuncionarios() }}</h3>
-        <p class="info-description">Ativos</p>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon info-icon-error">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Total de Faltas</p>
-        <h3 class="info-value">{{ totalFaltas() }}</h3>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-icon" [ngClass]="vencimentoClass()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      </div>
-      <div class="info-content">
-        <p class="info-label">Vencimento Contrato</p>
-        @if (diasParaVencimento() !== null) {
-        <h3 class="info-value">{{ diasParaVencimento() }} dias</h3>
-        <p class="info-description">{{ contratoAtual()?.dataFim | date : 'dd/MM/yyyy' }}</p>
-        } @else {
-        <h3 class="info-value">-</h3>
-        <p class="info-description">Nenhum contrato ativo</p>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- Postos e Alocações Grid -->
-  <div class="postos-alocacoes-grid">
-    <!-- Postos de Trabalho (1/3) -->
-    <div class="section">
-      <h2 class="section-title">📍 Postos de Trabalho</h2>
-      @if (postos().length === 0) {
-      <div class="empty-state-small">
-        <p>Nenhum posto de trabalho cadastrado</p>
-      </div>
-      } @else {
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Horário</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (posto of postos(); track posto.id) {
-            <tr>
-              <td>{{ posto.horario }}</td>
-            </tr>
-            }
-          </tbody>
-        </table>
+      <!-- Alerta de Contrato -->
+      @if (contratoAtual()) {
+      <div class="contract-alert" [class]="getUrgenciaClass(diasParaVencimento())">
+        <div class="alert-icon">
+          @if (diasParaVencimento() !== null && diasParaVencimento()! <= 14) {
+            ⚠️
+          } @else if (diasParaVencimento() !== null && diasParaVencimento()! <= 90) {
+            ⏰
+          } @else {
+            ✅
+          }
+        </div>
+        <div class="alert-content">
+          <strong>Contrato Vigente</strong>
+          @if (diasParaVencimento() !== null) {
+          <p>Vence em {{ diasParaVencimento() }} dias ({{ formatDate(contratoAtual()!.dataFim) }})</p>
+          }
+        </div>
       </div>
       }
     </div>
+  </header>
 
-    <!-- Alocações com Problema (4/5) -->
-    <div class="section">
-      <h2 class="section-title">⚠️ Alocações com Problema</h2>
-      @if (alocacoesComProblema().length === 0) {
-      <div class="empty-state-small success">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <p>Nenhuma alocação com problema! 🎉</p>
+  <!-- Informações Operacionais do Condomínio -->
+  <section class="info-section">
+    <h2 class="section-title">📋 Informações Operacionais</h2>
+    <div class="info-grid">
+      <!-- Quantidade de Funcionários Ideal -->
+      <div class="info-card">
+        <div class="info-icon">👥</div>
+        <div class="info-content">
+          <span class="info-label">Funcionários Ideal</span>
+          <span class="info-value">{{ condominio()!.quantidadeFuncionariosIdeal }}</span>
+        </div>
       </div>
-      } @else {
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Funcionário</th>
-              <th>Posto</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (alocacao of alocacoesComProblema(); track alocacao.id) {
-            <tr>
-              <td>{{ alocacao.data }}</td>
-              <td>{{ getFuncionarioNome(alocacao.funcionarioId) }}</td>
-              <td>{{ getPostoHorario(alocacao.postoDeTrabalhoId) }}</td>
-              <td>
-                <span class="badge badge-error">
-                  {{ getStatusLabel(alocacao.statusAlocacao) }}
-                </span>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
+
+      <!-- Horário de Troca de Turno -->
+      <div class="info-card">
+        <div class="info-icon">🕐</div>
+        <div class="info-content">
+          <span class="info-label">Horário de Troca</span>
+          <span class="info-value">{{ condominio()!.horarioTrocaTurno.substring(0, 5) }}</span>
+        </div>
+      </div>
+
+      <!-- Email do Gestor -->
+      @if (condominio()!.emailGestor) {
+      <div class="info-card">
+        <div class="info-icon">📧</div>
+        <div class="info-content">
+          <span class="info-label">Email do Gestor</span>
+          <span class="info-value">{{ condominio()!.emailGestor }}</span>
+        </div>
+      </div>
+      }
+
+      <!-- Telefone de Emergência -->
+      @if (condominio()!.telefoneEmergencia) {
+      <div class="info-card">
+        <div class="info-icon">📞</div>
+        <div class="info-content">
+          <span class="info-label">Telefone de Emergência</span>
+          <span class="info-value">{{ formatarTelefone(condominio()!.telefoneEmergencia) }}</span>
+        </div>
       </div>
       }
     </div>
-  </div>
+  </section>
 
-  <!-- Cronograma Completo -->
-  <div class="section">
-    <h2 class="section-title">📅 Cronograma de Alocações</h2>
+  <!-- Filtro de Período -->
+  <section class="period-filter">
+    <div class="filter-header">
+      <h2>📊 Análise Financeira - {{ getPeriodoLabel() }}</h2>
+      <div class="filter-buttons">
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'mensal'"
+          (click)="mudarPeriodo('mensal')">
+          Mensal
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'trimestral'"
+          (click)="mudarPeriodo('trimestral')">
+          Trimestral
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'semestral'"
+          (click)="mudarPeriodo('semestral')">
+          Semestral
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'anual'"
+          (click)="mudarPeriodo('anual')">
+          Anual
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-info">
+      <span>Período: {{ formatDate(dataInicio().toISOString()) }} até {{ formatDate(dataFim().toISOString()) }}</span>
+    </div>
+  </section>
+
+  <!-- Métricas do Período -->
+  <section class="metrics-section">
+    <div class="metrics-grid">
+      @for (metrica of metricasPeriodo(); track metrica.titulo) {
+      <div class="metric-card">
+        <div class="metric-icon">{{ metrica.icone }}</div>
+        <div class="metric-content">
+          <p class="metric-title">{{ metrica.titulo }}</p>
+          <h3 class="metric-value">
+            @if (metrica.unidade === 'BRL') {
+              {{ formatCurrency(metrica.valor) }}
+            } @else if (metrica.unidade === '%') {
+              {{ formatPercent(metrica.valor) }}
+            } @else {
+              {{ metrica.valor }}
+            }
+          </h3>
+          @if (metrica.unidade && metrica.unidade !== 'BRL' && metrica.unidade !== '%') {
+          <p class="metric-unit">{{ metrica.unidade }}</p>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Breakdown Financeiro -->
+  <section class="breakdown-section">
+    <h2>💰 Breakdown Financeiro ({{ getPeriodoLabel() }})</h2>
+    <div class="breakdown-cards">
+      <!-- Receita -->
+      <div class="breakdown-card receita">
+        <h3>📈 Receita Total</h3>
+        <p class="breakdown-value">{{ formatCurrency(receitaPeriodo()) }}</p>
+        <div class="breakdown-details">
+          <span>{{ contratosPeriodo().length }} contrato(s) vigente(s)</span>
+        </div>
+      </div>
+
+      <!-- Custos -->
+      <div class="breakdown-card custo">
+        <h3>💸 Custos Operacionais</h3>
+        <p class="breakdown-value">{{ formatCurrency(custoPeriodo()) }}</p>
+        <div class="breakdown-details">
+          <span>{{ funcionariosPeriodo().length }} funcionário(s) ativo(s)</span>
+        </div>
+      </div>
+
+      <!-- Lucro -->
+      <div class="breakdown-card lucro" [class.negativo]="lucroPeriodo() < 0">
+        <h3>{{ lucroPeriodo() >= 0 ? '📊' : '⚠️' }} {{ lucroPeriodo() >= 0 ? 'Lucro' : 'Prejuízo' }}</h3>
+            <p class="stat-breakdown-value">{{ formatCurrency(abs(lucroPeriodo())) }}</p>
+        <div class="breakdown-details">
+          <span>Margem: {{ formatPercent(margemLucroPeriodo()) }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Postos de Trabalho -->
+  <section class="section-postos">
+    <div class="section-header">
+      <h2>📍 Postos de Trabalho ({{ postos().length }})</h2>
+      <a [routerLink]="['/postos', 'novo']" [queryParams]="{condominioId: condominio()!.id}" class="btn-add">
+        + Adicionar Posto
+      </a>
+    </div>
+
     @if (postos().length === 0) {
-    <div class="empty-state-small">
-      <p>Nenhum posto de trabalho cadastrado</p>
+    <div class="empty-state">
+      <p>Nenhum posto cadastrado</p>
     </div>
     } @else {
-    <div class="cronograma-container">
+    <div class="postos-grid">
       @for (posto of postos(); track posto.id) {
-      <div class="cronograma-posto">
+      <div class="posto-card">
         <div class="posto-header">
-          <div class="posto-icon">📍</div>
-          <div class="posto-info">
-            <h3 class="posto-titulo">Posto {{ posto.horario }}</h3>
-            <p class="posto-subtitle">
-              {{ getAlocacoesByPosto(posto.id).length }} alocaç{{
-                getAlocacoesByPosto(posto.id).length !== 1 ? 'ões' : 'ão'
-              }}
-            </p>
+          <h3>Posto #{{ $index + 1 }}</h3>
+          <div class="posto-actions">
+            <a [routerLink]="['/postos', posto.id, 'editar']" class="btn-icon">✏️</a>
           </div>
         </div>
-
-        <div class="alocacoes-list">
-          @if (getAlocacoesByPosto(posto.id).length === 0) {
-          <div class="empty-alocacao">
-            <p>Nenhuma alocação registrada</p>
+        <div class="posto-info">
+          <div class="info-row">
+            <span class="label">Horário:</span>
+            <span class="value">{{ formatHorario(posto.horarioInicio, posto.horarioFim) }}</span>
           </div>
-          } @else { @for (alocacao of getAlocacoesByPosto(posto.id); track alocacao.id) {
-          <div class="alocacao-item" [class.problema]="alocacao.statusAlocacao !== 'CONFIRMADA'">
-            <div class="alocacao-content">
-              <div class="funcionario-info">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <span class="funcionario-nome">{{
-                  getFuncionarioNome(alocacao.funcionarioId)
-                }}</span>
-              </div>
-              <div class="alocacao-meta">
-                <span class="alocacao-data">{{ alocacao.data | date : 'dd/MM/yyyy' }}</span>
-                <span class="badge" [ngClass]="getStatusBadgeClass(alocacao.statusAlocacao)">
-                  {{ getStatusLabel(alocacao.statusAlocacao) }}
-                </span>
-              </div>
-            </div>
+          <div class="info-row">
+            <span class="label">Capacidade Ideal:</span>
+            <span class="value badge badge-info">{{ posto.quantidadeIdealFuncionarios }}</span>
           </div>
-          } }
+          @if (posto.permiteDobrarEscala) {
+          <div class="info-row">
+            <span class="badge badge-success">Permite Dobras</span>
+          </div>
+          }
+          @if (posto.capacidadeMaximaPorDobras && posto.capacidadeMaximaPorDobras > 0) {
+          <div class="info-row">
+            <span class="label">Capacidade Máxima c/ Dobras:</span>
+            <span class="value">{{ posto.capacidadeMaximaPorDobras }}</span>
+          </div>
+          }
         </div>
       </div>
       }
     </div>
     }
-  </div>
+  </section>
+
+  <!-- Top Postos com Mais Faltas -->
+  @if (postosMaisFaltas().length > 0) {
+  <section class="section-alertas">
+    <h2>⚠️ Postos com Mais Faltas ({{ getPeriodoLabel() }})</h2>
+    <div class="alertas-list">
+      @for (item of postosMaisFaltas(); track item.posto.id) {
+      <div class="alerta-item">
+        <div class="alerta-info">
+          <span class="alerta-icon">📍</span>
+          <div>
+            <strong>{{ formatHorario(item.posto.horarioInicio, item.posto.horarioFim) }}</strong>
+            <p>{{ item.faltas }} falta(s) registrada(s)</p>
+          </div>
+        </div>
+        <span class="badge badge-error">{{ item.faltas }}</span>
+      </div>
+      }
+    </div>
+  </section>
+  }
 
   <!-- Funcionários -->
-  <div class="section">
-    <h2 class="section-title">👥 Funcionários Ativos</h2>
+  <section class="section-funcionarios">
+    <div class="section-header">
+      <h2>👥 Funcionários ({{ funcionarios().length }})</h2>
+      <a [routerLink]="['/funcionarios', 'novo']" [queryParams]="{condominioId: condominio()!.id}" class="btn-add">
+        + Adicionar Funcionário
+      </a>
+    </div>
+
     @if (funcionarios().length === 0) {
-    <div class="empty-state-small">
+    <div class="empty-state">
       <p>Nenhum funcionário cadastrado</p>
     </div>
     } @else {
@@ -437,67 +304,36 @@
         <thead>
           <tr>
             <th>Nome</th>
-            <th>Modalidade</th>
+            <th>CPF</th>
+            <th>Tipo</th>
             <th>Status</th>
+            <th>Salário Total</th>
             <th>Faltas</th>
-            <th>Ações</th>
+            <th class="actions-column">Ações</th>
           </tr>
         </thead>
         <tbody>
           @for (func of funcionarios(); track func.id) {
           <tr>
-            <td>{{ func.nome }}</td>
+            <td><strong>{{ func.nome }}</strong></td>
+            <td>{{ func.cpf }}</td>
+            <td>{{ getTipoFuncionarioLabel(func.tipoFuncionario) }}</td>
             <td>
-              <span class="badge badge-info">{{
-                getTipoFuncionarioLabel(func.tipoFuncionario)
-              }}</span>
-            </td>
-            <td>
-              <span
-                class="badge"
-                [ngClass]="getStatusFuncionarioBadgeClass(func.statusFuncionario)"
-              >
+              <span [class]="'badge ' + getStatusFuncionarioBadgeClass(func.statusFuncionario)">
                 {{ getStatusFuncionarioLabel(func.statusFuncionario) }}
               </span>
             </td>
-            <td>{{ getFaltasByFuncionario(func.id) }}</td>
+            <td>{{ formatCurrency(func.salarioTotal || 0) }}</td>
             <td>
-              <div class="action-buttons">
-                <button class="btn-action btn-view" title="Visualizar">
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path
-                      fill-rule="evenodd"
-                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </button>
-                <button
-                  class="btn-action btn-edit"
-                  [routerLink]="['/funcionarios', func.id, 'editar']"
-                  title="Editar"
-                >
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                      d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  class="btn-action btn-delete"
-                  (click)="deleteFuncionario(func.id)"
-                  title="Apagar"
-                >
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                      fill-rule="evenodd"
-                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
+              @if (getFaltasByFuncionario(func.id) > 0) {
+              <span class="badge badge-warning">{{ getFaltasByFuncionario(func.id) }}</span>
+              } @else {
+              <span class="badge badge-success">0</span>
+              }
+            </td>
+            <td class="actions-column">
+              <a [routerLink]="['/funcionarios', func.id, 'editar']" class="btn-icon">✏️</a>
+              <button (click)="deleteFuncionario(func.id)" class="btn-icon btn-danger">🗑️</button>
             </td>
           </tr>
           }
@@ -505,6 +341,81 @@
       </table>
     </div>
     }
-  </div>
+  </section>
+
+  <!-- Alocações Recentes -->
+  <section class="section-alocacoes">
+    <div class="section-header">
+      <h2>📅 Alocações ({{ getPeriodoLabel() }}) - {{ alocacoesPeriodo().length }}</h2>
+      <a [routerLink]="['/alocacoes']" class="btn-view-all">Ver todas →</a>
+    </div>
+
+    @if (alocacoesPeriodo().length === 0) {
+    <div class="empty-state">
+      <p>Nenhuma alocação no período selecionado</p>
+    </div>
+    } @else {
+    <div class="alocacoes-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ alocacoesConfirmadas() }}</span>
+        <span class="stat-label badge-success">Confirmadas</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ dobrasRealizadas() }}</span>
+        <span class="stat-label badge-warning">Dobras</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ substituicoesRealizadas() }}</span>
+        <span class="stat-label badge-info">Substituições</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ alocacoesFaltas() }}</span>
+        <span class="stat-label badge-error">Faltas</span>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Funcionário</th>
+            <th>Posto</th>
+            <th>Tipo</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (alocacao of alocacoesPeriodo().slice(0, 10); track alocacao.id) {
+          <tr>
+            <td>{{ formatDate(alocacao.data) }}</td>
+            <td>{{ getFuncionarioNome(alocacao.funcionarioId) }}</td>
+            <td>{{ getPostoHorario(alocacao.postoDeTrabalhoId) }}</td>
+            <td>
+              <span [class]="'badge ' + getTipoAlocacaoBadgeClass(alocacao.tipoAlocacao)">
+                {{ getTipoAlocacaoLabel(alocacao.tipoAlocacao) }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'badge ' + getStatusBadgeClass(alocacao.statusAlocacao)">
+                {{ getStatusLabel(alocacao.statusAlocacao) }}
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (alocacoesPeriodo().length > 10) {
+    <div class="table-footer">
+      <p>Mostrando 10 de {{ alocacoesPeriodo().length }} alocações</p>
+      <a [routerLink]="['/alocacoes']" class="btn-view-all">Ver todas →</a>
+    </div>
+    }
+    }
+  </section>
+
   }
 </div>
+

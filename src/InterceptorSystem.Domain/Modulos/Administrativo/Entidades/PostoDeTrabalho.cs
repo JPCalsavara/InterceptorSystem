@@ -13,7 +13,6 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
     public TimeSpan HorarioInicio { get; private set; }
     public TimeSpan HorarioFim { get; private set; }
     public bool PermiteDobrarEscala { get; private set; }
-    public int? QuantidadeMaximaFaltas { get; private set; } // Quantidade de faltas permitidas antes de dobrar
 
     // Navigation Properties
     public Condominio? Condominio { get; private set; }
@@ -48,8 +47,7 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
         Guid empresaId, 
         TimeSpan inicio, 
         TimeSpan fim, 
-        bool permiteDobrarEscala,
-        int? quantidadeMaximaFaltas = null)
+        bool permiteDobrarEscala)
     {
         // Validações de negócio
         CheckRule(condominioId == Guid.Empty, "O Posto deve pertencer a um Condom��nio.");
@@ -67,11 +65,10 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
         HorarioInicio = inicio;
         HorarioFim = fim;
         PermiteDobrarEscala = permiteDobrarEscala;
-        QuantidadeMaximaFaltas = quantidadeMaximaFaltas;
     }
 
     // FASE 4: Método de atualização simplificado
-    public void AtualizarHorario(TimeSpan inicio, TimeSpan fim, bool permiteDobrarEscala, int? quantidadeMaximaFaltas = null)
+    public void AtualizarHorario(TimeSpan inicio, TimeSpan fim, bool permiteDobrarEscala)
     {
         var duracao = fim > inicio 
             ? fim - inicio
@@ -82,7 +79,6 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
         HorarioInicio = inicio;
         HorarioFim = fim;
         PermiteDobrarEscala = permiteDobrarEscala;
-        QuantidadeMaximaFaltas = quantidadeMaximaFaltas;
     }
 
     public int CapacidadeMaximaPorDobras => PermiteDobrarEscala ? QuantidadeIdealFuncionarios * 2 : QuantidadeIdealFuncionarios;

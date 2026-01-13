@@ -37,8 +37,7 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
             empresaId,
             input.HorarioInicio,
             input.HorarioFim,
-            input.PermiteDobrarEscala,
-            input.QuantidadeMaximaFaltas
+            input.PermiteDobrarEscala
         );
 
         _repository.Add(posto);
@@ -54,7 +53,7 @@ public class PostoDeTrabalhoAppService : IPostoDeTrabalhoAppService
             throw new KeyNotFoundException("Posto de Trabalho não encontrado.");
 
         // FASE 4: Sem QuantidadeIdealFuncionarios (calculado automaticamente)
-        posto.AtualizarHorario(input.HorarioInicio, input.HorarioFim, input.PermiteDobrarEscala, input.QuantidadeMaximaFaltas);
+        posto.AtualizarHorario(input.HorarioInicio, input.HorarioFim, input.PermiteDobrarEscala);
 
         _repository.Update(posto);
         await _repository.UnitOfWork.CommitAsync();

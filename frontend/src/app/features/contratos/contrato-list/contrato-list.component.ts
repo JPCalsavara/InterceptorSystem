@@ -36,7 +36,7 @@ export class ContratoListComponent implements OnInit {
   // Computed signals para organização kanban
   contratosPendentes = computed(() =>
     this.contratos().filter(
-      (c) => c.status === StatusContrato.PENDENTE || c.status === StatusContrato.INATIVO
+      (c) => c.status === StatusContrato.PENDENTE
     )
   );
   contratosVerde = computed(() => this.getContratosByDias(90, Infinity));
@@ -46,7 +46,7 @@ export class ContratoListComponent implements OnInit {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     return this.contratos().filter((c) => {
-      if (c.status !== StatusContrato.PAGO) return false;
+      if (c.status !== StatusContrato.ATIVO) return false;
       const dataFim = new Date(c.dataFim);
       dataFim.setHours(0, 0, 0, 0);
       return dataFim < hoje;
@@ -58,8 +58,8 @@ export class ContratoListComponent implements OnInit {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     return this.contratos().filter((c) => {
-      // Excluir contratos finalizados (PAGO com dataFim no passado)
-      if (c.status === StatusContrato.PAGO) {
+      // Excluir contratos finalizados (ATIVO com dataFim no passado)
+      if (c.status === StatusContrato.ATIVO) {
         const dataFim = new Date(c.dataFim);
         dataFim.setHours(0, 0, 0, 0);
         if (dataFim < hoje) return false; // Finalizado
@@ -72,7 +72,7 @@ export class ContratoListComponent implements OnInit {
     hoje.setHours(0, 0, 0, 0);
     return this.contratos()
       .filter((c) => {
-        if (c.status !== StatusContrato.PAGO) return false;
+        if (c.status !== StatusContrato.ATIVO) return false;
         const dataFim = new Date(c.dataFim);
         dataFim.setHours(0, 0, 0, 0);
         return dataFim >= hoje; // Apenas não finalizados
@@ -84,7 +84,7 @@ export class ContratoListComponent implements OnInit {
     hoje.setHours(0, 0, 0, 0);
     return this.contratos()
       .filter((c) => {
-        if (c.status !== StatusContrato.PAGO) return false;
+        if (c.status !== StatusContrato.ATIVO) return false;
         const dataFim = new Date(c.dataFim);
         dataFim.setHours(0, 0, 0, 0);
         return dataFim >= hoje; // Apenas não finalizados
@@ -163,12 +163,12 @@ export class ContratoListComponent implements OnInit {
 
   getStatusLabel(status: StatusContrato): string {
     switch (status) {
-      case StatusContrato.PAGO:
-        return 'Pago';
+      case StatusContrato.ATIVO:
+        return 'Ativo';
       case StatusContrato.PENDENTE:
         return 'Pendente';
-      case StatusContrato.INATIVO:
-        return 'Inativo';
+      case StatusContrato.FINALIZADO:
+        return 'Finalizado';
       default:
         return 'Desconhecido';
     }
@@ -176,11 +176,11 @@ export class ContratoListComponent implements OnInit {
 
   getStatusClass(status: StatusContrato): string {
     switch (status) {
-      case StatusContrato.PAGO:
+      case StatusContrato.ATIVO:
         return 'success';
       case StatusContrato.PENDENTE:
         return 'warning';
-      case StatusContrato.INATIVO:
+      case StatusContrato.FINALIZADO:
         return 'inactive';
       default:
         return '';
@@ -190,7 +190,7 @@ export class ContratoListComponent implements OnInit {
   getContratosByDias(min: number, max: number): Contrato[] {
     const now = new Date();
     return this.contratos().filter((c) => {
-      if (c.status !== StatusContrato.PAGO) return false;
+      if (c.status !== StatusContrato.ATIVO) return false;
       const dataFim = new Date(c.dataFim);
       const diff = dataFim.getTime() - now.getTime();
       const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -222,12 +222,10 @@ export class ContratoListComponent implements OnInit {
         f.condominioId === contrato.condominioId && f.statusFuncionario === StatusFuncionario.ATIVO
     );
 
-    const custoFixo = funcionariosCondominio.reduce(
-      (sum, f) => sum + f.salarioMensal + f.valorTotalBeneficiosMensal + f.valorDiariasFixas,
+    return funcionariosCondominio.reduce(
+      (sum, f) => sum + (f.salarioTotal || 0),
       0
     );
-
-    return custoFixo;
   }
 
   getValorMensal(contrato: Contrato): number {

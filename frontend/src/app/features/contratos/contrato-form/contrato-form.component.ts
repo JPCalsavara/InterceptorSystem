@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ContratoService } from '../../../services/contrato.service';
+import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
 import { CondominioService } from '../../../services/condominio.service';
-import { StatusContrato } from '../../../models/index';
+import { StatusContrato, CalculoValorTotalOutput } from '../../../models/index';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-contrato-form',
@@ -16,6 +19,7 @@ import { StatusContrato } from '../../../models/index';
 export class ContratoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(ContratoService);
+  private calculoService = inject(ContratoCalculoService);
   private condominioService = inject(CondominioService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -28,11 +32,16 @@ export class ContratoFormComponent implements OnInit {
   submitted = signal(false);
   condominios = signal<any[]>([]);
 
+  // Estado do cálculo
+  calculando = signal(false);
+  erroCalculo = signal<string | null>(null);
+  breakdown = signal<CalculoValorTotalOutput | null>(null);
+
   StatusContrato = StatusContrato;
   statusOptions = [
-    { value: StatusContrato.PAGO, label: 'Pago' },
+    { value: StatusContrato.ATIVO, label: 'Ativo' },
     { value: StatusContrato.PENDENTE, label: 'Pendente' },
-    { value: StatusContrato.INATIVO, label: 'Inativo' },
+    { value: StatusContrato.FINALIZADO, label: 'Finalizado' },
   ];
 
   ngOnInit(): void {
@@ -45,6 +54,9 @@ export class ContratoFormComponent implements OnInit {
       this.isEdit.set(true);
       this.loadContrato(id);
     }
+
+    // Setup auto-cálculo
+    this.setupAutoCalculo();
   }
 
   loadCondominios(): void {
@@ -75,63 +87,58 @@ export class ContratoFormComponent implements OnInit {
       dataFim: ['', Validators.required],
       status: [StatusContrato.PENDENTE, Validators.required],
     });
-
-    // Observar mudanças nos campos para recalcular o valor total
-    this.form.valueChanges.subscribe(() => {
-      this.calcularValorTotal();
-    });
   }
 
-  calcularValorTotalMensal(): number {
-    const valores = this.form.value;
+  setupAutoCalculo(): void {
+    this.form.valueChanges
+      .pipe(
+        debounceTime(500), // Aguarda 500ms após última mudança
+        distinctUntilChanged(),
+        switchMap((valores) => {
+          // Validar campos necessários
+          if (!valores.valorDiariaCobrada || !valores.quantidadeFuncionarios) {
+            this.breakdown.set(null);
+            return of(null);
+          }
 
-    // Calcular valor por funcionário: (diária × 30 dias + benefícios extras)
-    const valorDiariaMensal = (valores.valorDiariaCobrada || 0) * 30;
-    const beneficiosPorFuncionario = valores.valorBeneficiosExtrasMensal || 0;
-    const valorPorFuncionario = valorDiariaMensal + beneficiosPorFuncionario;
+          // Chamar backend
+          this.calculando.set(true);
+          this.erroCalculo.set(null);
 
-    // Multiplicar pela quantidade de funcionários
-    const quantidadeFuncionarios = valores.quantidadeFuncionarios || 0;
-    const base = valorPorFuncionario * quantidadeFuncionarios;
+          const input = {
+            valorDiariaCobrada: valores.valorDiariaCobrada,
+            quantidadeFuncionarios: valores.quantidadeFuncionarios,
+            valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
+            percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
+            margemLucroPercentual: (valores.margemLucroPercentual || 0) / 100,
+            margemCoberturaFaltasPercentual: (valores.margemCoberturaFaltasPercentual || 0) / 100,
+          };
 
-    return base;
+          return this.calculoService.calcularValorTotal(input);
+        })
+      )
+      .subscribe({
+        next: (resultado) => {
+          this.calculando.set(false);
+          if (resultado) {
+            this.breakdown.set(resultado);
+          }
+        },
+        error: (err) => {
+          this.calculando.set(false);
+          this.erroCalculo.set(err.error?.error || 'Erro ao calcular valor total');
+          this.breakdown.set(null);
+        },
+      });
   }
 
-  calcularValorTotal(): number {
-    const valores = this.form.value;
-
-    // Base: Calcular valor total mensal
-    let base = this.calcularValorTotalMensal();
-
-    // Aplicar percentual adicional noturno APENAS A METADE (50% dos funcionários)
-    if (valores.percentualAdicionalNoturno > 0) {
-      base += base * 0.5 * (valores.percentualAdicionalNoturno / 100);
-    }
-
-    // Aplicar margem de cobertura de faltas
-    if (valores.margemCoberturaFaltasPercentual > 0) {
-      base += base * (valores.margemCoberturaFaltasPercentual / 100);
-    }
-
-    // Aplicar margem de lucro
-    if (valores.margemLucroPercentual > 0) {
-      base += base * (valores.margemLucroPercentual / 100);
-    }
-
-    // Aplicar impostos
-    if (valores.percentualImpostos > 0) {
-      base += base * (valores.percentualImpostos / 100);
-    }
-
-    return base;
-  }
-
-  get valorTotalMensalCalculado(): number {
-    return this.calcularValorTotalMensal();
-  }
-
+  // Getters para template
   get valorTotalCalculado(): number {
-    return this.calcularValorTotal();
+    return this.breakdown()?.valorTotalMensal || 0;
+  }
+
+  get temBreakdown(): boolean {
+    return this.breakdown() !== null;
   }
 
   loadContrato(id: string): void {
@@ -174,10 +181,13 @@ export class ContratoFormComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    // Adicionar o valorTotalMensal calculado e converter percentuais de 0-100 para 0-1
+    // Usar valorTotalMensal do breakdown calculado pelo backend
+    const valorTotalMensal = this.breakdown()?.valorTotalMensal || 0;
+
+    // Converter percentuais de 0-100 para 0-1
     const formValue = {
       ...this.form.value,
-      valorTotalMensal: this.calcularValorTotalMensal(),
+      valorTotalMensal: valorTotalMensal,
       percentualAdicionalNoturno: this.form.value.percentualAdicionalNoturno / 100,
       percentualImpostos: this.form.value.percentualImpostos / 100,
       margemLucroPercentual: this.form.value.margemLucroPercentual / 100,

@@ -96,9 +96,9 @@
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              {{ posto.horario }}
+              {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
             </h3>
-            <span class="ideal-badge">{{ posto.quantidadeIdealFuncionarios }} pessoas</span>
+            <span class="ideal-badge">{{ posto.quantidadeIdealFuncionarios }} pessoa(s) ideal</span>
           </div>
 
           <!-- Informações do Posto -->
@@ -112,7 +112,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                Capacidade Máxima:
+                Capacidade Dobras:
               </span>
               <span class="info-value">{{ posto.capacidadeMaximaPorDobras }}</span>
             </div>
@@ -155,6 +155,17 @@
           <!-- Ações -->
           <div class="card-actions">
             <button
+              class="btn-action btn-view"
+              [routerLink]="['/postos', posto.id]"
+              title="Ver Detalhes"
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+              </svg>
+              Detalhes
+            </button>
+            <button
               class="btn-action btn-edit"
               [routerLink]="['/postos', posto.id, 'editar']"
               title="Editar"
@@ -168,7 +179,7 @@
             </button>
             <button
               class="btn-action btn-delete"
-              (click)="confirmDelete(posto.id, posto.horario)"
+              (click)="confirmDelete(posto.id, posto.horarioInicio, posto.horarioFim)"
               title="Excluir"
             >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">

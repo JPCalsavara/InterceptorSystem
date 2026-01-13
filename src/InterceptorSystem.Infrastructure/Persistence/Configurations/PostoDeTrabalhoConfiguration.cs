@@ -43,9 +43,5 @@ public class PostoDeTrabalhoConfiguration : IEntityTypeConfiguration<PostoDeTrab
         builder.Property(p => p.PermiteDobrarEscala)
             .HasDefaultValue(true)
             .IsRequired();
-
-        // FASE 4: Nova propriedade para controle de faltas
-        builder.Property(p => p.QuantidadeMaximaFaltas)
-            .IsRequired(false);
     }
 }

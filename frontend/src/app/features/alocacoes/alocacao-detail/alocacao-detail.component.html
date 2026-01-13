@@ -1,0 +1,197 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📅 Detalhes da Alocação</h1>
+      <p class="subtitle">Visualize informações completas da alocação</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" routerLink="/alocacoes">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      @if (alocacao()) {
+      <button class="btn-primary" [routerLink]="['/alocacoes', alocacao()!.id, 'editar']">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
+        Editar
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+  <div class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ error() }}
+    <button class="alert-close" (click)="dismissError()">×</button>
+  </div>
+  }
+
+  <!-- Loading -->
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando detalhes...</p>
+  </div>
+  }
+
+  <!-- Content -->
+  @if (!loading() && alocacao()) {
+  <div class="detail-container">
+    <!-- Info Card Principal -->
+    <div class="info-card">
+      <div class="card-header">
+        <h2>Informações da Alocação</h2>
+        <div class="badges">
+          <span class="badge" [ngClass]="getStatusClass(alocacao()!.statusAlocacao)">
+            {{ getStatusLabel(alocacao()!.statusAlocacao) }}
+          </span>
+          <span class="badge" [ngClass]="getTipoClass(alocacao()!.tipoAlocacao)">
+            {{ getTipoLabel(alocacao()!.tipoAlocacao) }}
+          </span>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Data:</label>
+          <span>{{ formatDate(alocacao()!.data) }}</span>
+        </div>
+        <div class="info-item">
+          <label>ID:</label>
+          <span class="text-muted">{{ alocacao()!.id }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Funcionário Card -->
+    @if (funcionario()) {
+    <div class="info-card">
+      <div class="card-header">
+        <h2>👤 Funcionário</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nome:</label>
+          <span>{{ funcionario()!.nome }}</span>
+        </div>
+        <div class="info-item">
+          <label>CPF:</label>
+          <span>{{ funcionario()!.cpf }}</span>
+        </div>
+        <div class="info-item">
+          <label>Celular:</label>
+          <span>{{ funcionario()!.celular }}</span>
+        </div>
+        <div class="info-item">
+          <label>Tipo:</label>
+          <span class="badge badge-info">{{ funcionario()!.tipoFuncionario }}</span>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn-link" [routerLink]="['/funcionarios', funcionario()!.id]">
+          Ver detalhes do funcionário →
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Posto de Trabalho Card -->
+    @if (posto()) {
+    <div class="info-card">
+      <div class="card-header">
+        <h2>🏢 Posto de Trabalho</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Horário:</label>
+          <span>{{ posto()!.horarioInicio.substring(0, 5) }} - {{ posto()!.horarioFim.substring(0, 5) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Permite Dobra:</label>
+          <span class="badge" [ngClass]="posto()!.permiteDobrarEscala ? 'badge-success' : 'badge-inactive'">
+            {{ posto()!.permiteDobrarEscala ? 'Sim' : 'Não' }}
+          </span>
+        </div>
+        @if (posto()!.permiteDobrarEscala && posto()!.capacidadeMaximaPorDobras) {
+        <div class="info-item">
+          <label>Capacidade Extra:</label>
+          <span class="badge badge-warning">+{{ posto()!.capacidadeMaximaPorDobras }} vagas</span>
+        </div>
+        }
+      </div>
+      <div class="action-row">
+        <button class="btn-link" [routerLink]="['/postos-de-trabalho', posto()!.id]">
+          Ver detalhes do posto →
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Condomínio Card -->
+    @if (condominio()) {
+    <div class="info-card">
+      <div class="card-header">
+        <h2>🏘️ Condomínio</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nome:</label>
+          <span>{{ condominio()!.nome }}</span>
+        </div>
+        <div class="info-item">
+          <label>CNPJ:</label>
+          <span>{{ condominio()!.cnpj }}</span>
+        </div>
+        <div class="info-item">
+          <label>Endereço:</label>
+          <span>{{ condominio()!.endereco }}</span>
+        </div>
+        <div class="info-item">
+          <label>Status:</label>
+          <span class="badge" [ngClass]="condominio()!.ativo ? 'badge-success' : 'badge-inactive'">
+            {{ condominio()!.ativo ? 'Ativo' : 'Inativo' }}
+          </span>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn-link" [routerLink]="['/condominios', condominio()!.id]">
+          Ver detalhes do condomínio →
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+      <h3>⚠️ Zona de Perigo</h3>
+      <p>Ações irreversíveis que afetam esta alocação.</p>
+      <button class="btn-danger" (click)="confirmDelete()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Excluir Alocação
+      </button>
+    </div>
+  </div>
+  }
+</div>
+

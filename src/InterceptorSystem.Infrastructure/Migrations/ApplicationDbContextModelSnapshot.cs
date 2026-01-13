@@ -271,9 +271,6 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<int?>("QuantidadeMaximaFaltas")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CondominioId");

@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PostoDeTrabalhoService } from '../../services/posto-de-trabalho.service';
-import { CondominioService } from '../../services/condominio.service';
-import { AlocacaoService } from '../../services/alocacao.service';
-import { PostoDeTrabalho, Condominio, Alocacao, StatusAlocacao } from '../../models/index';
+import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
+import { CondominioService } from '../../../services/condominio.service';
+import { AlocacaoService } from '../../../services/alocacao.service';
+import { PostoDeTrabalho, Condominio, Alocacao, StatusAlocacao } from '../../../models/index';
 
 interface PostoPorCondominio {
   condominio: Condominio;
@@ -94,12 +94,21 @@ export class PostoListComponent implements OnInit {
   }
 
   getNumeroFaltas(postoId: string): number {
+    // Calcula o número de faltas a partir das alocações
     return this.alocacoes().filter(
       (a) => a.postoDeTrabalhoId === postoId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
     ).length;
   }
 
-  confirmDelete(id: string, horario: string): void {
+  formatHorario(inicio: string, fim: string): string {
+    // Remove segundos para exibição (HH:mm)
+    const inicioFormatado = inicio.substring(0, 5);
+    const fimFormatado = fim.substring(0, 5);
+    return `${inicioFormatado} às ${fimFormatado}`;
+  }
+
+  confirmDelete(id: string, inicio: string, fim: string): void {
+    const horario = this.formatHorario(inicio, fim);
     if (confirm(`Deseja excluir o posto "${horario}"?`)) {
       this.service.delete(id).subscribe({
         next: () => {

@@ -1,0 +1,480 @@
+<div class="wizard-container">
+  <!-- Header -->
+  <header class="wizard-header">
+    <h1>Novo Condomínio Completo</h1>
+    <p class="subtitle">Crie um condomínio com contrato e funcionários em 3 passos</p>
+  </header>
+
+  <!-- Progress Indicator -->
+  <div class="progress-container">
+    <div class="progress-steps">
+      @for (step of steps; track step.number) {
+      <div
+        class="step-item"
+        [class.active]="currentStep() === step.number"
+        [class.completed]="currentStep() > step.number"
+        (click)="goToStep(step.number)">
+        <div class="step-circle">
+          @if (currentStep() > step.number) {
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          } @else if (currentStep() === step.number) {
+            <div class="step-circle-filled"></div>
+          } @else {
+            <span class="step-number">{{ step.number }}</span>
+          }
+        </div>
+        <div class="step-label">
+          <span class="step-icon">{{ step.icon }}</span>
+          <span class="step-text">{{ step.label }}</span>
+        </div>
+      </div>
+      @if (!$last) {
+      <div class="step-connector" [class.completed]="currentStep() > step.number"></div>
+      }
+      }
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+  <div class="error-message">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+    </svg>
+    <span>{{ error() }}</span>
+  </div>
+  }
+
+  <!-- Step Content -->
+  <div class="wizard-content">
+
+    <!-- STEP 1: Condomínio + Postos -->
+    @if (currentStep() === 1) {
+    <div class="step-content">
+      <h2>🏢 Dados do Condomínio</h2>
+
+      <form [formGroup]="formCondominio" class="form-grid">
+        <!-- Dados Básicos -->
+        <div class="form-section">
+          <h3>Informações Básicas</h3>
+
+          <div class="form-field">
+            <label for="nome">Nome do Condomínio *</label>
+            <input
+              type="text"
+              id="nome"
+              formControlName="nome"
+              placeholder="Ex: Residencial Sol Nascente"
+              [class.invalid]="formCondominio.get('nome')?.invalid && formCondominio.get('nome')?.touched">
+            @if (formCondominio.get('nome')?.hasError('required') && formCondominio.get('nome')?.touched) {
+            <span class="error-text">Nome é obrigatório</span>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="cnpj">CNPJ *</label>
+            <input
+              type="text"
+              id="cnpj"
+              formControlName="cnpj"
+              placeholder="00.000.000/0000-00"
+              [class.invalid]="formCondominio.get('cnpj')?.invalid && formCondominio.get('cnpj')?.touched">
+            @if (formCondominio.get('cnpj')?.hasError('required') && formCondominio.get('cnpj')?.touched) {
+            <span class="error-text">CNPJ é obrigatório</span>
+            } @else if (formCondominio.get('cnpj')?.hasError('pattern') && formCondominio.get('cnpj')?.touched) {
+            <span class="error-text">CNPJ inválido</span>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="endereco">Endereço Completo *</label>
+            <textarea
+              id="endereco"
+              formControlName="endereco"
+              rows="2"
+              placeholder="Rua, número, complemento, bairro, cidade - UF"
+              [class.invalid]="formCondominio.get('endereco')?.invalid && formCondominio.get('endereco')?.touched">
+            </textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="horarioTrocaTurno">Horário de Troca de Turno *</label>
+              <input
+                type="time"
+                id="horarioTrocaTurno"
+                formControlName="horarioTrocaTurno"
+                [class.invalid]="formCondominio.get('horarioTrocaTurno')?.invalid && formCondominio.get('horarioTrocaTurno')?.touched">
+              <small>Horário padrão para mudança de turno (ex: 06:00)</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="emailGestor">E-mail do Gestor</label>
+              <input
+                type="email"
+                id="emailGestor"
+                formControlName="emailGestor"
+                placeholder="gestor@example.com">
+            </div>
+
+            <div class="form-field">
+              <label for="telefoneEmergencia">Telefone de Emergência</label>
+              <input
+                type="tel"
+                id="telefoneEmergencia"
+                formControlName="telefoneEmergencia"
+                placeholder="11999999999"
+                maxlength="11">
+              <small>Somente números (ex: 11999999999)</small>
+            </div>
+          </div>
+
+          <!-- Configuração de Postos -->
+          <div class="form-row">
+            <div class="form-field">
+              <label for="numeroPostos">Número de Postos *</label>
+              <div class="input-with-total">
+                <input
+                  type="number"
+                  id="numeroPostos"
+                  formControlName="numeroPostos"
+                  min="1"
+                  max="10"
+                  [class.invalid]="formCondominio.get('numeroPostos')?.invalid && formCondominio.get('numeroPostos')?.touched">
+                <span class="total-badge">Total: {{ totalPostos() }} {{ totalPostos() === 1 ? 'posto' : 'postos' }}</span>
+              </div>
+              <small>Quantos postos de trabalho terá (1-10)</small>
+            </div>
+
+            <div class="form-field">
+              <label for="funcionariosPorPosto">Funcionários por Posto *</label>
+              <div class="input-with-total">
+                <input
+                  type="number"
+                  id="funcionariosPorPosto"
+                  formControlName="funcionariosPorPosto"
+                  min="1"
+                  max="5"
+                  [class.invalid]="formCondominio.get('funcionariosPorPosto')?.invalid && formCondominio.get('funcionariosPorPosto')?.touched">
+                <span class="total-badge highlight">Total: {{ totalFuncionariosPorPostos() }} {{ totalFuncionariosPorPostos() === 1 ? 'funcionário' : 'funcionários' }}</span>
+              </div>
+              <small>Quantos funcionários por posto (1-5)</small>
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div class="info-box">
+            <div class="info-item">
+              <span class="info-label">Total de Postos:</span>
+              <span class="info-value">{{ totalPostos() }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Total de Funcionários Necessários:</span>
+              <span class="info-value highlight">{{ totalFuncionariosPorPostos() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Postos de Trabalho Gerados -->
+        <div class="form-section">
+          <h3>📍 Postos de Trabalho Configurados</h3>
+          <p class="section-description">Os postos abaixo foram gerados automaticamente. Você pode ajustar os horários se necessário.</p>
+
+          <div formArrayName="postos" class="postos-list">
+            @for (postoControl of postos.controls; track $index) {
+            <div class="posto-card" [formGroupName]="$index">
+              <div class="posto-header">
+                <h4>Posto #{{ $index + 1 }}</h4>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Horário Início *</label>
+                  <input type="time" formControlName="horarioInicio">
+                </div>
+
+                <div class="form-field">
+                  <label>Horário Fim *</label>
+                  <input type="time" formControlName="horarioFim">
+                </div>
+
+                <div class="form-field">
+                  <label>Nº Funcionários *</label>
+                  <input type="number" formControlName="quantidadeFuncionarios" min="1">
+                </div>
+              </div>
+
+              <div class="form-field checkbox-field">
+                <label>
+                  <input type="checkbox" formControlName="permiteDobrarEscala">
+                  <span>Permite dobrar escala</span>
+                </label>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </form>
+    </div>
+    }
+
+    <!-- STEP 2: Contrato (Opcional) -->
+    @if (currentStep() === 2) {
+    <div class="step-content">
+      <h2>📄 Contrato (Opcional)</h2>
+
+      <form [formGroup]="formContrato" class="form-grid">
+        <div class="form-field checkbox-field-large">
+          <label>
+            <input type="checkbox" formControlName="criarContrato">
+            <span>Criar contrato neste momento</span>
+          </label>
+          <small>Você pode criar o contrato depois se preferir</small>
+        </div>
+
+        @if (formContrato.get('criarContrato')?.value) {
+        <div class="form-section">
+          <h3>Configuração Financeira</h3>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>Valor da Diária (R$) *</label>
+              <input type="number" formControlName="valorDiariaCobrada" min="0" step="0.01">
+              <small>Valor base por dia de trabalho</small>
+            </div>
+
+            <div class="form-field">
+              <label>Impostos (%)</label>
+              <input type="number" formControlName="percentualImpostos" min="0" max="100" step="1">
+              <small>Percentual de impostos</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>Adicional Noturno (%)</label>
+              <input type="number" formControlName="percentualAdicionalNoturno" min="0" max="100" step="1">
+              <small>Acréscimo por trabalho noturno</small>
+            </div>
+
+            <div class="form-field">
+              <label>Margem de Lucro (%)</label>
+              <input type="number" formControlName="percentualMargemLucro" min="0" max="100" step="1">
+              <small>Margem de lucro desejada</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>Margem para Faltas (%)</label>
+              <input type="number" formControlName="percentualMargemFaltas" min="0" max="100" step="1">
+              <small>Margem de segurança para faltas</small>
+            </div>
+          </div>
+
+          <h3>Período do Contrato</h3>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>Data Início *</label>
+              <input type="date" formControlName="dataInicio">
+            </div>
+
+            <div class="form-field">
+              <label>Duração (meses) *</label>
+              <input type="number" formControlName="mesesDuracao" min="1" max="60" step="1">
+              <small>Quantidade de meses do contrato</small>
+            </div>
+
+            <div class="form-field">
+              <label>Data Fim (calculada)</label>
+              <input type="text" [value]="calcularDataFim()" readonly class="readonly-field">
+              <small>Calculada automaticamente</small>
+            </div>
+          </div>
+
+          <!-- Resumo Financeiro -->
+          <div class="resumo-financeiro">
+            <h3>💰 Resumo Financeiro Mensal</h3>
+
+            <div class="resumo-grid">
+              <div class="resumo-item">
+                <span class="resumo-label">Funcionários:</span>
+                <span class="resumo-value">{{ totalFuncionariosPorPostos() }}</span>
+              </div>
+
+              <div class="resumo-item">
+                <span class="resumo-label">Custo Operacional:</span>
+                <span class="resumo-value">{{ custoOperacional() | currency: 'BRL' }}</span>
+              </div>
+
+              <div class="resumo-item">
+                <span class="resumo-label">Margem de Lucro:</span>
+                <span class="resumo-value success">{{ margemLucro() | currency: 'BRL' }}</span>
+              </div>
+
+              <div class="resumo-item">
+                <span class="resumo-label">Margem Faltas:</span>
+                <span class="resumo-value warning">{{ margemFaltas() | currency: 'BRL' }}</span>
+              </div>
+
+              <div class="resumo-item total">
+                <span class="resumo-label">Faturamento Mensal:</span>
+                <span class="resumo-value highlight">{{ faturamentoMensal() | currency: 'BRL' }}</span>
+              </div>
+            </div>
+
+            <div class="info-message">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              <span>Os valores são calculados automaticamente com base nas configurações acima</span>
+            </div>
+          </div>
+        </div>
+        }
+      </form>
+    </div>
+    }
+
+    <!-- STEP 3: Funcionários (Opcional) -->
+    @if (currentStep() === 3) {
+    <div class="step-content">
+      <h2>👥 Funcionários (Opcional)</h2>
+
+      <form [formGroup]="formFuncionarios" class="form-grid">
+        <div class="form-field checkbox-field-large">
+          <label>
+            <input type="checkbox" formControlName="adicionarFuncionarios">
+            <span>Adicionar funcionários neste momento</span>
+          </label>
+          <small>Você pode adicionar funcionários depois se preferir</small>
+        </div>
+
+        @if (formFuncionarios.get('adicionarFuncionarios')?.value) {
+        <div class="form-section">
+          <div class="section-header">
+            <h3>Lista de Funcionários</h3>
+            <button type="button" class="btn-add-small" (click)="addFuncionario()">
+              + Adicionar Funcionário
+            </button>
+          </div>
+
+          <div formArrayName="funcionarios" class="funcionarios-list">
+            @for (funcControl of funcionarios.controls; track $index) {
+            <div class="funcionario-card" [formGroupName]="$index">
+              <div class="funcionario-header">
+                <h4>Funcionário #{{ $index + 1 }}</h4>
+                <button type="button" class="btn-remove" (click)="removeFuncionario($index)">
+                  🗑️
+                </button>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Nome Completo *</label>
+                  <input type="text" formControlName="nome" placeholder="Nome completo">
+                </div>
+
+                <div class="form-field">
+                  <label>CPF *</label>
+                  <input type="text" formControlName="cpf" placeholder="000.000.000-00">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Celular</label>
+                  <input type="tel" formControlName="celular" placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="form-field">
+                  <label>Tipo</label>
+                  <select formControlName="tipoFuncionario">
+                    <option value="CLT">CLT</option>
+                    <option value="FREELANCER">Freelancer</option>
+                    <option value="TERCEIRIZADO">Terceirizado</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Status</label>
+                  <select formControlName="statusFuncionario">
+                    <option value="ATIVO">Ativo</option>
+                    <option value="FERIAS">Férias</option>
+                    <option value="AFASTADO">Afastado</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label>Escala</label>
+                  <select formControlName="tipoEscala">
+                    <option value="DOZE_TRINTA_SEIS">12x36</option>
+                    <option value="SEIS_UM">6x1</option>
+                    <option value="CINCO_DOIS">5x2</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            }
+
+            @if (funcionarios.length === 0) {
+            <div class="empty-state-small">
+              <p>Nenhum funcionário adicionado. Clique em "Adicionar Funcionário" para começar.</p>
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </form>
+    </div>
+    }
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="wizard-footer">
+    <div class="footer-left">
+      <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="loading()">
+        Cancelar
+      </button>
+    </div>
+
+    <div class="footer-right">
+      @if (canGoBack()) {
+      <button type="button" class="btn-back" (click)="previousStep()" [disabled]="loading()">
+        ← Anterior
+      </button>
+      }
+
+      @if (!isLastStep()) {
+      <button
+        type="button"
+        class="btn-next"
+        (click)="nextStep()"
+        [disabled]="!canGoNext() || loading()">
+        Próximo →
+      </button>
+      } @else {
+      <button
+        type="button"
+        class="btn-finish"
+        (click)="onSubmit()"
+        [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-small"></span>
+          Criando...
+        } @else {
+          ✓ Finalizar
+        }
+      </button>
+      }
+    </div>
+  </div>
+</div>
+

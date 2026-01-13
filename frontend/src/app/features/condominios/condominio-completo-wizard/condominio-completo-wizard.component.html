@@ -1,0 +1,453 @@
+<div class="wizard-container">
+  <div class="wizard-header">
+    <h1>Criar Condomínio Completo</h1>
+    <p class="subtitle">Configure condomínio, contrato e postos de trabalho em um único fluxo</p>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="steps-indicator">
+    <div class="step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">
+      <div class="step-number">1</div>
+      <div class="step-label">Condomínio</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep() > 1"></div>
+
+    <div class="step" [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
+      <div class="step-number">2</div>
+      <div class="step-label">Contrato</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep() > 2"></div>
+
+    <div class="step" [class.active]="currentStep() >= 3" [class.completed]="currentStep() > 3">
+      <div class="step-number">3</div>
+      <div class="step-label">Postos</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep() > 3"></div>
+
+    <div class="step" [class.active]="currentStep() >= 4">
+      <div class="step-number">4</div>
+      <div class="step-label">Revisão</div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <strong>⚠️ Erro:</strong> {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Step 1: Dados do Condomínio -->
+  @if (currentStep() === 1) {
+    <div class="step-content">
+      <h2>📋 Dados do Condomínio</h2>
+      <form [formGroup]="condominioForm" class="form-grid">
+        <div class="form-group">
+          <label for="nome">Nome do Condomínio *</label>
+          <input
+            id="nome"
+            type="text"
+            formControlName="nome"
+            placeholder="Ex: Residencial Solar"
+            class="form-control"
+          />
+          @if (condominioForm.get('nome')?.invalid && condominioForm.get('nome')?.touched) {
+            <span class="error-message">Nome é obrigatório (mínimo 3 caracteres)</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="cnpj">CNPJ *</label>
+          <input
+            id="cnpj"
+            type="text"
+            formControlName="cnpj"
+            placeholder="00.000.000/0000-00"
+            class="form-control"
+          />
+          @if (condominioForm.get('cnpj')?.invalid && condominioForm.get('cnpj')?.touched) {
+            <span class="error-message">CNPJ inválido</span>
+          }
+        </div>
+
+        <div class="form-group full-width">
+          <label for="endereco">Endereço *</label>
+          <input
+            id="endereco"
+            type="text"
+            formControlName="endereco"
+            placeholder="Rua, número, bairro, cidade/UF"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="quantidadeFuncionariosIdeal">Quantidade Ideal de Funcionários *</label>
+          <input
+            id="quantidadeFuncionariosIdeal"
+            type="number"
+            formControlName="quantidadeFuncionariosIdeal"
+            min="1"
+            class="form-control"
+          />
+          <small class="hint">Usado para cálculo de postos e valores</small>
+        </div>
+
+        <div class="form-group">
+          <label for="horarioTrocaTurno">Horário de Troca de Turno *</label>
+          <input
+            id="horarioTrocaTurno"
+            type="time"
+            formControlName="horarioTrocaTurno"
+            class="form-control"
+          />
+          <small class="hint">Formato: HH:mm (Ex: 06:00)</small>
+        </div>
+
+        <div class="form-group">
+          <label for="emailGestor">Email do Gestor</label>
+          <input
+            id="emailGestor"
+            type="email"
+            formControlName="emailGestor"
+            placeholder="gestor@email.com"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="telefoneEmergencia">Telefone de Emergência</label>
+          <input
+            id="telefoneEmergencia"
+            type="tel"
+            formControlName="telefoneEmergencia"
+            placeholder="(11) 99999-9999"
+            class="form-control"
+          />
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Step 2: Dados do Contrato -->
+  @if (currentStep() === 2) {
+    <div class="step-content">
+      <h2>💼 Dados do Contrato</h2>
+      <form [formGroup]="contratoForm" class="form-grid">
+        <div class="form-group full-width">
+          <label for="contratoDescricao">Descrição do Contrato *</label>
+          <input
+            id="contratoDescricao"
+            type="text"
+            formControlName="contratoDescricao"
+            placeholder="Ex: Contrato de Portaria 2025-2026"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="valorDiariaCobrada">Valor da Diária (R$) *</label>
+          <input
+            id="valorDiariaCobrada"
+            type="number"
+            formControlName="valorDiariaCobrada"
+            min="0"
+            step="0.01"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="percentualAdicionalNoturno">Adicional Noturno (0-1) *</label>
+          <input
+            id="percentualAdicionalNoturno"
+            type="number"
+            formControlName="percentualAdicionalNoturno"
+            min="0"
+            max="1"
+            step="0.01"
+            class="form-control"
+          />
+          <small class="hint">Ex: 0.30 = 30%</small>
+        </div>
+
+        <div class="form-group">
+          <label for="valorBeneficiosExtrasMensal">Benefícios Extras Mensais (R$) *</label>
+          <input
+            id="valorBeneficiosExtrasMensal"
+            type="number"
+            formControlName="valorBeneficiosExtrasMensal"
+            min="0"
+            step="0.01"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="percentualImpostos">Percentual de Impostos (0-1) *</label>
+          <input
+            id="percentualImpostos"
+            type="number"
+            formControlName="percentualImpostos"
+            min="0"
+            max="1"
+            step="0.01"
+            class="form-control"
+          />
+          <small class="hint">Ex: 0.15 = 15%</small>
+        </div>
+
+        <div class="form-group">
+          <label for="margemLucroPercentual">Margem de Lucro (0-1) *</label>
+          <input
+            id="margemLucroPercentual"
+            type="number"
+            formControlName="margemLucroPercentual"
+            min="0"
+            max="1"
+            step="0.01"
+            class="form-control"
+          />
+          <small class="hint">Ex: 0.20 = 20%</small>
+        </div>
+
+        <div class="form-group">
+          <label for="margemCoberturaFaltasPercentual">Margem p/ Faltas (0-1) *</label>
+          <input
+            id="margemCoberturaFaltasPercentual"
+            type="number"
+            formControlName="margemCoberturaFaltasPercentual"
+            min="0"
+            max="1"
+            step="0.01"
+            class="form-control"
+          />
+          <small class="hint">Ex: 0.10 = 10%</small>
+        </div>
+
+        <div class="form-group">
+          <label for="dataInicio">Data de Início *</label>
+          <input
+            id="dataInicio"
+            type="date"
+            formControlName="dataInicio"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="dataFim">Data de Término *</label>
+          <input
+            id="dataFim"
+            type="date"
+            formControlName="dataFim"
+            class="form-control"
+          />
+        </div>
+
+        @if (valorTotalCalculado()) {
+          <div class="form-group full-width">
+            <div class="calculated-value">
+              <strong>💰 Valor Total Mensal Calculado:</strong>
+              <span class="value">{{ valorTotalCalculado() | currency: 'BRL' }}</span>
+            </div>
+          </div>
+        }
+      </form>
+    </div>
+  }
+
+  <!-- Step 3: Configuração de Postos -->
+  @if (currentStep() === 3) {
+    <div class="step-content">
+      <h2>🏢 Configuração de Postos de Trabalho</h2>
+      <form [formGroup]="postosForm" class="form-grid">
+        <div class="form-group full-width">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="criarPostosAutomaticamente"
+            />
+            Criar postos automaticamente
+          </label>
+          <small class="hint">
+            Se marcado, serão criados 2 postos (diurno e noturno) baseados no horário de troca de turno
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="numeroPostos">Número de Postos</label>
+          <input
+            id="numeroPostos"
+            type="number"
+            formControlName="numeroPostos"
+            min="1"
+            max="10"
+            class="form-control"
+          />
+          <small class="hint">Máximo: 10 postos</small>
+        </div>
+      </form>
+
+      <div class="info-box">
+        <h3>ℹ️ Como funciona:</h3>
+        <ul>
+          <li>
+            <strong>Automático (recomendado):</strong> Cria 2 turnos de 12h baseados no horário configurado
+          </li>
+          <li>
+            <strong>Manual:</strong> Você define o número de postos (poderá configurar horários depois)
+          </li>
+        </ul>
+      </div>
+    </div>
+  }
+
+  <!-- Step 4: Revisão e Confirmação -->
+  @if (currentStep() === 4) {
+    <div class="step-content">
+      <h2>✅ Revisão Final</h2>
+
+      <div class="review-section">
+        <h3>Condomínio</h3>
+        <div class="review-item">
+          <span class="label">Nome:</span>
+          <span class="value">{{ condominioForm.value.nome }}</span>
+        </div>
+        <div class="review-item">
+          <span class="label">CNPJ:</span>
+          <span class="value">{{ condominioForm.value.cnpj }}</span>
+        </div>
+        <div class="review-item">
+          <span class="label">Funcionários Ideal:</span>
+          <span class="value">{{ condominioForm.value.quantidadeFuncionariosIdeal }}</span>
+        </div>
+        <div class="review-item">
+          <span class="label">Horário Troca:</span>
+          <span class="value">{{ condominioForm.value.horarioTrocaTurno }}</span>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <h3>Contrato</h3>
+        <div class="review-item">
+          <span class="label">Descrição:</span>
+          <span class="value">{{ contratoForm.value.contratoDescricao }}</span>
+        </div>
+        <div class="review-item">
+          <span class="label">Período:</span>
+          <span class="value">
+            {{ contratoForm.value.dataInicio | date: 'dd/MM/yyyy' }} até
+            {{ contratoForm.value.dataFim | date: 'dd/MM/yyyy' }}
+          </span>
+        </div>
+        @if (valorTotalCalculado()) {
+          <div class="review-item highlight">
+            <span class="label">Valor Total Mensal:</span>
+            <span class="value">{{ valorTotalCalculado() | currency: 'BRL' }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="review-section">
+        <h3>Postos de Trabalho</h3>
+        <div class="review-item">
+          <span class="label">Criação:</span>
+          <span class="value">
+            {{ postosForm.value.criarPostosAutomaticamente ? 'Automática (2 turnos)' : 'Manual (' + postosForm.value.numeroPostos + ' postos)' }}
+          </span>
+        </div>
+      </div>
+
+      @if (validationResult()) {
+        <div class="validation-result">
+          @if (validationResult()?.valido) {
+            <div class="alert alert-success">
+              ✅ Validação bem-sucedida! Pronto para criar.
+            </div>
+            @if (validationResult()?.avisos && validationResult()!.avisos.length > 0) {
+              <div class="alert alert-warning">
+                <strong>⚠️ Avisos:</strong>
+                <ul>
+                  @for (aviso of validationResult()!.avisos; track aviso) {
+                    <li>{{ aviso }}</li>
+                  }
+                </ul>
+              </div>
+            }
+          } @else {
+            <div class="alert alert-error">
+              <strong>❌ Validação falhou:</strong>
+              <ul>
+                @for (erro of validationResult()!.erros; track erro) {
+                  <li>{{ erro }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Navigation Buttons -->
+  <div class="wizard-actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="cancelar()"
+      [disabled]="isLoading()"
+    >
+      Cancelar
+    </button>
+
+    <div class="nav-buttons">
+      @if (currentStep() > 1) {
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="previousStep()"
+          [disabled]="isLoading()"
+        >
+          ← Voltar
+        </button>
+      }
+
+      @if (currentStep() < 4) {
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="nextStep()"
+          [disabled]="isLoading()"
+        >
+          Próximo →
+        </button>
+      }
+
+      @if (currentStep() === 4) {
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="validarCriacao()"
+          [disabled]="isLoading()"
+        >
+          🔍 Validar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="criar()"
+          [disabled]="isLoading() || (validationResult() && !validationResult()?.valido)"
+        >
+          @if (isLoading()) {
+            <span class="spinner"></span> Criando...
+          } @else {
+            ✅ Criar Condomínio Completo
+          }
+        </button>
+      }
+    </div>
+  </div>
+</div>
+

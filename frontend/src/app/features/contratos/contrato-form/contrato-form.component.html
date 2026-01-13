@@ -135,12 +135,6 @@
         }
       </div>
 
-      <!-- Valor Total Mensal Calculado -->
-      <div class="calculation-display">
-        <div class="calc-label">Valor Total Mensal (Base Calculada)</div>
-        <div class="calc-value">{{ valorTotalMensalCalculado | currency : 'BRL' }}</div>
-      </div>
-
       <h3 class="section-title">📊 Percentuais e Margens</h3>
 
       <div class="form-row">
@@ -280,7 +274,82 @@
         }
       </div>
 
-      <!-- Valor Total Calculado -->
+      <!-- Breakdown de Custos -->
+      @if (temBreakdown || calculando()) {
+      <div class="breakdown-section">
+        <h3 class="section-title">📊 Breakdown de Custos</h3>
+
+        <!-- Loading -->
+        @if (calculando()) {
+        <div class="loading-state">
+          <span class="spinner"></span>
+          <span>Calculando valores...</span>
+        </div>
+        }
+
+        <!-- Erro -->
+        @if (erroCalculo()) {
+        <div class="alert alert-error">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          {{ erroCalculo() }}
+        </div>
+        }
+
+        <!-- Breakdown -->
+        @if (breakdown() && !calculando()) {
+        <div class="breakdown-grid">
+          <div class="breakdown-item total">
+            <span class="label">💰 Valor Total Mensal</span>
+            <span class="value">{{ breakdown()!.valorTotalMensal | currency : 'BRL' }}</span>
+          </div>
+
+          <div class="breakdown-item">
+            <span class="label">📦 Custo Base</span>
+            <span class="value">{{ breakdown()!.custoBaseMensal | currency : 'BRL' }}</span>
+          </div>
+
+          <div class="breakdown-item">
+            <span class="label"
+              >🏛️ Impostos ({{ form.value.percentualImpostos }}%)</span
+            >
+            <span class="value">{{ breakdown()!.valorImpostos | currency : 'BRL' }}</span>
+          </div>
+
+          <div class="breakdown-item">
+            <span class="label"
+              >📈 Margem Lucro ({{ form.value.margemLucroPercentual }}%)</span
+            >
+            <span class="value">{{ breakdown()!.valorMargemLucro | currency : 'BRL' }}</span>
+          </div>
+
+          <div class="breakdown-item">
+            <span class="label"
+              >🛡️ Margem Faltas ({{ form.value.margemCoberturaFaltasPercentual }}%)</span
+            >
+            <span class="value">{{ breakdown()!.valorMargemFaltas | currency : 'BRL' }}</span>
+          </div>
+
+          <div class="breakdown-item">
+            <span class="label">🎁 Benefícios</span>
+            <span class="value">{{ breakdown()!.valorBeneficios | currency : 'BRL' }}</span>
+          </div>
+
+          <div class="breakdown-item highlight">
+            <span class="label">💵 Base para Salários</span>
+            <span class="value">{{ breakdown()!.baseParaSalarios | currency : 'BRL' }}</span>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Valor Total Calculado (mantido para compatibilidade) -->
       <div class="calculation-result">
         <div class="result-card">
           <div class="result-icon">
@@ -294,10 +363,10 @@
             </svg>
           </div>
           <div class="result-content">
-            <p class="result-label">Valor Total do Contrato (Calculado)</p>
+            <p class="result-label">Valor Total do Contrato</p>
             <h2 class="result-value">{{ valorTotalCalculado | currency : 'BRL' }}</h2>
             <p class="result-info">
-              Base + Benefícios + Adicional Noturno (50%) + Margem Faltas + Margem Lucro + Impostos
+              Calculado automaticamente com base nos valores informados
             </p>
           </div>
         </div>

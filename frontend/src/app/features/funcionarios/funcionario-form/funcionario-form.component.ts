@@ -4,7 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { CondominioService } from '../../../services/condominio.service';
-import { StatusFuncionario, TipoFuncionario, TipoEscala } from '../../../models/index';
+import { ContratoService } from '../../../services/contrato.service';
+import { StatusFuncionario, TipoFuncionario, TipoEscala, StatusContrato } from '../../../models';
 
 @Component({
   selector: 'app-funcionario-form',
@@ -17,6 +18,7 @@ export class FuncionarioFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(FuncionarioService);
   private condominioService = inject(CondominioService);
+  private contratoService = inject(ContratoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -27,6 +29,13 @@ export class FuncionarioFormComponent implements OnInit {
   error = signal<string | null>(null);
   submitted = signal(false);
   condominios = signal<any[]>([]);
+  contratos = signal<any[]>([]);
+  contratoSelecionado = signal<any | null>(null);
+
+  // Valores calculados do contrato
+  salarioCalculado = signal<number>(0);
+  beneficiosCalculados = signal<number>(0);
+  valorDiariaCalculado = signal<number>(0);
 
   StatusFuncionario = StatusFuncionario;
   TipoFuncionario = TipoFuncionario;
@@ -56,6 +65,7 @@ export class FuncionarioFormComponent implements OnInit {
   ngOnInit(): void {
     this.loadCondominios();
     this.buildForm();
+    this.setupCondominioChange();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -72,18 +82,56 @@ export class FuncionarioFormComponent implements OnInit {
     });
   }
 
+  setupCondominioChange(): void {
+    this.form.get('condominioId')?.valueChanges.subscribe((condominioId) => {
+      if (condominioId) {
+        this.loadContratos(condominioId);
+        // Limpar contratoId quando condomínio muda
+        this.form.patchValue({ contratoId: '' }, { emitEvent: false });
+        this.contratoSelecionado.set(null);
+      } else {
+        this.contratos.set([]);
+        this.contratoSelecionado.set(null);
+      }
+    });
+
+    // Listener para mudanças no contratoId
+    this.form.get('contratoId')?.valueChanges.subscribe((contratoId) => {
+      if (contratoId) {
+        this.calcularValoresDoContrato(contratoId);
+      } else {
+        this.contratoSelecionado.set(null);
+        this.salarioCalculado.set(0);
+        this.beneficiosCalculados.set(0);
+        this.valorDiariaCalculado.set(0);
+      }
+    });
+  }
+
+  loadContratos(condominioId: string): void {
+    this.contratoService.getAll().subscribe({
+      next: (data) => {
+        // Filtrar apenas contratos do condomínio selecionado e vigentes
+        const contratosDoCondominio = data.filter(
+          (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO
+        );
+        this.contratos.set(contratosDoCondominio);
+      },
+      error: (err) => console.error('Erro ao carregar contratos:', err),
+    });
+  }
+
   buildForm(): void {
     this.form = this.fb.group({
       condominioId: ['', Validators.required],
+      contratoId: ['', Validators.required],  // FASE 2 backend - obrigatório
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       celular: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
-      salarioMensal: [0, [Validators.required, Validators.min(0)]],
-      valorTotalBeneficiosMensal: [0, [Validators.min(0)]],
-      valorDiariasFixas: [0, [Validators.min(0)]],
       statusFuncionario: [StatusFuncionario.ATIVO, Validators.required],
       tipoFuncionario: [TipoFuncionario.CLT, Validators.required],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
+      // Campos de salário removidos - agora são calculados pelo backend (FASE 3)
     });
   }
 
@@ -94,12 +142,10 @@ export class FuncionarioFormComponent implements OnInit {
       next: (data) => {
         this.form.patchValue({
           condominioId: data.condominioId,
+          contratoId: data.contratoId,  // FASE 2
           nome: data.nome,
           cpf: data.cpf,
           celular: data.celular,
-          salarioMensal: data.salarioMensal,
-          valorTotalBeneficiosMensal: data.valorTotalBeneficiosMensal,
-          valorDiariasFixas: data.valorDiariasFixas,
           statusFuncionario: data.statusFuncionario,
           tipoFuncionario: data.tipoFuncionario,
           tipoEscala: data.tipoEscala,
@@ -112,6 +158,41 @@ export class FuncionarioFormComponent implements OnInit {
         setTimeout(() => this.router.navigate(['/funcionarios']), 2000);
       },
     });
+  }
+
+  calcularValoresDoContrato(contratoId: string): void {
+    const contrato = this.contratos().find(c => c.id === contratoId);
+
+    if (!contrato) {
+      return;
+    }
+
+    this.contratoSelecionado.set(contrato);
+
+    // Calcular valores conforme FASE 3
+    const quantidadeFuncionarios = contrato.quantidadeFuncionarios || 1;
+
+    // Salário Base = Valor Total Mensal / Quantidade de Funcionários
+    const salarioBase = contrato.valorTotalMensal / quantidadeFuncionarios;
+
+    // Adicional Noturno (para escala 12x36)
+    const tipoEscala = this.form.get('tipoEscala')?.value;
+    const adicionalNoturno = tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS
+      ? salarioBase * (contrato.percentualAdicionalNoturno / 100)
+      : 0;
+
+    // Benefícios
+    const beneficios = (contrato.valorBeneficiosExtrasMensal || 0) / quantidadeFuncionarios;
+
+    // Salário Total
+    const salarioTotal = salarioBase + adicionalNoturno + beneficios;
+
+    // Valor Diária (base de 30 dias)
+    const valorDiaria = contrato.valorDiariaCobrada || (salarioBase / 30);
+
+    this.salarioCalculado.set(salarioTotal);
+    this.beneficiosCalculados.set(beneficios);
+    this.valorDiariaCalculado.set(valorDiaria);
   }
 
   onSubmit(): void {

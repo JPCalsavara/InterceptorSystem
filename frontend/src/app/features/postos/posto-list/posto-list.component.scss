@@ -374,6 +374,17 @@
     flex-shrink: 0;
   }
 
+  &.btn-view {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+    border: 1px solid #2196f3;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+    }
+  }
+
   &.btn-edit {
     background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
     color: #92400e;

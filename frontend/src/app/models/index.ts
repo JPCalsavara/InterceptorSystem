@@ -1,8 +1,8 @@
 // Enums
 export enum StatusContrato {
-  PAGO = 'PAGO',
+  ATIVO = 'ATIVO',
   PENDENTE = 'PENDENTE',
-  INATIVO = 'INATIVO',
+  FINALIZADO = 'FINALIZADO',
 }
 
 export enum StatusFuncionario {
@@ -41,8 +41,10 @@ export interface Condominio {
   nome: string;
   cnpj: string;
   endereco: string;
-  telefone?: string;
-  email?: string;
+  quantidadeFuncionariosIdeal: number;  // FASE 1 backend
+  horarioTrocaTurno: string;            // FASE 1 backend - formato "HH:mm"
+  emailGestor?: string;                 // FASE 1 backend
+  telefoneEmergencia?: string;          // FASE 1 backend
   ativo: boolean;
   empresaId?: string;
   dataCriacao?: Date;
@@ -52,16 +54,20 @@ export interface CreateCondominioDto {
   nome: string;
   cnpj: string;
   endereco: string;
-  telefone?: string;
-  email?: string;
+  quantidadeFuncionariosIdeal: number;  // FASE 1 backend
+  horarioTrocaTurno: string;            // FASE 1 backend
+  emailGestor?: string;                 // FASE 1 backend
+  telefoneEmergencia?: string;          // FASE 1 backend
 }
 
 export interface UpdateCondominioDto {
   nome: string;
   cnpj: string;
   endereco: string;
-  telefone?: string;
-  email?: string;
+  quantidadeFuncionariosIdeal: number;  // FASE 1 backend
+  horarioTrocaTurno: string;            // FASE 1 backend
+  emailGestor?: string;                 // FASE 1 backend
+  telefoneEmergencia?: string;          // FASE 1 backend
 }
 
 // Contrato
@@ -118,29 +124,31 @@ export interface UpdateContratoDto {
 export interface Funcionario {
   id: string;
   condominioId: string;
+  contratoId: string;                   // FASE 2 backend - obrigatório
   nome: string;
   cpf: string;
   celular: string;
   statusFuncionario: StatusFuncionario;
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
-  salarioMensal: number;
-  valorTotalBeneficiosMensal: number;
-  valorDiariasFixas: number;
   ativo: boolean;
+
+  // FASE 3 backend - Campos calculados (read-only, vindos do backend)
+  salarioBase?: number;
+  adicionalNoturno?: number;
+  beneficios?: number;
+  salarioTotal?: number;
 }
 
 export interface CreateFuncionarioDto {
   condominioId: string;
+  contratoId: string;                   // FASE 2 backend - obrigatório
   nome: string;
   cpf: string;
   celular: string;
   statusFuncionario: StatusFuncionario;
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
-  salarioMensal: number;
-  valorTotalBeneficiosMensal: number;
-  valorDiariasFixas: number;
 }
 
 export interface UpdateFuncionarioDto {
@@ -149,52 +157,52 @@ export interface UpdateFuncionarioDto {
   statusFuncionario: StatusFuncionario;
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
-  salarioMensal: number;
-  valorTotalBeneficiosMensal: number;
-  valorDiariasFixas: number;
 }
 
-// PostoDeTrabalho
+// PostoDeTrabalho - FASE 3
 export interface PostoDeTrabalho {
   id: string;
   condominioId: string;
-  horario: string;
-  quantidadeIdealFuncionarios: number;
-  permiteDobrarEscala: boolean;
-  capacidadeMaximaPorDobras: number;
+  horarioInicio: string;               // FASE 5 - formato "HH:mm:ss"
+  horarioFim: string;                  // FASE 5 - formato "HH:mm:ss"
+  horario: string;                     // FASE 5 - formato "HH:mm - HH:mm" (display)
+  quantidadeIdealFuncionarios: number; // FASE 5 - calculado do condomínio
+  permiteDobrarEscala: boolean;        // FASE 5
+  capacidadeMaximaPorDobras: number;   // FASE 5
+  condominio?: Condominio;             // Pode vir populado em alguns endpoints
 }
 
 export interface CreatePostoDeTrabalhoDto {
   condominioId: string;
-  horarioInicio: string;
-  horarioFim: string;
-  quantidadeIdealFuncionarios: number;
-  permiteDobrarEscala?: boolean;
+  horarioInicio: string;             // formato "HH:mm:ss"
+  horarioFim: string;                // formato "HH:mm:ss"
+  permiteDobrarEscala: boolean;
   capacidadeMaximaExtraPorTerceiros?: number;
 }
 
 export interface UpdatePostoDeTrabalhoDto {
   horarioInicio: string;
   horarioFim: string;
-  quantidadeIdealFuncionarios: number;
-  permiteDobrarEscala?: boolean;
+  permiteDobrarEscala: boolean;
   capacidadeMaximaExtraPorTerceiros?: number;
 }
 
-// Alocacao
+// Alocacao - FASE 3
 export interface Alocacao {
   id: string;
   funcionarioId: string;
   postoDeTrabalhoId: string;
-  data: string;
+  data: string;                      // formato "yyyy-MM-dd"
   statusAlocacao: StatusAlocacao;
   tipoAlocacao: TipoAlocacao;
+  funcionario?: Funcionario;         // Pode vir populado
+  postoDeTrabalho?: PostoDeTrabalho; // Pode vir populado
 }
 
 export interface CreateAlocacaoDto {
   funcionarioId: string;
   postoDeTrabalhoId: string;
-  data: string;
+  data: string;                      // formato "yyyy-MM-dd"
   statusAlocacao: StatusAlocacao;
   tipoAlocacao: TipoAlocacao;
 }
@@ -203,3 +211,7 @@ export interface UpdateAlocacaoDto {
   statusAlocacao: StatusAlocacao;
   tipoAlocacao: TipoAlocacao;
 }
+
+// Cálculo de Contrato
+export * from './contrato-calculo.models';
+

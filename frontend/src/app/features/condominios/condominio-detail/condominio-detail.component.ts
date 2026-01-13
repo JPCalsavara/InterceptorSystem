@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CondominioService } from '../../../services/condominio.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
@@ -14,13 +15,25 @@ import {
   Contrato,
   StatusAlocacao,
   StatusFuncionario,
+  StatusContrato,
+  TipoAlocacao,
 } from '../../../models/index';
 import { forkJoin } from 'rxjs';
+
+type PeriodoAnalise = 'mensal' | 'trimestral' | 'semestral' | 'anual';
+
+interface MetricaPeriodo {
+  titulo: string;
+  valor: number;
+  unidade?: string;
+  variacao?: number; // % em relação ao período anterior
+  icone: string;
+}
 
 @Component({
   selector: 'app-condominio-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './condominio-detail.component.html',
   styleUrl: './condominio-detail.component.scss',
 })
@@ -40,140 +53,253 @@ export class CondominioDetailComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  // Métricas computadas
-  custoTotal = computed(() => {
-    return this.contratos().reduce((sum, c) => sum + c.valorTotalMensal, 0);
-  });
+  // Filtro de período
+  periodoSelecionado = signal<PeriodoAnalise>('mensal');
+  dataInicio = signal<Date>(this.calcularDataInicio('mensal'));
+  dataFim = signal<Date>(new Date());
 
-  valorDiariaMedia = computed(() => {
-    const contratos = this.contratos();
-    if (contratos.length === 0) return 0;
-    const total = contratos.reduce((sum, c) => sum + c.valorDiariaCobrada, 0);
-    return total / contratos.length;
-  });
-
-  totalFuncionarios = computed(() => {
-    return this.funcionarios().filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
-      .length;
-  });
-
-  totalFaltas = computed(() => {
-    return this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA)
-      .length;
-  });
-
-  alocacoesComProblema = computed(() => {
-    return this.alocacoes().filter(
-      (a) =>
-        a.statusAlocacao === StatusAlocacao.CANCELADA ||
-        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
-    );
-  });
-
-  custoEstimadoMensal = computed(() => {
-    return this.funcionarios()
-      .filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
-      .reduce((sum, f) => sum + f.salarioMensal + f.valorTotalBeneficiosMensal, 0);
-  });
-
-  custoExtraFaltas = computed(() => {
-    const faltas = this.alocacoes().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
-    );
-    return faltas.reduce((sum, a) => {
-      const func = this.funcionarios().find((f) => f.id === a.funcionarioId);
-      return sum + (func?.valorDiariasFixas || 0);
-    }, 0);
-  });
-
-  totalAdicionalNoturno = computed(() => {
-    // Estima 20% do valor da diária para adicional noturno
-    const alocacoesNoturnos = this.alocacoes().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA
-    );
-    return alocacoesNoturnos.reduce((sum, a) => {
-      const func = this.funcionarios().find((f) => f.id === a.funcionarioId);
-      return sum + (func?.valorDiariasFixas || 0) * 0.2;
-    }, 0);
-  });
-
-  totalBeneficios = computed(() => {
-    return this.funcionarios()
-      .filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
-      .reduce((sum, f) => sum + f.valorTotalBeneficiosMensal, 0);
-  });
-
-  faturamentoTotal = computed(() => {
-    return this.contratos()
-      .filter((c) => c.status === 'PAGO')
-      .reduce((sum, c) => sum + c.valorTotalMensal, 0);
-  });
-
-  contratoAtual = computed(() => {
-    const contratos = this.contratos();
-    console.log('Contratos disponíveis:', contratos);
-    if (contratos.length === 0) return null;
-    // Retorna o contrato com data fim mais próxima no futuro
-    const now = new Date();
-    const ativos = contratos.filter((c) => {
-      const dataFim = new Date(c.dataFim);
-      console.log(
-        'Verificando contrato:',
-        c.id,
-        'dataFim:',
-        c.dataFim,
-        'parsed:',
-        dataFim,
-        'maior que now:',
-        dataFim > now
-      );
-      return dataFim > now;
+  // Dados filtrados por período
+  alocacoesPeriodo = computed(() => {
+    const inicio = this.dataInicio();
+    const fim = this.dataFim();
+    return this.alocacoes().filter((a) => {
+      const data = new Date(a.data);
+      return data >= inicio && data <= fim;
     });
-    const contratoSelecionado =
+  });
+
+  funcionariosPeriodo = computed(() => {
+    // Funcionários ativos no período
+    return this.funcionarios().filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO);
+  });
+
+  contratosPeriodo = computed(() => {
+    const inicio = this.dataInicio();
+    const fim = this.dataFim();
+    return this.contratos().filter((c) => {
+      const dataInicio = new Date(c.dataInicio);
+      const dataFim = new Date(c.dataFim);
+      // Contrato vigente no período se houver sobreposição
+      return dataInicio <= fim && dataFim >= inicio;
+    });
+  });
+
+  // Métricas computadas do período
+  metricasPeriodo = computed<MetricaPeriodo[]>(() => {
+
+    return [
+      {
+        titulo: 'Receita Total',
+        valor: this.receitaPeriodo(),
+        unidade: 'BRL',
+        icone: '💰',
+      },
+      {
+        titulo: 'Custo Operacional',
+        valor: this.custoPeriodo(),
+        unidade: 'BRL',
+        icone: '💸',
+      },
+      {
+        titulo: 'Lucro Estimado',
+        valor: this.lucroPeriodo(),
+        unidade: 'BRL',
+        icone: '📈',
+      },
+      {
+        titulo: 'Margem de Lucro',
+        valor: this.margemLucroPeriodo(),
+        unidade: '%',
+        icone: '📊',
+      },
+      {
+        titulo: 'Alocações',
+        valor: this.alocacoesPeriodo().length,
+        unidade: 'total',
+        icone: '📅',
+      },
+      {
+        titulo: 'Taxa de Faltas',
+        valor: this.taxaFaltasPeriodo(),
+        unidade: '%',
+        icone: '⚠️',
+      },
+      {
+        titulo: 'Dobras Realizadas',
+        valor: this.dobrasRealizadas(),
+        unidade: 'total',
+        icone: '🔄',
+      },
+      {
+        titulo: 'Custo por Funcionário',
+        valor: this.custoMedioPorFuncionario(),
+        unidade: 'BRL',
+        icone: '👤',
+      },
+    ];
+  });
+
+  // Cálculos financeiros
+  receitaPeriodo = computed(() => {
+    const multiplicador = this.getMultiplicadorPeriodo();
+    return this.contratosPeriodo().reduce(
+      (sum, c) => sum + (c.valorTotalMensal || 0) * multiplicador,
+      0
+    );
+  });
+
+  custoPeriodo = computed(() => {
+    // Calcula custo baseado no contrato, não nos funcionários individuais
+    const multiplicador = this.getMultiplicadorPeriodo();
+    const contrato = this.contratoAtual();
+
+    if (!contrato) {
+      return 0;
+    }
+
+    // Custo = valorTotalMensal - margem de lucro
+    const custoMensal = contrato.valorTotalMensal * (1 - (contrato.margemLucroPercentual / 100));
+    return custoMensal * multiplicador;
+  });
+
+  lucroPeriodo = computed(() => {
+    return this.receitaPeriodo() - this.custoPeriodo();
+  });
+
+  margemLucroPeriodo = computed(() => {
+    const receita = this.receitaPeriodo();
+    if (receita === 0) return 0;
+    return (this.lucroPeriodo() / receita) * 100;
+  });
+
+  taxaFaltasPeriodo = computed(() => {
+    const total = this.alocacoesPeriodo().length;
+    if (total === 0) return 0;
+    const faltas = this.alocacoesPeriodo().filter(
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
+    ).length;
+    return (faltas / total) * 100;
+  });
+
+  dobrasRealizadas = computed(() => {
+    return this.alocacoesPeriodo().filter(
+      (a) => a.tipoAlocacao === TipoAlocacao.DOBRA_PROGRAMADA
+    ).length;
+  });
+
+  substituicoesRealizadas = computed(() => {
+    return this.alocacoesPeriodo().filter(
+      (a) => a.tipoAlocacao === TipoAlocacao.SUBSTITUICAO
+    ).length;
+  });
+
+  custoMedioPorFuncionario = computed(() => {
+    const total = this.funcionariosPeriodo().length;
+    const contrato = this.contratoAtual();
+
+    if (total === 0 || !contrato) return 0;
+
+    // Custo mensal dividido pela quantidade de funcionários
+    const custoMensal = contrato.valorTotalMensal * (1 - (contrato.margemLucroPercentual / 100));
+    return custoMensal / total;
+  });
+
+  // Métricas de contratos
+  contratoAtual = computed(() => {
+    const now = new Date();
+    const ativos = this.contratos().filter((c) => {
+      const dataFim = new Date(c.dataFim);
+      return dataFim > now && c.status === StatusContrato.ATIVO;
+    });
+    return (
       ativos.sort((a, b) => new Date(a.dataFim).getTime() - new Date(b.dataFim).getTime())[0] ||
-      contratos[0] ||
-      null;
-    console.log('Contrato atual selecionado:', contratoSelecionado);
-    return contratoSelecionado;
+      null
+    );
   });
 
   diasParaVencimento = computed(() => {
     const contrato = this.contratoAtual();
-    console.log('Calculando dias para vencimento, contrato:', contrato);
-    if (!contrato || !contrato.dataFim) return null;
+    if (!contrato) return null;
     const now = new Date();
     const fim = new Date(contrato.dataFim);
-    const diff = fim.getTime() - now.getTime();
-    const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    console.log('Dias para vencimento:', dias);
-    return dias;
+    return Math.ceil((fim.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   });
 
-  vencimentoClass = computed(() => {
-    const dias = this.diasParaVencimento();
-    if (dias === null) return 'info-icon-info';
-    if (dias <= 14) return 'info-icon-error'; // 2 semanas - vermelho
-    if (dias <= 90) return 'info-icon-warning'; // 3 meses - amarelo
-    return 'info-icon-success'; // verde
+  // Métricas de postos
+  postosMaisFaltas = computed(() => {
+    const faltasPorPosto = new Map<string, number>();
+
+    this.alocacoesPeriodo()
+      .filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA)
+      .forEach((a) => {
+        const count = faltasPorPosto.get(a.postoDeTrabalhoId) || 0;
+        faltasPorPosto.set(a.postoDeTrabalhoId, count + 1);
+      });
+
+    return this.postos()
+      .map((p) => ({
+        posto: p,
+        faltas: faltasPorPosto.get(p.id) || 0,
+      }))
+      .filter((item) => item.faltas > 0)
+      .sort((a, b) => b.faltas - a.faltas)
+      .slice(0, 5); // Top 5
   });
 
-  custoTotalFuncionarios = computed(() => {
-    return this.funcionarios()
-      .filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
-      .reduce(
-        (sum, f) => sum + f.salarioMensal + f.valorTotalBeneficiosMensal + f.valorDiariasFixas,
-        0
-      );
-  });
+  // Métodos auxiliares
+  calcularDataInicio(periodo: PeriodoAnalise): Date {
+    const hoje = new Date();
+    const data = new Date(hoje);
 
-  lucro = computed(() => {
-    return this.faturamentoTotal() - this.custoTotalFuncionarios();
-  });
+    switch (periodo) {
+      case 'mensal':
+        data.setMonth(hoje.getMonth() - 1);
+        break;
+      case 'trimestral':
+        data.setMonth(hoje.getMonth() - 3);
+        break;
+      case 'semestral':
+        data.setMonth(hoje.getMonth() - 6);
+        break;
+      case 'anual':
+        data.setFullYear(hoje.getFullYear() - 1);
+        break;
+    }
 
-  custoMedioFuncionario = computed(() => {
-    const total = this.totalFuncionarios();
-    return total > 0 ? this.custoTotalFuncionarios() / total : 0;
-  });
+    return data;
+  }
+
+  getMultiplicadorPeriodo(): number {
+    switch (this.periodoSelecionado()) {
+      case 'mensal':
+        return 1;
+      case 'trimestral':
+        return 3;
+      case 'semestral':
+        return 6;
+      case 'anual':
+        return 12;
+    }
+  }
+
+  getPeriodoLabel(): string {
+    switch (this.periodoSelecionado()) {
+      case 'mensal':
+        return 'Último Mês';
+      case 'trimestral':
+        return 'Último Trimestre';
+      case 'semestral':
+        return 'Último Semestre';
+      case 'anual':
+        return 'Último Ano';
+    }
+  }
+
+  mudarPeriodo(periodo: PeriodoAnalise): void {
+    this.periodoSelecionado.set(periodo);
+    this.dataInicio.set(this.calcularDataInicio(periodo));
+    this.dataFim.set(new Date());
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -186,34 +312,58 @@ export class CondominioDetailComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    forkJoin({
-      condominio: this.condominioService.getById(id),
-      funcionarios: this.funcionarioService.getAll(),
-      postos: this.postoService.getByCondominioId(id),
-      alocacoes: this.alocacaoService.getAll(),
-      contratos: this.contratoService.getAll(),
-    }).subscribe({
-      next: (data) => {
-        this.condominio.set(data.condominio);
-        // Filtrar funcionários do condomínio
-        this.funcionarios.set(data.funcionarios.filter((f) => f.condominioId === id));
-        this.postos.set(data.postos);
+    // Carregar condomínio primeiro
+    this.condominioService.getById(id).subscribe({
+      next: (condominio) => {
+        this.condominio.set(condominio);
 
-        // Filtrar alocações dos postos deste condomínio
-        const postoIds = data.postos.map((p) => p.id);
-        this.alocacoes.set(data.alocacoes.filter((a) => postoIds.includes(a.postoDeTrabalhoId)));
-
-        // Filtrar contratos do condomínio
-        this.contratos.set(data.contratos.filter((c) => c.condominioId === id));
-
-        this.loading.set(false);
+        // Carregar dados relacionados em paralelo (com tratamento de erro individual)
+        this.loadRelatedData(id);
       },
       error: (err) => {
         this.error.set('Erro ao carregar dados do condomínio');
         this.loading.set(false);
-        console.error('Erro:', err);
+        console.error('Erro ao carregar condomínio:', err);
       },
     });
+  }
+
+  private loadRelatedData(id: string): void {
+    // Carregar funcionários
+    this.funcionarioService.getAll().subscribe({
+      next: (funcionarios) => {
+        this.funcionarios.set(funcionarios.filter((f) => f.condominioId === id));
+      },
+      error: (err) => console.warn('Erro ao carregar funcionários:', err),
+    });
+
+    // Carregar postos
+    this.postoService.getByCondominioId(id).subscribe({
+      next: (postos) => {
+        this.postos.set(postos);
+
+        // Carregar alocações dos postos
+        this.alocacaoService.getAll().subscribe({
+          next: (alocacoes) => {
+            const postoIds = postos.map((p) => p.id);
+            this.alocacoes.set(alocacoes.filter((a) => postoIds.includes(a.postoDeTrabalhoId)));
+          },
+          error: (err) => console.warn('Erro ao carregar alocações:', err),
+        });
+      },
+      error: (err) => console.warn('Erro ao carregar postos:', err),
+    });
+
+    // Carregar contratos
+    this.contratoService.getAll().subscribe({
+      next: (contratos) => {
+        this.contratos.set(contratos.filter((c) => c.condominioId === id));
+      },
+      error: (err) => console.warn('Erro ao carregar contratos:', err),
+    });
+
+    // Dados carregados
+    this.loading.set(false);
   }
 
   getStatusLabel(status: StatusAlocacao): string {
@@ -230,14 +380,19 @@ export class CondominioDetailComponent implements OnInit {
     return func?.nome || 'Desconhecido';
   }
 
-  getPostoHorario(postoId: string): string {
-    const posto = this.postos().find((p) => p.id === postoId);
-    return posto?.horario || 'Desconhecido';
+  formatHorario(inicio: string, fim: string): string {
+    // Remove segundos para exibição (HH:mm)
+    const inicioFormatado = inicio.substring(0, 5);
+    const fimFormatado = fim.substring(0, 5);
+    return `${inicioFormatado} às ${fimFormatado}`;
   }
 
-  getAlocacoesByPosto(postoId: string): Alocacao[] {
-    return this.alocacoes().filter((a) => a.postoDeTrabalhoId === postoId);
+  getPostoHorario(postoId: string): string {
+    const posto = this.postos().find((p) => p.id === postoId);
+    if (!posto) return 'Desconhecido';
+    return this.formatHorario(posto.horarioInicio, posto.horarioFim);
   }
+
 
   getStatusBadgeClass(status: StatusAlocacao): string {
     const classes = {
@@ -300,4 +455,79 @@ export class CondominioDetailComponent implements OnInit {
       });
     }
   }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  }
+
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  }
+
+  formatPercent(value: number): string {
+    return `${value.toFixed(2)}%`;
+  }
+
+  getUrgenciaClass(dias: number | null): string {
+    if (dias === null) return 'urgencia-info';
+    if (dias <= 14) return 'urgencia-alta'; // 2 semanas
+    if (dias <= 90) return 'urgencia-media'; // 3 meses
+    return 'urgencia-baixa';
+  }
+
+  getTipoAlocacaoLabel(tipo: TipoAlocacao): string {
+    const labels = {
+      [TipoAlocacao.REGULAR]: 'Regular',
+      [TipoAlocacao.DOBRA_PROGRAMADA]: 'Dobra Programada',
+      [TipoAlocacao.SUBSTITUICAO]: 'Substituição',
+    };
+    return labels[tipo] || 'Desconhecido';
+  }
+
+  getTipoAlocacaoBadgeClass(tipo: TipoAlocacao): string {
+    const classes = {
+      [TipoAlocacao.REGULAR]: 'badge-info',
+      [TipoAlocacao.DOBRA_PROGRAMADA]: 'badge-warning',
+      [TipoAlocacao.SUBSTITUICAO]: 'badge-secondary',
+    };
+    return classes[tipo] || 'badge-info';
+  }
+
+  // Métodos auxiliares para template
+  abs(value: number): number {
+    return Math.abs(value);
+  }
+
+  formatarTelefone(telefone: string | null | undefined): string {
+    if (!telefone) return 'Não informado';
+
+    // Remove tudo que não é número
+    const numeros = telefone.replace(/\D/g, '');
+
+    // Formato: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+    if (numeros.length === 11) {
+      return `(${numeros.substring(0, 2)}) ${numeros.substring(2, 7)}-${numeros.substring(7)}`;
+    } else if (numeros.length === 10) {
+      return `(${numeros.substring(0, 2)}) ${numeros.substring(2, 6)}-${numeros.substring(6)}`;
+    }
+
+    return telefone;
+  }
+
+  // Contadores para alocações (evitar filtros no template)
+  alocacoesConfirmadas = computed(() => {
+    return this.alocacoesPeriodo().filter(
+      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA
+    ).length;
+  });
+
+  alocacoesFaltas = computed(() => {
+    return this.alocacoesPeriodo().filter(
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
+    ).length;
+  });
 }
