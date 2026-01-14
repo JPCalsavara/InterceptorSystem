@@ -34,13 +34,14 @@ interface NavItem {
       .sidebar {
         width: 260px;
         height: calc(100vh - 64px);
-        background: white;
-        border-right: 1px solid #e5e7eb;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--sidebar-border);
         position: fixed;
         top: 64px;
         left: 0;
         overflow-y: auto;
         padding: 1.5rem 1rem;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
       }
 
       .nav {
@@ -56,19 +57,19 @@ interface NavItem {
         padding: 0.75rem 1rem;
         border-radius: 8px;
         text-decoration: none;
-        color: #6b7280;
+        color: var(--sidebar-text);
         font-weight: 500;
         transition: all 0.2s;
 
         &:hover {
-          background: #f3f4f6;
-          color: #374151;
+          background: var(--sidebar-hover);
+          color: var(--sidebar-text-hover);
         }
 
         &.active {
-          background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
-          color: white;
-          box-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.3);
+          background: var(--sidebar-active-bg);
+          color: var(--sidebar-active-text);
+          box-shadow: var(--sidebar-active-shadow);
         }
       }
 
@@ -92,12 +93,12 @@ interface NavItem {
       }
 
       .sidebar::-webkit-scrollbar-thumb {
-        background: #d1d5db;
+        background: var(--sidebar-scrollbar);
         border-radius: 3px;
       }
 
       .sidebar::-webkit-scrollbar-thumb:hover {
-        background: #9ca3af;
+        background: var(--sidebar-scrollbar-hover);
       }
 
       @media (max-width: 768px) {

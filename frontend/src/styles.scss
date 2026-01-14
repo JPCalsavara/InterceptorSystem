@@ -9,38 +9,104 @@
 
 /* Variáveis CSS globais */
 :root {
-  // Beige-forward light palette
-  --bg-primary: #fef7ef;
-  --bg-secondary: #f8ecdf;
-  --bg-tertiary: #f1e1d1;
-  --surface-card: #fff8f0;
-  --surface-muted: #f6eade;
-  --text-primary: #1f1a16;
-  --text-secondary: #5f4e43;
-  --text-tertiary: #8a776b;
-  --border-subtle: #e3d5c6;
-  --border-strong: #cbb69f;
-  --shadow-sm: 0 1px 2px rgba(31, 26, 22, 0.08);
-  --shadow-md: 0 4px 10px rgba(31, 26, 22, 0.12);
-  --shadow-lg: 0 12px 30px rgba(31, 26, 22, 0.16);
+  // Blue baby palette - Light mode
+  --bg-primary: #e3f2fd;
+  --bg-secondary: #bbdefb;
+  --bg-tertiary: #90caf9;
+  --surface-card: #f5faff;
+  --surface-muted: #e1f5fe;
+  --text-primary: #0d47a1;
+  --text-secondary: #1565c0;
+  --text-tertiary: #1976d2;
+  --border-subtle: #bbdefb;
+  --border-strong: #90caf9;
+  --shadow-sm: 0 1px 2px rgba(13, 71, 161, 0.08);
+  --shadow-md: 0 4px 10px rgba(13, 71, 161, 0.12);
+  --shadow-lg: 0 12px 30px rgba(13, 71, 161, 0.16);
+
+  // Additional light mode variables
+  --card-bg: #f5faff;
+  --input-bg: #ffffff;
+  --border-color: #bbdefb;
+  --hover-bg: #e1f5fe;
+  --bg-hover: #e1f5fe;
+  --border-hover: #90caf9;
+  --primary-color: #2196f3;
+  --primary-dark: #1976d2;
+
+  // Navbar specific
+  --navbar-bg: #e3f2fd;
+  --navbar-border: #bbdefb;
+  --theme-toggle-bg: #bbdefb;
+  --theme-toggle-color: #1565c0;
+  --theme-toggle-hover-bg: #90caf9;
+  --profile-hover-bg: #bbdefb;
+  --dropdown-bg: #f5faff;
+  --dropdown-border: #bbdefb;
+  --dropdown-item-hover: #e1f5fe;
+  --dropdown-divider: #bbdefb;
+
+  // Sidebar specific - Light mode (azul bebê)
+  --sidebar-bg: #e3f2fd;
+  --sidebar-border: #bbdefb;
+  --sidebar-text: #1565c0;
+  --sidebar-text-hover: #0d47a1;
+  --sidebar-hover: #bbdefb;
+  --sidebar-active-bg: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.4);
+  --sidebar-scrollbar: #90caf9;
+  --sidebar-scrollbar-hover: #64b5f6;
 }
 
 /* Dark Mode global */
 body.dark-mode {
-  // Cool gray palette for dark mode
-  --bg-primary: #101216;
-  --bg-secondary: #161a20;
-  --bg-tertiary: #1d222b;
-  --surface-card: #1f2530;
-  --surface-muted: #181c24;
-  --text-primary: #f5f7fb;
-  --text-secondary: #c3cad9;
-  --text-tertiary: #959fb3;
-  --border-subtle: #2c323f;
-  --border-strong: #3a4151;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
+  // Blue-gray palette for dark mode
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1f2e;
+  --bg-tertiary: #252d3d;
+  --surface-card: #1e2738;
+  --surface-muted: #151b26;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  --border-subtle: #30363d;
+  --border-strong: #424a53;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6);
+
+  // Additional dark mode variables
+  --card-bg: #1e2738;
+  --input-bg: #0d1117;
+  --border-color: #30363d;
+  --hover-bg: #252d3d;
+  --primary-color: #58a6ff;
+  --primary-dark: #4a8fd8;
+
+  // Navbar specific dark mode
+  --navbar-bg: #161b22;
+  --navbar-border: #30363d;
+  --theme-toggle-bg: #21262d;
+  --theme-toggle-color: #8b949e;
+  --theme-toggle-hover-bg: #30363d;
+  --profile-hover-bg: #21262d;
+  --dropdown-bg: #161b22;
+  --dropdown-border: #30363d;
+  --dropdown-item-hover: #21262d;
+  --dropdown-divider: #30363d;
+
+  // Sidebar specific - Dark mode
+  --sidebar-bg: #0d1117;
+  --sidebar-border: #21262d;
+  --sidebar-text: #8b949e;
+  --sidebar-text-hover: #c9d1d9;
+  --sidebar-hover: #161b22;
+  --sidebar-active-bg: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-shadow: 0 4px 6px -1px rgba(88, 166, 255, 0.4);
+  --sidebar-scrollbar: #30363d;
+  --sidebar-scrollbar-hover: #424a53;
 }
 
 /* Estilos do body */
@@ -59,15 +125,15 @@ body.dark-mode {
   }
 
   ::-webkit-scrollbar-track {
-    background: #1f2937;
+    background: #0d1117;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #4b5563;
+    background: #30363d;
     border-radius: 6px;
 
     &:hover {
-      background: #6b7280;
+      background: #424a53;
     }
   }
 }

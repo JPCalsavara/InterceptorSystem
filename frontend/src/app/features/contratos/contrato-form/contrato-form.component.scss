@@ -213,10 +213,9 @@ select.form-input {
 .btn-primary {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #135fb0 0%, #1976d2 100%);
+  background: linear-gradient(135deg, #1976d2 0%, #135fb0 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -224,28 +223,22 @@ select.form-input {
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
-  min-width: 120px;
 
-  &:hover:not(:disabled) {
+  &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
   }
 
-  &:active:not(:disabled) {
+  &:active {
     transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 }
 
 .btn-secondary {
   padding: 0.75rem 1.5rem;
-  background: var(--surface-card);
-  color: var(--text-secondary);
-  border: 2px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -253,8 +246,8 @@ select.form-input {
   min-width: 120px;
 
   &:hover:not(:disabled) {
-    background: var(--bg-secondary);
-    border-color: #d1d5db;
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
   }
 
   &:disabled {
@@ -286,8 +279,8 @@ select.form-input {
 }
 
 .calculation-display {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 2px solid #22c55e;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #2196f3;
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
@@ -298,7 +291,7 @@ select.form-input {
   .calc-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #15803d;
+    color: #1565c0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -306,7 +299,7 @@ select.form-input {
   .calc-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #166534;
+    color: #0d47a1;
   }
 
   @media (max-width: 640px) {
@@ -317,20 +310,20 @@ select.form-input {
 }
 
 .result-card {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 2px solid #3b82f6;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #2196f3;
   border-radius: 12px;
   padding: 2rem;
   display: flex;
   gap: 1.5rem;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 6px rgba(33, 150, 243, 0.1);
 }
 
 .result-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -345,7 +338,7 @@ select.form-input {
   .result-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #1e40af;
+    color: #1565c0;
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -415,7 +408,7 @@ select.form-input {
 
     &.total {
       grid-column: 1 / -1;
-      background: linear-gradient(135deg, #135fb0 0%, #1976d2 100%);
+      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
       color: white;
       font-size: 1.125rem;
       font-weight: bold;
@@ -429,7 +422,7 @@ select.form-input {
     }
 
     &.highlight {
-      background: linear-gradient(135deg, #0d8f73 0%, #10b981 100%);
+      background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
       color: white;
       border: none;
 
