@@ -45,7 +45,7 @@ cp .env.example .env
 
 # Subir tudo com Docker Compose
 cd backend/src
-docker-compose up -d
+docker compose up -d
 
 # Acessar aplicação
 # Frontend: http://localhost
@@ -78,7 +78,7 @@ docker-compose up -d
 - [Resultado](#resultado)
 - [Regras de Negócio (5 Fases)](#-regras-implementadas-nas-5-fases)
 - [Cenários de Teste](#cenários-e-regras-de-negócio-das-entidades)
-- [Docker Compose](#-docker-compose---ambiente-completo)
+- [Docker Compose](#-docker compose---ambiente-completo)
 - [CI/CD](#-cicd---github-actions)
 - [FAQ](#-faq---perguntas-frequentes)
 - [Tecnologias](#️-tecnologias-e-ferramentas)
@@ -903,14 +903,14 @@ nano .env
 cd backend/src
 
 # Modo desenvolvimento (com hot-reload)
-docker-compose up -d
+docker compose up -d
 
 # Ver logs
-docker-compose logs -f
+docker compose logs -f
 
 # Logs de um serviço específico
-docker-compose logs -f api
-docker-compose logs -f frontend
+docker compose logs -f api
+docker compose logs -f frontend
 ```
 
 #### **3. Acessar Aplicação**
@@ -921,7 +921,7 @@ docker-compose logs -f frontend
 
 ### **⚡ Modo Desenvolvimento (Hot-Reload)**
 
-Quando você roda `docker-compose up`, automaticamente:
+Quando você roda `docker compose up`, automaticamente:
 
 **Backend (.NET):**
 - ✅ `dotnet watch run` detecta mudanças e recompila
@@ -940,7 +940,7 @@ Quando você roda `docker-compose up`, automaticamente:
 
 ```bash
 # Build e subir em modo produção (sem hot-reload)
-docker-compose -f compose.yaml up -d --build
+docker compose -f compose.yaml up -d --build
 
 # Backend: build otimizado (sem SDK)
 # Frontend: build AOT com minificação
@@ -951,26 +951,26 @@ docker-compose -f compose.yaml up -d --build
 
 ```bash
 # Ver status dos containers
-docker-compose ps
+docker compose ps
 
 # Parar todos os serviços
-docker-compose stop
+docker compose stop
 
 # Parar e remover containers
-docker-compose down
+docker compose down
 
 # Parar e remover TUDO (incluindo volumes)
-docker-compose down -v
+docker compose down -v
 
 # Rebuild forçado
-docker-compose up -d --build --force-recreate
+docker compose up -d --build --force-recreate
 
 # Executar comando dentro do container
-docker-compose exec api dotnet ef database update
-docker-compose exec frontend npm install nova-biblioteca
+docker compose exec api dotnet ef database update
+docker compose exec frontend npm install nova-biblioteca
 
 # Conectar ao PostgreSQL
-docker-compose exec db psql -U admin -d interceptor_db
+docker compose exec db psql -U admin -d interceptor_db
 ```
 
 ### **📚 Documentação Completa**
@@ -1056,13 +1056,13 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 ```yaml
 # .github/workflows/ci.yml
 - Checkout code
-- Test docker-compose build
+- Test docker compose build
 - Valida Dockerfiles
 ```
 
 **O que é testado:**
 - ✅ Dockerfiles fazem build sem erros
-- ✅ docker-compose.yaml válido
+- ✅ docker compose.yaml válido
 - ✅ Multi-stage builds funcionam
 - ✅ Dependências resolvidas
 
@@ -1101,7 +1101,7 @@ npm run lint
 
 # Docker
 cd backend/src
-docker-compose build
+docker compose build
 ```
 
 ### **📚 Arquivo de Configuração**
@@ -1309,7 +1309,7 @@ dotnet run
 ```bash
 # Verificar versões instaladas
 docker --version        # Docker 20+
-docker-compose --version # Docker Compose 2+
+docker compose --version # Docker Compose 2+
 dotnet --version        # .NET 8.0
 node --version          # Node.js 20+
 npm --version           # npm 10+
@@ -1327,10 +1327,10 @@ nano .env  # Editar com suas configurações
 
 # 3. Subir todos os serviços (DB + API + Frontend + Nginx)
 cd backend/src
-docker-compose up -d
+docker compose up -d
 
 # 4. Aguardar containers iniciarem (~30s)
-docker-compose logs -f
+docker compose logs -f
 
 # 5. Acessar aplicação
 # Frontend: http://localhost

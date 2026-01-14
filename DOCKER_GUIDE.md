@@ -44,16 +44,16 @@ nano .env
 cd backend/src
 
 # Subir todos os serviços (DB + API + Frontend + Nginx)
-docker-compose up -d
+docker compose up -d
 
 # Ver logs
-docker-compose logs -f
+docker compose logs -f
 
 # Apenas logs da API
-docker-compose logs -f api
+docker compose logs -f api
 
 # Apenas logs do Frontend
-docker-compose logs -f frontend
+docker compose logs -f frontend
 ```
 
 ### **3. Acessar Aplicação**
@@ -101,7 +101,7 @@ docker-compose logs -f frontend
 
 ### **Desenvolvimento (com compose.override.yml)**
 
-Quando você roda `docker-compose up`, ele automaticamente aplica o `compose.override.yml`:
+Quando você roda `docker compose up`, ele automaticamente aplica o `compose.override.yml`:
 
 - **API:** Hot-reload com `dotnet watch`
 - **Frontend:** Hot-reload com `npm start`
@@ -112,10 +112,10 @@ Quando você roda `docker-compose up`, ele automaticamente aplica o `compose.ove
 
 ```bash
 # Build e subir em modo produção
-docker-compose -f compose.yaml up -d --build
+docker compose -f compose.yaml up -d --build
 
 # Ou explicitamente
-docker-compose --profile production up -d
+docker compose --profile production up -d
 ```
 
 - **API:** Build otimizado (sem watch)
@@ -131,63 +131,63 @@ docker-compose --profile production up -d
 
 ```bash
 # Ver status
-docker-compose ps
+docker compose ps
 
 # Parar todos
-docker-compose stop
+docker compose stop
 
 # Parar e remover containers
-docker-compose down
+docker compose down
 
 # Parar e remover TUDO (incluindo volumes)
-docker-compose down -v
+docker compose down -v
 
 # Rebuild forçado
-docker-compose up -d --build --force-recreate
+docker compose up -d --build --force-recreate
 ```
 
 ### **Logs e Debug**
 
 ```bash
 # Logs de todos os serviços
-docker-compose logs -f
+docker compose logs -f
 
 # Logs de um serviço específico
-docker-compose logs -f api
-docker-compose logs -f frontend
-docker-compose logs -f nginx
+docker compose logs -f api
+docker compose logs -f frontend
+docker compose logs -f nginx
 
 # Últimas 100 linhas
-docker-compose logs --tail=100 -f
+docker compose logs --tail=100 -f
 ```
 
 ### **Executar Comandos Dentro dos Containers**
 
 ```bash
 # Entrar no container da API
-docker-compose exec api bash
+docker compose exec api bash
 
 # Rodar migrations
-docker-compose exec api dotnet ef database update
+docker compose exec api dotnet ef database update
 
 # Entrar no container do frontend
-docker-compose exec frontend sh
+docker compose exec frontend sh
 
 # Instalar nova dependência
-docker-compose exec frontend npm install nome-pacote
+docker compose exec frontend npm install nome-pacote
 ```
 
 ### **Banco de Dados**
 
 ```bash
 # Conectar ao PostgreSQL
-docker-compose exec db psql -U admin -d interceptor_db
+docker compose exec db psql -U admin -d interceptor_db
 
 # Backup do banco
-docker-compose exec db pg_dump -U admin interceptor_db > backup.sql
+docker compose exec db pg_dump -U admin interceptor_db > backup.sql
 
 # Restaurar backup
-docker-compose exec -T db psql -U admin interceptor_db < backup.sql
+docker compose exec -T db psql -U admin interceptor_db < backup.sql
 ```
 
 ---
@@ -198,39 +198,39 @@ docker-compose exec -T db psql -U admin interceptor_db < backup.sql
 
 ```bash
 # Verificar logs
-docker-compose logs frontend
+docker compose logs frontend
 
 # Rebuild do frontend
-docker-compose up -d --build frontend
+docker compose up -d --build frontend
 
 # Limpar cache do npm
-docker-compose exec frontend npm cache clean --force
-docker-compose restart frontend
+docker compose exec frontend npm cache clean --force
+docker compose restart frontend
 ```
 
 ### **Problema: API não conecta ao banco**
 
 ```bash
 # Verificar se o banco está saudável
-docker-compose ps
+docker compose ps
 
 # Ver logs do banco
-docker-compose logs db
+docker compose logs db
 
 # Testar conexão
-docker-compose exec api dotnet ef database update
+docker compose exec api dotnet ef database update
 ```
 
 ### **Problema: Mudanças não aparecem (hot-reload não funciona)**
 
 ```bash
 # Reiniciar serviço
-docker-compose restart api
-docker-compose restart frontend
+docker compose restart api
+docker compose restart frontend
 
 # Verificar se volumes estão montados
-docker-compose exec api ls -la /src
-docker-compose exec frontend ls -la /app
+docker compose exec api ls -la /src
+docker compose exec frontend ls -la /app
 ```
 
 ### **Problema: Porta 80 já está em uso**
@@ -252,22 +252,22 @@ sudo lsof -i :80
 ```bash
 # 1. Iniciar ambiente
 cd backend/src
-docker-compose up -d
+docker compose up -d
 
 # 2. Verificar se tudo subiu
-docker-compose ps
+docker compose ps
 
 # 3. Desenvolver normalmente
 # As mudanças serão detectadas automaticamente!
 
 # 4. Ver logs se necessário
-docker-compose logs -f api
+docker compose logs -f api
 
 # 5. Ao finalizar o dia
-docker-compose stop
+docker compose stop
 
 # 6. No dia seguinte
-docker-compose start
+docker compose start
 ```
 
 ---
@@ -278,7 +278,7 @@ docker-compose start
 
 ```bash
 # Rodar testes dentro do container
-docker-compose exec api dotnet test
+docker compose exec api dotnet test
 
 # Rodar testes localmente (sem Docker)
 cd backend/src
@@ -289,7 +289,7 @@ dotnet test
 
 ```bash
 # Rodar testes dentro do container
-docker-compose exec frontend npm test
+docker compose exec frontend npm test
 
 # Rodar testes localmente (sem Docker)
 cd frontend

@@ -126,5 +126,5 @@ jobs:
         working-directory: backend/src
         run: |
           # Testa se os Dockerfiles fazem build corretamente
-          docker-compose build --no-cache
+          docker compose build --no-cache
           echo "✅ Docker build successful!"
