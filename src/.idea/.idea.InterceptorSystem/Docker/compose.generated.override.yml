@@ -2,7 +2,7 @@
 services:
   api:
     build:
-      context: "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src"
+      context: "/home/jpcalsavara/projetos/andamento/InterceptorSystem/backend/src"
       dockerfile: "InterceptorSystem.Api/Dockerfile"
       target: "build"
     command: []

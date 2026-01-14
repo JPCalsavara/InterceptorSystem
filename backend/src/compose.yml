@@ -1,4 +1,4 @@
-﻿﻿services:
+﻿services:
   # --- BANCO DE DADOS (Relacional/Core) ---
   db:
     image: postgres:15-alpine
@@ -41,30 +41,28 @@
     expose:
       - "8080"
 
-  # --- FRONTEND ANGULAR ---
+  # --- FRONTEND ANGULAR (SEPARADO) ---
   frontend:
     build:
       context: ../../frontend
       dockerfile: Dockerfile
       target: production  # Usar 'development' no compose.override.yml
     container_name: interceptor_frontend
+    ports:
+      - "4201:80"  # Frontend exposto diretamente na porta 4201
     networks:
       - interceptor-network
-    expose:
-      - "80"
-    # Em produção, não precisa de volumes
 
-  # --- LOAD BALANCER / REVERSE PROXY ---
+  # --- LOAD BALANCER / REVERSE PROXY (APENAS API) ---
   nginx:
     image: nginx:alpine
     container_name: interceptor_nginx
     ports:
-      - "80:80"  # O mundo acessa a porta 80
+      - "80:80"  # API acessível via Nginx na porta 80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - api
-      - frontend
     networks:
       - interceptor-network
 

@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: InterceptorSystem.Api/Dockerfile
-      target: build  # <--- O PULO DO GATO: Para na etapa de SDK, ignorando a etapa 'final'
+      target: developmente  # <--- O PULO DO GATO: Para na etapa de SDK, ignorando a etapa 'final'
     
     # Monta seu código local dentro do container para o 'watch' ver as mudanças
     volumes:
