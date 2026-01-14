@@ -1,0 +1,32 @@
+{
+  "create": {
+    "condominioId": "22222222-2222-2222-2222-222222222221",
+    "contratoId": "33333333-3333-3333-3333-333333333331",
+    "nome": "João da Silva",
+    "cpf": "98765432100",
+    "celular": "+5511999999999",
+    "statusFuncionario": "ATIVO",
+    "tipoEscala": "DOZE_POR_TRINTA_SEIS",
+    "tipoFuncionario": "CLT"
+  },
+  "update": {
+    "nome": "João da Silva Junior",
+    "celular": "+5511888888888",
+    "statusFuncionario": "ATIVO",
+    "tipoEscala": "SEMANAL_COMERCIAL",
+    "tipoFuncionario": "TERCEIRIZADO"
+  },
+  "_nota": {
+    "fase3": "Salários agora são calculados automaticamente do contrato",
+    "campos_removidos": ["salarioMensal", "valorTotalBeneficiosMensal", "valorDiariasFixas"],
+    "campos_calculados": ["salarioBase", "adicionalNoturno", "beneficios", "salarioTotal"],
+    "exemplo_ids": {
+      "condominioSolar": "22222222-2222-2222-2222-222222222221",
+      "contratoSolar": "33333333-3333-3333-3333-333333333331",
+      "condominioHorizonte": "22222222-2222-2222-2222-222222222222",
+      "contratoHorizonte": "33333333-3333-3333-3333-333333333332",
+      "condominioTorres": "22222222-2222-2222-2222-222222222223",
+      "contratoTorres": "33333333-3333-3333-3333-333333333333"
+    }
+  }
+}

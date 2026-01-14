@@ -1,0 +1,43 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: InterceptorSystem.Api/Dockerfile
+      target: build  # <--- O PULO DO GATO: Para na etapa de SDK, ignorando a etapa 'final'
+    
+    # Monta seu código local dentro do container para o 'watch' ver as mudanças
+    volumes:
+      - .:/src
+    
+    # Define a pasta onde o comando deve rodar (onde está o .csproj da API)
+    working_dir: /src/InterceptorSystem.Api
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # Essencial para o Docker no Linux perceber mudanças de arquivo rapidamente
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+    
+    # Substitui o "dotnet InterceptorSystem.Api.dll" pelo modo Watch
+    command: ["dotnet", "watch", "run", "--no-launch-profile"]
+
+  # --- FRONTEND EM MODO DESENVOLVIMENTO ---
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      target: development  # <--- Usa stage de desenvolvimento
+    
+    # Monta código local para hot-reload
+    volumes:
+      - ../../frontend:/app
+      - /app/node_modules  # Evita sobrescrever node_modules do container
+    
+    # Expor porta para acesso direto (opcional, para debug)
+    ports:
+      - "4200:4200"
+    
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true  # Hot-reload no Docker
+    
+    # Comando já está no Dockerfile (npm start)
