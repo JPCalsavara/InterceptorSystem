@@ -1,21 +1,180 @@
-bin/
-obj/
-*.user
-*.DotSettings.user
+## ==================================================
+## .NET / C# / ASP.NET Core
+## ==================================================
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.rsuser
 *.suo
+*.user
 *.userosscache
 *.sln.docstates
-/.vs/
-/TestResults/
-launchSettings.json
-appsettings.*.local.json
-.env
-.env.*
-*.env
+*.userprefs
+.DS_Store
 
-src/.env
-/.idea/
+# Rider specific
+.idea/
+**/.idea/
 **/rider.project.*.nuget.info
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.obj
+*.cache
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Assembly info (auto-generated)
+**/*AssemblyInfo.cs
+**/*AssemblyAttributes.cs
 **/*.AssemblyInfo.cs
 **/*.AssemblyInfoInputs.cache
 **/project.packagespec.json
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+TestResults/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Entity Framework
+*.mdf
+*.ldf
+*.ndf
+Migrations/*.Designer.cs
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.env
+src/.env
+appsettings.*.local.json
+launchSettings.json
+
+## ==================================================
+## Angular / Node.js / Frontend
+## ==================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+tmp/
+out-tsc/
+.angular/
+frontend/dist/
+frontend/.angular/
+frontend/tmp/
+
+# IDEs and editors
+.vscode/
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Misc
+.DS_Store
+Thumbs.db
+
+## ==================================================
+## Docker
+## ==================================================
+*.log
+.dockerignore
+
+## ==================================================
+## Database
+## ==================================================
+*.sqlite
+*.sqlite3
+*.db
+*.mdf
+*.ldf
+
+## ==================================================
+## OS
+## ==================================================
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*~
+
+## ==================================================
+## JetBrains Rider
+## ==================================================
+.idea/
+*.sln.iml
+**/*.DotSettings.user
+**/rider.project.model.nuget.info
+*.ide
+*.ide-shm
+*.ide-wal
+
+## ==================================================
+## Outros
+## ==================================================
+*.stackdump
+*.log
+*.bak
+*.swp
+*.swo
+*~
+.history/
