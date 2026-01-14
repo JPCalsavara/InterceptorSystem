@@ -36,5 +36,12 @@ public class PostoDeTrabalhoConfiguration : IEntityTypeConfiguration<PostoDeTrab
         // Índices
         builder.HasIndex(p => p.EmpresaId);
         builder.HasIndex(p => p.CondominioId);
+
+        // FASE 4: QuantidadeIdealFuncionarios removido (calculado automaticamente)
+        // Propriedade marcada como [NotMapped] na entidade
+
+        builder.Property(p => p.PermiteDobrarEscala)
+            .HasDefaultValue(true)
+            .IsRequired();
     }
 }

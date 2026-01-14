@@ -1,0 +1,141 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>📊 Dashboard</h1>
+      <p class="subtitle">Visão geral do sistema - InterceptorSystem</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="loadAllData()" [disabled]="loading()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" [class.spinning]="loading()">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+        </svg>
+        {{ loading() ? 'Atualizando...' : 'Atualizar' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+  }
+
+  <!-- Dashboard Content -->
+  @if (!loading()) {
+
+  <!-- Métricas Financeiras -->
+  <section class="metricas-section">
+    <h2 class="section-title">💰 Métricas Financeiras</h2>
+    <div class="metricas-grid">
+      @for (metrica of metricasFinanceiras(); track metrica.titulo) {
+      <div class="metrica-card" [style.border-left-color]="metrica.cor">
+        <div class="metrica-header">
+          <span class="metrica-icone">{{ metrica.icone }}</span>
+          @if (metrica.tendencia) {
+          <span class="tendencia" [class]="'tendencia-' + metrica.tendencia">
+            @if (metrica.tendencia === 'up') { ↗ }
+            @if (metrica.tendencia === 'down') { ↘ }
+            @if (metrica.tendencia === 'neutral') { → }
+          </span>
+          }
+        </div>
+        <p class="metrica-titulo">{{ metrica.titulo }}</p>
+        <h3 class="metrica-valor">
+          @if (metrica.titulo.includes('Receita')) {
+            {{ formatCurrency(metrica.valor) }}
+          } @else {
+            {{ metrica.valor }}
+          }
+        </h3>
+        <p class="metrica-subtitulo">{{ metrica.subtitulo }}</p>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Cards de Navegação -->
+  <section class="navegacao-section">
+    <h2 class="section-title">🧭 Navegação Rápida</h2>
+    <div class="cards-grid">
+      @for (card of cards(); track card.route) {
+      <a [routerLink]="card.route" class="nav-card" [style.border-left-color]="card.color">
+        <div class="card-header">
+          <span class="card-icon">{{ card.icon }}</span>
+          <h3 class="card-title">{{ card.title }}</h3>
+        </div>
+        <p class="card-description">{{ card.description }}</p>
+        <div class="card-stats">
+          <span class="stats-label">{{ card.stats.label }}:</span>
+          <span class="stats-value">{{ card.stats.value }}</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-link">Acessar →</span>
+        </div>
+      </a>
+      }
+    </div>
+  </section>
+
+  <!-- Alertas de Contratos Próximos ao Vencimento -->
+  @if (contratosProximosVencimento().length > 0) {
+  <section class="alertas-section">
+    <h2 class="section-title">⚠️ Contratos Próximos ao Vencimento</h2>
+    <div class="alertas-list">
+      @for (contrato of contratosProximosVencimento(); track contrato.id) {
+      <div class="alerta-card" [class]="getUrgenciaClass(contrato.diasRestantes)">
+        <div class="alerta-header">
+          <div class="alerta-info">
+            <h4 class="alerta-titulo">{{ contrato.condominioNome }}</h4>
+            <p class="alerta-valor">{{ formatCurrency(contrato.valorTotalMensal) }}/mês</p>
+          </div>
+          <div class="alerta-dias">
+            <span class="dias-numero">{{ contrato.diasRestantes }}</span>
+            <span class="dias-label">dias</span>
+          </div>
+        </div>
+        <div class="alerta-footer">
+          <span class="alerta-data">Vence em: {{ formatDate(contrato.dataFim) }}</span>
+          <a [routerLink]="['/contratos']" class="alerta-link">Ver contrato →</a>
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+  } @else {
+  <section class="info-section-empty">
+    <div class="empty-state">
+      <svg width="80" height="80" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+      </svg>
+      <h3>✅ Todos os contratos estão ok!</h3>
+      <p>Nenhum contrato vence nos próximos 30 dias.</p>
+    </div>
+  </section>
+  }
+
+  <!-- Info Cards -->
+  <section class="info-section">
+    <div class="info-card">
+      <h3>🎯 Multi-Tenant</h3>
+      <p>Sistema isolado por empresa com filtros automáticos</p>
+    </div>
+    <div class="info-card">
+      <h3>✅ Clean Architecture</h3>
+      <p>Backend .NET 8 + Frontend Angular 19</p>
+    </div>
+    <div class="info-card">
+      <h3>🧪 Alta Cobertura</h3>
+      <p>124+ testes unitários e de integração</p>
+    </div>
+    <div class="info-card">
+      <h3>📊 Dashboards</h3>
+      <p>Métricas financeiras e operacionais em tempo real</p>
+    </div>
+  </section>
+
+  }
+</div>
+

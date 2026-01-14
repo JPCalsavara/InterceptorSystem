@@ -19,7 +19,7 @@ public class PostosDeTrabalhoController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(PostoDeTrabalhoDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(CreatePostoInput input)
+    public async Task<IActionResult> Create([FromBody] CreatePostoInput input)
     {
         try
         {
@@ -58,7 +58,7 @@ public class PostosDeTrabalhoController : ControllerBase
     [ProducesResponseType(typeof(PostoDeTrabalhoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update(Guid id, UpdatePostoInput input)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePostoInput input)
     {
         try 
         {
@@ -82,4 +82,3 @@ public class PostosDeTrabalhoController : ControllerBase
         catch (KeyNotFoundException) { return NotFound(); }
     }
 }
-

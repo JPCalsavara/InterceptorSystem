@@ -28,30 +28,68 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.Property(f => f.TipoEscala)
             .IsRequired()
             .HasConversion(
-                v => v.ToString(),
-                v => Enum.Parse<TipoEscala>(v))
+                v => ConvertTipoEscalaToDb(v),
+                v => Enum.Parse<TipoEscala>(NormalizeTipoEscala(v)))
             .HasMaxLength(50);
 
         builder.Property(f => f.TipoFuncionario)
             .IsRequired()
             .HasConversion(
                 v => v.ToString(),
-                v => Enum.Parse<TipoFuncionario>(v))
+                v => Enum.Parse<TipoFuncionario>(NormalizeTipoFuncionario(v)))
             .HasMaxLength(50);
 
-        builder.Property(f => f.SalarioMensal).HasColumnType("decimal(10,2)");
-        builder.Property(f => f.ValorTotalBeneficiosMensal).HasColumnType("decimal(10,2)");
-        builder.Property(f => f.ValorDiariasFixas).HasColumnType("decimal(10,2)");
+        // FASE 3: Campos de salário removidos - agora são calculados automaticamente
+        // As propriedades SalarioBase, AdicionalNoturno, Beneficios e SalarioTotal
+        // estão marcadas como [NotMapped] e são calculadas em tempo real do Contrato
 
         builder.Property(f => f.EmpresaId).IsRequired();
         builder.Property(f => f.CondominioId).IsRequired();
+        builder.Property(f => f.ContratoId).IsRequired();
 
         builder.HasOne(f => f.Condominio)
             .WithMany(c => c.Funcionarios)
             .HasForeignKey(f => f.CondominioId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // FASE 2: Relacionamento com Contrato
+        builder.HasOne(f => f.Contrato)
+            .WithMany(c => c.Funcionarios)
+            .HasForeignKey(f => f.ContratoId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(f => f.EmpresaId);
         builder.HasIndex(f => f.CondominioId);
+        builder.HasIndex(f => f.ContratoId); // FASE 2: Índice para performance
+    }
+
+    private static string ConvertTipoEscalaToDb(TipoEscala tipoEscala)
+    {
+        return tipoEscala switch
+        {
+            TipoEscala.DOZE_POR_TRINTA_SEIS => "DOZE_POR_TRINTA_SEIS",
+            TipoEscala.SEMANAL_COMERCIAL => "SEMANAL_COMERCIAL",
+            _ => tipoEscala.ToString()
+        };
+    }
+
+    private static string NormalizeTipoEscala(string value)
+    {
+        return value switch
+        {
+            "12x36" => nameof(TipoEscala.DOZE_POR_TRINTA_SEIS),
+            "5x2" => nameof(TipoEscala.SEMANAL_COMERCIAL),
+            _ => value
+        };
+    }
+
+    private static string NormalizeTipoFuncionario(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "PORTEIRO" => nameof(TipoFuncionario.CLT),
+            "PORTEIROS" => nameof(TipoFuncionario.CLT),
+            _ => value.ToUpperInvariant()
+        };
     }
 }

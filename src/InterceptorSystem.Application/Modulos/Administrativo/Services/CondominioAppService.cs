@@ -29,14 +29,20 @@ public class CondominioAppService : ICondominioAppService
             throw new InvalidOperationException("Já existe um condomínio cadastrado com este CNPJ.");
         }
         
-        var condominio = new Condominio(empresaId: empresaId,
-                                        nome: input.Nome,
-                                        cnpj: input.Cnpj,
-                                        endereco: input.Endereco);
+        var condominio = new Condominio(
+            empresaId: empresaId,
+            nome: input.Nome,
+            cnpj: input.Cnpj,
+            endereco: input.Endereco,
+            quantidadeFuncionariosIdeal: input.QuantidadeFuncionariosIdeal,
+            horarioTrocaTurno: input.HorarioTrocaTurno,
+            emailGestor: input.EmailGestor,
+            telefoneEmergencia: input.TelefoneEmergencia);
+        
         _repository.Add(condominio);
         await _repository.UnitOfWork.CommitAsync();
         
-        return CondominioDtoOutput.FromEntity(condominio);
+        return CondominioDtoOutput.FromEntity(condominio)!;
     }
 
     public async Task<CondominioDtoOutput> UpdateAsync(Guid id, UpdateCondominioDtoInput input)
@@ -46,11 +52,16 @@ public class CondominioAppService : ICondominioAppService
             throw new KeyNotFoundException("Condomínio não encontrado.");
         
         condominio.AtualizarDados(input.Nome, input.Endereco);
+        condominio.AtualizarConfiguracoesOperacionais(
+            input.QuantidadeFuncionariosIdeal,
+            input.HorarioTrocaTurno,
+            input.EmailGestor,
+            input.TelefoneEmergencia);
         
         _repository.Update(condominio);
         await  _repository.UnitOfWork.CommitAsync();
         
-        return CondominioDtoOutput.FromEntity(condominio);
+        return CondominioDtoOutput.FromEntity(condominio)!;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -66,13 +77,12 @@ public class CondominioAppService : ICondominioAppService
     public async Task<CondominioDtoOutput?> GetByIdAsync(Guid id)
     {
         var condominio = await _repository.GetByIdAsync(id);
-        return condominio == null ? null : CondominioDtoOutput.FromEntity(condominio);
+        return condominio != null ? CondominioDtoOutput.FromEntity(condominio) : null;
     }
 
     public async Task<IEnumerable<CondominioDtoOutput>> GetAllAsync()
     {
         var lista = await _repository.GetAllAsync();
-        return lista.Select(CondominioDtoOutput.FromEntity);    
+        return lista.Select(c => CondominioDtoOutput.FromEntity(c)).Where(dto => dto != null)!;    
     }
 }
-

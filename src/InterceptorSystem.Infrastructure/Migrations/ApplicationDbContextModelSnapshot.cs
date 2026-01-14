@@ -17,7 +17,7 @@ namespace InterceptorSystem.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -81,6 +81,10 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("EmailGestor")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid");
 
@@ -88,10 +92,20 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<TimeSpan>("HorarioTrocaTurno")
+                        .HasColumnType("interval");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("QuantidadeFuncionariosIdeal")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TelefoneEmergencia")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -131,15 +145,33 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("MargemCoberturaFaltasPercentual")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<decimal>("MargemLucroPercentual")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<decimal>("PercentualAdicionalNoturno")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<decimal>("PercentualImpostos")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("QuantidadeFuncionarios")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<decimal>("ValorBeneficiosExtrasMensal")
+                        .HasColumnType("decimal(12,2)");
+
                     b.Property<decimal>("ValorDiariaCobrada")
                         .HasColumnType("decimal(12,2)");
 
-                    b.Property<decimal>("ValorTotal")
+                    b.Property<decimal>("ValorTotalMensal")
                         .HasColumnType("decimal(12,2)");
 
                     b.HasKey("Id");
@@ -165,6 +197,9 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<Guid>("CondominioId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Cpf")
                         .IsRequired()
                         .HasMaxLength(14)
@@ -181,9 +216,6 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<decimal>("SalarioMensal")
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<string>("StatusFuncionario")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -199,15 +231,11 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<decimal>("ValorDiariasFixas")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("ValorTotalBeneficiosMensal")
-                        .HasColumnType("decimal(10,2)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CondominioId");
+
+                    b.HasIndex("ContratoId");
 
                     b.HasIndex("Cpf")
                         .IsUnique();
@@ -237,6 +265,11 @@ namespace InterceptorSystem.Infrastructure.Migrations
 
                     b.Property<TimeSpan>("HorarioInicio")
                         .HasColumnType("time");
+
+                    b.Property<bool>("PermiteDobrarEscala")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.HasKey("Id");
 
@@ -285,7 +318,15 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", "Contrato")
+                        .WithMany("Funcionarios")
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Condominio");
+
+                    b.Navigation("Contrato");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoDeTrabalho", b =>
@@ -306,6 +347,11 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Navigation("Funcionarios");
 
                     b.Navigation("PostosDeTrabalho");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+                {
+                    b.Navigation("Funcionarios");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>

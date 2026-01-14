@@ -1,0 +1,416 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📅 Alocações</h1>
+      <p class="subtitle">Gerencie todas as alocações de funcionários</p>
+    </div>
+    <button class="btn-primary" routerLink="/alocacoes/novo">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Nova Alocação
+    </button>
+  </div>
+
+  <!-- View Mode Selector -->
+  <div class="view-mode-selector">
+    <button
+      [class.active]="viewMode() === 'daily'"
+      (click)="setViewMode('daily')"
+      class="view-btn"
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+      </svg>
+      Diário
+    </button>
+    <button
+      [class.active]="viewMode() === 'weekly'"
+      (click)="setViewMode('weekly')"
+      class="view-btn"
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+      </svg>
+      Semanal
+    </button>
+    <button
+      [class.active]="viewMode() === 'monthly'"
+      (click)="setViewMode('monthly')"
+      class="view-btn"
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+      </svg>
+      Mensal
+    </button>
+  </div>
+
+  <!-- Period Navigation (for weekly and monthly) -->
+  @if (viewMode() !== 'daily') {
+  <div class="period-navigation">
+    <button class="nav-btn" (click)="previousPeriod()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+      </svg>
+    </button>
+    <span class="period-label">{{ getCurrentPeriodLabel() }}</span>
+    <button class="nav-btn" (click)="today()">Hoje</button>
+    <button class="nav-btn" (click)="nextPeriod()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+      </svg>
+    </button>
+  </div>
+  }
+
+  <!-- Filtros (apenas para diário) -->
+  @if (viewMode() === 'daily') {
+  <div class="filters-section">
+    <div class="filter-group">
+      <label>Data Início:</label>
+      <input
+        type="date"
+        [ngModel]="filtroDataInicio()"
+        (ngModelChange)="filtroDataInicio.set($event)"
+        class="form-control"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Data Fim:</label>
+      <input
+        type="date"
+        [ngModel]="filtroDataFim()"
+        (ngModelChange)="filtroDataFim.set($event)"
+        class="form-control"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Condomínio:</label>
+      <select [ngModel]="filtroCondominioId()" (ngModelChange)="filtroCondominioId.set($event)" class="form-control">
+        <option value="">Todos</option>
+        @for (cond of condominios(); track cond.id) {
+        <option [value]="cond.id">{{ cond.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Funcionário:</label>
+      <select [ngModel]="filtroFuncionarioId()" (ngModelChange)="filtroFuncionarioId.set($event)" class="form-control">
+        <option value="">Todos</option>
+        @for (func of funcionarios(); track func.id) {
+        <option [value]="func.id">{{ func.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Status:</label>
+      <select [ngModel]="filtroStatus()" (ngModelChange)="filtroStatus.set($event)" class="form-control">
+        <option value="">Todos</option>
+        <option value="CONFIRMADA">Confirmada</option>
+        <option value="CANCELADA">Cancelada</option>
+        <option value="FALTA_REGISTRADA">Falta Registrada</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Tipo:</label>
+      <select [ngModel]="filtroTipo()" (ngModelChange)="filtroTipo.set($event)" class="form-control">
+        <option value="">Todos</option>
+        <option value="REGULAR">Regular</option>
+        <option value="DOBRA_PROGRAMADA">Dobra Programada</option>
+        <option value="SUBSTITUICAO">Substituição</option>
+      </select>
+    </div>
+  </div>
+  }
+
+  <!-- Filtros simplificados (para semanal e mensal) -->
+  @if (viewMode() !== 'daily') {
+  <div class="filters-section-simple">
+    <div class="filter-group">
+      <label>Condomínio:</label>
+      <select [ngModel]="filtroCondominioId()" (ngModelChange)="filtroCondominioId.set($event)" class="form-control">
+        <option value="">Todos</option>
+        @for (cond of condominios(); track cond.id) {
+        <option [value]="cond.id">{{ cond.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Status:</label>
+      <select [ngModel]="filtroStatus()" (ngModelChange)="filtroStatus.set($event)" class="form-control">
+        <option value="">Todos</option>
+        <option value="CONFIRMADA">Confirmada</option>
+        <option value="CANCELADA">Cancelada</option>
+        <option value="FALTA_REGISTRADA">Falta Registrada</option>
+      </select>
+    </div>
+  </div>
+  }
+
+  <!-- Success Message -->
+  @if (successMessage()) {
+  <div class="alert alert-success">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ successMessage() }}
+    <button class="alert-close" (click)="dismissSuccess()">×</button>
+  </div>
+  }
+
+  <!-- Error Message -->
+  @if (error()) {
+  <div class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ error() }}
+    <button class="alert-close" (click)="dismissError()">×</button>
+  </div>
+  }
+
+  <!-- Loading -->
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando alocações...</p>
+  </div>
+  }
+
+  <!-- Daily View -->
+  @if (!loading() && viewMode() === 'daily') {
+  <!-- Empty State -->
+  @if (alocacoesFiltradas().length === 0) {
+  <div class="empty-state">
+    <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <h3>Nenhuma alocação encontrada</h3>
+    <p>Não há alocações cadastradas para os filtros selecionados.</p>
+    <button class="btn-primary" routerLink="/alocacoes/novo">Nova Alocação</button>
+  </div>
+  }
+
+  <!-- Alocações List -->
+  @if (alocacoesFiltradas().length > 0) {
+  <div class="alocacoes-list">
+    @for (alocacao of alocacoesFiltradas(); track alocacao.id) {
+    <div class="alocacao-card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ getFuncionarioNome(alocacao.funcionarioId) }}</span>
+        </div>
+        <div class="card-badges">
+          <span class="badge" [ngClass]="getStatusClass(alocacao.statusAlocacao)">
+            {{ getStatusLabel(alocacao.statusAlocacao) }}
+          </span>
+          <span class="badge" [ngClass]="getTipoClass(alocacao.tipoAlocacao)">
+            {{ getTipoLabel(alocacao.tipoAlocacao) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ formatDate(alocacao.data) }}</span>
+        </div>
+
+        <div class="info-row">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ getPostoHorario(alocacao.postoDeTrabalhoId) }}</span>
+        </div>
+
+        <div class="info-row">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ getCondominioNome(alocacao.postoDeTrabalhoId) }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-icon" [routerLink]="['/alocacoes', alocacao.id]" title="Ver detalhes">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+            <path
+              fill-rule="evenodd"
+              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+        <button class="btn-icon" [routerLink]="['/alocacoes', 'editar', alocacao.id]" title="Editar">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+        </button>
+        <button class="btn-icon btn-danger" (click)="confirmDelete(alocacao.id, alocacao.data)" title="Excluir">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+  }
+
+  <!-- Weekly View (Kanban) -->
+  @if (!loading() && viewMode() === 'weekly') {
+  <div class="weekly-kanban">
+    @for (column of weekData(); track column.dateStr) {
+    <div class="kanban-column">
+      <div class="column-header">
+        <span class="day-name">{{ column.dayName }}</span>
+        <span class="day-date">{{ column.date.getDate() }}/{{ column.date.getMonth() + 1 }}</span>
+      </div>
+
+      <div class="column-body">
+        @for (item of column.postos; track item.posto.id) {
+        <div class="posto-group">
+          <div class="posto-header">
+            <span class="condominio-name">{{ item.condominio.nome }}</span>
+            <span class="posto-time">{{ item.posto.horario }}</span>
+          </div>
+
+          <div class="funcionarios-cards">
+            @for (alocacao of item.alocacoes; track alocacao.id) {
+            <div class="funcionario-card" [class]="'status-' + alocacao.statusAlocacao.toLowerCase()">
+              <div class="func-name">{{ getFuncionarioNome(alocacao.funcionarioId) }}</div>
+              <div class="func-badges">
+                <span class="mini-badge" [ngClass]="getStatusClass(alocacao.statusAlocacao)">
+                  {{ getStatusLabel(alocacao.statusAlocacao) }}
+                </span>
+                @if (alocacao.tipoAlocacao !== 'REGULAR') {
+                <span class="mini-badge" [ngClass]="getTipoClass(alocacao.tipoAlocacao)">
+                  {{ getTipoLabel(alocacao.tipoAlocacao) }}
+                </span>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        @if (column.postos.length === 0) {
+        <div class="empty-column">
+          <svg width="32" height="32" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+          </svg>
+          <span>Sem alocações</span>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Monthly View (Calendar) -->
+  @if (!loading() && viewMode() === 'monthly') {
+  <div class="monthly-view">
+    <!-- Legenda -->
+    <div class="legend">
+      <h3>Legenda de Funcionários</h3>
+      <div class="legend-items">
+        @for (item of funcionariosLegenda(); track item.funcionario.id) {
+        <div class="legend-item">
+          <span class="legend-number">{{ item.number }}</span>
+          <span class="legend-name">{{ item.funcionario.nome }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar">
+      <div class="calendar-header">
+        <div class="day-header">Dom</div>
+        <div class="day-header">Seg</div>
+        <div class="day-header">Ter</div>
+        <div class="day-header">Qua</div>
+        <div class="day-header">Qui</div>
+        <div class="day-header">Sex</div>
+        <div class="day-header">Sáb</div>
+      </div>
+
+      <div class="calendar-grid">
+        @for (cell of monthData(); track cell.dateStr) {
+        <div class="calendar-cell" [class.other-month]="!cell.isCurrentMonth">
+          <div class="cell-date">{{ cell.date.getDate() }}</div>
+
+          @if (cell.alocacoes.length > 0) {
+          <div class="cell-alocacoes">
+            @for (alocacao of cell.alocacoes; track alocacao.id) {
+            <span
+              class="funcionario-number"
+              [class]="'status-' + alocacao.statusAlocacao.toLowerCase()"
+              [title]="getFuncionarioNome(alocacao.funcionarioId) + ' - ' + getStatusLabel(alocacao.statusAlocacao)"
+            >
+              {{ getFuncionarioNumber(alocacao.funcionarioId) }}
+            </span>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>
+

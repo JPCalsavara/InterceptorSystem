@@ -1,0 +1,421 @@
+<div class="detail-container">
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando dados do condomínio...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="error-container">
+    <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+    </svg>
+    <h3>{{ error() }}</h3>
+    <a [routerLink]="['/condominios']" class="btn-back">← Voltar para lista</a>
+  </div>
+  }
+
+  <!-- Content -->
+  @if (!loading() && !error() && condominio()) {
+
+  <!-- Header do Condomínio -->
+  <header class="detail-header">
+    <div class="header-top">
+      <a [routerLink]="['/condominios']" class="btn-back">← Voltar</a>
+      <div class="header-actions">
+        <a [routerLink]="['/condominios', condominio()!.id, 'editar']" class="btn-edit">✏️ Editar</a>
+      </div>
+    </div>
+
+    <div class="header-content">
+      <div class="header-info">
+        <h1>{{ condominio()!.nome }}</h1>
+        <div class="header-meta">
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
+            </svg>
+            CNPJ: {{ condominio()!.cnpj }}
+          </span>
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            {{ condominio()!.endereco }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Alerta de Contrato -->
+      @if (contratoAtual()) {
+      <div class="contract-alert" [class]="getUrgenciaClass(diasParaVencimento())">
+        <div class="alert-icon">
+          @if (diasParaVencimento() !== null && diasParaVencimento()! <= 14) {
+            ⚠️
+          } @else if (diasParaVencimento() !== null && diasParaVencimento()! <= 90) {
+            ⏰
+          } @else {
+            ✅
+          }
+        </div>
+        <div class="alert-content">
+          <strong>Contrato Vigente</strong>
+          @if (diasParaVencimento() !== null) {
+          <p>Vence em {{ diasParaVencimento() }} dias ({{ formatDate(contratoAtual()!.dataFim) }})</p>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </header>
+
+  <!-- Informações Operacionais do Condomínio -->
+  <section class="info-section">
+    <h2 class="section-title">📋 Informações Operacionais</h2>
+    <div class="info-grid">
+      <!-- Quantidade de Funcionários Ideal -->
+      <div class="info-card">
+        <div class="info-icon">👥</div>
+        <div class="info-content">
+          <span class="info-label">Funcionários Ideal</span>
+          <span class="info-value">{{ condominio()!.quantidadeFuncionariosIdeal }}</span>
+        </div>
+      </div>
+
+      <!-- Horário de Troca de Turno -->
+      <div class="info-card">
+        <div class="info-icon">🕐</div>
+        <div class="info-content">
+          <span class="info-label">Horário de Troca</span>
+          <span class="info-value">{{ condominio()!.horarioTrocaTurno.substring(0, 5) }}</span>
+        </div>
+      </div>
+
+      <!-- Email do Gestor -->
+      @if (condominio()!.emailGestor) {
+      <div class="info-card">
+        <div class="info-icon">📧</div>
+        <div class="info-content">
+          <span class="info-label">Email do Gestor</span>
+          <span class="info-value">{{ condominio()!.emailGestor }}</span>
+        </div>
+      </div>
+      }
+
+      <!-- Telefone de Emergência -->
+      @if (condominio()!.telefoneEmergencia) {
+      <div class="info-card">
+        <div class="info-icon">📞</div>
+        <div class="info-content">
+          <span class="info-label">Telefone de Emergência</span>
+          <span class="info-value">{{ formatarTelefone(condominio()!.telefoneEmergencia) }}</span>
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Filtro de Período -->
+  <section class="period-filter">
+    <div class="filter-header">
+      <h2>📊 Análise Financeira - {{ getPeriodoLabel() }}</h2>
+      <div class="filter-buttons">
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'mensal'"
+          (click)="mudarPeriodo('mensal')">
+          Mensal
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'trimestral'"
+          (click)="mudarPeriodo('trimestral')">
+          Trimestral
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'semestral'"
+          (click)="mudarPeriodo('semestral')">
+          Semestral
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="periodoSelecionado() === 'anual'"
+          (click)="mudarPeriodo('anual')">
+          Anual
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-info">
+      <span>Período: {{ formatDate(dataInicio().toISOString()) }} até {{ formatDate(dataFim().toISOString()) }}</span>
+    </div>
+  </section>
+
+  <!-- Métricas do Período -->
+  <section class="metrics-section">
+    <div class="metrics-grid">
+      @for (metrica of metricasPeriodo(); track metrica.titulo) {
+      <div class="metric-card">
+        <div class="metric-icon">{{ metrica.icone }}</div>
+        <div class="metric-content">
+          <p class="metric-title">{{ metrica.titulo }}</p>
+          <h3 class="metric-value">
+            @if (metrica.unidade === 'BRL') {
+              {{ formatCurrency(metrica.valor) }}
+            } @else if (metrica.unidade === '%') {
+              {{ formatPercent(metrica.valor) }}
+            } @else {
+              {{ metrica.valor }}
+            }
+          </h3>
+          @if (metrica.unidade && metrica.unidade !== 'BRL' && metrica.unidade !== '%') {
+          <p class="metric-unit">{{ metrica.unidade }}</p>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Breakdown Financeiro -->
+  <section class="breakdown-section">
+    <h2>💰 Breakdown Financeiro ({{ getPeriodoLabel() }})</h2>
+    <div class="breakdown-cards">
+      <!-- Receita -->
+      <div class="breakdown-card receita">
+        <h3>📈 Receita Total</h3>
+        <p class="breakdown-value">{{ formatCurrency(receitaPeriodo()) }}</p>
+        <div class="breakdown-details">
+          <span>{{ contratosPeriodo().length }} contrato(s) vigente(s)</span>
+        </div>
+      </div>
+
+      <!-- Custos -->
+      <div class="breakdown-card custo">
+        <h3>💸 Custos Operacionais</h3>
+        <p class="breakdown-value">{{ formatCurrency(custoPeriodo()) }}</p>
+        <div class="breakdown-details">
+          <span>{{ funcionariosPeriodo().length }} funcionário(s) ativo(s)</span>
+        </div>
+      </div>
+
+      <!-- Lucro -->
+      <div class="breakdown-card lucro" [class.negativo]="lucroPeriodo() < 0">
+        <h3>{{ lucroPeriodo() >= 0 ? '📊' : '⚠️' }} {{ lucroPeriodo() >= 0 ? 'Lucro' : 'Prejuízo' }}</h3>
+            <p class="stat-breakdown-value">{{ formatCurrency(abs(lucroPeriodo())) }}</p>
+        <div class="breakdown-details">
+          <span>Margem: {{ formatPercent(margemLucroPeriodo()) }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Postos de Trabalho -->
+  <section class="section-postos">
+    <div class="section-header">
+      <h2>📍 Postos de Trabalho ({{ postos().length }})</h2>
+      <a [routerLink]="['/postos', 'novo']" [queryParams]="{condominioId: condominio()!.id}" class="btn-add">
+        + Adicionar Posto
+      </a>
+    </div>
+
+    @if (postos().length === 0) {
+    <div class="empty-state">
+      <p>Nenhum posto cadastrado</p>
+    </div>
+    } @else {
+    <div class="postos-grid">
+      @for (posto of postos(); track posto.id) {
+      <div class="posto-card">
+        <div class="posto-header">
+          <h3>Posto #{{ $index + 1 }}</h3>
+          <div class="posto-actions">
+            <a [routerLink]="['/postos', posto.id, 'editar']" class="btn-icon">✏️</a>
+          </div>
+        </div>
+        <div class="posto-info">
+          <div class="info-row">
+            <span class="label">Horário:</span>
+            <span class="value">{{ formatHorario(posto.horarioInicio, posto.horarioFim) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Capacidade Ideal:</span>
+            <span class="value badge badge-info">{{ posto.quantidadeIdealFuncionarios }}</span>
+          </div>
+          @if (posto.permiteDobrarEscala) {
+          <div class="info-row">
+            <span class="badge badge-success">Permite Dobras</span>
+          </div>
+          }
+          @if (posto.capacidadeMaximaPorDobras && posto.capacidadeMaximaPorDobras > 0) {
+          <div class="info-row">
+            <span class="label">Capacidade Máxima c/ Dobras:</span>
+            <span class="value">{{ posto.capacidadeMaximaPorDobras }}</span>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </section>
+
+  <!-- Top Postos com Mais Faltas -->
+  @if (postosMaisFaltas().length > 0) {
+  <section class="section-alertas">
+    <h2>⚠️ Postos com Mais Faltas ({{ getPeriodoLabel() }})</h2>
+    <div class="alertas-list">
+      @for (item of postosMaisFaltas(); track item.posto.id) {
+      <div class="alerta-item">
+        <div class="alerta-info">
+          <span class="alerta-icon">📍</span>
+          <div>
+            <strong>{{ formatHorario(item.posto.horarioInicio, item.posto.horarioFim) }}</strong>
+            <p>{{ item.faltas }} falta(s) registrada(s)</p>
+          </div>
+        </div>
+        <span class="badge badge-error">{{ item.faltas }}</span>
+      </div>
+      }
+    </div>
+  </section>
+  }
+
+  <!-- Funcionários -->
+  <section class="section-funcionarios">
+    <div class="section-header">
+      <h2>👥 Funcionários ({{ funcionarios().length }})</h2>
+      <a [routerLink]="['/funcionarios', 'novo']" [queryParams]="{condominioId: condominio()!.id}" class="btn-add">
+        + Adicionar Funcionário
+      </a>
+    </div>
+
+    @if (funcionarios().length === 0) {
+    <div class="empty-state">
+      <p>Nenhum funcionário cadastrado</p>
+    </div>
+    } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Salário Total</th>
+            <th>Faltas</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (func of funcionarios(); track func.id) {
+          <tr>
+            <td><strong>{{ func.nome }}</strong></td>
+            <td>{{ func.cpf }}</td>
+            <td>{{ getTipoFuncionarioLabel(func.tipoFuncionario) }}</td>
+            <td>
+              <span [class]="'badge ' + getStatusFuncionarioBadgeClass(func.statusFuncionario)">
+                {{ getStatusFuncionarioLabel(func.statusFuncionario) }}
+              </span>
+            </td>
+            <td>{{ formatCurrency(func.salarioTotal || 0) }}</td>
+            <td>
+              @if (getFaltasByFuncionario(func.id) > 0) {
+              <span class="badge badge-warning">{{ getFaltasByFuncionario(func.id) }}</span>
+              } @else {
+              <span class="badge badge-success">0</span>
+              }
+            </td>
+            <td class="actions-column">
+              <a [routerLink]="['/funcionarios', func.id, 'editar']" class="btn-icon">✏️</a>
+              <button (click)="deleteFuncionario(func.id)" class="btn-icon btn-danger">🗑️</button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </section>
+
+  <!-- Alocações Recentes -->
+  <section class="section-alocacoes">
+    <div class="section-header">
+      <h2>📅 Alocações ({{ getPeriodoLabel() }}) - {{ alocacoesPeriodo().length }}</h2>
+      <a [routerLink]="['/alocacoes']" class="btn-view-all">Ver todas →</a>
+    </div>
+
+    @if (alocacoesPeriodo().length === 0) {
+    <div class="empty-state">
+      <p>Nenhuma alocação no período selecionado</p>
+    </div>
+    } @else {
+    <div class="alocacoes-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ alocacoesConfirmadas() }}</span>
+        <span class="stat-label badge-success">Confirmadas</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ dobrasRealizadas() }}</span>
+        <span class="stat-label badge-warning">Dobras</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ substituicoesRealizadas() }}</span>
+        <span class="stat-label badge-info">Substituições</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ alocacoesFaltas() }}</span>
+        <span class="stat-label badge-error">Faltas</span>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Funcionário</th>
+            <th>Posto</th>
+            <th>Tipo</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (alocacao of alocacoesPeriodo().slice(0, 10); track alocacao.id) {
+          <tr>
+            <td>{{ formatDate(alocacao.data) }}</td>
+            <td>{{ getFuncionarioNome(alocacao.funcionarioId) }}</td>
+            <td>{{ getPostoHorario(alocacao.postoDeTrabalhoId) }}</td>
+            <td>
+              <span [class]="'badge ' + getTipoAlocacaoBadgeClass(alocacao.tipoAlocacao)">
+                {{ getTipoAlocacaoLabel(alocacao.tipoAlocacao) }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'badge ' + getStatusBadgeClass(alocacao.statusAlocacao)">
+                {{ getStatusLabel(alocacao.statusAlocacao) }}
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (alocacoesPeriodo().length > 10) {
+    <div class="table-footer">
+      <p>Mostrando 10 de {{ alocacoesPeriodo().length }} alocações</p>
+      <a [routerLink]="['/alocacoes']" class="btn-view-all">Ver todas →</a>
+    </div>
+    }
+    }
+  </section>
+
+  }
+</div>
+

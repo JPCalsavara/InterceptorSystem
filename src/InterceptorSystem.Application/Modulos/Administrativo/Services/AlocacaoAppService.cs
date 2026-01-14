@@ -41,7 +41,19 @@ public class AlocacaoAppService : IAlocacaoAppService
             throw new InvalidOperationException("Funcionário e Posto devem pertencer ao mesmo condomínio.");
         }
 
+        // Validar se já existe alocação na mesma data
+        var existeAlocacaoMesmaData = await _repository.ExisteAlocacaoNaDataAsync(funcionario.Id, input.Data);
+        if (existeAlocacaoMesmaData)
+        {
+            throw new InvalidOperationException("Funcionário já possui alocação neste período.");
+        }
+
         await ValidarRegrasDeConsecutividade(funcionario.Id, input.Data, input.TipoAlocacao);
+
+        if (!await ValidarCapacidadeDoPosto(posto, input.Data))
+        {
+            throw new InvalidOperationException("Capacidade máxima do posto atingida para esta data.");
+        }
 
         var alocacao = new Alocacao(
             empresaId,
@@ -61,6 +73,13 @@ public class AlocacaoAppService : IAlocacaoAppService
     {
         var alocacao = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Alocação não encontrada.");
+
+        // Validar se não há alocação simultânea na mesma data (ignorando a atual)
+        var existeAlocacaoMesmaData = await _repository.ExisteAlocacaoNaDataAsync(alocacao.FuncionarioId, alocacao.Data, id);
+        if (existeAlocacaoMesmaData)
+        {
+            throw new InvalidOperationException("Funcionário já possui alocação neste período.");
+        }
 
         await ValidarRegrasDeConsecutividade(alocacao.FuncionarioId, alocacao.Data, input.TipoAlocacao, alocacaoIdIgnorado: id);
 
@@ -107,14 +126,26 @@ public class AlocacaoAppService : IAlocacaoAppService
 
     private async Task ValidarRegrasDeConsecutividade(Guid funcionarioId, DateOnly data, TipoAlocacao tipoSolicitado, Guid? alocacaoIdIgnorado = null)
     {
+        var alocacoesFuncionario = await _repository.GetByFuncionarioAsync(funcionarioId);
+        var alocacoesRelevantes = alocacoesFuncionario.Where(a => a.Id != alocacaoIdIgnorado).ToList();
+
+        // Verifica se há dobra programada no dia anterior
+        var dobraProgramadaAnterior = alocacoesRelevantes
+            .FirstOrDefault(a => a.Data == data.AddDays(-1) && a.TipoAlocacao == TipoAlocacao.DOBRA_PROGRAMADA);
+
+        if (dobraProgramadaAnterior != null)
+        {
+            throw new InvalidOperationException("Funcionário deve descansar após dobra programada.");
+        }
+
+        // Se é DOBRA_PROGRAMADA, permite criar mesmo com alocação no dia anterior
         if (tipoSolicitado == TipoAlocacao.DOBRA_PROGRAMADA)
         {
             return;
         }
 
-        var alocacoesFuncionario = await _repository.GetByFuncionarioAsync(funcionarioId);
-        var existeAdjacente = alocacoesFuncionario.Any(a =>
-            a.Id != alocacaoIdIgnorado &&
+        // Para alocações regulares/substituição, verifica dias consecutivos
+        var existeAdjacente = alocacoesRelevantes.Any(a =>
             (a.Data == data.AddDays(-1) || a.Data == data.AddDays(1)) &&
             a.TipoAlocacao != TipoAlocacao.DOBRA_PROGRAMADA);
 
@@ -122,5 +153,19 @@ public class AlocacaoAppService : IAlocacaoAppService
         {
             throw new InvalidOperationException("Não é permitido duas alocações em dias consecutivos, exceto em dobra programada.");
         }
+    }
+
+    private async Task<bool> ValidarCapacidadeDoPosto(PostoDeTrabalho posto, DateOnly data)
+    {
+        // Lógica para validar a capacidade do posto na data informada
+        // Isso pode envolver verificar quantos funcionários já estão alocados no posto nesse dia
+        // e comparar com a capacidade máxima permitida.
+
+        // Exemplo fictício:
+        var capacidadeMaxima = posto.CapacidadeMaximaPorDobras;
+        var alocacoesNoPosto = await _repository.GetByPostoEDataAsync(posto.Id, data);
+        var quantidadeAtual = alocacoesNoPosto.Count();
+
+        return quantidadeAtual < capacidadeMaxima;
     }
 }

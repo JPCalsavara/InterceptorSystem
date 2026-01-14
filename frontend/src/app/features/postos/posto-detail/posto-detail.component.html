@@ -1,0 +1,262 @@
+<div class="detail-container">
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando dados do posto...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="error-container">
+    <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <h3>{{ error() }}</h3>
+    <a [routerLink]="['/postos']" class="btn-back">← Voltar para lista</a>
+  </div>
+  }
+
+  <!-- Content -->
+  @if (!loading() && !error() && posto()) {
+
+  <!-- Header -->
+  <header class="detail-header">
+    <div class="header-top">
+      <a [routerLink]="['/postos']" class="btn-back">← Voltar</a>
+      <div class="header-actions">
+        <a [routerLink]="['/postos', posto()!.id, 'editar']" class="btn-edit">✏️ Editar</a>
+      </div>
+    </div>
+
+    <div class="header-content">
+      <div class="header-info">
+        <h1>📍 Posto de Trabalho</h1>
+        <div class="horario-badge">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          {{ formatHorario(posto()!.horarioInicio, posto()!.horarioFim) }}
+        </div>
+        <div class="header-meta">
+          @if (condominio()) {
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            {{ condominio()!.nome }}
+          </span>
+          }
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+            </svg>
+            {{ totalFuncionarios() }} funcionário(s) participaram
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Métricas Principais -->
+  <section class="metrics-section">
+    <h2 class="section-title">📊 Métricas do Posto</h2>
+    <div class="metrics-grid">
+      <div class="metric-card highlight">
+        <div class="metric-icon">👥</div>
+        <div class="metric-content">
+          <span class="metric-label">Quantidade Ideal de Funcionários</span>
+          <span class="metric-value primary">{{ posto()?.quantidadeIdealFuncionarios || 0 }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">📅</div>
+        <div class="metric-content">
+          <span class="metric-label">Total de Alocações</span>
+          <span class="metric-value">{{ totalAlocacoes() }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">✅</div>
+        <div class="metric-content">
+          <span class="metric-label">Confirmadas</span>
+          <span class="metric-value success">{{ alocacoesConfirmadas() }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">⚠️</div>
+        <div class="metric-content">
+          <span class="metric-label">Total de Faltas</span>
+          <span class="metric-value alert">{{ totalFaltas() }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">❌</div>
+        <div class="metric-content">
+          <span class="metric-label">Canceladas</span>
+          <span class="metric-value">{{ alocacoesCanceladas() }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">📈</div>
+        <div class="metric-content">
+          <span class="metric-label">Taxa de Presença</span>
+          <span class="metric-value">{{ taxaPresenca() | number : '1.1-1' }}%</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">👥</div>
+        <div class="metric-content">
+          <span class="metric-label">Funcionários Participantes</span>
+          <span class="metric-value">{{ totalFuncionarios() }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Alocações por Tipo -->
+  <section class="tipos-section">
+    <h2 class="section-title">📋 Distribuição por Tipo</h2>
+    <div class="tipos-grid">
+      @for (item of alocacoesPorTipo(); track item.tipo) {
+      <div class="tipo-card">
+        <div class="tipo-icon">{{ item.icon }}</div>
+        <div class="tipo-content">
+          <span class="tipo-label">{{ item.tipo }}</span>
+          <span class="tipo-count">{{ item.count }}</span>
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Ranking de Funcionários -->
+  @if (rankingFuncionarios().length > 0) {
+  <section class="ranking-section">
+    <h2 class="section-title">🏆 Top 5 Funcionários Mais Alocados</h2>
+    <div class="ranking-list">
+      @for (item of rankingFuncionarios(); track item.funcionario.id; let idx = $index) {
+      <div class="ranking-item">
+        <div class="ranking-position">
+          @if (idx === 0) {
+            <span class="medal gold">🥇</span>
+          } @else if (idx === 1) {
+            <span class="medal silver">🥈</span>
+          } @else if (idx === 2) {
+            <span class="medal bronze">🥉</span>
+          } @else {
+            <span class="medal">{{ idx + 1 }}º</span>
+          }
+        </div>
+        <div class="ranking-info">
+          <span class="ranking-name">{{ item.funcionario.nome }}</span>
+          <span class="ranking-details">CPF: {{ item.funcionario.cpf }}</span>
+        </div>
+        <div class="ranking-count">
+          <span class="count-value">{{ item.total }}</span>
+          <span class="count-label">alocações</span>
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+  }
+
+  <!-- Histórico de Alocações -->
+  <section class="alocacoes-section">
+    <h2 class="section-title">📅 Histórico de Alocações</h2>
+
+    @if (alocacoes().length === 0) {
+    <div class="empty-state">
+      <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M3 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm7 8a1 1 0 000 2h3a1 1 0 000-2h-3z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <p>Nenhuma alocação encontrada para este posto</p>
+    </div>
+    } @else {
+    <div class="table-container">
+      <table class="alocacoes-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Funcionário</th>
+            <th>Status</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (alocacao of alocacoes(); track alocacao.id) {
+          <tr>
+            <td>{{ formatDate(alocacao.data) }}</td>
+            <td>{{ getFuncionarioNome(alocacao.funcionarioId) }}</td>
+            <td>
+              <span [class]="'badge ' + getStatusBadgeClass(alocacao.statusAlocacao)">
+                {{ getStatusLabel(alocacao.statusAlocacao) }}
+              </span>
+            </td>
+            <td>{{ getTipoLabel(alocacao.tipoAlocacao) }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </section>
+
+  <!-- Detalhamento de Faltas -->
+  @if (totalFaltas() > 0) {
+  <section class="faltas-section">
+    <h2 class="section-title">⚠️ Detalhamento de Faltas</h2>
+    <div class="faltas-container">
+      <div class="faltas-summary">
+        <div class="summary-card">
+          <h3>Resumo de Faltas</h3>
+          <div class="summary-content">
+            <div class="summary-item total">
+              <span class="summary-label">Total de Faltas Registradas:</span>
+              <span class="summary-value danger">{{ totalFaltas() }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">% do Total de Alocações:</span>
+              <span class="summary-value">{{ (totalFaltas() / totalAlocacoes() * 100) | number : '1.1-1' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="faltas-list">
+        <h4>Histórico de Faltas</h4>
+        @for (falta of faltas(); track falta.id) {
+        <div class="falta-item">
+          <div class="falta-date">{{ formatDate(falta.data) }}</div>
+          <div class="falta-funcionario">{{ getFuncionarioNome(falta.funcionarioId) }}</div>
+          <div class="falta-tipo">{{ getTipoLabel(falta.tipoAlocacao) }}</div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+  }
+
+  }
+</div>
+

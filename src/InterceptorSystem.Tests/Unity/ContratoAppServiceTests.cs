@@ -33,13 +33,19 @@ public class ContratoAppServiceTests
             "Contrato Segurança",
             10000,
             500,
+            0.2m,
+            800,
+            0.18m,
+            10,
+            0.15m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua"));
+            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua", 10, TimeSpan.FromHours(6)));
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(input);
@@ -56,6 +62,12 @@ public class ContratoAppServiceTests
             "Contrato",
             1000,
             100,
+            0.1m,
+            200,
+            0.15m,
+            5,
+            0.1m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             StatusContrato.PENDENTE);
@@ -73,6 +85,12 @@ public class ContratoAppServiceTests
             "Contrato",
             1000,
             100,
+            0.1m,
+            200,
+            0.15m,
+            5,
+            0.1m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             StatusContrato.PENDENTE);
@@ -94,13 +112,19 @@ public class ContratoAppServiceTests
             "",
             -10,
             0,
+            1.5m,
+            -100,
+            -0.1m,
+            0,
+            1.2m,
+            1.5m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(5)),
             DateOnly.FromDateTime(DateTime.Today),
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua"));
+            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua", 10, TimeSpan.FromHours(6)));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
@@ -115,6 +139,12 @@ public class ContratoAppServiceTests
             "Antigo",
             1000,
             100,
+            0.2m,
+            300,
+            0.15m,
+            8,
+            0.1m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.PENDENTE);
@@ -123,6 +153,12 @@ public class ContratoAppServiceTests
             "Novo",
             2000,
             150,
+            0.25m,
+            400,
+            0.2m,
+            12,
+            0.2m,
+            0.08m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             DateOnly.FromDateTime(DateTime.Today.AddDays(20)),
             StatusContrato.PAGO);
@@ -146,6 +182,12 @@ public class ContratoAppServiceTests
             "Desc",
             1000,
             50,
+            0.1m,
+            100,
+            0.1m,
+            5,
+            0.1m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             StatusContrato.PAGO);
@@ -161,6 +203,12 @@ public class ContratoAppServiceTests
             "",
             0,
             -1,
+            1.1m,
+            -100,
+            -0.1m,
+            0,
+            1.2m,
+            1.5m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(5)),
             DateOnly.FromDateTime(DateTime.Today),
             StatusContrato.PAGO);
@@ -179,6 +227,12 @@ public class ContratoAppServiceTests
             "Contrato",
             100,
             10,
+            0.1m,
+            50,
+            0.1m,
+            3,
+            0.1m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             StatusContrato.PENDENTE);
@@ -200,6 +254,123 @@ public class ContratoAppServiceTests
         _contratoRepo.Verify(r => r.Remove(It.IsAny<Contrato>()), Times.Never);
     }
 
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando já existe contrato vigente")]
+    public async Task CreateAsync_DeveFalharQuandoJaExisteContratoVigente()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Teste", "12345678000100", "Rua A, 123, Centro, São Paulo-SP", 10, TimeSpan.FromHours(6));
+        
+        var input = new CreateContratoDtoInput(
+            condominioId,
+            "Contrato novo",
+            2000,
+            150,
+            0.25m,
+            400,
+            0.2m,
+            12,
+            0.2m,
+            0.08m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(30)),
+            StatusContrato.PENDENTE);
+
+        _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
+        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, null)).ReturnsAsync(true);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("Já existe um contrato vigente para este condomínio", exception.Message);
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Deve falhar quando tentar ativar contrato com outro vigente")]
+    public async Task UpdateAsync_DeveFalharQuandoTentarAtivarContratoComOutroVigente()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contrato = new Contrato(
+            empresaId,
+            condominioId,
+            "Contrato inativo",
+            1000,
+            100,
+            0.2m,
+            300,
+            0.15m,
+            8,
+            0.1m,
+            0.05m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
+            StatusContrato.INATIVO);
+
+        var input = new UpdateContratoDtoInput(
+            "Contrato reativado",
+            1500,
+            120,
+            0.22m,
+            350,
+            0.16m,
+            10,
+            0.12m,
+            0.06m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
+            StatusContrato.PAGO);
+
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(true);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(contrato.Id, input));
+        Assert.Contains("Já existe um contrato vigente para este condomínio", exception.Message);
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Deve permitir ativar contrato quando não há outro vigente")]
+    public async Task UpdateAsync_DevePermitirAtivarContratoQuandoNaoHaOutroVigente()
+    {
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contrato = new Contrato(
+            empresaId,
+            condominioId,
+            "Contrato inativo",
+            1000,
+            100,
+            0.2m,
+            300,
+            0.15m,
+            8,
+            0.1m,
+            0.05m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
+            StatusContrato.INATIVO);
+
+        var input = new UpdateContratoDtoInput(
+            "Contrato ativado",
+            1500,
+            120,
+            0.22m,
+            350,
+            0.16m,
+            10,
+            0.12m,
+            0.06m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
+            StatusContrato.PAGO);
+
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(false);
+        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        var result = await _service.UpdateAsync(contrato.Id, input);
+
+        Assert.NotNull(result);
+        Assert.Equal(StatusContrato.PAGO, result.Status);
+    }
+
     private static Contrato CriarContratoValido()
     {
         return new Contrato(
@@ -208,6 +379,12 @@ public class ContratoAppServiceTests
             "Contrato base",
             1000,
             100,
+            0.2m,
+            300,
+            0.15m,
+            8,
+            0.1m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.PENDENTE);

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 
@@ -11,19 +12,45 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
     // Atributos
     public TimeSpan HorarioInicio { get; private set; }
     public TimeSpan HorarioFim { get; private set; }
+    public bool PermiteDobrarEscala { get; private set; }
 
     // Navigation Properties
     public Condominio? Condominio { get; private set; }
     public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
 
+    // FASE 4: Propriedade calculada baseada no Condomínio
+    /// <summary>
+    /// Quantidade ideal de funcionários por posto.
+    /// Calculado como: Total de funcionários do condomínio / Número de postos
+    /// </summary>
+    [NotMapped]
+    public int QuantidadeIdealFuncionarios
+    {
+        get
+        {
+            if (Condominio == null)
+                return 0; // Fallback para quando não há navegação carregada
+            
+            var totalPostos = Condominio.PostosDeTrabalho?.Count ?? 1;
+            return totalPostos > 0 
+                ? Condominio.QuantidadeFuncionariosIdeal / totalPostos 
+                : 0;
+        }
+    }
+
     // Construtor vazio para o EF Core
     protected PostoDeTrabalho() { }
 
-    // Construtor rico com validações
-    public PostoDeTrabalho(Guid condominioId, Guid empresaId, TimeSpan inicio, TimeSpan fim)
+    // FASE 4: Construtor simplificado sem QuantidadeIdealFuncionarios
+    public PostoDeTrabalho(
+        Guid condominioId, 
+        Guid empresaId, 
+        TimeSpan inicio, 
+        TimeSpan fim, 
+        bool permiteDobrarEscala)
     {
         // Validações de negócio
-        CheckRule(condominioId == Guid.Empty, "O Posto deve pertencer a um Condomínio.");
+        CheckRule(condominioId == Guid.Empty, "O Posto deve pertencer a um Condom��nio.");
         CheckRule(empresaId == Guid.Empty, "O Posto deve pertencer a uma Empresa.");
         
         // Calcula a duração do turno (considerando turnos que atravessam meia-noite)
@@ -37,10 +64,11 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
         EmpresaId = empresaId;
         HorarioInicio = inicio;
         HorarioFim = fim;
+        PermiteDobrarEscala = permiteDobrarEscala;
     }
 
-    // Métodos de negócio
-    public void AtualizarHorario(TimeSpan inicio, TimeSpan fim)
+    // FASE 4: Método de atualização simplificado
+    public void AtualizarHorario(TimeSpan inicio, TimeSpan fim, bool permiteDobrarEscala)
     {
         var duracao = fim > inicio 
             ? fim - inicio
@@ -50,5 +78,8 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
 
         HorarioInicio = inicio;
         HorarioFim = fim;
+        PermiteDobrarEscala = permiteDobrarEscala;
     }
+
+    public int CapacidadeMaximaPorDobras => PermiteDobrarEscala ? QuantidadeIdealFuncionarios * 2 : QuantidadeIdealFuncionarios;
 }

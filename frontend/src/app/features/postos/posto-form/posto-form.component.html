@@ -1,0 +1,144 @@
+<div class="form-container">
+  <!-- Header -->
+  <div class="form-header">
+    <button class="btn-back" routerLink="/postos">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Voltar
+    </button>
+    <h1>{{ isEditMode() ? '✏️ Editar Posto' : '➕ Novo Posto de Trabalho' }}</h1>
+  </div>
+
+  <!-- Error Alert -->
+  @if (error()) {
+  <div class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    {{ error() }}
+    <button class="alert-close" (click)="dismissError()">×</button>
+  </div>
+  }
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card">
+    <!-- Condomínio -->
+    <div class="form-group">
+      <label for="condominioId" class="form-label">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+          />
+        </svg>
+        Condomínio *
+      </label>
+      <select
+        id="condominioId"
+        formControlName="condominioId"
+        class="form-control"
+        [class.invalid]="form.get('condominioId')?.invalid && form.get('condominioId')?.touched"
+      >
+        <option value="">Selecione um condomínio</option>
+        @for (cond of condominios(); track cond.id) {
+        <option [value]="cond.id">{{ cond.nome }}</option>
+        }
+      </select>
+      @if (form.get('condominioId')?.invalid && form.get('condominioId')?.touched) {
+      <span class="error-message">Condomínio é obrigatório</span>
+      }
+    </div>
+
+    <!-- Horários (Importados Automaticamente) -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="horarioInicio" class="form-label">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Horário Início *
+        </label>
+        <input
+          type="time"
+          id="horarioInicio"
+          formControlName="horarioInicio"
+          class="form-control"
+          readonly
+          [class.invalid]="form.get('horarioInicio')?.invalid && form.get('horarioInicio')?.touched"
+        />
+        <p class="help-text">
+          ℹ️ Importado automaticamente do horário de troca do condomínio
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="horarioFim" class="form-label">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Horário Fim *
+        </label>
+        <input
+          type="time"
+          id="horarioFim"
+          formControlName="horarioFim"
+          class="form-control"
+          readonly
+          [class.invalid]="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched"
+        />
+        <p class="help-text">
+          ℹ️ Calculado automaticamente (12 horas após o início)
+        </p>
+      </div>
+    </div>
+
+    <!-- Permite Dobrar Escala -->
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="permiteDobrarEscala" class="form-checkbox" />
+        <span>Permite Dobrar Escala</span>
+      </label>
+      <p class="help-text">
+        Permite que funcionários façam dobras programadas neste posto
+      </p>
+    </div>
+
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" routerLink="/postos" [disabled]="loading()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="loading() || form.invalid">
+        @if (loading()) {
+        <span class="spinner-small"></span>
+        Salvando...
+        } @else {
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"
+          />
+        </svg>
+        {{ isEditMode() ? 'Atualizar' : 'Criar' }} Posto
+        }
+      </button>
+    </div>
+  </form>
+</div>
+

@@ -16,7 +16,10 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
         var input = new CreateCondominioDtoInput(
             $"Condomínio Contrato {DateTime.Now.Ticks}",
             $"{DateTime.Now.Ticks % 100000000:00000000}/0001-55",
-            "Rua Contrato, 1");
+            "Rua Contrato, 1",
+            10,
+            TimeSpan.FromHours(6)
+        );
         var response = await Client.PostAsJsonAsync("/api/condominios", input);
         response.EnsureSuccessStatusCode();
         var dto = await ReadAsAsync<CondominioDtoOutput>(response);
@@ -30,6 +33,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             "Contrato Teste",
             10000,
             500,
+            0.2m,
+            800,
+            0.18m,
+            10,
+            0.15m,
+            0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
             StatusContrato.PENDENTE);
@@ -48,6 +57,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             "Contrato Segurança",
             20000,
             800,
+            0.2m,
+            1200,
+            0.2m,
+            20,
+            0.2m,
+            0.08m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
             StatusContrato.PENDENTE);
@@ -69,6 +84,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             "Contrato Atualizado",
             25000,
             900,
+            0.25m,
+            1300,
+            0.22m,
+            22,
+            0.25m,
+            0.1m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(10)),
             StatusContrato.PAGO);
@@ -121,4 +142,3 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
         Assert.Equal(contrato.Id, result!.Id);
     }
 }
-

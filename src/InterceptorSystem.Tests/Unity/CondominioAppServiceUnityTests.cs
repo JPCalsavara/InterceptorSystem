@@ -40,7 +40,11 @@ public class CondominioAppServiceTests
         var input = new CreateCondominioDtoInput(
             "Condomínio Residencial Solar", 
             "12.345.678/0001-90", 
-            "Av. Paulista, 1000 - São Paulo/SP"
+            "Av. Paulista, 1000 - São Paulo/SP",
+            10,
+            TimeSpan.FromHours(6),
+            "gestor@solar.com.br",
+            "(11) 98765-4321"
         );
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
@@ -54,12 +58,16 @@ public class CondominioAppServiceTests
         Assert.NotNull(result);
         Assert.Equal(input.Nome, result.Nome);
         Assert.Equal(input.Cnpj, result.Cnpj);
+        Assert.Equal(10, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal("06:00:00", result.HorarioTrocaTurno);
+        Assert.Equal("gestor@solar.com.br", result.EmailGestor);
         Assert.True(result.Ativo);
 
         _mockRepo.Verify(r => r.Add(It.Is<Condominio>(c => 
             c.EmpresaId == empresaId && 
             c.Nome == input.Nome && 
-            c.Cnpj == input.Cnpj
+            c.Cnpj == input.Cnpj &&
+            c.QuantidadeFuncionariosIdeal == 10
         )), Times.Once);
         
         _mockUow.Verify(u => u.CommitAsync(), Times.Once);
@@ -70,12 +78,18 @@ public class CondominioAppServiceTests
     {
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
-        var input = new CreateCondominioDtoInput("Condomínio Duplicado", "11.111.111/0001-11", "Rua X");
+        var input = new CreateCondominioDtoInput(
+            "Condomínio Duplicado", 
+            "11.111.111/0001-11", 
+            "Rua X",
+            10,
+            TimeSpan.FromHours(6)
+        );
         
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
 
         // Simula que JÁ EXISTE um condomínio com esse CNPJ
-        var existente = new Condominio(empresaId, "Existente", input.Cnpj, "Rua Y");
+        var existente = new Condominio(empresaId, "Existente", input.Cnpj, "Rua Y", 10, TimeSpan.FromHours(6));
         _mockRepo.Setup(r => r.GetByCnpjAsync(input.Cnpj)).ReturnsAsync(existente);
 
         // --- ACT & ASSERT ---
@@ -90,7 +104,13 @@ public class CondominioAppServiceTests
     public async Task CreateAsync_DeveFalhar_QuandoEmpresaIdNulo()
     {
         // --- ARRANGE ---
-        var input = new CreateCondominioDtoInput("Condomínio Teste", "11.111.111/0001-11", "Rua Teste");
+        var input = new CreateCondominioDtoInput(
+            "Condomínio Teste", 
+            "11.111.111/0001-11", 
+            "Rua Teste",
+            10,
+            TimeSpan.FromHours(6)
+        );
         
         // EmpresaId retorna null (usuário não autenticado ou sem tenant)
         _mockTenant.Setup(t => t.EmpresaId).Returns((Guid?)null);
@@ -112,9 +132,23 @@ public class CondominioAppServiceTests
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominioExistente = new Condominio(empresaId, "Nome Antigo", "11.111.111/0001-11", "Endereço Antigo");
+        var condominioExistente = new Condominio(
+            empresaId, 
+            "Nome Antigo", 
+            "11.111.111/0001-11", 
+            "Endereço Antigo",
+            8,
+            TimeSpan.FromHours(6)
+        );
         
-        var input = new UpdateCondominioDtoInput("Nome Atualizado", "Novo Endereço, 123");
+        var input = new UpdateCondominioDtoInput(
+            "Nome Atualizado", 
+            "Novo Endereço, 123",
+            12,
+            TimeSpan.FromHours(7),
+            "novo@email.com",
+            "(11) 99999-8888"
+        );
 
         _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominioExistente);
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -125,8 +159,13 @@ public class CondominioAppServiceTests
         // --- ASSERT ---
         Assert.NotNull(result);
         Assert.Equal("Nome Atualizado", result.Nome);
+        Assert.Equal(12, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal("07:00:00", result.HorarioTrocaTurno);
         
-        _mockRepo.Verify(r => r.Update(It.Is<Condominio>(c => c.Nome == input.Nome)), Times.Once);
+        _mockRepo.Verify(r => r.Update(It.Is<Condominio>(c => 
+            c.Nome == input.Nome && 
+            c.QuantidadeFuncionariosIdeal == 12
+        )), Times.Once);
         _mockUow.Verify(u => u.CommitAsync(), Times.Once);
     }
 
@@ -135,7 +174,12 @@ public class CondominioAppServiceTests
     {
         // --- ARRANGE ---
         var condominioId = Guid.NewGuid();
-        var input = new UpdateCondominioDtoInput("Nome", "Endereço");
+        var input = new UpdateCondominioDtoInput(
+            "Nome", 
+            "Endereço",
+            10,
+            TimeSpan.FromHours(6)
+        );
 
         _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync((Condominio?)null);
 
@@ -152,9 +196,21 @@ public class CondominioAppServiceTests
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominioExistente = new Condominio(empresaId, "Nome Original", "11.111.111/0001-11", "Endereço");
+        var condominioExistente = new Condominio(
+            empresaId, 
+            "Nome Original", 
+            "11.111.111/0001-11", 
+            "Endereço",
+            10,
+            TimeSpan.FromHours(6)
+        );
         
-        var input = new UpdateCondominioDtoInput("", "Endereço válido"); // Nome vazio
+        var input = new UpdateCondominioDtoInput(
+            "", 
+            "Endereço válido",
+            10,
+            TimeSpan.FromHours(6)
+        ); // Nome vazio
 
         _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominioExistente);
 
@@ -175,7 +231,14 @@ public class CondominioAppServiceTests
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio a Deletar", "11.111.111/0001-11", "Rua X");
+        var condominio = new Condominio(
+            empresaId, 
+            "Condomínio a Deletar", 
+            "11.111.111/0001-11", 
+            "Rua X",
+            10,
+            TimeSpan.FromHours(6)
+        );
 
         _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -225,7 +288,14 @@ public class CondominioAppServiceTests
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua ABC");
+        var condominio = new Condominio(
+            empresaId, 
+            "Condomínio Teste", 
+            "11.111.111/0001-11", 
+            "Rua ABC",
+            10,
+            TimeSpan.FromHours(6)
+        );
 
         _mockRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
 
@@ -280,9 +350,9 @@ public class CondominioAppServiceTests
         var empresaId = Guid.NewGuid();
         var condominios = new List<Condominio>
         {
-            new Condominio(empresaId, "Condomínio A", "11.111.111/0001-11", "Rua A"),
-            new Condominio(empresaId, "Condomínio B", "22.222.222/0001-22", "Rua B"),
-            new Condominio(empresaId, "Condomínio C", "33.333.333/0001-33", "Rua C")
+            new Condominio(empresaId, "Condomínio A", "11.111.111/0001-11", "Rua A", 10, TimeSpan.FromHours(6)),
+            new Condominio(empresaId, "Condomínio B", "22.222.222/0001-22", "Rua B", 10, TimeSpan.FromHours(6)),
+            new Condominio(empresaId, "Condomínio C", "33.333.333/0001-33", "Rua C", 10, TimeSpan.FromHours(6))
         };
 
         _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(condominios);
@@ -317,8 +387,8 @@ public class CondominioAppServiceTests
     {
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
-        var condominio1 = new Condominio(empresaId, "Ativo", "11.111.111/0001-11", "Rua A");
-        var condominio2 = new Condominio(empresaId, "Inativo", "22.222.222/0001-22", "Rua B");
+        var condominio1 = new Condominio(empresaId, "Ativo", "11.111.111/0001-11", "Rua A", 10, TimeSpan.FromHours(6));
+        var condominio2 = new Condominio(empresaId, "Inativo", "22.222.222/0001-22", "Rua B", 10, TimeSpan.FromHours(6));
         condominio2.Desativar();
 
         var condominios = new List<Condominio> { condominio1, condominio2 };

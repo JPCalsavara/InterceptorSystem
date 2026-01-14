@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ybrZOyv8gZ3t1ORG9Oub+Mq2wFH4xtdFy1kh9GvxHeVK/Wi7yrkaLnYKa3/1v+bHMWimDh/l71a2Pm9lS8cq4w==",
+  "dgSpecHash": "NJZ9cIJ0b/U=",
   "success": true,
   "projectFilePath": "/home/jpcalsavara/projetos/andamento/InterceptorSystem/src/InterceptorSystem.Tests/InterceptorSystem.Tests.csproj",
   "expectedPackageFiles": [
@@ -13,7 +13,7 @@
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.0/microsoft.entityframeworkcore.abstractions.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.0/microsoft.entityframeworkcore.analyzers.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.inmemory/9.0.0/microsoft.entityframeworkcore.inmemory.9.0.0.nupkg.sha512",
-    "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.0/microsoft.entityframeworkcore.relational.9.0.0.nupkg.sha512",
+    "/home/jpcalsavara/.nuget/packages/microsoft.entityframeworkcore.relational/8.0.8/microsoft.entityframeworkcore.relational.8.0.8.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.0/microsoft.extensions.caching.abstractions.9.0.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/microsoft.extensions.caching.memory/9.0.0/microsoft.extensions.caching.memory.9.0.0.nupkg.sha512",
@@ -51,8 +51,8 @@
     "/home/jpcalsavara/.nuget/packages/microsoft.testplatform.testhost/17.10.0/microsoft.testplatform.testhost.17.10.0.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/moq/4.20.72/moq.4.20.72.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
-    "/home/jpcalsavara/.nuget/packages/npgsql/9.0.1/npgsql.9.0.1.nupkg.sha512",
-    "/home/jpcalsavara/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.1/npgsql.entityframeworkcore.postgresql.9.0.1.nupkg.sha512",
+    "/home/jpcalsavara/.nuget/packages/npgsql/8.0.4/npgsql.8.0.4.nupkg.sha512",
+    "/home/jpcalsavara/.nuget/packages/npgsql.entityframeworkcore.postgresql/8.0.8/npgsql.entityframeworkcore.postgresql.8.0.8.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/swashbuckle.aspnetcore/6.6.2/swashbuckle.aspnetcore.6.6.2.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/swashbuckle.aspnetcore.swagger/6.6.2/swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
     "/home/jpcalsavara/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.6.2/swashbuckle.aspnetcore.swaggergen.6.6.2.nupkg.sha512",

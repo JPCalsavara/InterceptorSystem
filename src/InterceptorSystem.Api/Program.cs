@@ -36,7 +36,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
-// 3. Serviço de Tenant (Especifico da API pois depende de HttpContext)
+// 3. CORS - Permitir comunicação com Angular
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+// 4. Serviço de Tenant (Especifico da API pois depende de HttpContext)
 builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
 
 var app = builder.Build();
@@ -68,6 +80,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// CORS deve vir ANTES de UseHttpsRedirection e UseAuthorization
+app.UseCors("AllowAngularApp");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

@@ -13,26 +13,57 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
 
     private async Task<Guid> CriarCondominioAsync()
     {
-        var input = new CreateCondominioDtoInput("Condomínio Aloc", $"{DateTime.Now.Ticks % 100000000:00000000}/0001-66", "Rua Aloc");
+        var input = new CreateCondominioDtoInput(
+            "Condomínio Aloc", 
+            $"{DateTime.Now.Ticks % 100000000:00000000}/0001-66", 
+            "Rua Aloc",
+            10,
+            TimeSpan.FromHours(6)
+        );
         var response = await Client.PostAsJsonAsync("/api/condominios", input);
         response.EnsureSuccessStatusCode();
         var dto = await ReadAsAsync<CondominioDtoOutput>(response);
         return dto!.Id;
     }
 
+    // FASE 2: Criar contrato vigente para vincular funcionários
+    private async Task<Guid> CriarContratoAsync(Guid condominioId)
+    {
+        var input = new CreateContratoDtoInput(
+            condominioId,
+            "Contrato Teste Alocações",
+            10000m,  // ValorTotalMensal
+            100m,    // ValorDiariaCobrada
+            0.30m,   // PercentualAdicionalNoturno (30% = 0.30)
+            500m,    // ValorBeneficiosExtrasMensal
+            0.15m,   // PercentualImpostos (15% = 0.15)
+            5,       // QuantidadeFuncionarios
+            0.20m,   // MargemLucroPercentual (20% = 0.20)
+            0.10m,   // MargemCoberturaFaltasPercentual (10% = 0.10)
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)),
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
+            StatusContrato.PAGO
+        );
+        var response = await Client.PostAsJsonAsync("/api/contratos", input);
+        response.EnsureSuccessStatusCode();
+        var dto = await ReadAsAsync<ContratoDtoOutput>(response);
+        return dto!.Id;
+    }
+
     private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
     {
+        var contratoId = await CriarContratoAsync(condominioId);
+        
+        // FASE 3: Sem parâmetros de salário (calculados automaticamente)
         var input = new CreateFuncionarioDtoInput(
             condominioId,
+            contratoId,
             "Funcionario Teste",
             Guid.NewGuid().ToString(),
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
-            TipoFuncionario.CLT,
-            2500,
-            400,
-            100);
+            TipoFuncionario.CLT);
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();
@@ -40,7 +71,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
 
     private async Task<PostoDeTrabalhoDto> CriarPostoAsync(Guid condominioId)
     {
-        var input = new CreatePostoInput(condominioId, TimeSpan.FromHours(6), TimeSpan.FromHours(18));
+        var input = new CreatePostoInput(condominioId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
         var response = await Client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<PostoDeTrabalhoDto>(response) ?? throw new InvalidOperationException();

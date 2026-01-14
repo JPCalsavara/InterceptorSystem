@@ -27,6 +27,19 @@ public class CondominioConfiguration : IEntityTypeConfiguration<Condominio>
         // Configuração do Multi-tenancy (EmpresaId é obrigatório)
         builder.Property(c => c.EmpresaId).IsRequired();
         
+        // Configurações Operacionais - FASE 1
+        builder.Property(c => c.QuantidadeFuncionariosIdeal)
+            .IsRequired();
+        
+        builder.Property(c => c.HorarioTrocaTurno)
+            .IsRequired();
+        
+        builder.Property(c => c.EmailGestor)
+            .HasMaxLength(100);
+        
+        builder.Property(c => c.TelefoneEmergencia)
+            .HasMaxLength(20);
+        
         builder.HasIndex(c => c.Nome);
         builder.HasIndex(c => c.EmpresaId);
     }
