@@ -1,6 +1,0 @@
-@InterceptorSystem.Api_HostAddress = http://localhost:5010
-
-GET {{InterceptorSystem.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
