@@ -10,6 +10,7 @@ import { Condominio, CreateCondominioDto, UpdateCondominioDto } from '../models/
 export class CondominioService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/condominios`;
+  private apiUrlCompleto = `${environment.apiUrl}/api/condominios-completos`;
 
   getAll(): Observable<Condominio[]> {
     return this.http.get<Condominio[]>(this.apiUrl);
@@ -21,6 +22,10 @@ export class CondominioService {
 
   create(dto: CreateCondominioDto): Observable<Condominio> {
     return this.http.post<Condominio>(this.apiUrl, dto);
+  }
+
+  createCompleto(dto: any): Observable<any> {
+    return this.http.post<any>(this.apiUrlCompleto, dto);
   }
 
   update(id: string, dto: UpdateCondominioDto): Observable<Condominio> {

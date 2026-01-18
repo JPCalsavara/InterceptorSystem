@@ -81,7 +81,28 @@
       <div class="form-row">
         <div class="form-group">
           <label for="valorDiariaCobrada" class="form-label">
-            Valor Diária por Funcionário <span class="required">*</span>
+            Valor Diária por Funcionário (R$) <span class="required">*</span>
+            <span class="info-tooltip-wrapper">
+              <button
+                type="button"
+                class="info-tooltip-button"
+                (click)="toggleTooltip('valorDiaria')"
+                [attr.aria-label]="'Informações sobre Valor da Diária'"
+                [attr.aria-expanded]="activeTooltip() === 'valorDiaria'">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              @if (activeTooltip() === 'valorDiaria') {
+                <div class="tooltip-content" role="tooltip">
+                  <button type="button" class="tooltip-close" (click)="toggleTooltip('valorDiaria')" aria-label="Fechar">×</button>
+                  <p><strong>Valor da Diária por Funcionário</strong></p>
+                  <p>Valor cobrado por dia de trabalho de cada funcionário.</p>
+                  <p><strong>Mercado:</strong> R$ 80-150</p>
+                  <p><strong>Recomendado:</strong> R$ 100 (média nacional para portaria)</p>
+                </div>
+              }
+            </span>
           </label>
           <input
             id="valorDiariaCobrada"
@@ -89,7 +110,7 @@
             formControlName="valorDiariaCobrada"
             class="form-input"
             [class.error]="hasError('valorDiariaCobrada')"
-            placeholder="0.00"
+            placeholder="Ex: 100.00"
             step="0.01"
           />
           @if (hasError('valorDiariaCobrada')) {
@@ -100,6 +121,11 @@
         <div class="form-group">
           <label for="quantidadeFuncionarios" class="form-label">
             Quantidade de Funcionários <span class="required">*</span>
+            <span class="info-tooltip" title="Total absoluto de funcionários que trabalharão neste condomínio (soma de todos os turnos). Exemplo: 6 funcionários no turno diurno + 6 no noturno = 12 funcionários total.">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </span>
           </label>
           <input
             id="quantidadeFuncionarios"
@@ -107,7 +133,7 @@
             formControlName="quantidadeFuncionarios"
             class="form-input"
             [class.error]="hasError('quantidadeFuncionarios')"
-            placeholder="0"
+            placeholder="Ex: 12 (total de todos os turnos)"
             step="1"
             min="1"
           />
@@ -115,11 +141,42 @@
           <span class="error-message">{{ getErrorMessage('quantidadeFuncionarios') }}</span>
           }
         </div>
-      </div>
 
+        <div class="form-group">
+          <label for="numeroDePostos" class="form-label">
+            Número de Postos de Trabalho <span class="required">*</span>
+            <span class="info-tooltip" title="Quantidade de turnos/postos diferentes. Exemplos: 2 postos = turnos de 12h (diurno/noturno), 3 postos = turnos de 8h, 4 postos = turnos de 6h. Padrão recomendado: 2 postos (escala 12x36).">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </span>
+          </label>
+          <input
+            id="numeroDePostos"
+            type="number"
+            formControlName="numeroDePostos"
+            class="form-input"
+            [class.error]="hasError('numeroDePostos')"
+            placeholder="Ex: 2 (padrão 12x36)"
+            step="1"
+            min="1"
+            max="6"
+          />
+          @if (hasError('numeroDePostos')) {
+          <span class="error-message">{{ getErrorMessage('numeroDePostos') }}</span>
+          }
+          <small class="field-hint">
+            💡 2 postos = 12h cada (padrão) | 3 postos = 8h cada | 4 postos = 6h cada
+          </small>
+        </div>
       <div class="form-group">
         <label for="valorBeneficiosExtrasMensal" class="form-label">
-          Benefícios Extras Mensais <span class="required">*</span>
+          Benefícios Extras Mensais (R$) <span class="required">*</span>
+          <span class="info-tooltip" title="Valor total mensal de benefícios como vale-transporte, vale-alimentação, plano de saúde, etc. Valor recomendado: R$ 350-500/funcionário.">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+          </span>
         </label>
         <input
           id="valorBeneficiosExtrasMensal"
@@ -127,13 +184,15 @@
           formControlName="valorBeneficiosExtrasMensal"
           class="form-input"
           [class.error]="hasError('valorBeneficiosExtrasMensal')"
-          placeholder="0.00"
+          placeholder="Ex: 350.00"
           step="0.01"
         />
         @if (hasError('valorBeneficiosExtrasMensal')) {
         <span class="error-message">{{ getErrorMessage('valorBeneficiosExtrasMensal') }}</span>
         }
       </div>
+      </div>
+
 
       <h3 class="section-title">📊 Percentuais e Margens</h3>
 
@@ -141,6 +200,11 @@
         <div class="form-group">
           <label for="percentualAdicionalNoturno" class="form-label">
             Adicional Noturno (%) <span class="required">*</span>
+            <span class="info-tooltip" title="Adicional obrigatório por CLT (Art. 73) para trabalho noturno (22h-5h). Mínimo legal: 20%. Recomendado: 20-30% dependendo da convenção coletiva.">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </span>
           </label>
           <input
             id="percentualAdicionalNoturno"
@@ -148,7 +212,7 @@
             formControlName="percentualAdicionalNoturno"
             class="form-input"
             [class.error]="hasError('percentualAdicionalNoturno')"
-            placeholder="0.00"
+            placeholder="Ex: 20.00"
             step="0.01"
             min="0"
             max="100"
@@ -161,6 +225,11 @@
         <div class="form-group">
           <label for="percentualImpostos" class="form-label">
             Impostos (%) <span class="required">*</span>
+            <span class="info-tooltip" title="Encargos sociais e impostos: INSS (20%), FGTS (8%), PIS (0.65%), etc. Total médio: 12-18%. Recomendado: 15% (cobre INSS + FGTS + outros).">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </span>
           </label>
           <input
             id="percentualImpostos"
@@ -168,7 +237,7 @@
             formControlName="percentualImpostos"
             class="form-input"
             [class.error]="hasError('percentualImpostos')"
-            placeholder="0.00"
+            placeholder="Ex: 15.00"
             step="0.01"
             min="0"
             max="100"
@@ -183,6 +252,11 @@
         <div class="form-group">
           <label for="margemLucroPercentual" class="form-label">
             Margem de Lucro (%) <span class="required">*</span>
+            <span class="info-tooltip" title="Percentual de lucro desejado sobre o contrato. Mercado de segurança: 10-20%. Recomendado: 15% (equilibra competitividade e rentabilidade).">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </span>
           </label>
           <input
             id="margemLucroPercentual"
@@ -190,7 +264,7 @@
             formControlName="margemLucroPercentual"
             class="form-input"
             [class.error]="hasError('margemLucroPercentual')"
-            placeholder="0.00"
+            placeholder="Ex: 15.00"
             step="0.01"
             min="0"
             max="100"
@@ -203,6 +277,11 @@
         <div class="form-group">
           <label for="margemCoberturaFaltasPercentual" class="form-label">
             Margem Cobertura de Faltas (%) <span class="required">*</span>
+            <span class="info-tooltip" title="Reserva para cobrir custos de faltas, substituições e imprevistos. Recomendado: 8-12%. Valor de 10% cobre aproximadamente 2-3 faltas por mês.">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+            </span>
           </label>
           <input
             id="margemCoberturaFaltasPercentual"
@@ -210,7 +289,7 @@
             formControlName="margemCoberturaFaltasPercentual"
             class="form-input"
             [class.error]="hasError('margemCoberturaFaltasPercentual')"
-            placeholder="0.00"
+            placeholder="Ex: 10.00"
             step="0.01"
             min="0"
             max="100"
@@ -243,7 +322,12 @@
         </div>
 
         <div class="form-group">
-          <label for="dataFim" class="form-label"> Data Fim <span class="required">*</span> </label>
+          <label for="dataFim" class="form-label">
+            Data Fim <span class="required">*</span>
+            @if (duracaoContrato()) {
+              <span class="duration-badge">📅 Duração: {{ duracaoContrato() }}</span>
+            }
+          </label>
           <input
             id="dataFim"
             type="date"

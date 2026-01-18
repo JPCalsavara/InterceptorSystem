@@ -42,55 +42,24 @@ export class ContratoListComponent implements OnInit {
   contratosVerde = computed(() => this.getContratosByDias(90, Infinity));
   contratosAmarelo = computed(() => this.getContratosByDias(30, 90));
   contratosVermelho = computed(() => this.getContratosByDias(0, 30));
-  contratosFinalizados = computed(() => {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    return this.contratos().filter((c) => {
-      if (c.status !== StatusContrato.ATIVO) return false;
-      const dataFim = new Date(c.dataFim);
-      dataFim.setHours(0, 0, 0, 0);
-      return dataFim < hoje;
-    });
-  });
+  contratosFinalizados = computed(() =>
+    this.contratos().filter((c) => c.status === StatusContrato.FINALIZADO)
+  );
 
   // Métricas mensais
-  totalContratos = computed(() => {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    return this.contratos().filter((c) => {
-      // Excluir contratos finalizados (ATIVO com dataFim no passado)
-      if (c.status === StatusContrato.ATIVO) {
-        const dataFim = new Date(c.dataFim);
-        dataFim.setHours(0, 0, 0, 0);
-        if (dataFim < hoje) return false; // Finalizado
-      }
-      return true;
-    }).length;
-  });
-  faturamentoMensal = computed(() => {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    return this.contratos()
-      .filter((c) => {
-        if (c.status !== StatusContrato.ATIVO) return false;
-        const dataFim = new Date(c.dataFim);
-        dataFim.setHours(0, 0, 0, 0);
-        return dataFim >= hoje; // Apenas não finalizados
-      })
-      .reduce((sum, c) => sum + this.getValorMensal(c), 0);
-  });
-  custoMensal = computed(() => {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    return this.contratos()
-      .filter((c) => {
-        if (c.status !== StatusContrato.ATIVO) return false;
-        const dataFim = new Date(c.dataFim);
-        dataFim.setHours(0, 0, 0, 0);
-        return dataFim >= hoje; // Apenas não finalizados
-      })
-      .reduce((sum, c) => sum + this.getContratoCusto(c), 0);
-  });
+  totalContratos = computed(() =>
+    this.contratos().filter((c) => c.status !== StatusContrato.FINALIZADO).length
+  );
+  faturamentoMensal = computed(() =>
+    this.contratos()
+      .filter((c) => c.status === StatusContrato.ATIVO)
+      .reduce((sum, c) => sum + this.getValorMensal(c), 0)
+  );
+  custoMensal = computed(() =>
+    this.contratos()
+      .filter((c) => c.status === StatusContrato.ATIVO)
+      .reduce((sum, c) => sum + this.getContratoCusto(c), 0)
+  );
   lucroMensal = computed(() => this.faturamentoMensal() - this.custoMensal());
 
   ngOnInit(): void {

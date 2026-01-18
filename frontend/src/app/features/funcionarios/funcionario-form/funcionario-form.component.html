@@ -94,6 +94,40 @@
       </div>
 
       <div class="form-group">
+        <label for="postoDeTrabalhoId" class="form-label">
+          Posto de Trabalho <span class="required">*</span>
+        </label>
+        <select
+          id="postoDeTrabalhoId"
+          formControlName="postoDeTrabalhoId"
+          class="form-input"
+          [class.error]="hasError('postoDeTrabalhoId')"
+          [disabled]="!form.get('condominioId')?.value || isEdit()"
+        >
+          <option value="">Selecione um posto de trabalho</option>
+          @for (posto of postos(); track posto.id) {
+          <option [value]="posto.id">
+            {{ posto.horarioInicio }} - {{ posto.horarioFim }}
+            @if (posto.permiteDobrarEscala) {
+              <span class="badge">Permite Dobra</span>
+            }
+          </option>
+          }
+        </select>
+        @if (hasError('postoDeTrabalhoId')) {
+        <span class="error-message">{{ getErrorMessage('postoDeTrabalhoId') }}</span>
+        }
+        @if (!form.get('condominioId')?.value) {
+        <span class="info-message">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          Selecione um condomínio primeiro
+        </span>
+        }
+      </div>
+
+      <div class="form-group">
         <label for="nome" class="form-label"> Nome Completo <span class="required">*</span> </label>
         <input
           id="nome"
@@ -117,8 +151,8 @@
             formControlName="cpf"
             class="form-input"
             [class.error]="hasError('cpf')"
-            placeholder="12345678901 (somente números)"
-            maxlength="11"
+            placeholder="000.000.000-00"
+            maxlength="14"
           />
           @if (hasError('cpf')) {
           <span class="error-message">{{ getErrorMessage('cpf') }}</span>
@@ -133,8 +167,8 @@
             formControlName="celular"
             class="form-input"
             [class.error]="hasError('celular')"
-            placeholder="11987654321 (somente números)"
-            maxlength="11"
+            placeholder="(00) 00000-0000"
+            maxlength="15"
           />
           @if (hasError('celular')) {
           <span class="error-message">{{ getErrorMessage('celular') }}</span>
@@ -221,26 +255,7 @@
           </div>
         </div>
 
-        <div class="contract-info">
-          <h4>Informações do Contrato</h4>
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="info-label">Valor Total Mensal:</span>
-              <span class="info-value">{{ contratoSelecionado()!.valorTotalMensal | currency : 'BRL' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Quantidade de Funcionários:</span>
-              <span class="info-value">{{ contratoSelecionado()!.quantidadeFuncionarios }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Período:</span>
-              <span class="info-value">
-                {{ contratoSelecionado()!.dataInicio | date: 'dd/MM/yyyy' }} até
-                {{ contratoSelecionado()!.dataFim | date: 'dd/MM/yyyy' }}
-              </span>
-            </div>
-          </div>
-        </div>
+
       </div>
       }
 
