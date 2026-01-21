@@ -31,6 +31,8 @@ export class ContratoFormComponent implements OnInit {
   error = signal<string | null>(null);
   submitted = signal(false);
   condominios = signal<any[]>([]);
+  duracaoContrato = signal<string>(''); // Duração calculada do contrato
+  activeTooltip = signal<string | null>(null); // Controla qual tooltip está aberto
 
   // Estado do cálculo
   calculando = signal(false);
@@ -67,25 +69,44 @@ export class ContratoFormComponent implements OnInit {
   }
 
   buildForm(): void {
+    // Datas padrão: hoje e 6 meses depois
+    const hoje = new Date();
+    const seisMesesDepois = new Date();
+    seisMesesDepois.setMonth(hoje.getMonth() + 6);
+
     this.form = this.fb.group({
       condominioId: ['', Validators.required],
       descricao: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]],
-      valorDiariaCobrada: [0, [Validators.required, Validators.min(0)]],
+      // Valores padrão baseados no mercado de segurança patrimonial brasileiro
+      valorDiariaCobrada: [100, [Validators.required, Validators.min(0)]], // R$ 100/dia é valor médio para portaria
       percentualAdicionalNoturno: [
-        0,
+        20, // 20% é o mínimo legal (CLT Art. 73)
         [Validators.required, Validators.min(0), Validators.max(100)],
       ],
-      valorBeneficiosExtrasMensal: [0, [Validators.required, Validators.min(0)]],
-      percentualImpostos: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      quantidadeFuncionarios: [0, [Validators.required, Validators.min(1)]],
-      margemLucroPercentual: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]], // Vale-transporte + alimentação
+      percentualImpostos: [15, [Validators.required, Validators.min(0), Validators.max(100)]], // Impostos médios (INSS + FGTS)
+      quantidadeFuncionarios: [2, [Validators.required, Validators.min(1)]], // Mínimo 2 para cobertura 24h
+      numeroDePostos: [2, [Validators.required, Validators.min(2), Validators.max(6)]], // 2 turnos (12x36) é padrão
+      margemLucroPercentual: [15, [Validators.required, Validators.min(0), Validators.max(100)]], // 15% margem razoável
       margemCoberturaFaltasPercentual: [
-        0,
+        10, // 10% para cobrir faltas e imprevistos
         [Validators.required, Validators.min(0), Validators.max(100)],
       ],
-      dataInicio: ['', Validators.required],
-      dataFim: ['', Validators.required],
+      dataInicio: [this.formatDateForInput(hoje), Validators.required],
+      dataFim: [this.formatDateForInput(seisMesesDepois), Validators.required],
       status: [StatusContrato.PENDENTE, Validators.required],
+    });
+
+    // Calcular duração inicial
+    this.calcularDuracaoContrato();
+
+    // Observar mudanças nas datas para recalcular duração
+    this.form.get('dataInicio')?.valueChanges.subscribe(() => {
+      this.calcularDuracaoContrato();
+    });
+
+    this.form.get('dataFim')?.valueChanges.subscribe(() => {
+      this.calcularDuracaoContrato();
     });
   }
 
@@ -108,8 +129,10 @@ export class ContratoFormComponent implements OnInit {
           const input = {
             valorDiariaCobrada: valores.valorDiariaCobrada,
             quantidadeFuncionarios: valores.quantidadeFuncionarios,
+            numeroDePostos: valores.numeroDePostos || 2, // Padrão: 2 postos (12x36)
             valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
             percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
+            percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100, // UI: 20, Backend: 0.20
             margemLucroPercentual: (valores.margemLucroPercentual || 0) / 100,
             margemCoberturaFaltasPercentual: (valores.margemCoberturaFaltasPercentual || 0) / 100,
           };
@@ -239,6 +262,48 @@ export class ContratoFormComponent implements OnInit {
     if (errors['min']) return `Valor mínimo: ${errors['min'].min}`;
 
     return 'Campo inválido';
+  }
+
+  private formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private calcularDuracaoContrato(): void {
+    const inicio = this.form.get('dataInicio')?.value;
+    const fim = this.form.get('dataFim')?.value;
+
+    if (inicio && fim) {
+      const dataInicio = new Date(inicio);
+      const dataFim = new Date(fim);
+
+      const diffTime = Math.abs(dataFim.getTime() - dataInicio.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffMonths = Math.floor(diffDays / 30);
+      const remainingDays = diffDays % 30;
+
+      if (diffMonths > 0) {
+        let duracao = `${diffMonths} ${diffMonths === 1 ? 'mês' : 'meses'}`;
+        if (remainingDays > 0) {
+          duracao += ` e ${remainingDays} ${remainingDays === 1 ? 'dia' : 'dias'}`;
+        }
+        this.duracaoContrato.set(duracao);
+      } else {
+        this.duracaoContrato.set(`${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}`);
+      }
+    } else {
+      this.duracaoContrato.set('');
+    }
+  }
+
+  toggleTooltip(tooltipId: string): void {
+    if (this.activeTooltip() === tooltipId) {
+      this.activeTooltip.set(null);
+    } else {
+      this.activeTooltip.set(tooltipId);
+    }
   }
 
   cancel(): void {

@@ -285,28 +285,28 @@
 }
 
 .kanban-green .column-header {
-  background: linear-gradient(135deg, #c5f1d8 0%, #a7f3d0 100%);
-  border-color: #10b981;
+  background: var(--kanban-success-bg);
+  border-color: var(--kanban-success-border);
 }
 
 .kanban-yellow .column-header {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-color: #f59e0b;
+  background: var(--kanban-warning-bg);
+  border-color: var(--kanban-warning-border);
 }
 
 .kanban-red .column-header {
-  background: linear-gradient(135deg, #ffd6d6 0%, #fecaca 100%);
-  border-color: #ef4444;
+  background: var(--kanban-error-bg);
+  border-color: var(--kanban-error-border);
 }
 
 .kanban-gray .column-header {
-  background: linear-gradient(135deg, var(--surface-muted) 0%, var(--border-subtle) 100%);
-  border-color: #9ca3af;
+  background: var(--kanban-neutral-bg);
+  border-color: var(--kanban-neutral-border);
 }
 
 .kanban-blue .column-header {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-color: #3b82f6;
+  background: var(--kanban-info-bg);
+  border-color: var(--kanban-info-border);
 }
 
 .column-content {

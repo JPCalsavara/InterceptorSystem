@@ -57,6 +57,18 @@
   --sidebar-active-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.4);
   --sidebar-scrollbar: #90caf9;
   --sidebar-scrollbar-hover: #64b5f6;
+
+  // Kanban status colors - Light mode
+  --kanban-success-bg: linear-gradient(135deg, #c5f1d8 0%, #a7f3d0 100%);
+  --kanban-success-border: #10b981;
+  --kanban-warning-bg: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  --kanban-warning-border: #f59e0b;
+  --kanban-error-bg: linear-gradient(135deg, #ffd6d6 0%, #fecaca 100%);
+  --kanban-error-border: #ef4444;
+  --kanban-info-bg: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  --kanban-info-border: #3b82f6;
+  --kanban-neutral-bg: linear-gradient(135deg, var(--surface-muted) 0%, var(--border-subtle) 100%);
+  --kanban-neutral-border: #9ca3af;
 }
 
 /* Dark Mode global */
@@ -107,6 +119,18 @@ body.dark-mode {
   --sidebar-active-shadow: 0 4px 6px -1px rgba(88, 166, 255, 0.4);
   --sidebar-scrollbar: #30363d;
   --sidebar-scrollbar-hover: #424a53;
+
+  // Kanban status colors - Dark mode (mais escuras)
+  --kanban-success-bg: linear-gradient(135deg, #0d4d2f 0%, #065f46 100%);
+  --kanban-success-border: #059669;
+  --kanban-warning-bg: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  --kanban-warning-border: #d97706;
+  --kanban-error-bg: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  --kanban-error-border: #dc2626;
+  --kanban-info-bg: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  --kanban-info-border: #2563eb;
+  --kanban-neutral-bg: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  --kanban-neutral-border: #6b7280;
 }
 
 /* Estilos do body */
@@ -219,6 +243,47 @@ hr,
     background: var(--bg-tertiary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Badges globais usando variáveis de kanban */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.badge-success {
+    background: var(--kanban-success-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--kanban-success-border);
+  }
+
+  &.badge-warning {
+    background: var(--kanban-warning-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--kanban-warning-border);
+  }
+
+  &.badge-error,
+  &.badge-danger {
+    background: var(--kanban-error-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--kanban-error-border);
+  }
+
+  &.badge-info {
+    background: var(--kanban-info-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--kanban-info-border);
+  }
+
+  &.badge-neutral,
+  &.badge-inactive {
+    background: var(--kanban-neutral-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--kanban-neutral-border);
   }
 }
 

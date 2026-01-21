@@ -1,0 +1,110 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/alocacoes">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>➕ Nova Alocação Múltipla</h1>
+      <p class="subtitle">
+        Gere alocações para um funcionário para toda a duração de um contrato.
+      </p>
+    </div>
+  </div>
+
+  @if (error()) {
+  <div class="alert alert-error">
+    {{ error() }}
+  </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-card">
+      <h3 class="section-title">Seleção Principal</h3>
+
+      <div class="form-group">
+        <label for="condominioId" class="form-label">Condomínio <span class="required">*</span></label>
+        <select id="condominioId" formControlName="condominioId" class="form-input" [class.error]="hasError('condominioId')">
+          <option value="">Selecione um condomínio</option>
+          @for (cond of condominios(); track cond.id) {
+          <option [value]="cond.id">{{ cond.nome }}</option>
+          }
+        </select>
+        @if (hasError('condominioId')) {
+        <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contratoId" class="form-label">Contrato <span class="required">*</span></label>
+          <select id="contratoId" formControlName="contratoId" class="form-input" [class.error]="hasError('contratoId')">
+            <option value="">Selecione um contrato</option>
+            @for (contrato of contratos(); track contrato.id) {
+            <option [value]="contrato.id">
+              {{ contrato.descricao }} ({{ contrato.dataInicio | date:'dd/MM/yy' }} - {{ contrato.dataFim | date:'dd/MM/yy' }})
+            </option>
+            }
+          </select>
+          @if (hasError('contratoId')) {
+          <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="postoDeTrabalhoId" class="form-label">Posto de Trabalho <span class="required">*</span></label>
+          <select id="postoDeTrabalhoId" formControlName="postoDeTrabalhoId" class="form-input" [class.error]="hasError('postoDeTrabalhoId')">
+            <option value="">Selecione um posto</option>
+            @for (posto of postos(); track posto.id) {
+            <option [value]="posto.id">{{ posto.horarioInicio }} - {{ posto.horarioFim }}</option>
+            }
+          </select>
+          @if (hasError('postoDeTrabalhoId')) {
+          <span class="error-message">{{ getErrorMessage('postoDeTrabalhoId') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="funcionarioId" class="form-label">Funcionário <span class="required">*</span></label>
+        <select id="funcionarioId" formControlName="funcionarioId" class="form-input" [class.error]="hasError('funcionarioId')">
+          <option value="">Selecione um funcionário</option>
+          @for (func of funcionarios(); track func.id) {
+          <option [value]="func.id">{{ func.nome }} (Escala: {{ func.tipoEscala }})</option>
+          }
+        </select>
+        @if (hasError('funcionarioId')) {
+        <span class="error-message">{{ getErrorMessage('funcionarioId') }}</span>
+        }
+      </div>
+
+      @if (summary()) {
+        <div class="summary-box">
+            <h4 class="summary-title">Resumo da Geração</h4>
+            <p>{{ summary() }}</p>
+        </div>
+      }
+
+      <div class="form-footer">
+        <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
+        <div class="button-group">
+          <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="loading() || form.invalid">
+            @if (loading()) {
+            <span class="spinner-small"></span>
+            Gerando...
+            } @else {
+            Gerar Alocações
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

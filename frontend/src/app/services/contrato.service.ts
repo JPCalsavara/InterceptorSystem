@@ -10,6 +10,7 @@ import { Contrato, CreateContratoDto, UpdateContratoDto } from '../models/index'
 export class ContratoService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/contratos`;
+  private apiUrlCalculos = `${environment.apiUrl}/api/contratos/calculos`;
 
   getAll(): Observable<Contrato[]> {
     return this.http.get<Contrato[]>(this.apiUrl);
@@ -29,5 +30,13 @@ export class ContratoService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Calcula valor total mensal baseado nos parâmetros do contrato
+   * Usa API de cálculos para garantir consistência com backend
+   */
+  calcularValorTotal(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrlCalculos}/calcular-valor-total`, payload);
   }
 }

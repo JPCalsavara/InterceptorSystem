@@ -23,6 +23,14 @@ export class AlocacaoService {
     return this.http.post<Alocacao>(this.apiUrl, dto);
   }
 
+  /**
+   * Cria múltiplas alocações em lote (batch)
+   * Usado ao cadastrar funcionário para criar todas as alocações de uma vez
+   */
+  createBatch(alocacoes: CreateAlocacaoDto[]): Observable<Alocacao[]> {
+    return this.http.post<Alocacao[]>(`${this.apiUrl}/batch`, { alocacoes });
+  }
+
   update(id: string, dto: UpdateAlocacaoDto): Observable<Alocacao> {
     return this.http.put<Alocacao>(`${this.apiUrl}/${id}`, dto);
   }

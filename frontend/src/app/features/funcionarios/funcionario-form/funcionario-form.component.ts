@@ -5,7 +5,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { CondominioService } from '../../../services/condominio.service';
 import { ContratoService } from '../../../services/contrato.service';
-import { StatusFuncionario, TipoFuncionario, TipoEscala, StatusContrato } from '../../../models';
+import { StatusFuncionario, TipoFuncionario, TipoEscala, Contrato, StatusContrato } from '../../../models';
 
 @Component({
   selector: 'app-funcionario-form',
@@ -29,13 +29,7 @@ export class FuncionarioFormComponent implements OnInit {
   error = signal<string | null>(null);
   submitted = signal(false);
   condominios = signal<any[]>([]);
-  contratos = signal<any[]>([]);
-  contratoSelecionado = signal<any | null>(null);
-
-  // Valores calculados do contrato
-  salarioCalculado = signal<number>(0);
-  beneficiosCalculados = signal<number>(0);
-  valorDiariaCalculado = signal<number>(0);
+  contratos = signal<Contrato[]>([]);
 
   StatusFuncionario = StatusFuncionario;
   TipoFuncionario = TipoFuncionario;
@@ -86,24 +80,8 @@ export class FuncionarioFormComponent implements OnInit {
     this.form.get('condominioId')?.valueChanges.subscribe((condominioId) => {
       if (condominioId) {
         this.loadContratos(condominioId);
-        // Limpar contratoId quando condomínio muda
-        this.form.patchValue({ contratoId: '' }, { emitEvent: false });
-        this.contratoSelecionado.set(null);
       } else {
         this.contratos.set([]);
-        this.contratoSelecionado.set(null);
-      }
-    });
-
-    // Listener para mudanças no contratoId
-    this.form.get('contratoId')?.valueChanges.subscribe((contratoId) => {
-      if (contratoId) {
-        this.calcularValoresDoContrato(contratoId);
-      } else {
-        this.contratoSelecionado.set(null);
-        this.salarioCalculado.set(0);
-        this.beneficiosCalculados.set(0);
-        this.valorDiariaCalculado.set(0);
       }
     });
   }
@@ -111,7 +89,6 @@ export class FuncionarioFormComponent implements OnInit {
   loadContratos(condominioId: string): void {
     this.contratoService.getAll().subscribe({
       next: (data) => {
-        // Filtrar apenas contratos do condomínio selecionado e vigentes
         const contratosDoCondominio = data.filter(
           (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO
         );
@@ -124,32 +101,80 @@ export class FuncionarioFormComponent implements OnInit {
   buildForm(): void {
     this.form = this.fb.group({
       condominioId: ['', Validators.required],
-      contratoId: ['', Validators.required],  // FASE 2 backend - obrigatório
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
-      celular: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
+      cpf: ['', [Validators.required, this.cpfValidator]],
+      celular: ['', [Validators.required, this.celularValidator]],
       statusFuncionario: [StatusFuncionario.ATIVO, Validators.required],
       tipoFuncionario: [TipoFuncionario.CLT, Validators.required],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
-      // Campos de salário removidos - agora são calculados pelo backend (FASE 3)
     });
+
+    this.setupFormatListeners();
+  }
+
+  private cpfValidator(control: any) {
+    if (!control.value) return null;
+    const cleaned = control.value.replace(/\D/g, '');
+    if (cleaned.length !== 11) {
+      return { cpfInvalid: true };
+    }
+    return null;
+  }
+
+  private celularValidator(control: any) {
+    if (!control.value) return null;
+    const cleaned = control.value.replace(/\D/g, '');
+    if (cleaned.length < 10 || cleaned.length > 11) {
+      return { celularInvalid: true };
+    }
+    return null;
+  }
+
+  private setupFormatListeners(): void {
+    this.form.get('cpf')?.valueChanges.subscribe((value) => {
+      if (value) {
+        const cleaned = value.replace(/\D/g, '');
+        const formatted = this.formatCPF(cleaned);
+        if (formatted !== value) {
+          this.form.get('cpf')?.setValue(formatted, { emitEvent: false });
+        }
+      }
+    });
+
+    this.form.get('celular')?.valueChanges.subscribe((value) => {
+      if (value) {
+        const cleaned = value.replace(/\D/g, '');
+        const formatted = this.formatCelular(cleaned);
+        if (formatted !== value) {
+          this.form.get('celular')?.setValue(formatted, { emitEvent: false });
+        }
+      }
+    });
+  }
+
+  private formatCPF(value: string): string {
+    if (!value) return '';
+    const numbers = value.replace(/\D/g, '').slice(0, 11);
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+  }
+
+  private formatCelular(value: string): string {
+    if (!value) return '';
+    const numbers = value.replace(/\D/g, '').slice(0, 11);
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   }
 
   loadFuncionario(id: string): void {
     this.loading.set(true);
-
     this.service.getById(id).subscribe({
       next: (data) => {
-        this.form.patchValue({
-          condominioId: data.condominioId,
-          contratoId: data.contratoId,  // FASE 2
-          nome: data.nome,
-          cpf: data.cpf,
-          celular: data.celular,
-          statusFuncionario: data.statusFuncionario,
-          tipoFuncionario: data.tipoFuncionario,
-          tipoEscala: data.tipoEscala,
-        });
+        this.form.patchValue(data);
         this.loading.set(false);
       },
       error: (err) => {
@@ -160,41 +185,6 @@ export class FuncionarioFormComponent implements OnInit {
     });
   }
 
-  calcularValoresDoContrato(contratoId: string): void {
-    const contrato = this.contratos().find(c => c.id === contratoId);
-
-    if (!contrato) {
-      return;
-    }
-
-    this.contratoSelecionado.set(contrato);
-
-    // Calcular valores conforme FASE 3
-    const quantidadeFuncionarios = contrato.quantidadeFuncionarios || 1;
-
-    // Salário Base = Valor Total Mensal / Quantidade de Funcionários
-    const salarioBase = contrato.valorTotalMensal / quantidadeFuncionarios;
-
-    // Adicional Noturno (para escala 12x36)
-    const tipoEscala = this.form.get('tipoEscala')?.value;
-    const adicionalNoturno = tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS
-      ? salarioBase * (contrato.percentualAdicionalNoturno / 100)
-      : 0;
-
-    // Benefícios
-    const beneficios = (contrato.valorBeneficiosExtrasMensal || 0) / quantidadeFuncionarios;
-
-    // Salário Total
-    const salarioTotal = salarioBase + adicionalNoturno + beneficios;
-
-    // Valor Diária (base de 30 dias)
-    const valorDiaria = contrato.valorDiariaCobrada || (salarioBase / 30);
-
-    this.salarioCalculado.set(salarioTotal);
-    this.beneficiosCalculados.set(beneficios);
-    this.valorDiariaCalculado.set(valorDiaria);
-  }
-
   onSubmit(): void {
     this.submitted.set(true);
 
@@ -203,16 +193,28 @@ export class FuncionarioFormComponent implements OnInit {
       return;
     }
 
+    if (this.contratos().length === 0 && !this.isEdit()) {
+        this.error.set('Não há contratos ativos para o condomínio selecionado. Cadastre um contrato primeiro.');
+        return;
+    }
+
     this.loading.set(true);
     this.error.set(null);
 
-    const formValue = this.form.value;
+    const formValue = {
+      ...this.form.value,
+      cpf: this.form.value.cpf.replace(/\D/g, ''),
+      celular: this.form.value.celular.replace(/\D/g, ''),
+      contratoId: this.isEdit() ? this.form.value.contratoId : this.contratos()[0].id,
+    };
+
     const request = this.isEdit()
       ? this.service.update(this.funcionarioId()!, formValue)
       : this.service.create(formValue);
 
     request.subscribe({
       next: () => {
+        this.loading.set(false);
         this.router.navigate(['/funcionarios']);
       },
       error: (err) => {
@@ -253,11 +255,8 @@ export class FuncionarioFormComponent implements OnInit {
     if (errors['required']) return 'Este campo é obrigatório';
     if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['min']) return `Valor mínimo: ${errors['min'].min}`;
-    if (errors['pattern']) {
-      if (fieldName === 'cpf') return 'CPF deve conter 11 dígitos';
-      if (fieldName === 'celular') return 'Celular deve conter 10 ou 11 dígitos';
-    }
+    if (errors['cpfInvalid']) return 'CPF deve conter 11 dígitos';
+    if (errors['celularInvalid']) return 'Celular deve conter 10 ou 11 dígitos';
 
     return 'Campo inválido';
   }

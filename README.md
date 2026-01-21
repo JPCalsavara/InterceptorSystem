@@ -1,7 +1,7 @@
 # InterceptorSystem
 
 **Versão:** 2.0 (Refatoração Completa - Backend, Frontend e Infraestrutura)  
-**Data da Última Atualização:** 2026-01-14  
+**Data da Última Atualização:** 2026-01-18  
 **Status:** ✅ **Backend - 5 Fases Concluídas** | ✅ **Frontend - 5 Fases Concluídas** | ✅ **Docker Compose Completo** | ✅ **CI/CD com Testes**
 
 ---
@@ -13,22 +13,27 @@
 ### **✨ Destaques da Versão 2.0:**
 
 🎯 **Refatoração Completa (10 Fases)**
+
 - ✅ Backend: 5 fases de otimização e automação
 - ✅ Frontend: 5 fases de UX e correções críticas
 - ✅ **75% menos requests API** (criação em cascata)
+- ✅ **Criação de alocações em lote** (`POST /api/alocacoes/batch`) para evitar dezenas/centenas de requisições
 - ✅ **Bug crítico corrigido** (cálculos financeiros)
 
 🐳 **Docker Compose Completo**
+
 - ✅ 4 serviços orquestrados (DB, API, Frontend, Nginx)
 - ✅ Hot-reload para desenvolvimento ágil
 - ✅ Ambiente completo em **1 comando**
 
 🔄 **CI/CD Automatizado**
+
 - ✅ GitHub Actions com 3 jobs (Backend + Frontend + Docker)
 - ✅ 124 testes automatizados
 - ✅ Build de produção validado em cada PR
 
 📊 **Visualizações Avançadas**
+
 - ✅ 3 modos de visualização de alocações (Diário, Semanal, Mensal)
 - ✅ Dashboard financeiro com análises por período
 - ✅ Wizard intuitivo de criação
@@ -57,12 +62,13 @@ docker compose up -d
 
 ### **📚 Documentação Principal:**
 
-| Documento | Descrição |
-|-----------|-----------|
-| 📄 [README.md](#) | Este arquivo - Visão geral completa |
-| 📄 [DOCKER_GUIDE.md](DOCKER_GUIDE.md) | Guia completo Docker Compose (300+ linhas) |
-| 📄 [docs/INDEX.md](docs/INDEX.md) | Índice de toda documentação |
-| 📄 [docs/frontend/REFATORACAO_FRONTEND_RESUMO.md](docs/frontend/REFATORACAO_FRONTEND_RESUMO.md) | Refatoração frontend consolidada |
+| Documento                                                                                       | Descrição                                  |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| 📄 [README.md](#)                                                                               | Este arquivo - Visão geral completa        |
+| 📄 [DOCKER_GUIDE.md](DOCKER_GUIDE.md)                                                           | Guia completo Docker Compose (300+ linhas) |
+| 📄 [docs/INDEX.md](docs/INDEX.md)                                                               | Índice de toda documentação                |
+| 📄 [docs/frontend/REFATORACAO_FRONTEND_RESUMO.md](docs/frontend/REFATORACAO_FRONTEND_RESUMO.md) | Refatoração frontend consolidada           |
+| 📄 [docs/frontend/CHANGELOG_FRONTEND.md](docs/frontend/CHANGELOG_FRONTEND.md)                   | Changelog e roadmap do frontend            |
 
 ---
 
@@ -102,39 +108,40 @@ docker compose up -d
 
 ### **✅ REFATORAÇÃO COMPLETA - BACKEND (5 FASES)**
 
-| Fase | Descrição | Status | Impacto |
-|------|-----------|--------|---------|
-| **FASE 1** | Configurações Operacionais no Condomínio | ✅ | Centralização de dados operacionais |
-| **FASE 2** | Vínculo Funcionário ↔ Contrato Obrigatório | ✅ | 100% funcionários vinculados |
-| **FASE 3** | Cálculo Automático de Salário | ✅ | Salários sempre consistentes |
-| **FASE 4** | Simplificação de PostoDeTrabalho | ✅ | Quantidade calculada do Condomínio |
-| **FASE 5** | Criação em Cascata (Orquestração) | ✅ | **75% menos requests API** |
+| Fase       | Descrição                                  | Status | Impacto                             |
+| ---------- | ------------------------------------------ | ------ | ----------------------------------- |
+| **FASE 1** | Configurações Operacionais no Condomínio   | ✅     | Centralização de dados operacionais |
+| **FASE 2** | Vínculo Funcionário ↔ Contrato Obrigatório | ✅     | 100% funcionários vinculados        |
+| **FASE 3** | Cálculo Automático de Salário              | ✅     | Salários sempre consistentes        |
+| **FASE 4** | Simplificação de PostoDeTrabalho           | ✅     | Quantidade calculada do Condomínio  |
+| **FASE 5** | Criação em Cascata (Orquestração)          | ✅     | **75% menos requests API**          |
 
 ### **✅ REFATORAÇÃO COMPLETA - FRONTEND (5 FASES)**
 
-| Fase | Descrição | Status | Impacto |
-|------|-----------|--------|---------|
-| **FASE 1** | Correções Iniciais (Detail & Forms) | ✅ | Componentes base atualizados |
-| **FASE 2** | Integração com Backend v2.0 | ✅ | Models e enums alinhados |
-| **FASE 3** | **Visualizações de Alocações (3 modos)** | ✅ | **Diário, Semanal, Mensal** |
-| **FASE 4** | Dashboard Avançado de Condomínio | ✅ | Análises financeiras completas |
-| **FASE 5** | Melhorias de UX (Wizard) | ✅ | Cálculos automáticos |
+| Fase       | Descrição                                | Status | Impacto                        |
+| ---------- | ---------------------------------------- | ------ | ------------------------------ |
+| **FASE 1** | Correções Iniciais (Detail & Forms)      | ✅     | Componentes base atualizados   |
+| **FASE 2** | Integração com Backend v2.0              | ✅     | Models e enums alinhados       |
+| **FASE 3** | **Visualizações de Alocações (3 modos)** | ✅     | **Diário, Semanal, Mensal**    |
+| **FASE 4** | Dashboard Avançado de Condomínio         | ✅     | Análises financeiras completas |
+| **FASE 5** | Melhorias de UX (Wizard)                 | ✅     | Cálculos automáticos           |
 
 ### **🐳 INFRAESTRUTURA E CI/CD**
 
-| Recurso | Descrição | Status | Benefício |
-|---------|-----------|--------|-----------|
-| **Docker Compose Completo** | 4 serviços (DB + API + Frontend + Nginx) | ✅ | Ambiente completo em 1 comando |
-| **Hot-Reload Dev** | Backend e Frontend com watch mode | ✅ | Desenvolvimento ágil |
-| **CI/CD GitHub Actions** | Testa Backend + Frontend + Docker | ✅ | Qualidade garantida em PRs |
-| **Nginx Reverse Proxy** | Roteamento `/api` e `/` | ✅ | Arquitetura profissional |
-| **Multi-Stage Dockerfiles** | Build dev e prod separados | ✅ | Otimização de recursos |
+| Recurso                     | Descrição                                | Status | Benefício                      |
+| --------------------------- | ---------------------------------------- | ------ | ------------------------------ |
+| **Docker Compose Completo** | 4 serviços (DB + API + Frontend + Nginx) | ✅     | Ambiente completo em 1 comando |
+| **Hot-Reload Dev**          | Backend e Frontend com watch mode        | ✅     | Desenvolvimento ágil           |
+| **CI/CD GitHub Actions**    | Testa Backend + Frontend + Docker        | ✅     | Qualidade garantida em PRs     |
+| **Nginx Reverse Proxy**     | Roteamento `/api` e `/`                  | ✅     | Arquitetura profissional       |
+| **Multi-Stage Dockerfiles** | Build dev e prod separados               | ✅     | Otimização de recursos         |
 
 ### **📊 NOVA FUNCIONALIDADE: Visualização de Alocações (3 Modos)**
 
 A tela de alocações agora oferece **3 visualizações diferentes** para atender diferentes necessidades:
 
 #### **1. Modo Diário (Lista Detalhada)**
+
 ```
 ┌────────────────────────────────────────┐
 │ 👤 João Silva                          │
@@ -146,13 +153,16 @@ A tela de alocações agora oferece **3 visualizações diferentes** para atende
 │ [Ver] [Editar] [Excluir]              │
 └────────────────────────────────────────┘
 ```
+
 **Recursos:**
+
 - ✅ Filtros: Data início/fim, Condomínio, Funcionário, Status, Tipo
 - ✅ Cards individuais com todas as informações
 - ✅ Ações rápidas (ver, editar, excluir)
 - ✅ Grid responsivo (auto-fill 350px)
 
 #### **2. Modo Semanal (Kanban por Posto)**
+
 ```
 ┌─────────────┬─────────────┬─────────────┬─────────────┐
 │  SEGUNDA    │   TERÇA     │   QUARTA    │   QUINTA    │
@@ -169,7 +179,9 @@ A tela de alocações agora oferece **3 visualizações diferentes** para atende
 │ └─────────┘ │             │             │ └─────────┘ │
 └─────────────┴─────────────┴─────────────┴─────────────┘
 ```
+
 **Recursos:**
+
 - ✅ Organização por **Posto de Trabalho** dentro de cada dia
 - ✅ Condomínio e horário no header do grupo
 - ✅ Funcionários como cards coloridos por status
@@ -177,6 +189,7 @@ A tela de alocações agora oferece **3 visualizações diferentes** para atende
 - ✅ Scroll vertical por coluna
 
 #### **3. Modo Mensal (Calendário com Legenda)**
+
 ```
 ┌────────────────────────────────────────────────────┐
 │                 JANEIRO 2026                       │
@@ -195,7 +208,9 @@ A tela de alocações agora oferece **3 visualizações diferentes** para atende
 
 Status: 🟢 Verde = Confirmada | 🟠 Laranja = Falta | ⚫ Cinza = Cancelada
 ```
+
 **Recursos:**
+
 - ✅ **Números representam funcionários** (legenda lateral)
 - ✅ **Cores por status** (verde, laranja, cinza)
 - ✅ Tooltip mostra nome + status ao passar o mouse
@@ -203,16 +218,26 @@ Status: 🟢 Verde = Confirmada | 🟠 Laranja = Falta | ⚫ Cinza = Cancelada
 - ✅ Células quadradas com aspect-ratio 1:1
 
 **Implementação Técnica:**
+
 ```typescript
 // 12+ Computed Signals para performance otimizada
-viewMode = signal<'daily' | 'weekly' | 'monthly'>('daily');
-alocacoesFiltradas = computed(() => { /* filtros reativos */ });
-weekData = computed(() => { /* estrutura semanal */ });
-monthData = computed(() => { /* 42 células calendário */ });
-funcionariosLegenda = computed(() => { /* mapeamento números */ });
+viewMode = signal<"daily" | "weekly" | "monthly">("daily");
+alocacoesFiltradas = computed(() => {
+  /* filtros reativos */
+});
+weekData = computed(() => {
+  /* estrutura semanal */
+});
+monthData = computed(() => {
+  /* 42 células calendário */
+});
+funcionariosLegenda = computed(() => {
+  /* mapeamento números */
+});
 ```
 
 **Estatísticas de Código:**
+
 - 📄 3 arquivos modificados
 - 📝 1.300+ linhas de código
 - 🎨 600+ linhas de SCSS
@@ -221,6 +246,7 @@ funcionariosLegenda = computed(() => { /* mapeamento números */ });
 ### **🚀 Nova Funcionalidade: Criação em Cascata (Backend + Frontend)**
 
 #### **Backend API**
+
 Agora é possível criar **Condomínio + Contrato + Postos de Trabalho** em uma única operação:
 
 ```http
@@ -250,25 +276,30 @@ Content-Type: application/json
 ```
 
 **Ganhos:**
-- **Antes:** 4 requests (Condomínio → Contrato → Posto 1 → Posto 2)  
-- **Depois:** 1 request  
+
+- **Antes:** 4 requests (Condomínio → Contrato → Posto 1 → Posto 2)
+- **Depois:** 1 request
 - **Redução:** 75% ⬇️
 
 #### **Frontend - Wizard Intuitivo**
+
 Formulário de 3 etapas com validação em tempo real:
 
 **Step 1 - Dados do Condomínio:**
+
 - Nome, CNPJ, Endereço
 - Quantidade de funcionários ideais
 - Horário de troca de turno
 - Email do gestor / Telefone emergência
 
 **Step 2 - Configuração de Postos:**
+
 - Número de postos (1-4)
 - Quantidade de funcionários por posto (calculado automaticamente)
 - Visualização de horários dos turnos
 
 **Step 3 - Dados do Contrato:**
+
 - Período de vigência
 - Valor da diária cobrada
 - Cálculos automáticos:
@@ -277,6 +308,7 @@ Formulário de 3 etapas com validação em tempo real:
   - Lucro estimado
 
 **Benefícios do Wizard:**
+
 - ✅ Validação progressiva (não avança com erros)
 - ✅ Cálculos em tempo real
 - ✅ Indicadores visuais de progresso
@@ -313,13 +345,15 @@ Definimos quatro metas principais:
 ### Arquitetura e Tecnologias
 
 #### **Backend**
+
 - **Stack**: .NET 8, ASP.NET Core, Entity Framework Core + PostgreSQL, Docker/Compose, xUnit.
 - **Estrutura**: `InterceptorSystem.Domain`, `.Application`, `.Infrastructure`, `.Api`, `.Tests` seguindo Clean Architecture.
 - **Multi-tenant**: filtros globais no `ApplicationDbContext` e validação de tenant em cada AppService.
 
 #### **Frontend**
+
 - **Stack**: Angular 21 (standalone components), TypeScript 5.7, SCSS, RxJS.
-- **Estrutura**: 
+- **Estrutura**:
   - `features/`: módulos por funcionalidade (condominios, funcionarios, contratos, etc.)
   - `services/`: camada de comunicação com API
   - `models/`: interfaces TypeScript alinhadas com DTOs do backend
@@ -330,13 +364,13 @@ Definimos quatro metas principais:
 
 ### Casos de uso implementados
 
-| Módulo | Destaques de Regra de Negócio | Cobertura de Testes |
-|--------|-------------------------------|---------------------|
-| Condomínios | CRUD isolado por empresa, validações de CNPJ/ endereço | Integração (Controllers) |
-| Postos de Trabalho | Vínculo 1:N com condomínio, turnos 12h | Unit + Integração |
-| Funcionários | Enums fortes, CPF único, salários positivos | Unit (casos bons e ruins) + Integração |
-| Alocações | Respeita tenant, valida funcionário/posto, bloqueio de dias consecutivos | Unit (múltiplos cenários) + Integração |
-| Contratos | Status enumerado, valores/ datas coerentes | Unit + Integração |
+| Módulo             | Destaques de Regra de Negócio                                            | Cobertura de Testes                    |
+| ------------------ | ------------------------------------------------------------------------ | -------------------------------------- |
+| Condomínios        | CRUD isolado por empresa, validações de CNPJ/ endereço                   | Integração (Controllers)               |
+| Postos de Trabalho | Vínculo 1:N com condomínio, turnos 12h                                   | Unit + Integração                      |
+| Funcionários       | Enums fortes, CPF único, salários positivos                              | Unit (casos bons e ruins) + Integração |
+| Alocações          | Respeita tenant, valida funcionário/posto, bloqueio de dias consecutivos | Unit (múltiplos cenários) + Integração |
+| Contratos          | Status enumerado, valores/ datas coerentes                               | Unit + Integração                      |
 
 ### Qualidade e Documentação
 
@@ -350,28 +384,31 @@ Definimos quatro metas principais:
 ### **✅ Indicadores de Qualidade (Versão 2.0)**
 
 #### **Backend**
-| Métrica | Antes (v1.0) | Depois (v2.0) | Melhoria |
-|---------|--------------|---------------|----------|
-| Requests para criar condomínio completo | 4 | 1 | **75% ↓** |
-| Salários desatualizados | Frequente | Zero | **100% ✅** |
-| Postos criados manualmente | 100% | 0% | **Automático** |
-| Funcionários sem contrato | Possível | Impossível | **Validação** |
-| Cálculos financeiros manuais | Sim | Não | **Automático** |
-| Testes automatizados | 48 | 124 | **+158%** |
+
+| Métrica                                 | Antes (v1.0) | Depois (v2.0) | Melhoria       |
+| --------------------------------------- | ------------ | ------------- | -------------- |
+| Requests para criar condomínio completo | 4            | 1             | **75% ↓**      |
+| Salários desatualizados                 | Frequente    | Zero          | **100% ✅**    |
+| Postos criados manualmente              | 100%         | 0%            | **Automático** |
+| Funcionários sem contrato               | Possível     | Impossível    | **Validação**  |
+| Cálculos financeiros manuais            | Sim          | Não           | **Automático** |
+| Testes automatizados                    | 48           | 124           | **+158%**      |
 
 #### **Frontend**
-| Métrica | Antes | Depois | Melhoria |
-|---------|-------|--------|----------|
-| Cálculos financeiros | ❌ Errados (92% a mais) | ✅ Corretos | **Bug crítico corrigido** |
-| Código para criar condomínio | ~80 linhas | ~20 linhas | **75% ↓** |
-| Validações de formulário | Básicas | Avançadas + Tempo real | **UX melhorada** |
-| Campos calculados automaticamente | 0 | 8+ | **Menos erros** |
-| Dashboard de condomínio | Básico | Análises avançadas | **Insights financeiros** |
-| Responsividade mobile | Parcial | Completa | **100%** |
+
+| Métrica                           | Antes                   | Depois                 | Melhoria                  |
+| --------------------------------- | ----------------------- | ---------------------- | ------------------------- |
+| Cálculos financeiros              | ❌ Errados (92% a mais) | ✅ Corretos            | **Bug crítico corrigido** |
+| Código para criar condomínio      | ~80 linhas              | ~20 linhas             | **75% ↓**                 |
+| Validações de formulário          | Básicas                 | Avançadas + Tempo real | **UX melhorada**          |
+| Campos calculados automaticamente | 0                       | 8+                     | **Menos erros**           |
+| Dashboard de condomínio           | Básico                  | Análises avançadas     | **Insights financeiros**  |
+| Responsividade mobile             | Parcial                 | Completa               | **100%**                  |
 
 ### **🎯 Ganhos Técnicos**
 
 #### **Backend**
+
 - **Confiabilidade**: ✅ **TODAS as regras críticas implementadas e cobertas** por testes unitários/integrados. Sistema detecta e previne inconsistências automaticamente.
 - **Escalabilidade**: ✅ **Arquitetura limpa** facilita adicionar novos módulos sem quebrar validações existentes.
 - **Operacional**: ✅ **Docker Compose** + **README completo** + **payloads documentados** = onboarding rápido.
@@ -379,6 +416,7 @@ Definimos quatro metas principais:
 - **Manutenibilidade**: ✅ **75% menos código** para operações comuns.
 
 #### **Frontend**
+
 - **Correção Crítica**: ✅ **Bug de cálculo financeiro corrigido** (economizando ~R$ 66.000/mês por contrato)
 - **UX Moderna**: ✅ **Wizard intuitivo** com validação progressiva e feedback visual
 - **Automação**: ✅ **Cálculos em tempo real** eliminam erros de digitação
@@ -390,25 +428,30 @@ Definimos quatro metas principais:
 ### **🎯 Regras Implementadas nas 5 Fases**
 
 #### **BACKEND - FASE 1: Configurações Operacionais** ✅
+
 - Condomínio centraliza: quantidade ideal de funcionários, horário de troca de turno, email do gestor
 - Criação automática de postos baseada nessas configurações
 
 #### **BACKEND - FASE 2: Vínculo Funcionário ↔ Contrato** ✅
+
 - Todo funcionário vinculado a contrato vigente
 - Validação automática de contrato expirado
 
 #### **BACKEND - FASE 3: Cálculo Automático de Salário** ✅
+
 - `SalarioBase` = `ValorTotalContrato` / `QuantidadeFuncionarios`
 - `AdicionalNoturno` = `SalarioBase` × `PercentualAdicionalNoturno`
 - `Beneficios` = `ValorBeneficiosContrato` / `QuantidadeFuncionarios`
 - `SalarioTotal` = `SalarioBase` + `AdicionalNoturno` + `Beneficios`
 
 #### **BACKEND - FASE 4: Simplificação de PostoDeTrabalho** ✅
+
 - `QuantidadeIdealFuncionarios` agora é propriedade calculada:
   - `QuantidadeIdeal` = `Condominio.QuantidadeFuncionariosIdeal` / `TotalPostos`
 - Redução de duplicação de dados
 
 #### **BACKEND - FASE 5: Criação em Cascata** ✅
+
 - Endpoint `/api/condominios-completos` orquestra criação completa
 - Validações automáticas de consistência
 - Cálculo automático de horários de turnos
@@ -416,7 +459,9 @@ Definimos quatro metas principais:
 ---
 
 #### **FRONTEND - FASE 1: Wizard de Criação** ✅
+
 **Implementações:**
+
 - Wizard de 3 steps com navegação progressiva
 - Step 1: Dados básicos do condomínio (nome, CNPJ, endereço)
 - Step 2: Configurações operacionais (funcionários, horário, postos)
@@ -426,6 +471,7 @@ Definimos quatro metas principais:
 - Indicador de progresso (Step 1/3)
 
 **Ganhos:**
+
 - ✅ UX intuitiva (não precisa conhecer a API)
 - ✅ Validação progressiva (detecta erros antes de enviar)
 - ✅ Campos auto-calculados (menos digitação)
@@ -433,9 +479,11 @@ Definimos quatro metas principais:
 ---
 
 #### **FRONTEND - FASE 2: Atualização de Models** ✅
+
 **Implementações:**
+
 - Models alinhados com enums do backend:
-  - `StatusContrato`: PAGO, PENDENTE, ATIVO, FINALIZADO
+  - `StatusContrato`: ATIVO, PENDENTE, FINALIZADO
   - `StatusFuncionario`: ATIVO, FERIAS, AFASTADO, DEMITIDO
   - `TipoEscala`: DOZE_POR_TRINTA_SEIS, SEIS_POR_UM
   - `TipoFuncionario`: CLT, TERCEIRIZADO, FREELANCE
@@ -448,6 +496,7 @@ Definimos quatro metas principais:
 - Services adaptados para novos endpoints
 
 **Ganhos:**
+
 - ✅ 100% consistência com backend
 - ✅ Autocomplete TypeScript funciona perfeitamente
 - ✅ Erros de tipo detectados em build time
@@ -455,7 +504,9 @@ Definimos quatro metas principais:
 ---
 
 #### **FRONTEND - FASE 3: Correção de Cálculos** ✅
+
 **Problema Corrigido:**
+
 ```typescript
 // ❌ ANTES - Fórmula errada (juros compostos)
 calcularValorTotal(): number {
@@ -474,6 +525,7 @@ this.contratoCalculosService.calcular(dados).subscribe(resultado => {
 ```
 
 **Fórmula Correta Implementada no Backend:**
+
 ```
 custoBase = (diária × 30 × funcionários) + benefícios
 somaMargens = impostos + lucro + faltas
@@ -481,6 +533,7 @@ valorTotal = custoBase / (1 - somaMargens)
 ```
 
 **Ganhos:**
+
 - ✅ **Economia de ~R$ 66.000/mês por contrato**
 - ✅ Cálculos financeiros 100% corretos
 - ✅ Frontend não precisa replicar lógica complexa
@@ -488,7 +541,9 @@ valorTotal = custoBase / (1 - somaMargens)
 ---
 
 #### **FRONTEND - FASE 4: Dashboard Avançado** ✅
+
 **Implementações:**
+
 - Filtros de período: Mensal, Trimestral, Semestral, Anual
 - Cards de resumo financeiro:
   - Faturamento total do período
@@ -513,6 +568,7 @@ valorTotal = custoBase / (1 - somaMargens)
   - Taxa de faltas por posto
 
 **Ganhos:**
+
 - ✅ Visão gerencial completa
 - ✅ Tomada de decisão baseada em dados
 - ✅ Identificação rápida de problemas (ex: muitas faltas)
@@ -520,26 +576,31 @@ valorTotal = custoBase / (1 - somaMargens)
 ---
 
 #### **FRONTEND - FASE 5: Formulários Automatizados** ✅
+
 **Implementações:**
 
 **Condomínio:**
+
 - Máscara para CNPJ/telefone
 - Validação de CNPJ
 - Cálculo automático de quantidade total de funcionários
 - Preview de horários dos postos
 
 **Funcionário:**
+
 - Seleção de contrato vigente (filtrado automaticamente)
 - Campos de salário/benefícios **somente leitura** (calculados via API)
 - Validação de CPF
 - Máscara para celular
 
 **Posto de Trabalho:**
+
 - Importação automática do `horarioTrocaTurno` do condomínio
 - Cálculo automático de `horarioFim` (inicio + 12h)
 - Preview da quantidade ideal de funcionários
 
 **Contrato:**
+
 - Cálculo em tempo real de:
   - Faturamento mensal
   - Custo operacional
@@ -548,29 +609,38 @@ valorTotal = custoBase / (1 - somaMargens)
 - Validação de período (não permite datas no passado)
 
 **Ganhos:**
+
 - ✅ **90% menos erros de digitação**
 - ✅ Formulários guiados (usuário sabe o que preencher)
 - ✅ Feedback instantâneo de validação
 
 **Próximos passos sugeridos**:
-  1. ✅ ~~Implementar regras críticas de alocação e contrato~~ **CONCLUÍDO** 
-  2. ✅ ~~Refatoração de domínio (5 fases - Backend)~~ **CONCLUÍDO**
-  3. ✅ ~~Refatoração completa do Frontend (5 fases)~~ **CONCLUÍDO**
-  4. ✅ ~~Correção de bug crítico de cálculo financeiro~~ **CONCLUÍDO**
-  5. ✅ ~~Implementar Dashboard avançado~~ **CONCLUÍDO**
-  6. ⏳ Deploy em ambiente de staging (próximo passo)
-  7. ⏳ Automatizar migrations em pipeline CI/CD
-  8. ⏳ Implementar observabilidade (logs estruturados + métricas)
-  9. 📋 Testes E2E com Playwright/Cypress
-  10. 📋 Expor APIs públicas com autenticação JWT e rate limiting
-  11. 📋 Notificações por email/SMS (contratos vencendo, faltas, etc.)
-  12. 📋 Relatórios em PDF (contratos, escalas, folha de pagamento)
+
+1. ✅ ~~Implementar regras críticas de alocação e contrato~~ **CONCLUÍDO**
+2. ✅ ~~Refatoração de domínio (5 fases - Backend)~~ **CONCLUÍDO**
+3. ✅ ~~Refatoração completa do Frontend (5 fases)~~ **CONCLUÍDO**
+4. ✅ ~~Correção de bug crítico de cálculo financeiro~~ **CONCLUÍDO**
+5. ✅ ~~Implementar Dashboard avançado~~ **CONCLUÍDO**
+6. ⏳ Formulário: criar todas as alocações automaticamente quando adicionar um funcionário a um **posto de trabalho único**
+7. ⏳ Corrigir o **wizard** (UX, validações e consistência fim-a-fim)
+8. ⏳ Corrigir a **lista de postos de trabalho**
+9. ⏳ Arrumar **details** e a **página principal** para exibir dados **precisos e importantes**
+10. ⏳ Subir na nuvem (AWS / GCP / Azure)
+11. ⏳ Criar acesso da API via **WhatsApp**
+12. ⏳ Implementar **sistema de login**
+13. ⏳ Implementar **gerenciamento de assinatura e contas**
+14. ⏳ Automatizar migrations em pipeline CI/CD
+15. ⏳ Implementar observabilidade (logs estruturados + métricas)
+16. 📋 Testes E2E com Playwright/Cypress
+17. 📋 Notificações por email/SMS (contratos vencendo, faltas, etc.)
+18. 📋 Relatórios em PDF (contratos, escalas, folha de pagamento)
 
 ---
 
 ## 🎨 Melhorias Visuais do Frontend
 
 ### **Design System Customizado**
+
 - **Paleta de Cores:**
   - Light Mode: Tons bege/marrom (#d2b48c, #8b7355)
   - Dark Mode: Tons cinza escuro (#1a1a1a, #2d2d2d)
@@ -583,6 +653,7 @@ valorTotal = custoBase / (1 - somaMargens)
   - Formulários com validação visual instantânea
 
 ### **Funcionalidades de UX**
+
 - **Dark Mode:** Toggle no navbar com persistência em localStorage
 - **Feedback Visual:**
   - Spinners durante carregamento
@@ -599,6 +670,7 @@ valorTotal = custoBase / (1 - somaMargens)
   - Cards empilhados em telas pequenas
 
 ### **Wizard de Criação**
+
 ```
 ┌────────────────────────────────────────┐
 │  [1] Dados Básicos  →  [2] Postos  →  [3] Contrato  │
@@ -618,6 +690,7 @@ valorTotal = custoBase / (1 - somaMargens)
 ```
 
 ### **Dashboard Financeiro**
+
 ```
 ┌─────────────────────────────────────────────┐
 │  📊 Dashboard - Residencial Estrela         │
@@ -642,6 +715,7 @@ valorTotal = custoBase / (1 - somaMargens)
 ## 📚 Documentação
 
 ### **Backend (API .NET)**
+
 - [📋 Plano de Refatoração - 5 Fases](docs/backend/PLANO_REFATORACAO.md)
 - [✅ FASE 1: Configurações Operacionais](docs/backend/FASE_1_CONFIGURACOES_OPERACIONAIS.md)
 - [✅ FASE 2: Vínculo Funcionário ↔ Contrato](docs/backend/FASE_2_VINCULO_CONTRATO.md)
@@ -650,14 +724,17 @@ valorTotal = custoBase / (1 - somaMargens)
 - [✅ FASE 5: Criação em Cascata](docs/backend/FASE_5_CRIACAO_CASCATA.md)
 
 ### **Frontend (Angular 21)**
-- [📋 Plano de Refatoração Frontend](docs/frontend/PLANO_REFATORACAO_FRONTEND.md)
-- [✅ FASE 1: Wizard de Criação](docs/frontend/FASE_1_WIZARD.md)
-- [✅ FASE 2: Atualização de Models](docs/frontend/FASE_2_MODELS.md)
-- [✅ FASE 3: Correção de Cálculos](docs/frontend/FASE_3_CALCULOS.md)
-- [✅ FASE 4: Dashboard Avançado](docs/frontend/FASE_4_DASHBOARD_AVANCADO_CONCLUIDO.md)
-- [✅ FASE 5: Formulários Automatizados](docs/frontend/FASE_5_MELHORIAS_FORMULARIO.md)
+
+- [📄 Refatoração Frontend (Resumo Consolidado)](docs/frontend/REFATORACAO_FRONTEND_RESUMO.md)
+- [📄 Changelog do Frontend](docs/frontend/CHANGELOG_FRONTEND.md)
+- [🎯 Correção: Botão Cadastrar Funcionário + Endpoint Batch de Alocações](docs/frontend/CORRECAO_BOTAO_CADASTRAR_BATCH.md)
+- [🔧 Correção: Cálculo de Salário do Funcionário](docs/frontend/CORRECAO_CALCULO_SALARIO.md)
+- [✅ Refatoração: Formulário de Funcionário](docs/frontend/FUNCIONARIO_FORM_REFATORACAO.md)
+- [✅ Wizard: Correções Finais](docs/frontend/WIZARD_CORRECOES_FINAIS.md)
+- [🧭 Wizard: Navegação Livre com Validação](docs/frontend/WIZARD_NAVEGACAO_LIVRE.md)
 
 ### **Guias de Refatoração**
+
 - [📖 Guia Completo - 5 Fases](docs/refatoracao/GUIA_REFATORACAO_COMPLETO.md)
 - [🔧 Tutorial de Testes](docs/frontend/GUIA_TESTE_FORMULARIOS.md)
 - [🎨 Tutorial Visual - Wizard](docs/frontend/FASE_5_TUTORIAL_VISUAL.md)
@@ -667,9 +744,11 @@ valorTotal = custoBase / (1 - somaMargens)
 ## Cenários e Regras de Negócio das Entidades
 
 ### Condomínio (Agregado Raiz)
+
 **Atributos Obrigatórios**: `Nome`, `CNPJ`, `EmpresaId`, `QuantidadeFuncionariosIdeal`, `HorarioTrocaTurno`
 
 **Regras de Negócio**:
+
 - ✅ **Unicidade de CNPJ por empresa**: Não pode haver dois condomínios com o mesmo CNPJ na mesma empresa
 - ✅ **Multi-tenant**: Todos os condomínios são isolados por `EmpresaId`
 - ✅ **Configurações Operacionais (FASE 1)**:
@@ -680,6 +759,7 @@ valorTotal = custoBase / (1 - somaMargens)
 - ✅ **Base para criação automática de postos**: Horário de troca define turnos
 
 **Cenários de Teste**:
+
 ```
 ✅ Criar condomínio com 12 funcionários ideais → Status 201
 ✅ Criar condomínio com horário de troca 06:00 → Postos criados automaticamente
@@ -690,9 +770,11 @@ valorTotal = custoBase / (1 - somaMargens)
 ---
 
 ### PostoDeTrabalho
+
 **Atributos Obrigatórios**: `CondominioId`, `HorarioInicio`, `HorarioFim`
 
 **Regras de Negócio**:
+
 - ✅ **Relação 1:N com Condomínio**: Posto sempre vinculado a um condomínio
 - ✅ **Turnos de 12 horas**: Diferença entre `HorarioInicio` e `HorarioFim` deve ser exatamente 12 horas
 - ✅ **Respeito ao tenant**: Posto só pode ser criado em condomínio da mesma empresa
@@ -702,9 +784,10 @@ valorTotal = custoBase / (1 - somaMargens)
 - ✅ **Criação automática**: Postos criados automaticamente via endpoint `/api/condominios-completos`
 
 **Cenários de Teste**:
+
 ```
 ✅ Posto 06:00-18:00 → Criado com sucesso (QuantidadeIdeal calculado automaticamente)
-✅ Posto 18:00-06:00 (madrugada) → Criado com sucesso  
+✅ Posto 18:00-06:00 (madrugada) → Criado com sucesso
 ❌ Posto 08:00-16:00 (8h) → Exceção: "Diferença deve ser de 12 horas"
 ❌ Posto em condomínio de outra empresa → KeyNotFoundException
 ```
@@ -712,12 +795,14 @@ valorTotal = custoBase / (1 - somaMargens)
 ---
 
 ### Funcionário
+
 **Atributos Obrigatórios**: `Nome`, `CPF`, `CondominioId`, `ContratoId`, `StatusFuncionario`, `TipoEscala`, `TipoFuncionario`
 
 **Regras de Negócio**:
+
 - ✅ **CPF único no sistema**: Não pode haver dois funcionários com mesmo CPF
 - ✅ **FASE 2 - Vínculo com Contrato**: Todo funcionário deve estar vinculado a um contrato vigente
-  - Validação automática: contrato deve existir e estar com status `PAGO`
+  - Validação automática: contrato deve existir e estar com status `ATIVO`
   - Contrato não pode estar expirado (`DataFim` >= hoje)
 - ✅ **FASE 3 - Salários Calculados Automaticamente**:
   - `SalarioBase` = `Contrato.ValorTotalMensal` / `Contrato.QuantidadeFuncionarios`
@@ -728,12 +813,13 @@ valorTotal = custoBase / (1 - somaMargens)
 - ✅ **Vinculação a condomínio**: Funcionário pertence a um condomínio específico
 
 **Cenários de Teste**:
+
 ```
 ✅ Funcionário ATIVO com contrato vigente → Criado com sucesso (salário calculado automaticamente)
 ❌ CPF duplicado → Exceção: "CPF já cadastrado"
 ❌ Contrato inexistente → Exceção: "Contrato não encontrado"
 ❌ Contrato expirado → Exceção: "Contrato expirado"
-❌ Contrato não-vigente (PENDENTE/INATIVO) → Exceção: "Contrato não está vigente"
+❌ Contrato não-vigente (PENDENTE/FINALIZADO) → Exceção: "Contrato não está vigente"
 ✅ Atualizar status para AFASTADO → Permitido
 ✅ Salário recalculado quando contrato é atualizado → Sempre consistente
 ```
@@ -741,9 +827,11 @@ valorTotal = custoBase / (1 - somaMargens)
 ---
 
 ### Alocação (Regras Críticas de Escalação)
+
 **Atributos Obrigatórios**: `FuncionarioId`, `PostoDeTrabalhoId`, `Data`, `TipoAlocacao`, `StatusAlocacao`
 
 **Regras de Negócio**:
+
 - ✅ **Funcionário e posto do mesmo condomínio**: Validação de consistência de empresa
 - ✅ **UMA alocação por funcionário por vez**: Funcionário não pode ter duas alocações simultâneas
 - ✅ **Bloqueio de dias consecutivos**: Não permitir alocações em dias seguidos, **EXCETO** `DOBRA_PROGRAMADA`
@@ -751,6 +839,7 @@ valorTotal = custoBase / (1 - somaMargens)
 - ✅ **Status controlado**: `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`
 
 **Cenários Críticos**:
+
 ```
 ✅ Alocação REGULAR 2026-01-10 → Criada com sucesso
 ❌ Mesma pessoa 2026-01-10 e 2026-01-11 REGULAR → Exceção: "Não é permitido duas alocações em dias consecutivos"
@@ -763,35 +852,40 @@ valorTotal = custoBase / (1 - somaMargens)
 ---
 
 ### Contrato
+
 **Atributos Obrigatórios**: `CondominioId`, `ValorTotalMensal`, `DataInicio`, `DataFim`, `Status`, `QuantidadeFuncionarios`
 
 **Regras de Negócio**:
-- ✅ **Um contrato vigente por condomínio**: Não pode haver dois contratos `PAGO` ou `PENDENTE` para o mesmo condomínio simultaneamente
+
+- ✅ **Um contrato vigente por condomínio**: Não pode haver dois contratos `ATIVO` ou `PENDENTE` para o mesmo condomínio simultaneamente
 - ✅ **Auto-finalização**: contratos com `DataFim` vencida são automaticamente marcados como `FINALIZADO`
 - ✅ **Período válido**: `DataFim` > `DataInicio`
 - ✅ **Valores positivos**: Todos os valores financeiros devem ser ≥ 0
-- ✅ **Status controlado**: `PAGO`, `PENDENTE`, `FINALIZADO`, `INATIVO`
+- ✅ **Status controlado**: `ATIVO`, `PENDENTE`, `FINALIZADO`
 - ✅ **Cálculo automático**: Base de 30 dias/mês para cálculos de diárias
 
 **Cenários Críticos**:
+
 ```
 ✅ Contrato 2026-01-01 a 2026-12-31 status PENDENTE → Criado
-❌ Segundo contrato mesmo condomínio status PAGO → Exceção: "Já existe contrato vigente para este condomínio"
-✅ Contrato INATIVO + novo contrato PAGO → Permitido (anterior não está vigente)
+❌ Segundo contrato mesmo condomínio status ATIVO → Exceção: "Já existe contrato vigente para este condomínio"
+✅ Contrato FINALIZADO + novo contrato ATIVO → Permitido (anterior não está vigente)
 ❌ DataFim < DataInicio → Validação falha
-✅ Transição PENDENTE → PAGO → Permitido
-✅ Transição PAGO → INATIVO → Permitido (encerramento)
+✅ Transição PENDENTE → ATIVO → Permitido
+✅ Transição ATIVO → FINALIZADO → Permitido (encerramento)
 ✅ Contrato expirado automaticamente marcado como FINALIZADO → Não bloqueia novo contrato
 ```
 
 ---
 
 ### 🚀 Criação em Cascata (FASE 5)
+
 **Endpoint**: `POST /api/condominios-completos`
 
 **Objetivo**: Criar Condomínio, Contrato e Postos de Trabalho em uma única operação.
 
 **Regras de Negócio**:
+
 - ✅ **Validação de Consistência**: `Condominio.QuantidadeFuncionariosIdeal` == `Contrato.QuantidadeFuncionarios`
 - ✅ **Validação de Divisibilidade**: Quantidade de funcionários deve ser divisível pelo número de postos
 - ✅ **Validação de Datas**: Data de início do contrato não pode ser no passado
@@ -802,6 +896,7 @@ valorTotal = custoBase / (1 - somaMargens)
 - ✅ **Endpoint de Validação**: `POST /api/condominios-completos/validar` (dry-run)
 
 **Exemplo de Request**:
+
 ```json
 {
   "condominio": {
@@ -815,7 +910,7 @@ valorTotal = custoBase / (1 - somaMargens)
   },
   "contrato": {
     "descricao": "Contrato 2026",
-    "valorTotalMensal": 36000.00,
+    "valorTotalMensal": 36000.0,
     "quantidadeFuncionarios": 12,
     "dataInicio": "2026-01-10",
     "dataFim": "2026-12-31"
@@ -826,6 +921,7 @@ valorTotal = custoBase / (1 - somaMargens)
 ```
 
 **Cenários de Teste**:
+
 ```
 ✅ Criar condomínio completo (1 request) → Condomínio + Contrato + 2 Postos criados
 ✅ Validar dados antes de criar → Status 200 (válido) ou 400 (inválido)
@@ -836,6 +932,7 @@ valorTotal = custoBase / (1 - somaMargens)
 ```
 
 **Benefícios**:
+
 - 📉 **75% menos requests** (de 4 para 1)
 - 🎯 **Validações centralizadas** (consistência garantida)
 - ⚡ **Cálculo automático de horários** (sem lógica no frontend)
@@ -880,16 +977,17 @@ Network: interceptor-network (bridge)
 
 ### **4 Serviços Configurados**
 
-| Serviço | Container | Porta | Descrição |
-|---------|-----------|-------|-----------|
-| **PostgreSQL** | `interceptor_db` | 5432 | Banco de dados relacional |
-| **API .NET** | `interceptor_api` | 8080 | Backend ASP.NET Core |
-| **Frontend** | `interceptor_frontend` | 80/4200 | Angular 18 (prod/dev) |
-| **Nginx** | `interceptor_nginx` | 80 | Reverse proxy e load balancer |
+| Serviço        | Container              | Porta   | Descrição                     |
+| -------------- | ---------------------- | ------- | ----------------------------- |
+| **PostgreSQL** | `interceptor_db`       | 5432    | Banco de dados relacional     |
+| **API .NET**   | `interceptor_api`      | 8080    | Backend ASP.NET Core          |
+| **Frontend**   | `interceptor_frontend` | 80/4200 | Angular 18 (prod/dev)         |
+| **Nginx**      | `interceptor_nginx`    | 80      | Reverse proxy e load balancer |
 
 ### **🚀 Como Usar**
 
 #### **1. Configurar Ambiente**
+
 ```bash
 # Copiar template de variáveis
 cp .env.example .env
@@ -899,6 +997,7 @@ nano .env
 ```
 
 #### **2. Subir Aplicação Completa**
+
 ```bash
 cd backend/src
 
@@ -914,6 +1013,7 @@ docker compose logs -f frontend
 ```
 
 #### **3. Acessar Aplicação**
+
 - **Frontend:** http://localhost
 - **API (via Nginx):** http://localhost/api
 - **Swagger:** http://localhost/swagger
@@ -924,11 +1024,13 @@ docker compose logs -f frontend
 Quando você roda `docker compose up`, automaticamente:
 
 **Backend (.NET):**
+
 - ✅ `dotnet watch run` detecta mudanças e recompila
 - ✅ Volume montado: código local → `/src` no container
 - ✅ Sem necessidade de rebuild manual
 
 **Frontend (Angular):**
+
 - ✅ `npm start` com polling file watcher
 - ✅ Volume montado: código local → `/app` no container
 - ✅ Hot Module Replacement (HMR) ativo
@@ -976,6 +1078,7 @@ docker compose exec db psql -U admin -d interceptor_db
 ### **📚 Documentação Completa**
 
 Para guia detalhado com troubleshooting e best practices:
+
 - 📄 **`/DOCKER_GUIDE.md`** (guia completo de 300+ linhas)
 
 ---
@@ -1016,6 +1119,7 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 ### **3 Jobs Configurados**
 
 #### **1. Backend (.NET 8)**
+
 ```yaml
 # .github/workflows/ci.yml
 - Checkout code
@@ -1027,6 +1131,7 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 ```
 
 **O que é testado:**
+
 - ✅ Compilação sem erros
 - ✅ Testes unitários (regras de negócio)
 - ✅ Testes de integração (controllers + database)
@@ -1034,6 +1139,7 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 - ✅ Migrations aplicáveis
 
 #### **2. Frontend (Angular 18)**
+
 ```yaml
 # .github/workflows/ci.yml
 - Checkout code
@@ -1046,6 +1152,7 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 ```
 
 **O que é testado:**
+
 - ✅ Compilação sem erros TypeScript
 - ✅ Build de produção passa
 - ✅ Sem warnings ESLint
@@ -1053,6 +1160,7 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 - ✅ Artefatos gerados corretamente
 
 #### **3. Docker Build**
+
 ```yaml
 # .github/workflows/ci.yml
 - Checkout code
@@ -1061,6 +1169,7 @@ Toda vez que você faz um **Pull Request** ou **Push** para a branch `main`, o G
 ```
 
 **O que é testado:**
+
 - ✅ Dockerfiles fazem build sem erros
 - ✅ docker compose.yaml válido
 - ✅ Multi-stage builds funcionam
@@ -1072,7 +1181,7 @@ Quando você abre um PR, verá badges como:
 
 ```
 ✅ Backend Build - Passing
-✅ Frontend Build - Passing  
+✅ Frontend Build - Passing
 ✅ Docker Build - Passing
 ✅ All checks passed ✓
 ```
@@ -1094,7 +1203,7 @@ Docker:   Build OK   | Images válidas
 cd backend/src
 dotnet test
 
-# Frontend  
+# Frontend
 cd frontend
 npm run build -- --configuration=production
 npm run lint
@@ -1107,6 +1216,7 @@ docker compose build
 ### **📚 Arquivo de Configuração**
 
 Veja o pipeline completo em:
+
 - 📄 **`.github/workflows/ci.yml`**
 
 ---
@@ -1114,39 +1224,50 @@ Veja o pipeline completo em:
 ## ❓ FAQ - Perguntas Frequentes
 
 ### **1. Por que refatorar em 5 fases ao invés de tudo de uma vez?**
+
 **R:** Refatoração incremental permite:
+
 - ✅ Validar cada mudança isoladamente
 - ✅ Manter o sistema funcionando durante a refatoração
 - ✅ Facilitar code review e testes
 - ✅ Reduzir riscos de regressão
 
 ### **2. Como funcionam os salários calculados automaticamente?**
+
 **R:** Os salários não são mais campos persistidos. São propriedades calculadas em tempo real:
+
 ```csharp
 SalarioBase = Contrato.ValorTotalMensal / Contrato.QuantidadeFuncionarios
 AdicionalNoturno = SalarioBase × PercentualAdicionalNoturno (se escala 12x36)
 Beneficios = Contrato.ValorBeneficiosExtrasMensal / QuantidadeFuncionarios
 SalarioTotal = SalarioBase + AdicionalNoturno + Beneficios
 ```
+
 **Benefício:** Quando o contrato muda, todos os salários são atualizados automaticamente.
 
 ### **3. O que acontece se eu tentar criar dois contratos vigentes para o mesmo condomínio?**
+
 **R:** O sistema bloqueia com exceção: `"Já existe um contrato vigente para este condomínio"`.  
 Contratos com status `FINALIZADO` ou `INATIVO` não contam como vigentes.
 
 ### **4. Posso criar um posto de trabalho com turno de 8 horas?**
+
 **R:** Não. A regra de negócio exige **exatamente 12 horas** de diferença entre `HorarioInicio` e `HorarioFim`.  
 Isso garante que o dia seja coberto por 2 postos (ex: 06:00-18:00 e 18:00-06:00).
 
 ### **5. Como funciona o bloqueio de alocações consecutivas?**
+
 **R:**
+
 - ✅ **Permitido:** Alocação REGULAR dia 10 + dia 12 (tem folga no dia 11)
 - ❌ **Bloqueado:** Alocação REGULAR dia 10 + dia 11 (dias consecutivos)
 - ✅ **Exceção:** Alocação REGULAR dia 10 + DOBRA_PROGRAMADA dia 11
 - ❌ **Bloqueado:** Após DOBRA_PROGRAMADA, funcionário DEVE descansar no dia seguinte
 
 ### **6. Qual a diferença entre funcionário CLT, TERCEIRIZADO e FREELANCE?**
+
 **R:**
+
 - **CLT:** Contratado pela empresa, tem todos os benefícios, escala fixa
 - **TERCEIRIZADO:** Contratado por empresa parceira, empresa paga à parceira
 - **FREELANCE:** Trabalha por diária/plantão, sem vínculo empregatício
@@ -1154,27 +1275,36 @@ Isso garante que o dia seja coberto por 2 postos (ex: 06:00-18:00 e 18:00-06:00)
 Todos os tipos passam pelas mesmas validações de alocação.
 
 ### **7. Como o multi-tenant garante isolamento dos dados?**
+
 **R:** Cada requisição carrega um `TenantId` via `ICurrentTenantService`. O `ApplicationDbContext` aplica filtros globais:
+
 ```csharp
 builder.HasQueryFilter(e => e.EmpresaId == _currentTenantService.TenantId);
 ```
+
 Isso garante que TODAS as queries só retornem dados da empresa atual.
 
 ### **8. O que é a criação em cascata e quando devo usá-la?**
+
 **R:** Endpoint `/api/condominios-completos` que cria Condomínio + Contrato + Postos em 1 request.  
 **Use quando:** Está configurando um condomínio novo pela primeira vez.  
 **Não use quando:** Já tem condomínio e quer só adicionar um posto novo.
 
 ### **9. Como faço para migrar dados antigos para o novo formato?**
+
 **R:** Execute as migrations na ordem:
+
 ```bash
 dotnet ef migrations list  # Ver migrations disponíveis
 dotnet ef database update  # Aplicar todas pendentes
 ```
+
 Dados antigos são migrados automaticamente pelas migrations.
 
 ### **10. O wizard do frontend é obrigatório ou posso usar os formulários separados?**
+
 **R:** O wizard é opcional e recomendado para criação inicial. Você pode:
+
 - ✅ Usar wizard para setup completo
 - ✅ Usar formulários individuais para edições/adições
 - ✅ Usar diretamente a API via cURL/Postman
@@ -1183,18 +1313,19 @@ Dados antigos são migrados automaticamente pelas migrations.
 
 ## Cenários e Regras de Negócio das Entidades
 
-| Entidade | Validação Principal | Exceção/Status |
-|----------|-------------------|----------------|
-| Condomínio | CNPJ único por empresa + Configs operacionais | `InvalidOperationException` |
-| PostoDeTrabalho | Turnos de 12h exatas + Quantidade calculada | `ArgumentException` |
-| Funcionário | CPF único + Vínculo com contrato vigente | `InvalidOperationException` |
-| Alocação | Dias consecutivos + alocação simultânea + descanso pós-dobra | `InvalidOperationException` |
-| Contrato | ✅ Um vigente por condomínio + auto-finalização | `InvalidOperationException` |
-| **Criação Cascata** | **Consistência + Divisibilidade + Datas válidas** | `InvalidOperationException` |
+| Entidade            | Validação Principal                                          | Exceção/Status              |
+| ------------------- | ------------------------------------------------------------ | --------------------------- |
+| Condomínio          | CNPJ único por empresa + Configs operacionais                | `InvalidOperationException` |
+| PostoDeTrabalho     | Turnos de 12h exatas + Quantidade calculada                  | `ArgumentException`         |
+| Funcionário         | CPF único + Vínculo com contrato vigente                     | `InvalidOperationException` |
+| Alocação            | Dias consecutivos + alocação simultânea + descanso pós-dobra | `InvalidOperationException` |
+| Contrato            | ✅ Um vigente por condomínio + auto-finalização              | `InvalidOperationException` |
+| **Criação Cascata** | **Consistência + Divisibilidade + Datas válidas**            | `InvalidOperationException` |
 
 ## Como executar
 
 ### **Opção 1: Docker Compose (Recomendado)**
+
 ```bash
 # Clone o repositório
 cd /home/jpcalsavara/projetos/andamento/InterceptorSystem
@@ -1215,6 +1346,7 @@ docker compose up --build
 ### **Opção 2: Desenvolvimento Local**
 
 #### **Backend (.NET)**
+
 ```bash
 # Restaurar pacotes
 cd src
@@ -1239,17 +1371,19 @@ dotnet run
 ## 🛠️ Tecnologias e Ferramentas
 
 ### **Backend**
-| Tecnologia | Versão | Uso |
-|------------|--------|-----|
-| **.NET** | 8.0 | Framework principal |
-| **ASP.NET Core** | 8.0 | Web API |
-| **Entity Framework Core** | 8.0 | ORM para PostgreSQL |
-| **PostgreSQL** | 15 | Banco de dados relacional |
-| **xUnit** | 2.6+ | Framework de testes |
-| **Docker** | 24+ | Containerização |
-| **Nginx** | Alpine | Reverse proxy |
+
+| Tecnologia                | Versão | Uso                       |
+| ------------------------- | ------ | ------------------------- |
+| **.NET**                  | 8.0    | Framework principal       |
+| **ASP.NET Core**          | 8.0    | Web API                   |
+| **Entity Framework Core** | 8.0    | ORM para PostgreSQL       |
+| **PostgreSQL**            | 15     | Banco de dados relacional |
+| **xUnit**                 | 2.6+   | Framework de testes       |
+| **Docker**                | 24+    | Containerização           |
+| **Nginx**                 | Alpine | Reverse proxy             |
 
 **Pacotes NuGet Principais:**
+
 - `Npgsql.EntityFrameworkCore.PostgreSQL` - Provider PostgreSQL
 - `Microsoft.EntityFrameworkCore.Design` - Migrations
 - `Swashbuckle.AspNetCore` - Swagger/OpenAPI
@@ -1257,16 +1391,18 @@ dotnet run
 - `Microsoft.AspNetCore.Mvc.Testing` - Testes de integração
 
 ### **Frontend**
-| Tecnologia | Versão | Uso |
-|------------|--------|-----|
-| **Angular** | 18 | Framework SPA |
-| **TypeScript** | 5.7 | Linguagem tipada |
-| **RxJS** | 7.8+ | Programação reativa |
-| **SCSS** | - | Pré-processador CSS |
-| **Node.js** | 20 LTS | Runtime JavaScript |
-| **npm** | 10+ | Gerenciador de pacotes |
+
+| Tecnologia     | Versão | Uso                    |
+| -------------- | ------ | ---------------------- |
+| **Angular**    | 18     | Framework SPA          |
+| **TypeScript** | 5.7    | Linguagem tipada       |
+| **RxJS**       | 7.8+   | Programação reativa    |
+| **SCSS**       | -      | Pré-processador CSS    |
+| **Node.js**    | 20 LTS | Runtime JavaScript     |
+| **npm**        | 10+    | Gerenciador de pacotes |
 
 **Pacotes npm Principais:**
+
 - `@angular/core` - Core do Angular
 - `@angular/forms` - Reactive Forms
 - `@angular/router` - Roteamento
@@ -1274,15 +1410,17 @@ dotnet run
 - `rxjs` - Observables e operadores
 
 ### **DevOps & Infraestrutura**
-| Ferramenta | Versão | Uso |
-|------------|--------|-----|
-| **Docker Compose** | 2.x | Orquestração de containers |
-| **GitHub Actions** | - | CI/CD pipeline |
-| **Git** | 2.x+ | Controle de versão |
-| **VS Code** | Latest | IDE (opcional) |
-| **JetBrains Rider** | 2024+ | IDE (opcional) |
+
+| Ferramenta          | Versão | Uso                        |
+| ------------------- | ------ | -------------------------- |
+| **Docker Compose**  | 2.x    | Orquestração de containers |
+| **GitHub Actions**  | -      | CI/CD pipeline             |
+| **Git**             | 2.x+   | Controle de versão         |
+| **VS Code**         | Latest | IDE (opcional)             |
+| **JetBrains Rider** | 2024+  | IDE (opcional)             |
 
 ### **Padrões e Arquitetura**
+
 - ✅ **Clean Architecture** (Domain → Application → Infrastructure → API)
 - ✅ **Domain-Driven Design (DDD)** (Agregados, Entidades, Value Objects)
 - ✅ **SOLID Principles**
@@ -1294,6 +1432,7 @@ dotnet run
 - ✅ **Signals** (Angular reativo com performance otimizada)
 
 ### **Qualidade de Código**
+
 - ✅ **Testes Unitários** (regras de negócio isoladas)
 - ✅ **Testes de Integração** (controllers + database real)
 - ✅ **Code Coverage** (~85%)
@@ -1306,6 +1445,7 @@ dotnet run
 ## 🚀 Como Executar
 
 ### **Pré-requisitos**
+
 ```bash
 # Verificar versões instaladas
 docker --version        # Docker 20+
@@ -1316,6 +1456,7 @@ npm --version           # npm 10+
 ```
 
 ### **Opção 1: Docker Compose (Recomendado)**
+
 ```bash
 # 1. Clonar repositório
 git clone https://github.com/seu-usuario/InterceptorSystem.git
@@ -1343,6 +1484,7 @@ docker compose logs -f
 ### **Opção 2: Execução Local (Desenvolvimento)**
 
 #### **Backend (.NET)**
+
 ```bash
 cd backend/src
 
@@ -1360,6 +1502,7 @@ dotnet run
 ```
 
 #### **Frontend (Angular)**
+
 ```bash
 # Instalar dependências
 cd frontend
@@ -1375,6 +1518,7 @@ npm run build
 ```
 
 ### **Variáveis de Ambiente (.env)**
+
 ```env
 # PostgreSQL
 POSTGRES_USER=interceptor
@@ -1435,35 +1579,39 @@ InterceptorSystem/
 ## 📊 Estatísticas do Projeto
 
 ### **Backend (.NET 8)**
-| Métrica | Valor |
-|---------|-------|
-| Linhas de código | ~12.000 |
-| Testes automatizados | 124 |
-| Cobertura de testes | ~85% |
-| Entidades de domínio | 6 |
-| Endpoints API | 35+ |
-| Regras de negócio | 25+ |
-| Migrations | 15 |
+
+| Métrica              | Valor   |
+| -------------------- | ------- |
+| Linhas de código     | ~12.000 |
+| Testes automatizados | 124     |
+| Cobertura de testes  | ~85%    |
+| Entidades de domínio | 6       |
+| Endpoints API        | 35+     |
+| Regras de negócio    | 25+     |
+| Migrations           | 15      |
 
 ### **Frontend (Angular 21)**
-| Métrica | Valor |
-|---------|-------|
-| Linhas de código | ~8.500 |
-| Componentes | 45+ |
-| Services | 12 |
-| Interfaces/Models | 20+ |
-| SCSS (estilos) | ~3.000 linhas |
-| Formulários reativos | 10 |
+
+| Métrica              | Valor         |
+| -------------------- | ------------- |
+| Linhas de código     | ~8.500        |
+| Componentes          | 45+           |
+| Services             | 12            |
+| Interfaces/Models    | 20+           |
+| SCSS (estilos)       | ~3.000 linhas |
+| Formulários reativos | 10            |
 
 ### **Documentação**
-| Métrica | Valor |
-|---------|-------|
-| Arquivos .md | 30+ |
+
+| Métrica                | Valor  |
+| ---------------------- | ------ |
+| Arquivos .md           | 30+    |
 | Linhas de documentação | ~5.000 |
-| Exemplos de código | 100+ |
-| Payloads de teste | 25+ |
+| Exemplos de código     | 100+   |
+| Payloads de teste      | 25+    |
 
 ### **Evolução do Projeto**
+
 ```
 v1.0 (Dez/2025)  →  v2.0 (Jan/2026)
 ─────────────────────────────────────
@@ -1486,9 +1634,10 @@ v1.0 (Dez/2025)  →  v2.0 (Jan/2026)
 
 **🎉 InterceptorSystem v2.0 - Refatoração Completa Concluída!**
 
-*Desenvolvido com ❤️ usando .NET 8, Angular 18, Docker e as melhores práticas de arquitetura de software.*
+_Desenvolvido com ❤️ usando .NET 8, Angular 18, Docker e as melhores práticas de arquitetura de software._
 
 **Documentação Completa:**
+
 - 📄 `/README.md` - Este arquivo (visão geral)
 - 📄 `/DOCKER_GUIDE.md` - Guia completo Docker Compose
 - 📄 `/GITIGNORE_EXPLAINED.md` - Arquivos ignorados explicados
@@ -1499,5 +1648,3 @@ v1.0 (Dez/2025)  →  v2.0 (Jan/2026)
 **Licença:** MIT  
 **Última Atualização:** 2026-01-14  
 **Versão:** 2.0.0
-
-

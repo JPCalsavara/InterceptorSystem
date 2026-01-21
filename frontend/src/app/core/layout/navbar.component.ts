@@ -1,4 +1,4 @@
-import { Component, signal, effect, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, signal, effect, OnInit, Inject, PLATFORM_ID, computed } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
@@ -8,7 +8,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
   template: `
     <nav class="navbar">
       <div class="navbar-brand">
-        <span class="logo">Interceptor</span>
+        <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img">
       </div>
 
       <div class="navbar-actions">
@@ -120,13 +120,9 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
         align-items: center;
       }
 
-      .logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+      .logo-img {
+        height: 90px;
+        transition: content 0.3s ease;
       }
 
       .navbar-actions {
@@ -288,6 +284,10 @@ export class NavbarComponent implements OnInit {
   isDropdownOpen = signal(false);
   isDarkMode = signal(false);
 
+  logoSrc = computed(() =>
+    this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png'
+  );
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     // Effect to apply theme changes
     effect(() => {
@@ -303,14 +303,12 @@ export class NavbarComponent implements OnInit {
   private initializeTheme(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    // Check saved preference first
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       this.isDarkMode.set(savedTheme === 'dark');
       return;
     }
 
-    // Otherwise, check system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.isDarkMode.set(prefersDark);
   }
@@ -319,7 +317,6 @@ export class NavbarComponent implements OnInit {
     if (!isPlatformBrowser(this.platformId)) return;
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      // Only auto-update if user hasn't set a preference
       if (!localStorage.getItem('theme')) {
         this.isDarkMode.set(e.matches);
       }
@@ -331,11 +328,12 @@ export class NavbarComponent implements OnInit {
 
     if (isDark) {
       document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
     } else {
+      document.body.classList.add('light-mode');
       document.body.classList.remove('dark-mode');
     }
 
-    // Save preference
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }
 
