@@ -148,6 +148,11 @@ export const routes: Routes = [
           import('./features/alocacoes/alocacao-form/alocacao-form.component').then((m) => m.AlocacaoFormComponent),
       },
       {
+        path: 'batch',
+        loadComponent: () =>
+          import('./features/alocacoes/alocacao-batch-form/alocacao-batch-form.component').then((m) => m.AlocacaoBatchFormComponent),
+      },
+      {
         path: ':id/editar',
         loadComponent: () =>
           import('./features/alocacoes/alocacao-form/alocacao-form.component').then((m) => m.AlocacaoFormComponent),

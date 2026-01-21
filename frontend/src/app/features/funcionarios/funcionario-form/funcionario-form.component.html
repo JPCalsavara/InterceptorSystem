@@ -49,7 +49,6 @@
             formControlName="condominioId"
             class="form-input"
             [class.error]="hasError('condominioId')"
-            [disabled]="isEdit()"
           >
             <option value="">Selecione um condomínio</option>
             @for (cond of condominios(); track cond.id) {
@@ -60,71 +59,6 @@
           <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
           }
         </div>
-
-        <div class="form-group">
-          <label for="contratoId" class="form-label">
-            Contrato <span class="required">*</span>
-          </label>
-          <select
-            id="contratoId"
-            formControlName="contratoId"
-            class="form-input"
-            [class.error]="hasError('contratoId')"
-            [disabled]="!form.get('condominioId')?.value || isEdit()"
-          >
-            <option value="">Selecione um contrato</option>
-            @for (contrato of contratos(); track contrato.id) {
-            <option [value]="contrato.id">
-              {{ contrato.descricao }} - {{ contrato.valorTotalMensal | currency : 'BRL' }}
-            </option>
-            }
-          </select>
-          @if (hasError('contratoId')) {
-          <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
-          }
-          @if (!form.get('condominioId')?.value) {
-          <span class="info-message">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
-            Selecione um condomínio primeiro
-          </span>
-          }
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="postoDeTrabalhoId" class="form-label">
-          Posto de Trabalho <span class="required">*</span>
-        </label>
-        <select
-          id="postoDeTrabalhoId"
-          formControlName="postoDeTrabalhoId"
-          class="form-input"
-          [class.error]="hasError('postoDeTrabalhoId')"
-          [disabled]="!form.get('condominioId')?.value || isEdit()"
-        >
-          <option value="">Selecione um posto de trabalho</option>
-          @for (posto of postos(); track posto.id) {
-          <option [value]="posto.id">
-            {{ posto.horarioInicio }} - {{ posto.horarioFim }}
-            @if (posto.permiteDobrarEscala) {
-              <span class="badge">Permite Dobra</span>
-            }
-          </option>
-          }
-        </select>
-        @if (hasError('postoDeTrabalhoId')) {
-        <span class="error-message">{{ getErrorMessage('postoDeTrabalhoId') }}</span>
-        }
-        @if (!form.get('condominioId')?.value) {
-        <span class="info-message">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-          </svg>
-          Selecione um condomínio primeiro
-        </span>
-        }
       </div>
 
       <div class="form-group">
@@ -217,47 +151,6 @@
           }
         </div>
       </div>
-
-      <!-- Informações Financeiras Calculadas Automaticamente -->
-      @if (contratoSelecionado()) {
-      <div class="calculated-values">
-        <h3 class="section-title">💰 Valores Calculados Automaticamente</h3>
-        <p class="info-text">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-          </svg>
-          Valores calculados com base no contrato selecionado
-        </p>
-
-        <div class="value-cards">
-          <div class="value-card">
-            <div class="value-icon">💵</div>
-            <div class="value-content">
-              <span class="value-label">Salário Mensal</span>
-              <span class="value-amount">{{ salarioCalculado() | currency : 'BRL' }}</span>
-            </div>
-          </div>
-
-          <div class="value-card">
-            <div class="value-icon">🎁</div>
-            <div class="value-content">
-              <span class="value-label">Benefícios Mensais</span>
-              <span class="value-amount">{{ beneficiosCalculados() | currency : 'BRL' }}</span>
-            </div>
-          </div>
-
-          <div class="value-card">
-            <div class="value-icon">📅</div>
-            <div class="value-content">
-              <span class="value-label">Valor Diária</span>
-              <span class="value-amount">{{ valorDiariaCalculado() | currency : 'BRL' }}</span>
-            </div>
-          </div>
-        </div>
-
-
-      </div>
-      }
 
       <div class="form-row">
 
