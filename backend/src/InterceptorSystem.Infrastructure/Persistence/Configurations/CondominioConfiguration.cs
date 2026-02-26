@@ -28,7 +28,7 @@ public class CondominioConfiguration : IEntityTypeConfiguration<Condominio>
         builder.Property(c => c.EmpresaId).IsRequired();
         
         // Configurações Operacionais - FASE 1
-        builder.Property(c => c.QuantidadeFuncionariosIdeal)
+        builder.Property(c => c.QuantidadeIdealPorTurno)
             .IsRequired();
         
         builder.Property(c => c.HorarioTrocaTurno)

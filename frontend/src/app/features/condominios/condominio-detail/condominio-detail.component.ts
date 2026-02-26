@@ -19,6 +19,7 @@ import {
   TipoAlocacao,
 } from '../../../models/index';
 import { forkJoin } from 'rxjs';
+import { AlocacoesViewComponent } from '../../../shared/components/alocacoes-view/alocacoes-view.component';
 
 type PeriodoAnalise = 'mensal' | 'trimestral' | 'semestral' | 'anual';
 
@@ -33,7 +34,7 @@ interface MetricaPeriodo {
 @Component({
   selector: 'app-condominio-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, AlocacoesViewComponent],
   templateUrl: './condominio-detail.component.html',
   styleUrl: './condominio-detail.component.scss',
 })
@@ -86,32 +87,7 @@ export class CondominioDetailComponent implements OnInit {
 
   // Métricas computadas do período
   metricasPeriodo = computed<MetricaPeriodo[]>(() => {
-
     return [
-      {
-        titulo: 'Receita Total',
-        valor: this.receitaPeriodo(),
-        unidade: 'BRL',
-        icone: '💰',
-      },
-      {
-        titulo: 'Custo Operacional',
-        valor: this.custoPeriodo(),
-        unidade: 'BRL',
-        icone: '💸',
-      },
-      {
-        titulo: 'Lucro Estimado',
-        valor: this.lucroPeriodo(),
-        unidade: 'BRL',
-        icone: '📈',
-      },
-      {
-        titulo: 'Margem de Lucro',
-        valor: this.margemLucroPeriodo(),
-        unidade: '%',
-        icone: '📊',
-      },
       {
         titulo: 'Alocações',
         valor: this.alocacoesPeriodo().length,
@@ -144,7 +120,7 @@ export class CondominioDetailComponent implements OnInit {
     const multiplicador = this.getMultiplicadorPeriodo();
     return this.contratosPeriodo().reduce(
       (sum, c) => sum + (c.valorTotalMensal || 0) * multiplicador,
-      0
+      0,
     );
   });
 
@@ -158,7 +134,7 @@ export class CondominioDetailComponent implements OnInit {
     }
 
     // Custo = valorTotalMensal - margem de lucro
-    const custoMensal = contrato.valorTotalMensal * (1 - (contrato.margemLucroPercentual / 100));
+    const custoMensal = contrato.valorTotalMensal * (1 - contrato.margemLucroPercentual / 100);
     return custoMensal * multiplicador;
   });
 
@@ -176,21 +152,19 @@ export class CondominioDetailComponent implements OnInit {
     const total = this.alocacoesPeriodo().length;
     if (total === 0) return 0;
     const faltas = this.alocacoesPeriodo().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
     return (faltas / total) * 100;
   });
 
   dobrasRealizadas = computed(() => {
-    return this.alocacoesPeriodo().filter(
-      (a) => a.tipoAlocacao === TipoAlocacao.DOBRA_PROGRAMADA
-    ).length;
+    return this.alocacoesPeriodo().filter((a) => a.tipoAlocacao === TipoAlocacao.DOBRA_PROGRAMADA)
+      .length;
   });
 
   substituicoesRealizadas = computed(() => {
-    return this.alocacoesPeriodo().filter(
-      (a) => a.tipoAlocacao === TipoAlocacao.SUBSTITUICAO
-    ).length;
+    return this.alocacoesPeriodo().filter((a) => a.tipoAlocacao === TipoAlocacao.SUBSTITUICAO)
+      .length;
   });
 
   custoMedioPorFuncionario = computed(() => {
@@ -200,7 +174,7 @@ export class CondominioDetailComponent implements OnInit {
     if (total === 0 || !contrato) return 0;
 
     // Custo mensal dividido pela quantidade de funcionários
-    const custoMensal = contrato.valorTotalMensal * (1 - (contrato.margemLucroPercentual / 100));
+    const custoMensal = contrato.valorTotalMensal * (1 - contrato.margemLucroPercentual / 100);
     return custoMensal / total;
   });
 
@@ -393,7 +367,6 @@ export class CondominioDetailComponent implements OnInit {
     return this.formatHorario(posto.horarioInicio, posto.horarioFim);
   }
 
-
   getStatusBadgeClass(status: StatusAlocacao): string {
     const classes = {
       [StatusAlocacao.CONFIRMADA]: 'badge-success',
@@ -435,7 +408,7 @@ export class CondominioDetailComponent implements OnInit {
   getFaltasByFuncionario(funcionarioId: string): number {
     return this.alocacoes().filter(
       (a) =>
-        a.funcionarioId === funcionarioId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
+        a.funcionarioId === funcionarioId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
   }
 
@@ -520,14 +493,13 @@ export class CondominioDetailComponent implements OnInit {
 
   // Contadores para alocações (evitar filtros no template)
   alocacoesConfirmadas = computed(() => {
-    return this.alocacoesPeriodo().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA
-    ).length;
+    return this.alocacoesPeriodo().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
+      .length;
   });
 
   alocacoesFaltas = computed(() => {
     return this.alocacoesPeriodo().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
   });
 }

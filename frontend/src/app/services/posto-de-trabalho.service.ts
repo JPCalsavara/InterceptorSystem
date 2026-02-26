@@ -27,6 +27,10 @@ export class PostoDeTrabalhoService {
     return this.http.get<PostoDeTrabalho[]>(`${this.apiUrl}/condominio/${condominioId}`);
   }
 
+  getByContratoId(contratoId: string): Observable<PostoDeTrabalho[]> {
+    return this.http.get<PostoDeTrabalho[]>(`${this.apiUrl}/contrato/${contratoId}`);
+  }
+
   create(dto: CreatePostoDeTrabalhoDto): Observable<PostoDeTrabalho> {
     return this.http.post<PostoDeTrabalho>(this.apiUrl, dto);
   }

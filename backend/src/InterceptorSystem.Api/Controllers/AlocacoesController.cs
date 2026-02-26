@@ -34,6 +34,26 @@ public class AlocacoesController : ControllerBase
         }
     }
 
+    [HttpPost("batch")]
+    [ProducesResponseType(typeof(List<AlocacaoDtoOutput>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateBatch(CreateAlocacoesBatchDtoInput batch)
+    {
+        try
+        {
+            var result = await _service.CreateBatchAsync(batch);
+            return Created($"/api/alocacoes", result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<AlocacaoDtoOutput>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
@@ -87,4 +107,3 @@ public class AlocacoesController : ControllerBase
         }
     }
 }
-

@@ -14,6 +14,7 @@ public record CreateCondominioCompletoDtoInput(
 
 /// <summary>
 /// DTO simplificado para criação de contrato (sem CondominioId que será preenchido automaticamente)
+/// QuantidadeFuncionarios será calculado como: QuantidadeIdealPorTurno × NumeroDePostos
 /// </summary>
 public record CreateContratoCompletoDtoInput(
     string Descricao,
@@ -22,7 +23,6 @@ public record CreateContratoCompletoDtoInput(
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualImpostos,
-    int QuantidadeFuncionarios,
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,

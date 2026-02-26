@@ -18,7 +18,8 @@ public class ContratoConfiguration : IEntityTypeConfiguration<Contrato>
         builder.Property(c => c.PercentualAdicionalNoturno).HasColumnType("decimal(5,4)").IsRequired();
         builder.Property(c => c.ValorBeneficiosExtrasMensal).HasColumnType("decimal(12,2)").IsRequired();
         builder.Property(c => c.PercentualImpostos).HasColumnType("decimal(5,4)").IsRequired();
-        builder.Property(c => c.QuantidadeFuncionarios).IsRequired();
+        // QuantidadeFuncionarios agora é calculado: Condominio.QuantidadeIdealPorTurno × NumeroDePostos
+        builder.Property(c => c.NumeroDePostos).IsRequired();
         builder.Property(c => c.MargemLucroPercentual).HasColumnType("decimal(5,4)").IsRequired();
         builder.Property(c => c.MargemCoberturaFaltasPercentual).HasColumnType("decimal(5,4)").IsRequired();
         builder.Property(c => c.DataInicio).IsRequired();

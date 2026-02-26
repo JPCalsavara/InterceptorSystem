@@ -3,8 +3,15 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
 import { CondominioService } from '../../../services/condominio.service';
+import { ContratoService } from '../../../services/contrato.service';
 import { AlocacaoService } from '../../../services/alocacao.service';
-import { PostoDeTrabalho, Condominio, Alocacao, StatusAlocacao } from '../../../models/index';
+import {
+  PostoDeTrabalho,
+  Condominio,
+  Contrato,
+  Alocacao,
+  StatusAlocacao,
+} from '../../../models/index';
 
 interface PostoPorCondominio {
   condominio: Condominio;
@@ -21,10 +28,12 @@ interface PostoPorCondominio {
 export class PostoListComponent implements OnInit {
   private service = inject(PostoDeTrabalhoService);
   private condominioService = inject(CondominioService);
+  private contratoService = inject(ContratoService);
   private alocacaoService = inject(AlocacaoService);
 
   postos = signal<PostoDeTrabalho[]>([]);
   condominios = signal<Condominio[]>([]);
+  contratos = signal<Contrato[]>([]);
   alocacoes = signal<Alocacao[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
@@ -61,6 +70,7 @@ export class PostoListComponent implements OnInit {
   loadAll(): void {
     this.loading.set(true);
     this.loadCondominios();
+    this.loadContratos();
     this.loadPostos();
     this.loadAlocacoes();
   }
@@ -69,6 +79,13 @@ export class PostoListComponent implements OnInit {
     this.condominioService.getAll().subscribe({
       next: (data) => this.condominios.set(data),
       error: (err) => console.error('Erro ao carregar condomínios:', err),
+    });
+  }
+
+  loadContratos(): void {
+    this.contratoService.getAll().subscribe({
+      next: (data) => this.contratos.set(data),
+      error: (err) => console.error('Erro ao carregar contratos:', err),
     });
   }
 
@@ -96,15 +113,20 @@ export class PostoListComponent implements OnInit {
   getNumeroFaltas(postoId: string): number {
     // Calcula o número de faltas a partir das alocações
     return this.alocacoes().filter(
-      (a) => a.postoDeTrabalhoId === postoId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA
+      (a) =>
+        a.postoDeTrabalhoId === postoId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
   }
 
   formatHorario(inicio: string, fim: string): string {
-    // Remove segundos para exibição (HH:mm)
     const inicioFormatado = inicio.substring(0, 5);
     const fimFormatado = fim.substring(0, 5);
     return `${inicioFormatado} às ${fimFormatado}`;
+  }
+
+  getContratoDescricao(contratoId: string): string {
+    const contrato = this.contratos().find((c) => c.id === contratoId);
+    return contrato ? contrato.descricao : '—';
   }
 
   confirmDelete(id: string, inicio: string, fim: string): void {

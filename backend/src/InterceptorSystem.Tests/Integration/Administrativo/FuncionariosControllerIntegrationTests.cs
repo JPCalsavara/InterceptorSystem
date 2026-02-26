@@ -37,12 +37,12 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
             0.30m,   // PercentualAdicionalNoturno (30% = 0.30)
             500m,    // ValorBeneficiosExtrasMensal
             0.15m,   // PercentualImpostos (15% = 0.15)
-            5,       // QuantidadeFuncionarios
+            2,
             0.20m,   // MargemLucroPercentual (20% = 0.20)
             0.10m,   // MargemCoberturaFaltasPercentual (10% = 0.10)
             DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-            StatusContrato.PAGO
+            StatusContrato.ATIVO
         );
         var response = await Client.PostAsJsonAsync("/api/contratos", input);
         response.EnsureSuccessStatusCode();

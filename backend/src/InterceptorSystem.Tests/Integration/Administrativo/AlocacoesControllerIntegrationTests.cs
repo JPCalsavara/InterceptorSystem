@@ -37,12 +37,12 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
             0.30m,   // PercentualAdicionalNoturno (30% = 0.30)
             500m,    // ValorBeneficiosExtrasMensal
             0.15m,   // PercentualImpostos (15% = 0.15)
-            5,       // QuantidadeFuncionarios
+            2,
             0.20m,   // MargemLucroPercentual (20% = 0.20)
             0.10m,   // MargemCoberturaFaltasPercentual (10% = 0.10)
             DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-            StatusContrato.PAGO
+            StatusContrato.ATIVO
         );
         var response = await Client.PostAsJsonAsync("/api/contratos", input);
         response.EnsureSuccessStatusCode();
@@ -50,14 +50,14 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         return dto!.Id;
     }
 
-    private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
+    private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId, Guid? contratoId = null)
     {
-        var contratoId = await CriarContratoAsync(condominioId);
-        
+        var resolvedContratoId = contratoId ?? await CriarContratoAsync(condominioId);
+
         // FASE 3: Sem parâmetros de salário (calculados automaticamente)
         var input = new CreateFuncionarioDtoInput(
             condominioId,
-            contratoId,
+            resolvedContratoId,
             "Funcionario Teste",
             Guid.NewGuid().ToString(),
             "+5511999999999",
@@ -69,9 +69,10 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();
     }
 
-    private async Task<PostoDeTrabalhoDto> CriarPostoAsync(Guid condominioId)
+    private async Task<PostoDeTrabalhoDto> CriarPostoAsync(Guid condominioId, Guid? contratoId = null)
     {
-        var input = new CreatePostoInput(condominioId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
+        var resolvedContratoId = contratoId ?? await CriarContratoAsync(condominioId);
+        var input = new CreatePostoInput(condominioId, resolvedContratoId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
         var response = await Client.PostAsJsonAsync("/api/postos-de-trabalho", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<PostoDeTrabalhoDto>(response) ?? throw new InvalidOperationException();
@@ -94,8 +95,9 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     public async Task Post_DeveCriarAlocacao()
     {
         var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
-        var posto = await CriarPostoAsync(condominioId);
+        var contratoId = await CriarContratoAsync(condominioId);
+        var funcionario = await CriarFuncionarioAsync(condominioId, contratoId);
+        var posto = await CriarPostoAsync(condominioId, contratoId);
 
         var input = new CreateAlocacaoDtoInput(funcionario.Id, posto.Id, DateOnly.FromDateTime(DateTime.Today), StatusAlocacao.CONFIRMADA, TipoAlocacao.REGULAR);
         var response = await Client.PostAsJsonAsync("/api/alocacoes", input);
@@ -131,8 +133,9 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     public async Task GetById_DeveRetornar200()
     {
         var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
-        var posto = await CriarPostoAsync(condominioId);
+        var contratoId = await CriarContratoAsync(condominioId);
+        var funcionario = await CriarFuncionarioAsync(condominioId, contratoId);
+        var posto = await CriarPostoAsync(condominioId, contratoId);
         var alocacao = await CriarAlocacaoAsync(funcionario.Id, posto.Id);
 
         var response = await Client.GetAsync($"/api/alocacoes/{alocacao.Id}");
@@ -152,8 +155,9 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     public async Task GetAll_DeveRetornarLista()
     {
         var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
-        var posto = await CriarPostoAsync(condominioId);
+        var contratoId = await CriarContratoAsync(condominioId);
+        var funcionario = await CriarFuncionarioAsync(condominioId, contratoId);
+        var posto = await CriarPostoAsync(condominioId, contratoId);
         await CriarAlocacaoAsync(funcionario.Id, posto.Id);
 
         var response = await Client.GetAsync("/api/alocacoes");
@@ -165,8 +169,9 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     public async Task Put_DeveAtualizarAlocacao()
     {
         var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
-        var posto = await CriarPostoAsync(condominioId);
+        var contratoId = await CriarContratoAsync(condominioId);
+        var funcionario = await CriarFuncionarioAsync(condominioId, contratoId);
+        var posto = await CriarPostoAsync(condominioId, contratoId);
         var alocacao = await CriarAlocacaoAsync(funcionario.Id, posto.Id);
 
         var input = new UpdateAlocacaoDtoInput(StatusAlocacao.CANCELADA, TipoAlocacao.SUBSTITUICAO);
@@ -189,8 +194,9 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
     public async Task Delete_DeveExcluirAlocacao()
     {
         var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
-        var posto = await CriarPostoAsync(condominioId);
+        var contratoId = await CriarContratoAsync(condominioId);
+        var funcionario = await CriarFuncionarioAsync(condominioId, contratoId);
+        var posto = await CriarPostoAsync(condominioId, contratoId);
         var alocacao = await CriarAlocacaoAsync(funcionario.Id, posto.Id);
 
         var response = await Client.DeleteAsync($"/api/alocacoes/{alocacao.Id}");

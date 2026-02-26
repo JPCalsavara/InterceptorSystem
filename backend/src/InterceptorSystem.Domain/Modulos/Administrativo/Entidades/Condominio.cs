@@ -12,7 +12,10 @@ public class Condominio : Entity, IAggregateRoot
     public bool Ativo { get; private set; }
     
     // Configurações Operacionais - FASE 1
-    public int QuantidadeFuncionariosIdeal { get; private set; }
+    /// <summary>
+    /// Quantidade ideal de funcionários por turno/posto de trabalho.
+    /// </summary>
+    public int QuantidadeIdealPorTurno { get; private set; }
     public TimeSpan HorarioTrocaTurno { get; private set; }
     public string? EmailGestor { get; private set; }
     public string? TelefoneEmergencia { get; private set; }
@@ -30,7 +33,7 @@ public class Condominio : Entity, IAggregateRoot
         string nome, 
         string cnpj, 
         string endereco,
-        int quantidadeFuncionariosIdeal,
+        int quantidadeIdealPorTurno,
         TimeSpan horarioTrocaTurno,
         string? emailGestor = null,
         string? telefoneEmergencia = null)
@@ -38,13 +41,13 @@ public class Condominio : Entity, IAggregateRoot
         CheckRule(empresaId == Guid.Empty, "O Condomínio deve pertencer a uma empresa.");
         CheckRule(string.IsNullOrWhiteSpace(nome), "O nome do condomínio é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(cnpj), "O CNPJ é obrigatório.");
-        CheckRule(quantidadeFuncionariosIdeal <= 0, "Quantidade de funcionários deve ser maior que zero.");
+        CheckRule(quantidadeIdealPorTurno <= 0, "Quantidade ideal por turno deve ser maior que zero.");
 
         EmpresaId = empresaId;
         Nome = nome;
         Cnpj = cnpj;
         Endereco = endereco;
-        QuantidadeFuncionariosIdeal = quantidadeFuncionariosIdeal;
+        QuantidadeIdealPorTurno = quantidadeIdealPorTurno;
         HorarioTrocaTurno = horarioTrocaTurno;
         EmailGestor = emailGestor;
         TelefoneEmergencia = telefoneEmergencia;
@@ -59,14 +62,14 @@ public class Condominio : Entity, IAggregateRoot
     }
     
     public void AtualizarConfiguracoesOperacionais(
-        int quantidadeFuncionariosIdeal,
+        int quantidadeIdealPorTurno,
         TimeSpan horarioTrocaTurno,
         string? emailGestor,
         string? telefoneEmergencia)
     {
-        CheckRule(quantidadeFuncionariosIdeal <= 0, "Quantidade de funcionários deve ser maior que zero.");
+        CheckRule(quantidadeIdealPorTurno <= 0, "Quantidade ideal por turno deve ser maior que zero.");
         
-        QuantidadeFuncionariosIdeal = quantidadeFuncionariosIdeal;
+        QuantidadeIdealPorTurno = quantidadeIdealPorTurno;
         HorarioTrocaTurno = horarioTrocaTurno;
         EmailGestor = emailGestor;
         TelefoneEmergencia = telefoneEmergencia;

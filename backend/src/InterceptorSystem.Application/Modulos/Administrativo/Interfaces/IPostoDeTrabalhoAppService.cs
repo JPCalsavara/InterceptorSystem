@@ -10,5 +10,6 @@ public interface IPostoDeTrabalhoAppService
     Task<PostoDeTrabalhoDto?> GetByIdAsync(Guid id);
     Task<IEnumerable<PostoDeTrabalhoDto>> GetAllAsync();
     Task<IEnumerable<PostoDeTrabalhoDto>> GetByCondominioIdAsync(Guid condominioId);
+    Task<IEnumerable<PostoDeTrabalhoDto>> GetByContratoIdAsync(Guid contratoId);
 }
 

@@ -37,7 +37,7 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new KeyNotFoundException("Condomínio não encontrado para o funcionário.");
         }
 
-        // FASE 2: Validar se o contrato existe e está vigente
+        // FASE 2: Validar se o contrato existe e está ativo
         var contrato = await _contratoRepository.GetByIdAsync(input.ContratoId);
         if (contrato == null)
         {
@@ -49,16 +49,12 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new InvalidOperationException("O contrato não pertence ao condomínio informado.");
         }
 
-        var dataAtual = DateOnly.FromDateTime(DateTime.Now);
-        if (contrato.Status != StatusContrato.PAGO && contrato.Status != StatusContrato.PENDENTE)
+        // Apenas verificar se o contrato está ATIVO ou PENDENTE (sem validação rigorosa de datas)
+        if (contrato.Status != StatusContrato.ATIVO && contrato.Status != StatusContrato.PENDENTE)
         {
             throw new InvalidOperationException($"Não é possível vincular funcionário a um contrato com status {contrato.Status}.");
         }
 
-        if (dataAtual < contrato.DataInicio || dataAtual > contrato.DataFim)
-        {
-            throw new InvalidOperationException("O contrato não está vigente. Funcionários só podem ser vinculados a contratos vigentes.");
-        }
 
         var cpfExistente = await _repository.GetByCpfAsync(input.Cpf);
         if (cpfExistente != null)

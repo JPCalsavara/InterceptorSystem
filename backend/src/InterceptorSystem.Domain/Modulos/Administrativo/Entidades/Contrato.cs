@@ -1,27 +1,130 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
+/// <summary>
+/// Representa um contrato de prestação de serviços de segurança patrimonial entre a empresa e um condomínio.
+/// </summary>
 public class Contrato : Entity, IAggregateRoot
 {
+    /// <summary>
+    /// Identificador do condomínio associado a este contrato.
+    /// </summary>
     public Guid CondominioId { get; private set; }
+    
+    /// <summary>
+    /// Descrição do contrato (ex: "Contrato de Portaria 12x36", "Vigilância Diurna").
+    /// </summary>
     public string Descricao { get; private set; } = null!;
+    
+    /// <summary>
+    /// Valor total mensal que o condomínio pagará (faturamento bruto).
+    /// Inclui: salários, benefícios, impostos, margens de lucro e cobertura de faltas.
+    /// </summary>
     public decimal ValorTotalMensal { get; private set; }
+    
+    /// <summary>
+    /// Valor da diária cobrada por funcionário (base de cálculo para 30 dias).
+    /// Usado para cálculo do custo mensal: ValorDiaria × Funcionários × 30 dias.
+    /// </summary>
     public decimal ValorDiariaCobrada { get; private set; }
+    
+    /// <summary>
+    /// Percentual de adicional noturno (conforme CLT Art. 73 - mínimo 20%).
+    /// Aplicado quando o funcionário trabalha em posto com horário entre 22h e 5h.
+    /// Exemplo: 0.20 = 20% sobre o salário base.
+    /// </summary>
     public decimal PercentualAdicionalNoturno { get; private set; }
+    
+    /// <summary>
+    /// Valor total mensal de benefícios extras (vale-transporte, alimentação, etc.).
+    /// Será dividido igualmente entre todos os funcionários do contrato.
+    /// </summary>
     public decimal ValorBeneficiosExtrasMensal { get; private set; }
+    
+    /// <summary>
+    /// Percentual de impostos incidentes sobre o valor total (INSS, FGTS, etc.).
+    /// Exemplo: 0.15 = 15% do valor total mensal.
+    /// </summary>
     public decimal PercentualImpostos { get; private set; }
-    public int QuantidadeFuncionarios { get; private set; }
+    
+    /// <summary>
+    /// Número de turnos/postos de trabalho no condomínio.
+    /// - 2 postos = Escala 12x36 (diurno 6h-18h + noturno 18h-6h)
+    /// - 3 postos = Escala 8h (manhã, tarde, noite)
+    /// - 4 postos = Escala 6h (4 turnos por dia)
+    /// </summary>
+    public int NumeroDePostos { get; private set; }
+    
+    /// <summary>
+    /// Margem de lucro da empresa sobre o contrato (percentual do valor total).
+    /// Exemplo: 0.15 = 15% de lucro.
+    /// </summary>
     public decimal MargemLucroPercentual { get; private set; }
+    
+    /// <summary>
+    /// Margem de segurança para cobertura de faltas e imprevistos (percentual do valor total).
+    /// Exemplo: 0.10 = 10% para cobrir custos com substituições.
+    /// </summary>
     public decimal MargemCoberturaFaltasPercentual { get; private set; }
+    
+    /// <summary>
+    /// Data de início de vigência do contrato.
+    /// </summary>
     public DateOnly DataInicio { get; private set; }
+    
+    /// <summary>
+    /// Data de término de vigência do contrato.
+    /// </summary>
     public DateOnly DataFim { get; private set; }
+    
+    /// <summary>
+    /// Status atual do contrato (ATIVO, PENDENTE, FINALIZADO).
+    /// </summary>
     public StatusContrato Status { get; private set; }
+    
+    /// <summary>
+    /// Quantidade total de funcionários vinculados a este contrato.
+    /// Calculado automaticamente a partir do Condomínio.
+    /// IMPORTANTE: Esta é uma propriedade SOMENTE LEITURA que reflete a configuração do condomínio.
+    /// Fórmula: QuantidadeIdealPorTurno × NumeroDePostos
+    /// Exemplo: 6 funcionários/turno × 2 postos = 12 funcionários totais
+    /// </summary>
+    [NotMapped]
+    public int QuantidadeFuncionarios
+    {
+        get
+        {
+            if (Condominio == null)
+                return 0; // Fallback quando navegação não está carregada
+            
+            return Condominio.QuantidadeIdealPorTurno * NumeroDePostos;
+        }
+    }
+    
+    /// <summary>
+    /// Quantidade ideal de funcionários por turno/posto.
+    /// Calculado automaticamente: Funcionários do Condomínio ÷ Número de postos.
+    /// Exemplo: 12 funcionários ÷ 2 postos = 6 funcionários por turno.
+    /// </summary>
+    [NotMapped]
+    public int QuantidadeIdealFuncionariosPorTurno
+    {
+        get
+        {
+            if (NumeroDePostos == 0 || QuantidadeFuncionarios == 0)
+                return 0;
+            
+            return QuantidadeFuncionarios / NumeroDePostos;
+        }
+    }
 
     public Condominio? Condominio { get; private set; }
     public ICollection<Funcionario> Funcionarios { get; private set; } = new List<Funcionario>(); // FASE 2: Navegação para funcionários
+    public ICollection<PostoDeTrabalho> PostosDeTrabalho { get; private set; } = new List<PostoDeTrabalho>();
 
     protected Contrato() { }
 
@@ -34,7 +137,7 @@ public class Contrato : Entity, IAggregateRoot
         decimal percentualAdicionalNoturno,
         decimal valorBeneficiosExtrasMensal,
         decimal percentualImpostos,
-        int quantidadeFuncionarios,
+        int numeroDePostos, // Quantidade de turnos (2=12x36, 3=8h, 4=6h)
         decimal margemLucroPercentual,
         decimal margemCoberturaFaltasPercentual,
         DateOnly dataInicio,
@@ -49,7 +152,7 @@ public class Contrato : Entity, IAggregateRoot
         CheckPercentual(percentualAdicionalNoturno, "Percentual de adicional noturno inválido.");
         CheckRule(valorBeneficiosExtrasMensal < 0, "Valor de benefícios não pode ser negativo.");
         CheckPercentual(percentualImpostos, "Percentual de impostos inválido.");
-        CheckRule(quantidadeFuncionarios <= 0, "Quantidade de funcionários deve ser maior que zero.");
+        CheckRule(numeroDePostos < 2 || numeroDePostos > 4, "Número de postos deve estar entre 2 e 4 (ex: 2=12x36, 3=8h, 4=6h).");
         CheckPercentual(margemLucroPercentual, "Margem de lucro inválida.");
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
         CheckRule(dataFim < dataInicio, "A data final deve ser maior ou igual à data inicial.");
@@ -63,7 +166,7 @@ public class Contrato : Entity, IAggregateRoot
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
         PercentualImpostos = percentualImpostos;
-        QuantidadeFuncionarios = quantidadeFuncionarios;
+        NumeroDePostos = numeroDePostos;
         MargemLucroPercentual = margemLucroPercentual;
         MargemCoberturaFaltasPercentual = margemCoberturaFaltasPercentual;
         DataInicio = dataInicio;
@@ -78,7 +181,7 @@ public class Contrato : Entity, IAggregateRoot
         decimal percentualAdicionalNoturno,
         decimal valorBeneficiosExtrasMensal,
         decimal percentualImpostos,
-        int quantidadeFuncionarios,
+        int numeroDePostos,
         decimal margemLucroPercentual,
         decimal margemCoberturaFaltasPercentual,
         DateOnly dataInicio,
@@ -90,7 +193,7 @@ public class Contrato : Entity, IAggregateRoot
         CheckPercentual(percentualAdicionalNoturno, "Percentual de adicional noturno inválido.");
         CheckRule(valorBeneficiosExtrasMensal < 0, "Valor de benefícios não pode ser negativo.");
         CheckPercentual(percentualImpostos, "Percentual de impostos inválido.");
-        CheckRule(quantidadeFuncionarios <= 0, "Quantidade de funcionários deve ser maior que zero.");
+        CheckRule(numeroDePostos < 2 || numeroDePostos > 4, "Número de postos deve estar entre 2 e 4.");
         CheckPercentual(margemLucroPercentual, "Margem de lucro inválida.");
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
         CheckRule(dataFim < dataInicio, "A data final deve ser maior ou igual à data inicial.");
@@ -101,7 +204,7 @@ public class Contrato : Entity, IAggregateRoot
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
         PercentualImpostos = percentualImpostos;
-        QuantidadeFuncionarios = quantidadeFuncionarios;
+        NumeroDePostos = numeroDePostos;
         MargemLucroPercentual = margemLucroPercentual;
         MargemCoberturaFaltasPercentual = margemCoberturaFaltasPercentual;
         DataInicio = dataInicio;

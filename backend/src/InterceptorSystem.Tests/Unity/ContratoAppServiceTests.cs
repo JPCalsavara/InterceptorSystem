@@ -36,7 +36,7 @@ public class ContratoAppServiceTests
             0.2m,
             800,
             0.18m,
-            10,
+            2, // NumeroDePostos (QuantidadeFuncionarios calculado automaticamente)
             0.15m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -65,8 +65,8 @@ public class ContratoAppServiceTests
             0.1m,
             200,
             0.15m,
-            5,
-            0.1m,
+            2,
+            0.05m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
@@ -88,7 +88,7 @@ public class ContratoAppServiceTests
             0.1m,
             200,
             0.15m,
-            5,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -115,7 +115,7 @@ public class ContratoAppServiceTests
             1.5m,
             -100,
             -0.1m,
-            0,
+            2, // NumeroDePostos
             1.2m,
             1.5m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(5)),
@@ -142,7 +142,7 @@ public class ContratoAppServiceTests
             0.2m,
             300,
             0.15m,
-            8,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -156,12 +156,12 @@ public class ContratoAppServiceTests
             0.25m,
             400,
             0.2m,
-            12,
+            2,
             0.2m,
             0.08m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             DateOnly.FromDateTime(DateTime.Today.AddDays(20)),
-            StatusContrato.PAGO);
+            StatusContrato.ATIVO);
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -185,12 +185,12 @@ public class ContratoAppServiceTests
             0.1m,
             100,
             0.1m,
-            5,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
-            StatusContrato.PAGO);
+            StatusContrato.ATIVO);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(Guid.NewGuid(), input));
     }
@@ -206,12 +206,12 @@ public class ContratoAppServiceTests
             1.1m,
             -100,
             -0.1m,
-            0,
+            2,
             1.2m,
             1.5m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(5)),
             DateOnly.FromDateTime(DateTime.Today),
-            StatusContrato.PAGO);
+            StatusContrato.ATIVO);
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
 
@@ -230,7 +230,7 @@ public class ContratoAppServiceTests
             0.1m,
             50,
             0.1m,
-            3,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -269,7 +269,7 @@ public class ContratoAppServiceTests
             0.25m,
             400,
             0.2m,
-            12,
+            2, // NumeroDePostos
             0.2m,
             0.08m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -298,12 +298,12 @@ public class ContratoAppServiceTests
             0.2m,
             300,
             0.15m,
-            8,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
-            StatusContrato.INATIVO);
+            StatusContrato.FINALIZADO);
 
         var input = new UpdateContratoDtoInput(
             "Contrato reativado",
@@ -312,12 +312,12 @@ public class ContratoAppServiceTests
             0.22m,
             350,
             0.16m,
-            10,
+            2,
             0.12m,
             0.06m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
-            StatusContrato.PAGO);
+            StatusContrato.ATIVO);
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
         _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(true);
@@ -340,12 +340,12 @@ public class ContratoAppServiceTests
             0.2m,
             300,
             0.15m,
-            8,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
-            StatusContrato.INATIVO);
+            StatusContrato.FINALIZADO);
 
         var input = new UpdateContratoDtoInput(
             "Contrato ativado",
@@ -354,12 +354,12 @@ public class ContratoAppServiceTests
             0.22m,
             350,
             0.16m,
-            10,
+            2,
             0.12m,
             0.06m,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
-            StatusContrato.PAGO);
+            StatusContrato.ATIVO);
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
         _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(false);
@@ -368,7 +368,7 @@ public class ContratoAppServiceTests
         var result = await _service.UpdateAsync(contrato.Id, input);
 
         Assert.NotNull(result);
-        Assert.Equal(StatusContrato.PAGO, result.Status);
+        Assert.Equal(StatusContrato.ATIVO, result.Status);
     }
 
     private static Contrato CriarContratoValido()
@@ -382,7 +382,7 @@ public class ContratoAppServiceTests
             0.2m,
             300,
             0.15m,
-            8,
+            2,
             0.1m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),

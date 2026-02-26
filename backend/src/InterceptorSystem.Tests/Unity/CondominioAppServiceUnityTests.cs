@@ -58,7 +58,7 @@ public class CondominioAppServiceTests
         Assert.NotNull(result);
         Assert.Equal(input.Nome, result.Nome);
         Assert.Equal(input.Cnpj, result.Cnpj);
-        Assert.Equal(10, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal(10, result.QuantidadeIdealPorTurno);
         Assert.Equal("06:00:00", result.HorarioTrocaTurno);
         Assert.Equal("gestor@solar.com.br", result.EmailGestor);
         Assert.True(result.Ativo);
@@ -67,7 +67,7 @@ public class CondominioAppServiceTests
             c.EmpresaId == empresaId && 
             c.Nome == input.Nome && 
             c.Cnpj == input.Cnpj &&
-            c.QuantidadeFuncionariosIdeal == 10
+            c.QuantidadeIdealPorTurno == 10
         )), Times.Once);
         
         _mockUow.Verify(u => u.CommitAsync(), Times.Once);
@@ -159,12 +159,12 @@ public class CondominioAppServiceTests
         // --- ASSERT ---
         Assert.NotNull(result);
         Assert.Equal("Nome Atualizado", result.Nome);
-        Assert.Equal(12, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal(12, result.QuantidadeIdealPorTurno);
         Assert.Equal("07:00:00", result.HorarioTrocaTurno);
         
         _mockRepo.Verify(r => r.Update(It.Is<Condominio>(c => 
             c.Nome == input.Nome && 
-            c.QuantidadeFuncionariosIdeal == 12
+            c.QuantidadeIdealPorTurno == 12
         )), Times.Once);
         _mockUow.Verify(u => u.CommitAsync(), Times.Once);
     }

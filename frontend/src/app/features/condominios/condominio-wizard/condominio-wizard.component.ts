@@ -3,20 +3,17 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, firstValueFrom } from 'rxjs';
+import { CriarCondominioCompletoOutput } from '../../../services/condominio-completo.service';
 import { CondominioService } from '../../../services/condominio.service';
-import { ContratoService } from '../../../services/contrato.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { StatusContrato, StatusFuncionario, TipoFuncionario, TipoEscala } from '../../../models/index';
-
-interface PostoDeTrabalhoForm {
-  horarioInicio: string;
-  horarioFim: string;
-  quantidadeFuncionarios: number;
-  permiteDobrarEscala: boolean;
-}
+import {
+  StatusContrato,
+  StatusFuncionario,
+  TipoFuncionario,
+  TipoEscala,
+} from '../../../models/index';
 
 @Component({
   selector: 'app-condominio-wizard',
@@ -28,10 +25,8 @@ interface PostoDeTrabalhoForm {
 export class CondominioWizardComponent implements OnInit {
   private fb = inject(FormBuilder);
   private condominioService = inject(CondominioService);
-  private contratoService = inject(ContratoService);
   private calculoService = inject(ContratoCalculoService);
   private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
   private router = inject(Router);
 
   // Controle do wizard
@@ -39,10 +34,6 @@ export class CondominioWizardComponent implements OnInit {
   totalSteps = 3;
   loading = signal(false);
   error = signal<string | null>(null);
-
-  // IDs gerados após criação
-  condominioId = signal<string | null>(null);
-  contratoId = signal<string | null>(null);
 
   // Formulários de cada etapa
   formCondominio!: FormGroup;
@@ -57,26 +48,17 @@ export class CondominioWizardComponent implements OnInit {
   ];
 
   // Computed para controle de navegação
-  canGoNext = computed(() => {
+  canGoNext(): boolean {
     const step = this.currentStep();
-    if (step === 1) return this.formCondominio?.valid;
+    if (step === 1) return this.formCondominio?.valid ?? false;
     if (step === 2) {
-      // Se optou por criar contrato, valida o formulário inteiro
       const criarContrato = this.formContrato?.get('criarContrato')?.value;
-      if (criarContrato) {
-        // Marca todos os campos como touched para mostrar erros
-        const valorDiaria = this.formContrato?.get('valorDiariaCobrada');
-        const dataInicio = this.formContrato?.get('dataInicio');
-        const mesesDuracao = this.formContrato?.get('mesesDuracao');
-
-        // Verifica se os campos obrigatórios estão válidos
-        return valorDiaria?.valid && dataInicio?.valid && mesesDuracao?.valid;
-      }
-      return true; // Se não criar contrato, pode avançar
+      if (criarContrato) return this.formContrato?.valid ?? false;
+      return true;
     }
     if (step === 3) return true; // Funcionários são opcionais
     return false;
-  });
+  }
 
   canGoBack = computed(() => this.currentStep() > 1);
   isLastStep = computed(() => this.currentStep() === this.totalSteps);
@@ -141,7 +123,9 @@ export class CondominioWizardComponent implements OnInit {
 
           const input = {
             valorDiariaCobrada: valores.valorDiariaCobrada,
-            quantidadeFuncionarios: this.formCondominio.get('funcionariosPorPosto')?.value || 0,
+            quantidadeFuncionarios:
+              (this.formCondominio.get('funcionariosPorPosto')?.value || 0) *
+              (this.formCondominio.get('numeroPostos')?.value || 2),
             numeroDePostos: this.formCondominio.get('numeroPostos')?.value || 2,
             valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
             percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
@@ -151,7 +135,7 @@ export class CondominioWizardComponent implements OnInit {
           };
 
           return this.calculoService.calcularValorTotal(input);
-        })
+        }),
       )
       .subscribe({
         next: (resultado) => {
@@ -169,10 +153,7 @@ export class CondominioWizardComponent implements OnInit {
 
     // Também observar mudanças no formCondominio (numeroPostos, funcionariosPorPosto)
     this.formCondominio.valueChanges
-      .pipe(
-        debounceTime(500),
-        distinctUntilChanged()
-      )
+      .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => {
         // Forçar recálculo disparando valueChanges no formContrato
         const criarContrato = this.formContrato.get('criarContrato')?.value;
@@ -187,7 +168,10 @@ export class CondominioWizardComponent implements OnInit {
     this.formCondominio = this.fb.group({
       // Dados do condomínio
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cnpj: ['', [Validators.required, Validators.pattern(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/)]],
+      cnpj: [
+        '',
+        [Validators.required, Validators.pattern(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/)],
+      ],
       endereco: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(300)]],
       numeroPostos: [2, [Validators.required, Validators.min(1), Validators.max(10)]],
       funcionariosPorPosto: [2, [Validators.required, Validators.min(1), Validators.max(5)]],
@@ -203,7 +187,10 @@ export class CondominioWizardComponent implements OnInit {
       valorDiariaCobrada: [100, [Validators.required, Validators.min(0.01)]],
       valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]],
       percentualImpostos: [15, [Validators.required, Validators.min(0), Validators.max(100)]],
-      percentualAdicionalNoturno: [20, [Validators.required, Validators.min(0), Validators.max(100)]],
+      percentualAdicionalNoturno: [
+        20,
+        [Validators.required, Validators.min(0), Validators.max(100)],
+      ],
       percentualMargemLucro: [15, [Validators.required, Validators.min(0), Validators.max(100)]],
       percentualMargemFaltas: [10, [Validators.required, Validators.min(0), Validators.max(100)]],
       dataInicio: [this.formatDate(new Date()), [Validators.required]],
@@ -350,14 +337,13 @@ export class CondominioWizardComponent implements OnInit {
 
   contarFuncionariosPorStatus(status: string): number {
     return this.funcionarios.controls.filter(
-      (func) => func.get('statusFuncionario')?.value === status
+      (func) => func.get('statusFuncionario')?.value === status,
     ).length;
   }
 
   contarFuncionariosPorTipo(tipo: string): number {
-    return this.funcionarios.controls.filter(
-      (func) => func.get('tipoFuncionario')?.value === tipo
-    ).length;
+    return this.funcionarios.controls.filter((func) => func.get('tipoFuncionario')?.value === tipo)
+      .length;
   }
 
   // Navegação entre steps
@@ -375,13 +361,13 @@ export class CondominioWizardComponent implements OnInit {
     }
 
     if (this.currentStep() < this.totalSteps && this.canGoNext()) {
-      this.currentStep.update(v => v + 1);
+      this.currentStep.update((v) => v + 1);
       this.error.set(null);
     }
   }
 
   markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
 
@@ -393,7 +379,7 @@ export class CondominioWizardComponent implements OnInit {
 
   previousStep(): void {
     if (this.canGoBack()) {
-      this.currentStep.update(v => v - 1);
+      this.currentStep.update((v) => v - 1);
       this.error.set(null);
     }
   }
@@ -414,7 +400,7 @@ export class CondominioWizardComponent implements OnInit {
         // Validar STEP 2 (Contrato - se habilitado)
         if (currentStepNum === 2) {
           const criarContrato = this.formContrato?.get('criarContrato')?.value;
-          if (criarContrato && !this.isContratoFormValid()) {
+          if (criarContrato && !this.formContrato?.valid) {
             this.markFormGroupTouched(this.formContrato);
             this.error.set('⚠️ Preencha todos os campos obrigatórios do contrato antes de avançar');
             return;
@@ -428,13 +414,6 @@ export class CondominioWizardComponent implements OnInit {
     }
   }
 
-  private isContratoFormValid(): boolean {
-    const valorDiaria = this.formContrato?.get('valorDiariaCobrada');
-    const dataInicio = this.formContrato?.get('dataInicio');
-    const mesesDuracao = this.formContrato?.get('mesesDuracao');
-    return (valorDiaria?.valid && dataInicio?.valid && mesesDuracao?.valid) || false;
-  }
-
   // Submissão final
   async onSubmit(): Promise<void> {
     this.loading.set(true);
@@ -444,7 +423,7 @@ export class CondominioWizardComponent implements OnInit {
       const criarContrato = this.formContrato.get('criarContrato')?.value;
 
       if (!criarContrato) {
-        // Se não criar contrato, criar apenas condomínio manualmente
+        // Se não criar contrato, criar apenas condomínio
         const condominioId = await this.criarCondominio();
         this.router.navigate(['/condominios', condominioId]);
         return;
@@ -453,18 +432,52 @@ export class CondominioWizardComponent implements OnInit {
       // Usar endpoint /api/condominios-completos para criar tudo junto
       const payload = this.montarPayloadCompleto();
 
-      console.log('📤 Payload enviado para /api/condominios-completos:', JSON.stringify(payload, null, 2));
+      console.log(
+        '📤 Payload enviado para /api/condominios-completos:',
+        JSON.stringify(payload, null, 2),
+      );
 
       this.condominioService.createCompleto(payload).subscribe({
-        next: (response) => {
-          this.loading.set(false);
+        next: async (response: CriarCondominioCompletoOutput) => {
           console.log('✅ Resposta recebida:', response);
-          // Redirecionar para o condomínio criado
+
+          // Criar funcionários do Step 3, se houver
+          const funcionariosParaCriar = this.funcionarios.controls;
+          if (funcionariosParaCriar.length > 0) {
+            const contratoId = response.contrato.id;
+            const condominioId = response.condominio.id;
+
+            for (const funcControl of funcionariosParaCriar) {
+              const func = funcControl.value;
+              try {
+                await firstValueFrom(
+                  this.funcionarioService.create({
+                    condominioId,
+                    contratoId,
+                    nome: func.nome,
+                    cpf: func.cpf,
+                    celular: func.celular || '',
+                    tipoFuncionario: func.tipoFuncionario,
+                    statusFuncionario: func.statusFuncionario,
+                    tipoEscala: func.tipoEscala,
+                  }),
+                );
+              } catch (funcErr: any) {
+                console.error('❌ Erro ao criar funcionário:', func.nome, funcErr);
+              }
+            }
+          }
+
+          this.loading.set(false);
           this.router.navigate(['/condominios', response.condominio.id]);
         },
         error: (err) => {
           this.loading.set(false);
-          const errorMessage = err.error?.error || err.error?.message || err.message || 'Erro ao criar condomínio completo';
+          const errorMessage =
+            err.error?.error ||
+            err.error?.message ||
+            err.message ||
+            'Erro ao criar condomínio completo';
           this.error.set(errorMessage);
           console.error('❌ Erro detalhado:', err);
           console.error('❌ Status:', err.status);
@@ -484,7 +497,8 @@ export class CondominioWizardComponent implements OnInit {
 
     // Converter horário para formato backend (HH:mm -> HH:mm:ss)
     const horario = formCondominioValue.horarioTrocaTurno;
-    const horarioCompleto = horario && horario.includes(':00', 5) ? horario : (horario || '06:00') + ':00';
+    const horarioCompleto =
+      horario && horario.includes(':00', 5) ? horario : (horario || '06:00') + ':00';
 
     // Limpar telefone (remover parênteses, espaços e hífens) - aceita null/vazio
     let telefone = formCondominioValue.telefoneEmergencia || '';
@@ -505,7 +519,7 @@ export class CondominioWizardComponent implements OnInit {
         nome: formCondominioValue.nome,
         cnpj: formCondominioValue.cnpj,
         endereco: formCondominioValue.endereco,
-        quantidadeFuncionariosIdeal: quantidadeTotalFuncionarios,
+        quantidadeIdealPorTurno: funcionariosPorPosto,
         horarioTrocaTurno: horarioCompleto,
         emailGestor: formCondominioValue.emailGestor || null,
         telefoneEmergencia: telefone || null,
@@ -517,8 +531,6 @@ export class CondominioWizardComponent implements OnInit {
         percentualAdicionalNoturno: (formContratoValue.percentualAdicionalNoturno || 0) / 100,
         valorBeneficiosExtrasMensal: formContratoValue.valorBeneficiosExtrasMensal || 0,
         percentualImpostos: (formContratoValue.percentualImpostos || 0) / 100,
-        quantidadeFuncionarios: quantidadeTotalFuncionarios,
-        numeroDePostos: numeroPostos,
         margemLucroPercentual: (formContratoValue.percentualMargemLucro || 0) / 100,
         margemCoberturaFaltasPercentual: (formContratoValue.percentualMargemFaltas || 0) / 100,
         dataInicio: formContratoValue.dataInicio,
@@ -551,7 +563,7 @@ export class CondominioWizardComponent implements OnInit {
         nome: formValue.nome,
         cnpj: formValue.cnpj,
         endereco: formValue.endereco,
-        quantidadeFuncionariosIdeal: quantidadeTotalFuncionarios,
+        quantidadeIdealPorTurno: funcionariosPorPosto,
         horarioTrocaTurno: horarioCompleto,
         emailGestor: formValue.emailGestor || null,
         telefoneEmergencia: telefone || null,
@@ -559,102 +571,11 @@ export class CondominioWizardComponent implements OnInit {
 
       this.condominioService.create(payload).subscribe({
         next: (response) => {
-          this.condominioId.set(response.id);
           resolve(response.id);
         },
         error: (err) => reject(err),
       });
     });
-  }
-
-  private async criarPostos(condominioId: string): Promise<void> {
-    const postos = this.formCondominio.get('postos')?.value || [];
-
-    const promises = postos.map((posto: PostoDeTrabalhoForm) => {
-      return new Promise((resolve, reject) => {
-        const payload = {
-          condominioId,
-          horarioInicio: posto.horarioInicio.includes(':00', 5)
-            ? posto.horarioInicio
-            : posto.horarioInicio + ':00',
-          horarioFim: posto.horarioFim.includes(':00', 5)
-            ? posto.horarioFim
-            : posto.horarioFim + ':00',
-          permiteDobrarEscala: posto.permiteDobrarEscala,
-          capacidadeMaximaExtraPorTerceiros: posto.quantidadeFuncionarios,
-        };
-
-        this.postoService.create(payload).subscribe({
-          next: () => resolve(true),
-          error: (err) => reject(err),
-        });
-      });
-    });
-
-    await Promise.all(promises);
-  }
-
-  private async criarContrato(condominioId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const formValue = this.formContrato.value;
-      const dataFim = this.calcularDataFim();
-
-      const payload = {
-        condominioId,
-        descricao: `Contrato - ${this.formCondominio.get('nome')?.value}`,
-        valorTotalMensal: this.faturamentoMensal(),
-        valorDiariaCobrada: formValue.valorDiariaCobrada,
-        percentualAdicionalNoturno: formValue.percentualAdicionalNoturno,
-        valorBeneficiosExtrasMensal: 0,
-        percentualImpostos: formValue.percentualImpostos,
-        quantidadeFuncionarios: this.formFuncionarios?.get('funcionarios')?.value?.length || 0,
-        margemLucroPercentual: formValue.percentualMargemLucro,
-        margemCoberturaFaltasPercentual: formValue.percentualMargemFaltas,
-        dataInicio: formValue.dataInicio,
-        dataFim: dataFim,
-        status: formValue.status,
-      };
-
-      this.contratoService.create(payload).subscribe({
-        next: (response) => {
-          this.contratoId.set(response.id);
-          resolve();
-        },
-        error: (err) => reject(err),
-      });
-    });
-  }
-
-  private async criarFuncionarios(condominioId: string): Promise<void> {
-    const funcionarios = this.formFuncionarios.get('funcionarios')?.value || [];
-    const contratoId = this.contratoId();
-
-    if (!contratoId) {
-      console.warn('Sem contrato criado, funcionários não serão criados');
-      return;
-    }
-
-    const promises = funcionarios.map((func: any) => {
-      return new Promise((resolve, reject) => {
-        const payload = {
-          condominioId,
-          contratoId,
-          nome: func.nome,
-          cpf: func.cpf,
-          celular: func.celular || null,
-          tipoFuncionario: func.tipoFuncionario,
-          statusFuncionario: func.statusFuncionario,
-          tipoEscala: func.tipoEscala,
-        };
-
-        this.funcionarioService.create(payload).subscribe({
-          next: () => resolve(true),
-          error: (err) => reject(err),
-        });
-      });
-    });
-
-    await Promise.all(promises);
   }
 
   cancel(): void {
@@ -663,4 +584,3 @@ export class CondominioWizardComponent implements OnInit {
     }
   }
 }
-

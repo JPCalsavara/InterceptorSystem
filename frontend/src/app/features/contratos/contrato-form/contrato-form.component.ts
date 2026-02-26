@@ -85,7 +85,6 @@ export class ContratoFormComponent implements OnInit {
       ],
       valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]], // Vale-transporte + alimentação
       percentualImpostos: [15, [Validators.required, Validators.min(0), Validators.max(100)]], // Impostos médios (INSS + FGTS)
-      quantidadeFuncionarios: [2, [Validators.required, Validators.min(1)]], // Mínimo 2 para cobertura 24h
       numeroDePostos: [2, [Validators.required, Validators.min(2), Validators.max(6)]], // 2 turnos (12x36) é padrão
       margemLucroPercentual: [15, [Validators.required, Validators.min(0), Validators.max(100)]], // 15% margem razoável
       margemCoberturaFaltasPercentual: [
@@ -110,14 +109,26 @@ export class ContratoFormComponent implements OnInit {
     });
   }
 
+  // Calcula o total de funcionários a partir do condomínio selecionado × número de postos
+  getQuantidadeFuncionariosTotal(condominioId: string, numeroDePostos: number): number {
+    const cond = this.condominios().find((c) => c.id === condominioId);
+    return (cond?.quantidadeIdealPorTurno || 0) * (numeroDePostos || 0);
+  }
+
   setupAutoCalculo(): void {
     this.form.valueChanges
       .pipe(
         debounceTime(500), // Aguarda 500ms após última mudança
         distinctUntilChanged(),
         switchMap((valores) => {
+          // Deriva total de funcionários do condomínio selecionado × postos
+          const quantidadeFuncionarios = this.getQuantidadeFuncionariosTotal(
+            valores.condominioId,
+            valores.numeroDePostos,
+          );
+
           // Validar campos necessários
-          if (!valores.valorDiariaCobrada || !valores.quantidadeFuncionarios) {
+          if (!valores.valorDiariaCobrada || !quantidadeFuncionarios) {
             this.breakdown.set(null);
             return of(null);
           }
@@ -128,7 +139,7 @@ export class ContratoFormComponent implements OnInit {
 
           const input = {
             valorDiariaCobrada: valores.valorDiariaCobrada,
-            quantidadeFuncionarios: valores.quantidadeFuncionarios,
+            quantidadeFuncionarios: quantidadeFuncionarios,
             numeroDePostos: valores.numeroDePostos || 2, // Padrão: 2 postos (12x36)
             valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
             percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
@@ -138,7 +149,7 @@ export class ContratoFormComponent implements OnInit {
           };
 
           return this.calculoService.calcularValorTotal(input);
-        })
+        }),
       )
       .subscribe({
         next: (resultado) => {
@@ -176,7 +187,7 @@ export class ContratoFormComponent implements OnInit {
           percentualAdicionalNoturno: data.percentualAdicionalNoturno * 100, // Converter 0-1 para 0-100
           valorBeneficiosExtrasMensal: data.valorBeneficiosExtrasMensal,
           percentualImpostos: data.percentualImpostos * 100, // Converter 0-1 para 0-100
-          quantidadeFuncionarios: data.quantidadeFuncionarios,
+          numeroDePostos: data.numeroDePostos,
           margemLucroPercentual: data.margemLucroPercentual * 100, // Converter 0-1 para 0-100
           margemCoberturaFaltasPercentual: data.margemCoberturaFaltasPercentual * 100, // Converter 0-1 para 0-100
           dataInicio: data.dataInicio,
@@ -229,7 +240,7 @@ export class ContratoFormComponent implements OnInit {
         this.error.set(
           this.isEdit()
             ? 'Erro ao atualizar contrato. Tente novamente.'
-            : 'Erro ao criar contrato. Tente novamente.'
+            : 'Erro ao criar contrato. Tente novamente.',
         );
         this.loading.set(false);
         console.error('Erro:', err);

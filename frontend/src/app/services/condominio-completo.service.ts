@@ -2,82 +2,56 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Condominio, Contrato, PostoDeTrabalho, StatusContrato } from '../models/index';
 
+// Espelha: CreateCondominioCompletoDtoInput (backend)
 export interface CriarCondominioCompletoInput {
-  // Dados do Condomínio
-  nome: string;
-  cnpj: string;
-  endereco: string;
-  quantidadeFuncionariosIdeal: number;
-  horarioTrocaTurno: string;
-  emailGestor?: string;
-  telefoneEmergencia?: string;
-
-  // Dados do Contrato
-  contratoDescricao: string;
-  valorDiariaCobrada: number;
-  percentualAdicionalNoturno: number;
-  valorBeneficiosExtrasMensal: number;
-  percentualImpostos: number;
-  margemLucroPercentual: number;
-  margemCoberturaFaltasPercentual: number;
-  dataInicio: string;
-  dataFim: string;
-
-  // Configuração de Postos
-  criarPostosAutomaticamente: boolean;
-  numeroPostos?: number;
-}
-
-export interface CriarCondominioCompletoOutput {
-  condominioId: string;
-  contratoId: string;
-  postoIds: string[];
-  valorTotalMensalCalculado: number;
-  mensagem: string;
-}
-
-export interface ValidarCriacaoCondominioCompletoOutput {
-  valido: boolean;
-  erros: string[];
-  avisos: string[];
-  preview: {
-    condominioNome: string;
-    valorTotalMensal: number;
-    numeroPostos: number;
-    postos: Array<{
-      horarioInicio: string;
-      horarioFim: string;
-      quantidadeIdealFuncionarios: number;
-    }>;
+  condominio: {
+    nome: string;
+    cnpj: string;
+    endereco: string;
+    quantidadeIdealPorTurno: number; // Funcionários ideais por turno
+    horarioTrocaTurno: string; // formato "HH:mm:ss"
+    emailGestor?: string;
+    telefoneEmergencia?: string;
   };
+  // Espelha: CreateContratoCompletoDtoInput — sem condominioId (preenchido automaticamente)
+  contrato: {
+    descricao: string;
+    valorTotalMensal: number;
+    valorDiariaCobrada: number;
+    percentualAdicionalNoturno: number; // 0-1 (ex: 0.20 = 20%)
+    valorBeneficiosExtrasMensal: number;
+    percentualImpostos: number; // 0-1 (ex: 0.15 = 15%)
+    margemLucroPercentual: number; // 0-1 (ex: 0.15 = 15%)
+    margemCoberturaFaltasPercentual: number; // 0-1 (ex: 0.10 = 10%)
+    dataInicio: string; // formato "yyyy-MM-dd"
+    dataFim: string; // formato "yyyy-MM-dd"
+    status: StatusContrato;
+  };
+  criarPostosAutomaticamente?: boolean; // padrão: true
+  numeroDePostos?: number; // padrão: 2 (diurno + noturno)
+}
+
+// Espelha: CondominioCompletoDtoOutput (backend)
+export interface CriarCondominioCompletoOutput {
+  condominio: Condominio;
+  contrato: Contrato;
+  postos: PostoDeTrabalho[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CondominioCompletoService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/condominios-completos`;
 
   /**
-   * Valida os dados antes de criar (dry-run)
-   */
-  validar(input: CriarCondominioCompletoInput): Observable<ValidarCriacaoCondominioCompletoOutput> {
-    return this.http.post<ValidarCriacaoCondominioCompletoOutput>(
-      `${this.apiUrl}/validar`,
-      input
-    );
-  }
-
-  /**
-   * Cria Condomínio + Contrato + Postos de Trabalho em uma única operação
+   * Cria Condomínio + Contrato + Postos de Trabalho em uma única operação atômica.
+   * Endpoint: POST /api/condominios-completos
    */
   criar(input: CriarCondominioCompletoInput): Observable<CriarCondominioCompletoOutput> {
-    return this.http.post<CriarCondominioCompletoOutput>(
-      this.apiUrl,
-      input
-    );
+    return this.http.post<CriarCondominioCompletoOutput>(this.apiUrl, input);
   }
 }
-

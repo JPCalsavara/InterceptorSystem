@@ -5,6 +5,9 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
+# Atualizar npm para versão 11.x
+RUN npm install -g npm@11.10.1
+
 # Copiar package.json e package-lock.json
 COPY package*.json ./
 
@@ -24,11 +27,17 @@ FROM node:20-alpine AS development
 
 WORKDIR /app
 
+# Atualizar npm para versão 11.x
+RUN npm install -g npm@11.10.1
+
 # Copiar package.json
 COPY package*.json ./
 
 # Instalar dependências (incluindo devDependencies)
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
+
+# Copiar código fonte ANTES de executar comandos Angular
+COPY . .
 
 # Expor porta do dev server
 EXPOSE 4200

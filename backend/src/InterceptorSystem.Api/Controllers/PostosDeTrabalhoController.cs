@@ -26,6 +26,7 @@ public class PostosDeTrabalhoController : ControllerBase
             var result = await _service.CreateAsync(input);
             return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
+        catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
         catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
@@ -51,6 +52,14 @@ public class PostosDeTrabalhoController : ControllerBase
     public async Task<IActionResult> GetByCondominio(Guid condominioId)
     {
         var result = await _service.GetByCondominioIdAsync(condominioId);
+        return Ok(result);
+    }
+
+    [HttpGet("contrato/{contratoId}")]
+    [ProducesResponseType(typeof(IEnumerable<PostoDeTrabalhoDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByContrato(Guid contratoId)
+    {
+        var result = await _service.GetByContratoIdAsync(contratoId);
         return Ok(result);
     }
 

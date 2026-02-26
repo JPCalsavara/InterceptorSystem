@@ -27,7 +27,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
             Nome: $"Condomínio Teste {DateTime.Now.Ticks}",
             Cnpj: cnpjCustomizado ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
             Endereco: "Rua Teste, 123",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6),
             EmailGestor: "gestor@teste.com.br",
             TelefoneEmergencia: "(11) 98765-4321"
@@ -50,7 +50,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
             Nome: "Condomínio Residencial Solar",
             Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-90",
             Endereco: "Av. Paulista, 1000",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6),
             EmailGestor: "gestor@solar.com.br",
             TelefoneEmergencia: "(11) 98765-4321"
@@ -68,7 +68,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         Assert.Equal(input.Nome, result.Nome);
         Assert.Equal(input.Cnpj, result.Cnpj);
         Assert.Equal(input.Endereco, result.Endereco);
-        Assert.Equal(10, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal(10, result.QuantidadeIdealPorTurno);
         Assert.Equal("06:00:00", result.HorarioTrocaTurno);
         Assert.Equal("gestor@solar.com.br", result.EmailGestor);
         Assert.True(result.Ativo);
@@ -87,7 +87,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
             Nome: "Primeiro Condomínio",
             Cnpj: cnpjDuplicado,
             Endereco: "Rua A, 123",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         await _client.PostAsJsonAsync("/api/condominios", input1);
@@ -97,7 +97,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
             Nome: "Segundo Condomínio",
             Cnpj: cnpjDuplicado,
             Endereco: "Rua B, 456",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
 
@@ -243,7 +243,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Condomínio Atualizado",
             Endereco: "Rua Atualizada, 999",
-            QuantidadeFuncionariosIdeal: 15,
+            QuantidadeIdealPorTurno: 15,
             HorarioTrocaTurno: TimeSpan.FromHours(7),
             EmailGestor: "novogestor@atualizado.com.br",
             TelefoneEmergencia: "(11) 99999-8888"
@@ -260,7 +260,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         Assert.Equal(condominioId, result.Id);
         Assert.Equal(updateInput.Nome, result.Nome);
         Assert.Equal(updateInput.Endereco, result.Endereco);
-        Assert.Equal(15, result.QuantidadeFuncionariosIdeal);
+        Assert.Equal(15, result.QuantidadeIdealPorTurno);
         Assert.Equal("07:00:00", result.HorarioTrocaTurno);
         Assert.Equal("novogestor@atualizado.com.br", result.EmailGestor);
     }
@@ -273,7 +273,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Nome Qualquer",
             Endereco: "Endereço Qualquer",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
 
@@ -294,7 +294,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Nome Atualizado",
             Endereco: "Endereço Atualizado",
-            QuantidadeFuncionariosIdeal: 12,
+            QuantidadeIdealPorTurno: 12,
             HorarioTrocaTurno: TimeSpan.FromHours(7)
         );
 
@@ -367,7 +367,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
             Nome: "Condomínio Fluxo Completo",
             Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-77",
             Endereco: "Rua Fluxo, 100",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         var createResponse = await _client.PostAsJsonAsync("/api/condominios", createInput);
@@ -385,7 +385,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         var updateInput = new UpdateCondominioDtoInput(
             Nome: "Condomínio Fluxo Atualizado",
             Endereco: "Rua Fluxo Atualizada, 200",
-            QuantidadeFuncionariosIdeal: 10,
+            QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
         var updateResponse = await _client.PutAsJsonAsync($"/api/condominios/{created.Id}", updateInput);

@@ -3,6 +3,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using Moq;
 
@@ -12,6 +13,7 @@ public class PostoDeTrabalhoAppServiceTests
 {
     private readonly Mock<IPostoDeTrabalhoRepository> _mockRepo;
     private readonly Mock<ICondominioRepository> _mockCondominioRepo;
+    private readonly Mock<IContratoRepository> _mockContratoRepo;
     private readonly Mock<ICurrentTenantService> _mockTenant;
     private readonly Mock<IUnitOfWork> _mockUow;
     private readonly PostoDeTrabalhoAppService _service;
@@ -20,13 +22,33 @@ public class PostoDeTrabalhoAppServiceTests
     {
         _mockRepo = new Mock<IPostoDeTrabalhoRepository>();
         _mockCondominioRepo = new Mock<ICondominioRepository>();
+        _mockContratoRepo = new Mock<IContratoRepository>();
         _mockTenant = new Mock<ICurrentTenantService>();
         _mockUow = new Mock<IUnitOfWork>();
 
         _mockRepo.Setup(r => r.UnitOfWork).Returns(_mockUow.Object);
         _mockCondominioRepo.Setup(r => r.UnitOfWork).Returns(_mockUow.Object);
 
-        _service = new PostoDeTrabalhoAppService(_mockRepo.Object, _mockCondominioRepo.Object, _mockTenant.Object);
+        _service = new PostoDeTrabalhoAppService(
+            _mockRepo.Object,
+            _mockCondominioRepo.Object,
+            _mockContratoRepo.Object,
+            _mockTenant.Object);
+    }
+
+    private static Contrato CriarContratoTeste(
+        Guid empresaId,
+        Guid condominioId,
+        int numeroDePostos = 2,
+        StatusContrato status = StatusContrato.ATIVO)
+    {
+        return new Contrato(
+            empresaId, condominioId, "Contrato Teste",
+            10000m, 50m, 0.20m, 500m, 0.15m,
+            numeroDePostos, 0.15m, 0.10m,
+            DateOnly.FromDateTime(DateTime.Today),
+            DateOnly.FromDateTime(DateTime.Today.AddYears(1)),
+            status);
     }
 
     #region CreateAsync Tests
@@ -37,12 +59,16 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
-        
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+        var contrato = CriarContratoTeste(empresaId, condominioId, numeroDePostos: 2);
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(new List<PostoDeTrabalho>());
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         // Act
@@ -55,6 +81,7 @@ public class PostoDeTrabalhoAppServiceTests
 
         _mockRepo.Verify(r => r.Add(It.Is<PostoDeTrabalho>(p =>
             p.CondominioId == condominioId &&
+            p.ContratoId == contratoId &&
             p.HorarioInicio == input.HorarioInicio &&
             p.HorarioFim == input.HorarioFim
         )), Times.Once);
@@ -68,12 +95,16 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
-        
-        var input = new CreatePostoInput(condominioId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), false);
+        var contrato = CriarContratoTeste(empresaId, condominioId, numeroDePostos: 2);
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), false);
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(new List<PostoDeTrabalho>());
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         // Act
@@ -85,13 +116,72 @@ public class PostoDeTrabalhoAppServiceTests
         Assert.Contains("06:00", result.Horario);
     }
 
+    [Fact(DisplayName = "CreateAsync - Deve criar posto quando contrato está PENDENTE")]
+    public async Task CreateAsync_DeveCriar_QuandoContratoPendente()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
+        var contrato = CriarContratoTeste(empresaId, condominioId, numeroDePostos: 2, status: StatusContrato.PENDENTE);
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(new List<PostoDeTrabalho>());
+        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        // Act
+        var result = await _service.CreateAsync(input);
+
+        // Assert
+        Assert.NotNull(result);
+        _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve criar posto quando abaixo do limite")]
+    public async Task CreateAsync_DeveCriar_QuandoAbaixoDoLimite()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
+        var contrato = CriarContratoTeste(empresaId, condominioId, numeroDePostos: 3);
+
+        // Apenas 1 posto existente, limite é 3 → pode criar
+        var postosExistentes = new List<PostoDeTrabalho>
+        {
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true)
+        };
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true);
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(postosExistentes);
+        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+
+        // Act
+        var result = await _service.CreateAsync(input);
+
+        // Assert
+        Assert.NotNull(result);
+        _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Once);
+    }
+
     [Fact(DisplayName = "CreateAsync - Deve falhar quando condomínio não existe")]
     public async Task CreateAsync_DeveFalhar_QuandoCondominioNaoExiste()
     {
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        var input = new CreatePostoInput(condominioId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+        var contratoId = Guid.NewGuid();
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync((Condominio?)null);
@@ -103,18 +193,122 @@ public class PostoDeTrabalhoAppServiceTests
         _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Never);
     }
 
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando contrato não existe")]
+    public async Task CreateAsync_DeveFalhar_QuandoContratoNaoExiste()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync((Contrato?)null);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
+        Assert.Contains("Contrato não encontrado", exception.Message);
+
+        _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando contrato não pertence ao condomínio")]
+    public async Task CreateAsync_DeveFalhar_QuandoContratoNaoPertenceAoCondominio()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var outroCondominioId = Guid.NewGuid(); // contrato pertence a outro condomínio
+        var contratoId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
+        var contrato = CriarContratoTeste(empresaId, outroCondominioId);
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("não pertence ao condomínio", exception.Message);
+
+        _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando contrato está FINALIZADO")]
+    public async Task CreateAsync_DeveFalhar_QuandoContratoFinalizado()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
+        var contrato = CriarContratoTeste(empresaId, condominioId, status: StatusContrato.FINALIZADO);
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("ativo ou pendente", exception.Message);
+
+        _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando limite de postos do contrato é atingido")]
+    public async Task CreateAsync_DeveFalhar_QuandoLimiteDePostosAtingido()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
+        var contrato = CriarContratoTeste(empresaId, condominioId, numeroDePostos: 2);
+
+        // 2 postos já existentes — igual ao limite (2)
+        var postosExistentes = new List<PostoDeTrabalho>
+        {
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true),
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true)
+        };
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0), true);
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(postosExistentes);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("Limite de postos", exception.Message);
+
+        _mockRepo.Verify(r => r.Add(It.IsAny<PostoDeTrabalho>()), Times.Never);
+    }
+
     [Fact(DisplayName = "CreateAsync - Deve falhar quando duração não é 12 horas")]
     public async Task CreateAsync_DeveFalhar_QuandoDuracaoInvalida()
     {
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var condominio = new Condominio(empresaId, "Condomínio Teste", "11.111.111/0001-11", "Rua X", 10, TimeSpan.FromHours(6));
-        
-        var input = new CreatePostoInput(condominioId, new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), false); // 8 horas
+        var contrato = CriarContratoTeste(empresaId, condominioId);
+
+        var input = new CreatePostoInput(condominioId, contratoId, new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), false); // 8 horas
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockCondominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
+        _mockContratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(new List<PostoDeTrabalho>());
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
@@ -131,9 +325,9 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        // FASE 4: Sem QuantidadeIdealFuncionarios
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+        var posto = new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
 
         var input = new UpdatePostoInput(new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true);
 
@@ -174,9 +368,9 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        // FASE 4: Sem QuantidadeIdealFuncionarios
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+        var posto = new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
 
         var input = new UpdatePostoInput(new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), false); // 8 horas
 
@@ -199,9 +393,9 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        // FASE 4: Sem QuantidadeIdealFuncionarios
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+        var posto = new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
         _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
@@ -238,9 +432,9 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        // FASE 4: Sem QuantidadeIdealFuncionarios
-        var posto = new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
+        var posto = new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true);
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
 
@@ -279,12 +473,12 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        // FASE 4: Sem QuantidadeIdealFuncionarios
+        var contratoId = Guid.NewGuid();
         var postos = new List<PostoDeTrabalho>
         {
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true),
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true),
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0), false)
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true),
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true),
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(7, 0, 0), new TimeSpan(19, 0, 0), false)
         };
 
         _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(postos);
@@ -323,11 +517,11 @@ public class PostoDeTrabalhoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var condominioId = Guid.NewGuid();
-        // FASE 4: Sem QuantidadeIdealFuncionarios
+        var contratoId = Guid.NewGuid();
         var postos = new List<PostoDeTrabalho>
         {
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true),
-            new PostoDeTrabalho(condominioId, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true)
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true),
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), true)
         };
 
         _mockRepo.Setup(r => r.GetByCondominioIdAsync(condominioId)).ReturnsAsync(postos);
@@ -359,5 +553,49 @@ public class PostoDeTrabalhoAppServiceTests
     }
 
     #endregion
-}
 
+    #region GetByContratoIdAsync Tests
+
+    [Fact(DisplayName = "GetByContratoIdAsync - Deve retornar postos do contrato")]
+    public async Task GetByContratoIdAsync_DeveRetornarPostosDoContrato()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var condominioId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+        var postos = new List<PostoDeTrabalho>
+        {
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), true),
+            new PostoDeTrabalho(condominioId, empresaId, contratoId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), false)
+        };
+
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(postos);
+
+        // Act
+        var result = await _service.GetByContratoIdAsync(contratoId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count());
+        Assert.All(result, p => Assert.Equal(contratoId, p.ContratoId));
+
+        _mockRepo.Verify(r => r.GetByContratoIdAsync(contratoId), Times.Once);
+    }
+
+    [Fact(DisplayName = "GetByContratoIdAsync - Deve retornar lista vazia quando não há postos")]
+    public async Task GetByContratoIdAsync_DeveRetornarVazio_QuandoNaoHaPostos()
+    {
+        // Arrange
+        var contratoId = Guid.NewGuid();
+        _mockRepo.Setup(r => r.GetByContratoIdAsync(contratoId)).ReturnsAsync(new List<PostoDeTrabalho>());
+
+        // Act
+        var result = await _service.GetByContratoIdAsync(contratoId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result);
+    }
+
+    #endregion
+}

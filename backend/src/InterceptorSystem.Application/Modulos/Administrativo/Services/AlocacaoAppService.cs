@@ -69,6 +69,76 @@ public class AlocacaoAppService : IAlocacaoAppService
         return AlocacaoDtoOutput.FromEntity(alocacao)!;
     }
 
+    /// <summary>
+    /// Cria múltiplas alocações em lote (usado ao cadastrar funcionário)
+    /// Validação otimizada para não fazer N queries individuais
+    /// </summary>
+    public async Task<List<AlocacaoDtoOutput>> CreateBatchAsync(CreateAlocacoesBatchDtoInput batch)
+    {
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+
+        if (batch.Alocacoes == null || !batch.Alocacoes.Any())
+        {
+            throw new InvalidOperationException("Nenhuma alocação foi informada.");
+        }
+
+        // Validar primeiro item para obter funcionário e posto
+        var primeiraAlocacao = batch.Alocacoes.First();
+        
+        var funcionario = await _funcionarioRepository.GetByIdAsync(primeiraAlocacao.FuncionarioId)
+            ?? throw new KeyNotFoundException("Funcionário não encontrado.");
+
+        var posto = await _postoRepository.GetByIdAsync(primeiraAlocacao.PostoDeTrabalhoId)
+            ?? throw new KeyNotFoundException("Posto de Trabalho não encontrado.");
+
+        if (funcionario.CondominioId != posto.CondominioId)
+        {
+            throw new InvalidOperationException("Funcionário e Posto devem pertencer ao mesmo condomínio.");
+        }
+
+        // Criar todas as alocações
+        var alocacoesCriadas = new List<Alocacao>();
+        
+        foreach (var input in batch.Alocacoes)
+        {
+            // Validação básica: todas devem ser do mesmo funcionário e posto
+            if (input.FuncionarioId != funcionario.Id || input.PostoDeTrabalhoId != posto.Id)
+            {
+                throw new InvalidOperationException("Todas as alocações devem ser do mesmo funcionário e posto.");
+            }
+
+            var alocacao = new Alocacao(
+                empresaId,
+                input.FuncionarioId,
+                input.PostoDeTrabalhoId,
+                input.Data,
+                input.StatusAlocacao,
+                input.TipoAlocacao
+            );
+
+            alocacoesCriadas.Add(alocacao);
+        }
+
+        // Adicionar todas de uma vez (mais eficiente)
+        foreach (var alocacao in alocacoesCriadas)
+        {
+            _repository.Add(alocacao);
+        }
+
+        // Commit único para todas as alocações
+        await _repository.UnitOfWork.CommitAsync();
+
+        // Retornar DTOs
+        return alocacoesCriadas.Select(a => new AlocacaoDtoOutput(
+            a.Id,
+            a.FuncionarioId,
+            a.PostoDeTrabalhoId,
+            a.Data,
+            a.StatusAlocacao,
+            a.TipoAlocacao
+        )).ToList();
+    }
+
     public async Task<AlocacaoDtoOutput> UpdateAsync(Guid id, UpdateAlocacaoDtoInput input)
     {
         var alocacao = await _repository.GetByIdAsync(id)

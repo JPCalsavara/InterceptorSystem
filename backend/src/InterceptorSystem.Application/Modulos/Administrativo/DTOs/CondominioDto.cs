@@ -3,7 +3,7 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 public record UpdateCondominioDtoInput(
     string Nome, 
     string Endereco,
-    int QuantidadeFuncionariosIdeal,
+    int QuantidadeIdealPorTurno,
     TimeSpan HorarioTrocaTurno,
     string? EmailGestor = null,
     string? TelefoneEmergencia = null);
@@ -12,7 +12,7 @@ public record CreateCondominioDtoInput(
     string Nome, 
     string Cnpj, 
     string Endereco,
-    int QuantidadeFuncionariosIdeal,
+    int QuantidadeIdealPorTurno,
     TimeSpan HorarioTrocaTurno,
     string? EmailGestor = null,
     string? TelefoneEmergencia = null);
@@ -23,7 +23,7 @@ public record CondominioDtoOutput(
     string Cnpj, 
     string Endereco, 
     bool Ativo,
-    int QuantidadeFuncionariosIdeal,
+    int QuantidadeIdealPorTurno,
     string HorarioTrocaTurno,
     string? EmailGestor,
     string? TelefoneEmergencia)
@@ -43,7 +43,7 @@ public record CondominioDtoOutput(
             entity.Cnpj, 
             entity.Endereco, 
             entity.Ativo,
-            entity.QuantidadeFuncionariosIdeal,
+            entity.QuantidadeIdealPorTurno,
             entity.HorarioTrocaTurno.ToString(@"hh\:mm\:ss"),
             entity.EmailGestor,
             entity.TelefoneEmergencia);

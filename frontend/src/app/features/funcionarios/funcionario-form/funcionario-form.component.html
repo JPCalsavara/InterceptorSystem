@@ -23,16 +23,16 @@
   </div>
 
   @if (error()) {
-  <div class="alert alert-error">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        clip-rule="evenodd"
-      />
-    </svg>
-    {{ error() }}
-  </div>
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      {{ error() }}
+    </div>
   }
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
@@ -52,11 +52,11 @@
           >
             <option value="">Selecione um condomínio</option>
             @for (cond of condominios(); track cond.id) {
-            <option [value]="cond.id">{{ cond.nome }}</option>
+              <option [value]="cond.id">{{ cond.nome }}</option>
             }
           </select>
           @if (hasError('condominioId')) {
-          <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+            <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
           }
         </div>
       </div>
@@ -72,7 +72,7 @@
           placeholder="Ex: João Silva Santos"
         />
         @if (hasError('nome')) {
-        <span class="error-message">{{ getErrorMessage('nome') }}</span>
+          <span class="error-message">{{ getErrorMessage('nome') }}</span>
         }
       </div>
 
@@ -86,10 +86,11 @@
             class="form-input"
             [class.error]="hasError('cpf')"
             placeholder="000.000.000-00"
+            mask="000.000.000-00"
             maxlength="14"
           />
           @if (hasError('cpf')) {
-          <span class="error-message">{{ getErrorMessage('cpf') }}</span>
+            <span class="error-message">{{ getErrorMessage('cpf') }}</span>
           }
         </div>
 
@@ -102,10 +103,11 @@
             class="form-input"
             [class.error]="hasError('celular')"
             placeholder="(00) 00000-0000"
+            mask="(00) 0000-0000||(00) 00000-0000"
             maxlength="15"
           />
           @if (hasError('celular')) {
-          <span class="error-message">{{ getErrorMessage('celular') }}</span>
+            <span class="error-message">{{ getErrorMessage('celular') }}</span>
           }
         </div>
       </div>
@@ -124,11 +126,11 @@
             [class.error]="hasError('tipoFuncionario')"
           >
             @for (opt of tipoOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value">{{ opt.label }}</option>
             }
           </select>
           @if (hasError('tipoFuncionario')) {
-          <span class="error-message">{{ getErrorMessage('tipoFuncionario') }}</span>
+            <span class="error-message">{{ getErrorMessage('tipoFuncionario') }}</span>
           }
         </div>
 
@@ -143,17 +145,16 @@
             [class.error]="hasError('tipoEscala')"
           >
             @for (opt of escalaOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value">{{ opt.label }}</option>
             }
           </select>
           @if (hasError('tipoEscala')) {
-          <span class="error-message">{{ getErrorMessage('tipoEscala') }}</span>
+            <span class="error-message">{{ getErrorMessage('tipoEscala') }}</span>
           }
         </div>
       </div>
 
       <div class="form-row">
-
         <div class="form-group">
           <label for="statusFuncionario" class="form-label">
             Status <span class="required">*</span>
@@ -165,11 +166,11 @@
             [class.error]="hasError('statusFuncionario')"
           >
             @for (opt of statusOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value">{{ opt.label }}</option>
             }
           </select>
           @if (hasError('statusFuncionario')) {
-          <span class="error-message">{{ getErrorMessage('statusFuncionario') }}</span>
+            <span class="error-message">{{ getErrorMessage('statusFuncionario') }}</span>
           }
         </div>
       </div>
@@ -182,9 +183,10 @@
           </button>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             @if (loading()) {
-            <span class="spinner-small"></span>
-            Salvando... } @else {
-            {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
+              <span class="spinner-small"></span>
+              Salvando...
+            } @else {
+              {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
             }
           </button>
         </div>

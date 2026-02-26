@@ -46,7 +46,7 @@ public class ContratoAppService : IContratoAppService
             input.PercentualAdicionalNoturno,
             input.ValorBeneficiosExtrasMensal,
             input.PercentualImpostos,
-            input.QuantidadeFuncionarios,
+            input.NumeroDePostos,
             input.MargemLucroPercentual,
             input.MargemCoberturaFaltasPercentual,
             input.DataInicio,
@@ -64,9 +64,9 @@ public class ContratoAppService : IContratoAppService
         var contrato = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Contrato não encontrado.");
 
-        // Validar se não há contrato vigente quando alterando status para PAGO ou PENDENTE
-        if ((input.Status == StatusContrato.PAGO || input.Status == StatusContrato.PENDENTE) && 
-            contrato.Status == StatusContrato.INATIVO)
+        // Validar se não há contrato vigente quando alterando status para ATIVO ou PENDENTE
+        if ((input.Status == StatusContrato.ATIVO || input.Status == StatusContrato.PENDENTE) && 
+            contrato.Status == StatusContrato.FINALIZADO)
         {
             var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(contrato.CondominioId, id);
             if (existeContratoVigente)
@@ -82,7 +82,7 @@ public class ContratoAppService : IContratoAppService
             input.PercentualAdicionalNoturno,
             input.ValorBeneficiosExtrasMensal,
             input.PercentualImpostos,
-            input.QuantidadeFuncionarios,
+            input.NumeroDePostos,
             input.MargemLucroPercentual,
             input.MargemCoberturaFaltasPercentual,
             input.DataInicio,

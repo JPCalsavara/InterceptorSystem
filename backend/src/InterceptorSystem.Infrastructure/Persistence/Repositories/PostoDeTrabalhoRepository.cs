@@ -17,12 +17,12 @@ public class PostoDeTrabalhoRepository : IPostoDeTrabalhoRepository
 
     public IUnitOfWork UnitOfWork => _context;
 
-    // FASE 4: Eager loading do Condominio necessário para QuantidadeIdealFuncionarios calculado
+    // FASE 4: Eager loading do Condominio necessário para QuantidadeIdealFuncionarios (vem de Condominio.QuantidadeIdealPorTurno)
     public async Task<PostoDeTrabalho?> GetByIdAsync(Guid id)
     {
         return await _context.PostosDeTrabalho
             .Include(p => p.Condominio)
-                .ThenInclude(c => c.PostosDeTrabalho) // Para calcular divisão de funcionários
+            .Include(p => p.Contrato)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -30,7 +30,7 @@ public class PostoDeTrabalhoRepository : IPostoDeTrabalhoRepository
     {
         return await _context.PostosDeTrabalho
             .Include(p => p.Condominio)
-                .ThenInclude(c => c.PostosDeTrabalho)
+            .Include(p => p.Contrato)
             .ToListAsync();
     }
 
@@ -38,8 +38,17 @@ public class PostoDeTrabalhoRepository : IPostoDeTrabalhoRepository
     {
         return await _context.PostosDeTrabalho
             .Include(p => p.Condominio)
-                .ThenInclude(c => c.PostosDeTrabalho)
+            .Include(p => p.Contrato)
             .Where(p => p.CondominioId == condominioId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<PostoDeTrabalho>> GetByContratoIdAsync(Guid contratoId)
+    {
+        return await _context.PostosDeTrabalho
+            .Include(p => p.Condominio)
+            .Include(p => p.Contrato)
+            .Where(p => p.ContratoId == contratoId)
             .ToListAsync();
     }
 

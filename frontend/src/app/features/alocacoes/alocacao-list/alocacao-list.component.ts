@@ -119,24 +119,26 @@ export class AlocacaoListComponent implements OnInit {
       currentDay.setDate(weekStart.getDate() + i);
       const dateStr = this.formatDateToISO(currentDay);
 
-      const dayPostos = this.postos().map(posto => {
-        const condominio = this.condominios().find(c => c.id === posto.condominioId);
-        const alocacoes = this.alocacoesFiltradas().filter(a =>
-          a.postoDeTrabalhoId === posto.id && a.data === dateStr
-        );
+      const dayPostos = this.postos()
+        .map((posto) => {
+          const condominio = this.condominios().find((c) => c.id === posto.condominioId);
+          const alocacoes = this.alocacoesFiltradas().filter(
+            (a) => a.postoDeTrabalhoId === posto.id && a.data === dateStr,
+          );
 
-        return {
-          posto,
-          condominio: condominio!,
-          alocacoes
-        };
-      }).filter(item => item.condominio && item.alocacoes.length > 0);
+          return {
+            posto,
+            condominio: condominio!,
+            alocacoes,
+          };
+        })
+        .filter((item) => item.condominio && item.alocacoes.length > 0);
 
       columns.push({
         date: currentDay,
         dateStr,
         dayName: this.getDayName(currentDay),
-        postos: dayPostos
+        postos: dayPostos,
       });
     }
 
@@ -166,7 +168,7 @@ export class AlocacaoListComponent implements OnInit {
         date: cellDate,
         dateStr: this.formatDateToISO(cellDate),
         isCurrentMonth: false,
-        alocacoes: []
+        alocacoes: [],
       });
     }
 
@@ -174,13 +176,13 @@ export class AlocacaoListComponent implements OnInit {
     for (let day = 1; day <= daysInMonth; day++) {
       const cellDate = new Date(year, month, day);
       const dateStr = this.formatDateToISO(cellDate);
-      const alocacoes = this.alocacoesFiltradas().filter(a => a.data === dateStr);
+      const alocacoes = this.alocacoesFiltradas().filter((a) => a.data === dateStr);
 
       cells.push({
         date: cellDate,
         dateStr,
         isCurrentMonth: true,
-        alocacoes
+        alocacoes,
       });
     }
 
@@ -192,7 +194,7 @@ export class AlocacaoListComponent implements OnInit {
         date: cellDate,
         dateStr: this.formatDateToISO(cellDate),
         isCurrentMonth: false,
-        alocacoes: []
+        alocacoes: [],
       });
     }
 
@@ -204,9 +206,9 @@ export class AlocacaoListComponent implements OnInit {
     const funcionariosUsados = new Map<string, { funcionario: Funcionario; number: number }>();
     let counter = 1;
 
-    this.alocacoesFiltradas().forEach(alocacao => {
+    this.alocacoesFiltradas().forEach((alocacao) => {
       if (!funcionariosUsados.has(alocacao.funcionarioId)) {
-        const funcionario = this.funcionarios().find(f => f.id === alocacao.funcionarioId);
+        const funcionario = this.funcionarios().find((f) => f.id === alocacao.funcionarioId);
         if (funcionario) {
           funcionariosUsados.set(alocacao.funcionarioId, { funcionario, number: counter++ });
         }
@@ -376,8 +378,18 @@ export class AlocacaoListComponent implements OnInit {
 
   getMonthName(date: Date): string {
     const months = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
     ];
     return months[date.getMonth()];
   }
@@ -399,8 +411,24 @@ export class AlocacaoListComponent implements OnInit {
   }
 
   getFuncionarioNumber(funcionarioId: string): number {
-    const item = this.funcionariosLegenda().find(f => f.funcionario.id === funcionarioId);
+    const item = this.funcionariosLegenda().find((f) => f.funcionario.id === funcionarioId);
     return item?.number || 0;
+  }
+
+  getFuncionarioLegendaIndex(funcionarioId: string): number {
+    return this.funcionariosLegenda().findIndex((item) => item.funcionario.id === funcionarioId);
+  }
+
+  getAlocacaoMonthlyClass(alocacao: Alocacao): string {
+    if (alocacao.statusAlocacao === 'FALTA_REGISTRADA') return 'emp-falta';
+    if (alocacao.tipoAlocacao === 'SUBSTITUICAO') return 'emp-substituicao';
+    const index = this.getFuncionarioLegendaIndex(alocacao.funcionarioId);
+    return `emp-color-${index % 12}`;
+  }
+
+  getLegendColorClass(funcionarioId: string): string {
+    const index = this.getFuncionarioLegendaIndex(funcionarioId);
+    return `emp-color-${index % 12}`;
   }
 
   getFuncionarioNome(funcionarioId: string): string {

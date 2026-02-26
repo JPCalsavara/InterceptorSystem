@@ -9,763 +9,879 @@
   <div class="progress-container">
     <div class="progress-steps">
       @for (step of steps; track step.number) {
-      <div
-        class="step-item"
-        [class.active]="currentStep() === step.number"
-        [class.clickable]="true"
-        (click)="goToStep(step.number)">
-        <div class="step-circle">
-          @if (currentStep() === step.number) {
-            <div class="step-circle-filled"></div>
-          } @else {
-            <span class="step-number">{{ step.number }}</span>
-          }
+        <div
+          class="step-item"
+          [class.active]="currentStep() === step.number"
+          [class.clickable]="true"
+          (click)="goToStep(step.number)"
+        >
+          <div class="step-circle">
+            @if (currentStep() === step.number) {
+              <div class="step-circle-filled"></div>
+            } @else {
+              <span class="step-number">{{ step.number }}</span>
+            }
+          </div>
+          <div class="step-label">
+            <span class="step-icon">{{ step.icon }}</span>
+            <span class="step-text">{{ step.label }}</span>
+          </div>
         </div>
-        <div class="step-label">
-          <span class="step-icon">{{ step.icon }}</span>
-          <span class="step-text">{{ step.label }}</span>
-        </div>
-      </div>
-      @if (!$last) {
-      <div class="step-connector" [class.active]="currentStep() > step.number"></div>
-      }
+        @if (!$last) {
+          <div class="step-connector" [class.active]="currentStep() > step.number"></div>
+        }
       }
     </div>
   </div>
 
   <!-- Error Message -->
   @if (error()) {
-  <div class="error-message">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-    </svg>
-    <span>{{ error() }}</span>
-  </div>
+    <div class="error-message">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
   }
 
   <!-- Step Content -->
   <div class="wizard-content">
-
     <!-- STEP 1: Condomínio -->
     @if (currentStep() === 1) {
-    <div class="step-content">
-      <h2>🏢 Dados do Condomínio</h2>
+      <div class="step-content">
+        <h2>🏢 Dados do Condomínio</h2>
 
-      <form [formGroup]="formCondominio" class="form-grid">
-        <div class="form-card">
-          <!-- Nome -->
-          <div class="form-group">
-            <label for="nome" class="form-label">
-              Nome do Condomínio <span class="required">*</span>
-            </label>
-            <input
-              id="nome"
-              type="text"
-              formControlName="nome"
-              class="form-input"
-              [class.error]="hasError('nome')"
-              placeholder="Ex: Condomínio Horizonte Verde"
-            />
-            @if (hasError('nome')) {
-            <span class="error-message">{{ getErrorMessage('nome') }}</span>
-            }
-          </div>
-
-          <!-- CNPJ -->
-          <div class="form-group">
-            <label for="cnpj" class="form-label"> CNPJ <span class="required">*</span> </label>
-            <input
-              id="cnpj"
-              type="text"
-              formControlName="cnpj"
-              class="form-input"
-              [class.error]="hasError('cnpj')"
-              placeholder="Ex: 12.345.678/0001-90"
-            />
-            @if (hasError('cnpj')) {
-            <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
-            }
-            <span class="help-text">Formato: 00.000.000/0000-00</span>
-          </div>
-
-          <!-- Endereço -->
-          <div class="form-group">
-            <label for="endereco" class="form-label"> Endereço <span class="required">*</span> </label>
-            <textarea
-              id="endereco"
-              formControlName="endereco"
-              class="form-input"
-              [class.error]="hasError('endereco')"
-              rows="3"
-              placeholder="Ex: Rua das Flores, 123 - Centro - São Paulo/SP"
-            ></textarea>
-            @if (hasError('endereco')) {
-            <span class="error-message">{{ getErrorMessage('endereco') }}</span>
-            }
-          </div>
-
-          <h3 class="section-title">⚙️ Configurações Operacionais</h3>
-
-          <!-- Número de Postos e Funcionários por Posto -->
-          <div class="form-row">
+        <form [formGroup]="formCondominio" class="form-grid">
+          <div class="form-card">
+            <!-- Nome -->
             <div class="form-group">
-              <label for="numeroPostos" class="form-label">
-                Número de Postos de Trabalho <span class="required">*</span>
+              <label for="nome" class="form-label">
+                Nome do Condomínio <span class="required">*</span>
               </label>
               <input
-                id="numeroPostos"
-                type="number"
-                formControlName="numeroPostos"
+                id="nome"
+                type="text"
+                formControlName="nome"
                 class="form-input"
-                [class.error]="hasError('numeroPostos')"
-                placeholder="Ex: 2"
-                min="1"
-                max="10"
-                (input)="calcularQuantidadeFuncionarios()"
+                [class.error]="hasError('nome')"
+                placeholder="Ex: Condomínio Horizonte Verde"
               />
-              @if (hasError('numeroPostos')) {
-              <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
+              @if (hasError('nome')) {
+                <span class="error-message">{{ getErrorMessage('nome') }}</span>
               }
-              <span class="help-text">Quantidade de postos (1-10)</span>
             </div>
 
+            <!-- CNPJ -->
             <div class="form-group">
-              <label for="funcionariosPorPosto" class="form-label">
-                Funcionários por Posto <span class="required">*</span>
+              <label for="cnpj" class="form-label"> CNPJ <span class="required">*</span> </label>
+              <input
+                id="cnpj"
+                type="text"
+                formControlName="cnpj"
+                class="form-input"
+                [class.error]="hasError('cnpj')"
+                placeholder="Ex: 12.345.678/0001-90"
+              />
+              @if (hasError('cnpj')) {
+                <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
+              }
+              <span class="help-text">Formato: 00.000.000/0000-00</span>
+            </div>
+
+            <!-- Endereço -->
+            <div class="form-group">
+              <label for="endereco" class="form-label">
+                Endereço <span class="required">*</span>
+              </label>
+              <textarea
+                id="endereco"
+                formControlName="endereco"
+                class="form-input"
+                [class.error]="hasError('endereco')"
+                rows="3"
+                placeholder="Ex: Rua das Flores, 123 - Centro - São Paulo/SP"
+              ></textarea>
+              @if (hasError('endereco')) {
+                <span class="error-message">{{ getErrorMessage('endereco') }}</span>
+              }
+            </div>
+
+            <h3 class="section-title">⚙️ Configurações Operacionais</h3>
+
+            <!-- Número de Postos e Funcionários por Posto -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="numeroPostos" class="form-label">
+                  Número de Postos de Trabalho <span class="required">*</span>
+                </label>
+                <input
+                  id="numeroPostos"
+                  type="number"
+                  formControlName="numeroPostos"
+                  class="form-input"
+                  [class.error]="hasError('numeroPostos')"
+                  placeholder="Ex: 2"
+                  min="1"
+                  max="10"
+                  (input)="calcularQuantidadeFuncionarios()"
+                />
+                @if (hasError('numeroPostos')) {
+                  <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
+                }
+                <span class="help-text">Quantidade de postos (1-10)</span>
+              </div>
+
+              <div class="form-group">
+                <label for="funcionariosPorPosto" class="form-label">
+                  Funcionários por Posto <span class="required">*</span>
+                </label>
+                <input
+                  id="funcionariosPorPosto"
+                  type="number"
+                  formControlName="funcionariosPorPosto"
+                  class="form-input"
+                  [class.error]="hasError('funcionariosPorPosto')"
+                  placeholder="Ex: 2"
+                  min="1"
+                  max="5"
+                  (input)="calcularQuantidadeFuncionarios()"
+                />
+                @if (hasError('funcionariosPorPosto')) {
+                  <span class="error-message">{{ getErrorMessage('funcionariosPorPosto') }}</span>
+                }
+                <span class="help-text">Funcionários por posto (1-5)</span>
+              </div>
+            </div>
+
+            <!-- Quantidade Total (Calculada) -->
+            <div class="form-group">
+              <label class="form-label">Quantidade Total de Funcionários Por Turno</label>
+              <div class="calculated-value">
+                <span class="value-display">{{ quantidadeTotalFuncionarios() }}</span>
+                <span class="help-text">
+                  = {{ formCondominio.get('numeroPostos')?.value || 0 }} postos ×
+                  {{ formCondominio.get('funcionariosPorPosto')?.value || 0 }} funcionários
+                </span>
+              </div>
+            </div>
+
+            <!-- Horário Troca Turno -->
+            <div class="form-group">
+              <label for="horarioTrocaTurno" class="form-label">
+                Horário de Troca de Turno <span class="required">*</span>
               </label>
               <input
-                id="funcionariosPorPosto"
-                type="number"
-                formControlName="funcionariosPorPosto"
+                id="horarioTrocaTurno"
+                type="time"
+                formControlName="horarioTrocaTurno"
                 class="form-input"
-                [class.error]="hasError('funcionariosPorPosto')"
-                placeholder="Ex: 2"
-                min="1"
-                max="5"
-                (input)="calcularQuantidadeFuncionarios()"
+                [class.error]="hasError('horarioTrocaTurno')"
               />
-              @if (hasError('funcionariosPorPosto')) {
-              <span class="error-message">{{ getErrorMessage('funcionariosPorPosto') }}</span>
+              @if (hasError('horarioTrocaTurno')) {
+                <span class="error-message">{{ getErrorMessage('horarioTrocaTurno') }}</span>
               }
-              <span class="help-text">Funcionários por posto (1-5)</span>
-            </div>
-          </div>
-
-          <!-- Quantidade Total (Calculada) -->
-          <div class="form-group">
-            <label class="form-label">Quantidade Total de Funcionários Por Turno</label>
-            <div class="calculated-value">
-              <span class="value-display">{{ quantidadeTotalFuncionarios() }}</span>
-              <span class="help-text">
-                = {{ formCondominio.get('numeroPostos')?.value || 0 }} postos ×
-                {{ formCondominio.get('funcionariosPorPosto')?.value || 0 }} funcionários
-              </span>
-            </div>
-          </div>
-
-          <!-- Horário Troca Turno -->
-          <div class="form-group">
-            <label for="horarioTrocaTurno" class="form-label">
-              Horário de Troca de Turno <span class="required">*</span>
-            </label>
-            <input
-              id="horarioTrocaTurno"
-              type="time"
-              formControlName="horarioTrocaTurno"
-              class="form-input"
-              [class.error]="hasError('horarioTrocaTurno')"
-            />
-            @if (hasError('horarioTrocaTurno')) {
-            <span class="error-message">{{ getErrorMessage('horarioTrocaTurno') }}</span>
-            }
-            <span class="help-text">Ex: 06:00 (horário de início do turno diurno)</span>
-          </div>
-
-          <!-- Email Gestor e Telefone Emergência -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
-              <input
-                id="emailGestor"
-                type="email"
-                formControlName="emailGestor"
-                class="form-input"
-                [class.error]="hasError('emailGestor')"
-                placeholder="gestor@condominio.com.br"
-              />
-              @if (hasError('emailGestor')) {
-              <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
-              }
+              <span class="help-text">Ex: 06:00 (horário de início do turno diurno)</span>
             </div>
 
-            <div class="form-group">
-              <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
-              <input
-                id="telefoneEmergencia"
-                type="tel"
-                formControlName="telefoneEmergencia"
-                class="form-input"
-                [class.error]="hasError('telefoneEmergencia')"
-                placeholder="(11) 98765-4321"
-                maxlength="15"
-                (input)="formatarTelefone($event)"
-              />
-              @if (hasError('telefoneEmergencia')) {
-              <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
-              }
-              <span class="help-text">Digite apenas números</span>
+            <!-- Email Gestor e Telefone Emergência -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
+                <input
+                  id="emailGestor"
+                  type="email"
+                  formControlName="emailGestor"
+                  class="form-input"
+                  [class.error]="hasError('emailGestor')"
+                  placeholder="gestor@condominio.com.br"
+                />
+                @if (hasError('emailGestor')) {
+                  <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
+                <input
+                  id="telefoneEmergencia"
+                  type="tel"
+                  formControlName="telefoneEmergencia"
+                  class="form-input"
+                  [class.error]="hasError('telefoneEmergencia')"
+                  placeholder="(11) 98765-4321"
+                  maxlength="15"
+                  (input)="formatarTelefone($event)"
+                />
+                @if (hasError('telefoneEmergencia')) {
+                  <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
+                }
+                <span class="help-text">Digite apenas números</span>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
     }
 
     <!-- STEP 2: Contrato (Opcional) -->
     @if (currentStep() === 2) {
-    <div class="step-content">
-      <h2>📄 Contrato (Opcional)</h2>
+      <div class="step-content">
+        <h2>📄 Contrato (Opcional)</h2>
 
-      <form [formGroup]="formContrato" class="form-container">
-        <div class="form-card">
-          <!-- Checkbox para habilitar criação do contrato -->
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="criarContrato" class="checkbox-input">
-              <span class="checkbox-text">Criar contrato neste momento</span>
-            </label>
-            <span class="help-text">Você pode criar o contrato depois se preferir</span>
-          </div>
+        <form [formGroup]="formContrato" class="form-container">
+          <div class="form-card">
+            <!-- Checkbox para habilitar criação do contrato -->
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="criarContrato" class="checkbox-input" />
+                <span class="checkbox-text">Criar contrato neste momento</span>
+              </label>
+              <span class="help-text">Você pode criar o contrato depois se preferir</span>
+            </div>
 
-          @if (formContrato.get('criarContrato')?.value) {
+            @if (formContrato.get('criarContrato')?.value) {
+              <!-- Descrição -->
+              <div class="form-group">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea
+                  id="descricao"
+                  formControlName="descricao"
+                  class="form-input"
+                  [class.error]="
+                    formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched
+                  "
+                  rows="3"
+                  placeholder="Ex: Contrato de prestação de serviços de vigilância"
+                ></textarea>
+                @if (
+                  formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched
+                ) {
+                  <span class="error-message">Descrição é obrigatória</span>
+                }
+              </div>
 
-          <!-- Descrição -->
-          <div class="form-group">
-            <label for="descricao" class="form-label">Descrição</label>
-            <textarea
-              id="descricao"
-              formControlName="descricao"
-              class="form-input"
-              [class.error]="formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched"
-              rows="3"
-              placeholder="Ex: Contrato de prestação de serviços de vigilância"
-            ></textarea>
-            @if (formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched) {
-            <span class="error-message">Descrição é obrigatória</span>
+              <!-- Valores Base -->
+              <h3 class="section-title">💰 Valores Base</h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="valorDiariaCobrada" class="form-label">
+                    Valor Diária por Funcionário (R$) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="valorDiariaCobrada"
+                    type="number"
+                    formControlName="valorDiariaCobrada"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('valorDiariaCobrada')?.invalid &&
+                      formContrato.get('valorDiariaCobrada')?.touched
+                    "
+                    placeholder="Ex: 100.00"
+                    step="0.01"
+                    min="0.01"
+                  />
+                  @if (
+                    formContrato.get('valorDiariaCobrada')?.invalid &&
+                    formContrato.get('valorDiariaCobrada')?.touched
+                  ) {
+                    <span class="error-message"
+                      >Valor da diária é obrigatório e deve ser maior que zero</span
+                    >
+                  }
+                  <span class="help-text"
+                    >Valor cobrado por dia de trabalho de cada funcionário</span
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="quantidadeFuncionarios" class="form-label">
+                    Quantidade de Funcionários <span class="required">*</span>
+                  </label>
+                  <input
+                    id="quantidadeFuncionarios"
+                    type="number"
+                    [value]="quantidadeTotalFuncionarios()"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text">
+                    Calculado automaticamente:
+                    {{ formCondominio.get('numeroPostos')?.value || 0 }} postos ×
+                    {{ formCondominio.get('funcionariosPorPosto')?.value || 0 }} funcionários =
+                    {{ quantidadeTotalFuncionarios() }} total
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="numeroDePostos" class="form-label">
+                    Número de Postos de Trabalho <span class="required">*</span>
+                  </label>
+                  <input
+                    id="numeroDePostos"
+                    type="number"
+                    [value]="formCondominio.get('numeroPostos')?.value || 0"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text"> Importado do condomínio (Step 1) </span>
+                </div>
+
+                <div class="form-group">
+                  <label for="valorBeneficiosExtrasMensal" class="form-label">
+                    Benefícios Extras Mensais (R$) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="valorBeneficiosExtrasMensal"
+                    type="number"
+                    formControlName="valorBeneficiosExtrasMensal"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('valorBeneficiosExtrasMensal')?.invalid &&
+                      formContrato.get('valorBeneficiosExtrasMensal')?.touched
+                    "
+                    placeholder="Ex: 350.00"
+                    step="0.01"
+                    min="0"
+                  />
+                  @if (
+                    formContrato.get('valorBeneficiosExtrasMensal')?.invalid &&
+                    formContrato.get('valorBeneficiosExtrasMensal')?.touched
+                  ) {
+                    <span class="error-message">Benefícios extras são obrigatórios</span>
+                  }
+                  <span class="help-text"
+                    >Vale-transporte, vale-alimentação, plano de saúde, etc.</span
+                  >
+                </div>
+              </div>
+
+              <!-- Percentuais e Margens -->
+              <h3 class="section-title">📊 Percentuais e Margens</h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="percentualAdicionalNoturno" class="form-label">
+                    Adicional Noturno (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="percentualAdicionalNoturno"
+                    type="number"
+                    formControlName="percentualAdicionalNoturno"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualAdicionalNoturno')?.invalid &&
+                      formContrato.get('percentualAdicionalNoturno')?.touched
+                    "
+                    placeholder="Ex: 20.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualAdicionalNoturno')?.invalid &&
+                    formContrato.get('percentualAdicionalNoturno')?.touched
+                  ) {
+                    <span class="error-message">Adicional noturno é obrigatório</span>
+                  }
+                  <span class="help-text"
+                    >Adicional obrigatório por CLT (Art. 73). Mínimo legal: 20%</span
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="percentualImpostos" class="form-label">
+                    Impostos (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="percentualImpostos"
+                    type="number"
+                    formControlName="percentualImpostos"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualImpostos')?.invalid &&
+                      formContrato.get('percentualImpostos')?.touched
+                    "
+                    placeholder="Ex: 15.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualImpostos')?.invalid &&
+                    formContrato.get('percentualImpostos')?.touched
+                  ) {
+                    <span class="error-message">Percentual de impostos é obrigatório</span>
+                  }
+                  <span class="help-text">INSS, FGTS, PIS, etc. Recomendado: 15%</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="margemLucroPercentual" class="form-label">
+                    Margem de Lucro (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="margemLucroPercentual"
+                    type="number"
+                    formControlName="percentualMargemLucro"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualMargemLucro')?.invalid &&
+                      formContrato.get('percentualMargemLucro')?.touched
+                    "
+                    placeholder="Ex: 15.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualMargemLucro')?.invalid &&
+                    formContrato.get('percentualMargemLucro')?.touched
+                  ) {
+                    <span class="error-message">Margem de lucro é obrigatória</span>
+                  }
+                  <span class="help-text">Percentual de lucro desejado. Mercado: 10-20%</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="margemCoberturaFaltasPercentual" class="form-label">
+                    Margem Cobertura de Faltas (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="margemCoberturaFaltasPercentual"
+                    type="number"
+                    formControlName="percentualMargemFaltas"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualMargemFaltas')?.invalid &&
+                      formContrato.get('percentualMargemFaltas')?.touched
+                    "
+                    placeholder="Ex: 10.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualMargemFaltas')?.invalid &&
+                    formContrato.get('percentualMargemFaltas')?.touched
+                  ) {
+                    <span class="error-message">Margem de cobertura de faltas é obrigatória</span>
+                  }
+                  <span class="help-text"
+                    >Reserva para cobrir faltas e substituições. Recomendado: 8-12%</span
+                  >
+                </div>
+              </div>
+
+              <!-- Período do Contrato -->
+              <h3 class="section-title">📅 Período do Contrato</h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="dataInicio" class="form-label">
+                    Data de Início <span class="required">*</span>
+                  </label>
+                  <input
+                    id="dataInicio"
+                    type="date"
+                    formControlName="dataInicio"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('dataInicio')?.invalid &&
+                      formContrato.get('dataInicio')?.touched
+                    "
+                  />
+                  @if (
+                    formContrato.get('dataInicio')?.invalid &&
+                    formContrato.get('dataInicio')?.touched
+                  ) {
+                    <span class="error-message">Data de início é obrigatória</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="mesesDuracao" class="form-label">
+                    Duração (meses) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="mesesDuracao"
+                    type="number"
+                    formControlName="mesesDuracao"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('mesesDuracao')?.invalid &&
+                      formContrato.get('mesesDuracao')?.touched
+                    "
+                    placeholder="Ex: 6"
+                    min="1"
+                    max="60"
+                    step="1"
+                  />
+                  @if (
+                    formContrato.get('mesesDuracao')?.invalid &&
+                    formContrato.get('mesesDuracao')?.touched
+                  ) {
+                    <span class="error-message">Duração é obrigatória (1-60 meses)</span>
+                  }
+                  <span class="help-text">Duração do contrato em meses (1-60)</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="dataFim" class="form-label">
+                  Data de Término (Calculada)
+                  @if (calcularDataFim()) {
+                    <span class="duration-badge">📅 {{ calcularDuracaoMeses() }}</span>
+                  }
+                </label>
+                <div class="calculated-value">
+                  <span class="value-display">{{ calcularDataFim() }}</span>
+                  <span class="help-text"
+                    >Calculada automaticamente: Data início + Duração em meses</span
+                  >
+                </div>
+              </div>
+
+              <!-- Breakdown de Custos (Resumo Visual) -->
+              <div class="breakdown-section">
+                <h3 class="section-title">📊 Resumo Financeiro Mensal</h3>
+
+                <div class="breakdown-grid">
+                  <div class="breakdown-card">
+                    <div class="breakdown-header">
+                      <span class="icon">👥</span>
+                      <span class="label">Funcionários</span>
+                    </div>
+                    <div class="breakdown-value">{{ quantidadeTotalFuncionarios() }}</div>
+                    <div class="breakdown-detail">
+                      {{ formCondominio.get('numeroPostos')?.value || 0 }} postos ×
+                      {{ formCondominio.get('funcionariosPorPosto')?.value || 0 }}
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card">
+                    <div class="breakdown-header">
+                      <span class="icon">💵</span>
+                      <span class="label">Custo Base</span>
+                    </div>
+                    <div class="breakdown-value">{{ custoOperacional() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">Salários + Benefícios + Impostos</div>
+                  </div>
+
+                  <div class="breakdown-card success">
+                    <div class="breakdown-header">
+                      <span class="icon">📈</span>
+                      <span class="label">Margem de Lucro</span>
+                    </div>
+                    <div class="breakdown-value">{{ margemLucro() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('percentualMargemLucro')?.value || 0 }}% sobre o custo
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card warning">
+                    <div class="breakdown-header">
+                      <span class="icon">⚠️</span>
+                      <span class="label">Cobertura Faltas</span>
+                    </div>
+                    <div class="breakdown-value">{{ margemFaltas() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('percentualMargemFaltas')?.value || 0 }}% de segurança
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-value">
+                  <div class="total-label">💰 Faturamento Total Mensal</div>
+                  <div class="total-amount">{{ faturamentoMensal() | currency: 'BRL' }}</div>
+                  <div class="total-detail">Valor cobrado mensalmente do condomínio</div>
+                </div>
+              </div>
+
+              <div class="required-note">
+                <span class="required">*</span> Campos obrigatórios para criar o contrato
+              </div>
             }
           </div>
-
-          <!-- Valores Base -->
-          <h3 class="section-title">💰 Valores Base</h3>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="valorDiariaCobrada" class="form-label">
-                Valor Diária por Funcionário (R$) <span class="required">*</span>
-              </label>
-              <input
-                id="valorDiariaCobrada"
-                type="number"
-                formControlName="valorDiariaCobrada"
-                class="form-input"
-                [class.error]="formContrato.get('valorDiariaCobrada')?.invalid && formContrato.get('valorDiariaCobrada')?.touched"
-                placeholder="Ex: 100.00"
-                step="0.01"
-                min="0.01"
-              />
-              @if (formContrato.get('valorDiariaCobrada')?.invalid && formContrato.get('valorDiariaCobrada')?.touched) {
-              <span class="error-message">Valor da diária é obrigatório e deve ser maior que zero</span>
-              }
-              <span class="help-text">Valor cobrado por dia de trabalho de cada funcionário</span>
-            </div>
-
-            <div class="form-group">
-              <label for="quantidadeFuncionarios" class="form-label">
-                Quantidade de Funcionários <span class="required">*</span>
-              </label>
-              <input
-                id="quantidadeFuncionarios"
-                type="number"
-                [value]="quantidadeTotalFuncionarios()"
-                class="form-input calculated-field"
-                readonly
-                disabled
-              />
-              <span class="help-text">
-                Calculado automaticamente: {{ formCondominio.get('numeroPostos')?.value || 0 }} postos ×
-                {{ formCondominio.get('funcionariosPorPosto')?.value || 0 }} funcionários =
-                {{ quantidadeTotalFuncionarios() }} total
-              </span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="numeroDePostos" class="form-label">
-                Número de Postos de Trabalho <span class="required">*</span>
-              </label>
-              <input
-                id="numeroDePostos"
-                type="number"
-                [value]="formCondominio.get('numeroPostos')?.value || 0"
-                class="form-input calculated-field"
-                readonly
-                disabled
-              />
-              <span class="help-text">
-                Importado do condomínio (Step 1)
-              </span>
-            </div>
-
-            <div class="form-group">
-              <label for="valorBeneficiosExtrasMensal" class="form-label">
-                Benefícios Extras Mensais (R$) <span class="required">*</span>
-              </label>
-              <input
-                id="valorBeneficiosExtrasMensal"
-                type="number"
-                formControlName="valorBeneficiosExtrasMensal"
-                class="form-input"
-                [class.error]="formContrato.get('valorBeneficiosExtrasMensal')?.invalid && formContrato.get('valorBeneficiosExtrasMensal')?.touched"
-                placeholder="Ex: 350.00"
-                step="0.01"
-                min="0"
-              />
-              @if (formContrato.get('valorBeneficiosExtrasMensal')?.invalid && formContrato.get('valorBeneficiosExtrasMensal')?.touched) {
-              <span class="error-message">Benefícios extras são obrigatórios</span>
-              }
-              <span class="help-text">Vale-transporte, vale-alimentação, plano de saúde, etc.</span>
-            </div>
-          </div>
-
-          <!-- Percentuais e Margens -->
-          <h3 class="section-title">📊 Percentuais e Margens</h3>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="percentualAdicionalNoturno" class="form-label">
-                Adicional Noturno (%) <span class="required">*</span>
-              </label>
-              <input
-                id="percentualAdicionalNoturno"
-                type="number"
-                formControlName="percentualAdicionalNoturno"
-                class="form-input"
-                [class.error]="formContrato.get('percentualAdicionalNoturno')?.invalid && formContrato.get('percentualAdicionalNoturno')?.touched"
-                placeholder="Ex: 20.00"
-                step="0.01"
-                min="0"
-                max="100"
-              />
-              @if (formContrato.get('percentualAdicionalNoturno')?.invalid && formContrato.get('percentualAdicionalNoturno')?.touched) {
-              <span class="error-message">Adicional noturno é obrigatório</span>
-              }
-              <span class="help-text">Adicional obrigatório por CLT (Art. 73). Mínimo legal: 20%</span>
-            </div>
-
-            <div class="form-group">
-              <label for="percentualImpostos" class="form-label">
-                Impostos (%) <span class="required">*</span>
-              </label>
-              <input
-                id="percentualImpostos"
-                type="number"
-                formControlName="percentualImpostos"
-                class="form-input"
-                [class.error]="formContrato.get('percentualImpostos')?.invalid && formContrato.get('percentualImpostos')?.touched"
-                placeholder="Ex: 15.00"
-                step="0.01"
-                min="0"
-                max="100"
-              />
-              @if (formContrato.get('percentualImpostos')?.invalid && formContrato.get('percentualImpostos')?.touched) {
-              <span class="error-message">Percentual de impostos é obrigatório</span>
-              }
-              <span class="help-text">INSS, FGTS, PIS, etc. Recomendado: 15%</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="margemLucroPercentual" class="form-label">
-                Margem de Lucro (%) <span class="required">*</span>
-              </label>
-              <input
-                id="margemLucroPercentual"
-                type="number"
-                formControlName="percentualMargemLucro"
-                class="form-input"
-                [class.error]="formContrato.get('percentualMargemLucro')?.invalid && formContrato.get('percentualMargemLucro')?.touched"
-                placeholder="Ex: 15.00"
-                step="0.01"
-                min="0"
-                max="100"
-              />
-              @if (formContrato.get('percentualMargemLucro')?.invalid && formContrato.get('percentualMargemLucro')?.touched) {
-              <span class="error-message">Margem de lucro é obrigatória</span>
-              }
-              <span class="help-text">Percentual de lucro desejado. Mercado: 10-20%</span>
-            </div>
-
-            <div class="form-group">
-              <label for="margemCoberturaFaltasPercentual" class="form-label">
-                Margem Cobertura de Faltas (%) <span class="required">*</span>
-              </label>
-              <input
-                id="margemCoberturaFaltasPercentual"
-                type="number"
-                formControlName="percentualMargemFaltas"
-                class="form-input"
-                [class.error]="formContrato.get('percentualMargemFaltas')?.invalid && formContrato.get('percentualMargemFaltas')?.touched"
-                placeholder="Ex: 10.00"
-                step="0.01"
-                min="0"
-                max="100"
-              />
-              @if (formContrato.get('percentualMargemFaltas')?.invalid && formContrato.get('percentualMargemFaltas')?.touched) {
-              <span class="error-message">Margem de cobertura de faltas é obrigatória</span>
-              }
-              <span class="help-text">Reserva para cobrir faltas e substituições. Recomendado: 8-12%</span>
-            </div>
-          </div>
-
-          <!-- Período do Contrato -->
-          <h3 class="section-title">📅 Período do Contrato</h3>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="dataInicio" class="form-label">
-                Data de Início <span class="required">*</span>
-              </label>
-              <input
-                id="dataInicio"
-                type="date"
-                formControlName="dataInicio"
-                class="form-input"
-                [class.error]="formContrato.get('dataInicio')?.invalid && formContrato.get('dataInicio')?.touched"
-              />
-              @if (formContrato.get('dataInicio')?.invalid && formContrato.get('dataInicio')?.touched) {
-              <span class="error-message">Data de início é obrigatória</span>
-              }
-            </div>
-
-            <div class="form-group">
-              <label for="mesesDuracao" class="form-label">
-                Duração (meses) <span class="required">*</span>
-              </label>
-              <input
-                id="mesesDuracao"
-                type="number"
-                formControlName="mesesDuracao"
-                class="form-input"
-                [class.error]="formContrato.get('mesesDuracao')?.invalid && formContrato.get('mesesDuracao')?.touched"
-                placeholder="Ex: 6"
-                min="1"
-                max="60"
-                step="1"
-              />
-              @if (formContrato.get('mesesDuracao')?.invalid && formContrato.get('mesesDuracao')?.touched) {
-              <span class="error-message">Duração é obrigatória (1-60 meses)</span>
-              }
-              <span class="help-text">Duração do contrato em meses (1-60)</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="dataFim" class="form-label">
-              Data de Término (Calculada)
-              @if (calcularDataFim()) {
-              <span class="duration-badge">📅 {{ calcularDuracaoMeses() }}</span>
-              }
-            </label>
-            <div class="calculated-value">
-              <span class="value-display">{{ calcularDataFim() }}</span>
-              <span class="help-text">Calculada automaticamente: Data início + Duração em meses</span>
-            </div>
-          </div>
-
-          <!-- Breakdown de Custos (Resumo Visual) -->
-          <div class="breakdown-section">
-            <h3 class="section-title">📊 Resumo Financeiro Mensal</h3>
-
-            <div class="breakdown-grid">
-              <div class="breakdown-card">
-                <div class="breakdown-header">
-                  <span class="icon">👥</span>
-                  <span class="label">Funcionários</span>
-                </div>
-                <div class="breakdown-value">{{ quantidadeTotalFuncionarios() }}</div>
-                <div class="breakdown-detail">
-                  {{ formCondominio.get('numeroPostos')?.value || 0 }} postos ×
-                  {{ formCondominio.get('funcionariosPorPosto')?.value || 0 }}
-                </div>
-              </div>
-
-              <div class="breakdown-card">
-                <div class="breakdown-header">
-                  <span class="icon">💵</span>
-                  <span class="label">Custo Base</span>
-                </div>
-                <div class="breakdown-value">{{ custoOperacional() | currency : 'BRL' }}</div>
-                <div class="breakdown-detail">Salários + Benefícios + Impostos</div>
-              </div>
-
-              <div class="breakdown-card success">
-                <div class="breakdown-header">
-                  <span class="icon">📈</span>
-                  <span class="label">Margem de Lucro</span>
-                </div>
-                <div class="breakdown-value">{{ margemLucro() | currency : 'BRL' }}</div>
-                <div class="breakdown-detail">
-                  {{ formContrato.get('percentualMargemLucro')?.value || 0 }}% sobre o custo
-                </div>
-              </div>
-
-              <div class="breakdown-card warning">
-                <div class="breakdown-header">
-                  <span class="icon">⚠️</span>
-                  <span class="label">Cobertura Faltas</span>
-                </div>
-                <div class="breakdown-value">{{ margemFaltas() | currency : 'BRL' }}</div>
-                <div class="breakdown-detail">
-                  {{ formContrato.get('percentualMargemFaltas')?.value || 0 }}% de segurança
-                </div>
-              </div>
-            </div>
-
-            <div class="total-value">
-              <div class="total-label">💰 Faturamento Total Mensal</div>
-              <div class="total-amount">{{ faturamentoMensal() | currency : 'BRL' }}</div>
-              <div class="total-detail">
-                Valor cobrado mensalmente do condomínio
-              </div>
-            </div>
-          </div>
-
-          <div class="required-note">
-            <span class="required">*</span> Campos obrigatórios para criar o contrato
-          </div>
-          }
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
     }
 
     <!-- STEP 3: Funcionários (Opcional) -->
     @if (currentStep() === 3) {
-    <div class="step-content">
-      <h2>👥 Funcionários (Opcional)</h2>
+      <div class="step-content">
+        <h2>👥 Funcionários (Opcional)</h2>
 
-      <form [formGroup]="formFuncionarios" class="form-container">
-        <div class="form-card">
-          <!-- Info sobre importação automática -->
-          <div class="info-banner">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
-            <div>
-              <strong>📋 Dados Importados Automaticamente</strong>
-              <p>O condomínio e contrato criados nos passos anteriores serão associados automaticamente aos funcionários.</p>
-            </div>
-          </div>
-
-          <!-- Lista de Funcionários -->
-          <div class="funcionarios-section">
-            <div class="section-header">
-              <h3 class="section-title">📝 Lista de Funcionários</h3>
-              <button type="button" class="btn btn-secondary" (click)="addFuncionario()">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                </svg>
-                Adicionar Funcionário
-              </button>
-            </div>
-
-            @if (funcionarios.length === 0) {
-            <div class="empty-state">
-              <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+        <form [formGroup]="formFuncionarios" class="form-container">
+          <div class="form-card">
+            <!-- Info sobre importação automática -->
+            <div class="info-banner">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
-              <p>Nenhum funcionário adicionado ainda</p>
-              <span>Clique em "Adicionar Funcionário" para começar ou pule esta etapa</span>
+              <div>
+                <strong>📋 Dados Importados Automaticamente</strong>
+                <p>
+                  O condomínio e contrato criados nos passos anteriores serão associados
+                  automaticamente aos funcionários.
+                </p>
+              </div>
             </div>
-            }
 
-            <div formArrayName="funcionarios">
-              @for (func of funcionarios.controls; track $index; let i = $index) {
-              <div class="funcionario-card" [formGroupName]="i">
-                <div class="card-header">
-                  <h4>Funcionário #{{ i + 1 }}</h4>
-                  <button type="button" class="btn-remove" (click)="removeFuncionario(i)" title="Remover funcionário">
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-                </div>
-
-                <!-- Dados Pessoais -->
-                <h5 class="subsection-title">Dados Pessoais</h5>
-
-                <div class="form-group">
-                  <label [for]="'nome-' + i" class="form-label">
-                    Nome Completo <span class="required">*</span>
-                  </label>
-                  <input
-                    [id]="'nome-' + i"
-                    type="text"
-                    formControlName="nome"
-                    class="form-input"
-                    [class.error]="func.get('nome')?.invalid && func.get('nome')?.touched"
-                    placeholder="Ex: João da Silva Santos"
-                  />
-                  @if (func.get('nome')?.invalid && func.get('nome')?.touched) {
-                  <span class="error-message">Nome completo é obrigatório (mín. 3 caracteres)</span>
-                  }
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label [for]="'cpf-' + i" class="form-label">
-                      CPF <span class="required">*</span>
-                    </label>
-                    <input
-                      [id]="'cpf-' + i"
-                      type="text"
-                      formControlName="cpf"
-                      class="form-input"
-                      [class.error]="func.get('cpf')?.invalid && func.get('cpf')?.touched"
-                      placeholder="000.000.000-00"
-                      maxlength="14"
-                    />
-                    @if (func.get('cpf')?.invalid && func.get('cpf')?.touched) {
-                    <span class="error-message">CPF inválido (formato: 000.000.000-00)</span>
-                    }
-                  </div>
-
-                  <div class="form-group">
-                    <label [for]="'celular-' + i" class="form-label">Celular</label>
-                    <input
-                      [id]="'celular-' + i"
-                      type="text"
-                      formControlName="celular"
-                      class="form-input"
-                      [class.error]="func.get('celular')?.invalid && func.get('celular')?.touched"
-                      placeholder="(00) 00000-0000"
-                      maxlength="15"
-                    />
-                    @if (func.get('celular')?.invalid && func.get('celular')?.touched) {
-                    <span class="error-message">Formato inválido (00) 00000-0000</span>
-                    }
-                  </div>
-                </div>
-
-                <!-- Dados Profissionais -->
-                <h5 class="subsection-title">Dados Profissionais</h5>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label [for]="'tipoFuncionario-' + i" class="form-label">
-                      Tipo de Funcionário <span class="required">*</span>
-                    </label>
-                    <select
-                      [id]="'tipoFuncionario-' + i"
-                      formControlName="tipoFuncionario"
-                      class="form-input"
-                      [class.error]="func.get('tipoFuncionario')?.invalid && func.get('tipoFuncionario')?.touched"
-                    >
-                      <option value="">Selecione</option>
-                      <option value="CLT">CLT (Regime CLT)</option>
-                      <option value="TERCEIRIZADO">Terceirizado</option>
-                      <option value="FREELANCER">Freelancer</option>
-                    </select>
-                    @if (func.get('tipoFuncionario')?.invalid && func.get('tipoFuncionario')?.touched) {
-                    <span class="error-message">Tipo de funcionário é obrigatório</span>
-                    }
-                  </div>
-
-                  <div class="form-group">
-                    <label [for]="'tipoEscala-' + i" class="form-label">
-                      Escala de Trabalho <span class="required">*</span>
-                    </label>
-                    <select
-                      [id]="'tipoEscala-' + i"
-                      formControlName="tipoEscala"
-                      class="form-input"
-                      [class.error]="func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched"
-                    >
-                      <option value="">Selecione</option>
-                      <option value="DOZE_POR_TRINTA_SEIS">12x36 (12h trabalho, 36h descanso)</option>
-                      <option value="SEIS_POR_UMA">6x1 (6 dias trabalho, 1 descanso)</option>
-                      <option value="CINCO_POR_DOIS">5x2 (5 dias trabalho, 2 descanso)</option>
-                    </select>
-                    @if (func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched) {
-                    <span class="error-message">Escala de trabalho é obrigatória</span>
-                    }
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label [for]="'statusFuncionario-' + i" class="form-label">
-                    Status <span class="required">*</span>
-                  </label>
-                  <select
-                    [id]="'statusFuncionario-' + i"
-                    formControlName="statusFuncionario"
-                    class="form-input"
-                    [class.error]="func.get('statusFuncionario')?.invalid && func.get('statusFuncionario')?.touched"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="ATIVO">✅ Ativo</option>
-                    <option value="INATIVO">❌ Inativo</option>
-                    <option value="FERIAS">🏖️ Férias</option>
-                    <option value="AFASTADO">🏥 Afastado</option>
-                  </select>
-                  @if (func.get('statusFuncionario')?.invalid && func.get('statusFuncionario')?.touched) {
-                  <span class="error-message">Status é obrigatório</span>
-                  }
-                </div>
-
-                <!-- Valores Calculados Automaticamente (Info) -->
-                <div class="auto-calculated-info">
+            <!-- Lista de Funcionários -->
+            <div class="funcionarios-section">
+              <div class="section-header">
+                <h3 class="section-title">📝 Lista de Funcionários</h3>
+                <button type="button" class="btn btn-secondary" (click)="addFuncionario()">
                   <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
-                  <p>💰 <strong>Valores salariais serão calculados automaticamente</strong> com base no contrato vigente do condomínio</p>
+                  Adicionar Funcionário
+                </button>
+              </div>
+
+              @if (funcionarios.length === 0) {
+                <div class="empty-state">
+                  <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"
+                    />
+                  </svg>
+                  <p>Nenhum funcionário adicionado ainda</p>
+                  <span>Clique em "Adicionar Funcionário" para começar ou pule esta etapa</span>
+                </div>
+              }
+
+              <div formArrayName="funcionarios">
+                @for (func of funcionarios.controls; track $index; let i = $index) {
+                  <div class="funcionario-card" [formGroupName]="i">
+                    <div class="card-header">
+                      <h4>Funcionário #{{ i + 1 }}</h4>
+                      <button
+                        type="button"
+                        class="btn-remove"
+                        (click)="removeFuncionario(i)"
+                        title="Remover funcionário"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fill-rule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Dados Pessoais -->
+                    <h5 class="subsection-title">Dados Pessoais</h5>
+
+                    <div class="form-group">
+                      <label [for]="'nome-' + i" class="form-label">
+                        Nome Completo <span class="required">*</span>
+                      </label>
+                      <input
+                        [id]="'nome-' + i"
+                        type="text"
+                        formControlName="nome"
+                        class="form-input"
+                        [class.error]="func.get('nome')?.invalid && func.get('nome')?.touched"
+                        placeholder="Ex: João da Silva Santos"
+                      />
+                      @if (func.get('nome')?.invalid && func.get('nome')?.touched) {
+                        <span class="error-message"
+                          >Nome completo é obrigatório (mín. 3 caracteres)</span
+                        >
+                      }
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label [for]="'cpf-' + i" class="form-label">
+                          CPF <span class="required">*</span>
+                        </label>
+                        <input
+                          [id]="'cpf-' + i"
+                          type="text"
+                          formControlName="cpf"
+                          class="form-input"
+                          [class.error]="func.get('cpf')?.invalid && func.get('cpf')?.touched"
+                          placeholder="000.000.000-00"
+                          maxlength="14"
+                        />
+                        @if (func.get('cpf')?.invalid && func.get('cpf')?.touched) {
+                          <span class="error-message">CPF inválido (formato: 000.000.000-00)</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label [for]="'celular-' + i" class="form-label">Celular</label>
+                        <input
+                          [id]="'celular-' + i"
+                          type="text"
+                          formControlName="celular"
+                          class="form-input"
+                          [class.error]="
+                            func.get('celular')?.invalid && func.get('celular')?.touched
+                          "
+                          placeholder="(00) 00000-0000"
+                          maxlength="15"
+                        />
+                        @if (func.get('celular')?.invalid && func.get('celular')?.touched) {
+                          <span class="error-message">Formato inválido (00) 00000-0000</span>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Dados Profissionais -->
+                    <h5 class="subsection-title">Dados Profissionais</h5>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label [for]="'tipoFuncionario-' + i" class="form-label">
+                          Tipo de Funcionário <span class="required">*</span>
+                        </label>
+                        <select
+                          [id]="'tipoFuncionario-' + i"
+                          formControlName="tipoFuncionario"
+                          class="form-input"
+                          [class.error]="
+                            func.get('tipoFuncionario')?.invalid &&
+                            func.get('tipoFuncionario')?.touched
+                          "
+                        >
+                          <option value="">Selecione</option>
+                          <option value="CLT">CLT (Regime CLT)</option>
+                          <option value="TERCEIRIZADO">Terceirizado</option>
+                          <option value="FREELANCER">Freelancer</option>
+                        </select>
+                        @if (
+                          func.get('tipoFuncionario')?.invalid &&
+                          func.get('tipoFuncionario')?.touched
+                        ) {
+                          <span class="error-message">Tipo de funcionário é obrigatório</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label [for]="'tipoEscala-' + i" class="form-label">
+                          Escala de Trabalho <span class="required">*</span>
+                        </label>
+                        <select
+                          [id]="'tipoEscala-' + i"
+                          formControlName="tipoEscala"
+                          class="form-input"
+                          [class.error]="
+                            func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched
+                          "
+                        >
+                          <option value="">Selecione</option>
+                          <option value="DOZE_POR_TRINTA_SEIS">
+                            12x36 (12h trabalho, 36h descanso)
+                          </option>
+                          <option value="SEMANAL_COMERCIAL">
+                            Semanal Comercial (5x2, 44h/semana)
+                          </option>
+                        </select>
+                        @if (func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched) {
+                          <span class="error-message">Escala de trabalho é obrigatória</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label [for]="'statusFuncionario-' + i" class="form-label">
+                        Status <span class="required">*</span>
+                      </label>
+                      <select
+                        [id]="'statusFuncionario-' + i"
+                        formControlName="statusFuncionario"
+                        class="form-input"
+                        [class.error]="
+                          func.get('statusFuncionario')?.invalid &&
+                          func.get('statusFuncionario')?.touched
+                        "
+                      >
+                        <option value="">Selecione</option>
+                        <option value="ATIVO">✅ Ativo</option>
+                        <option value="FERIAS">🏖️ Férias</option>
+                        <option value="AFASTADO">🏥 Afastado</option>
+                        <option value="DEMITIDO">🚫 Demitido</option>
+                      </select>
+                      @if (
+                        func.get('statusFuncionario')?.invalid &&
+                        func.get('statusFuncionario')?.touched
+                      ) {
+                        <span class="error-message">Status é obrigatório</span>
+                      }
+                    </div>
+
+                    <!-- Valores Calculados Automaticamente (Info) -->
+                    <div class="auto-calculated-info">
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      <p>
+                        💰 <strong>Valores salariais serão calculados automaticamente</strong> com
+                        base no contrato vigente do condomínio
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Resumo -->
+            @if (funcionarios.length > 0) {
+              <div class="summary-card">
+                <h4>📊 Resumo</h4>
+                <div class="summary-grid">
+                  <div class="summary-item">
+                    <span class="label">Total de Funcionários:</span>
+                    <span class="value">{{ funcionarios.length }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">Funcionários Ativos:</span>
+                    <span class="value success">
+                      {{ contarFuncionariosPorStatus('ATIVO') }}
+                    </span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">CLT:</span>
+                    <span class="value">{{ contarFuncionariosPorTipo('CLT') }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">Terceirizados:</span>
+                    <span class="value">{{ contarFuncionariosPorTipo('TERCEIRIZADO') }}</span>
+                  </div>
                 </div>
               </div>
-              }
-            </div>
+            }
           </div>
-
-          <!-- Resumo -->
-          @if (funcionarios.length > 0) {
-          <div class="summary-card">
-            <h4>📊 Resumo</h4>
-            <div class="summary-grid">
-              <div class="summary-item">
-                <span class="label">Total de Funcionários:</span>
-                <span class="value">{{ funcionarios.length }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="label">Funcionários Ativos:</span>
-                <span class="value success">
-                  {{ contarFuncionariosPorStatus('ATIVO') }}
-                </span>
-              </div>
-              <div class="summary-item">
-                <span class="label">CLT:</span>
-                <span class="value">{{ contarFuncionariosPorTipo('CLT') }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="label">Terceirizados:</span>
-                <span class="value">{{ contarFuncionariosPorTipo('TERCEIRIZADO') }}</span>
-              </div>
-            </div>
-          </div>
-          }
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
     }
   </div>
 
@@ -779,34 +895,30 @@
 
     <div class="footer-right">
       @if (canGoBack()) {
-      <button type="button" class="btn-back" (click)="previousStep()" [disabled]="loading()">
-        ← Anterior
-      </button>
+        <button type="button" class="btn-back" (click)="previousStep()" [disabled]="loading()">
+          ← Anterior
+        </button>
       }
 
       @if (!isLastStep()) {
-      <button
-        type="button"
-        class="btn-next"
-        (click)="nextStep()"
-        [disabled]="!canGoNext() || loading()">
-        Próximo →
-      </button>
+        <button
+          type="button"
+          class="btn-next"
+          (click)="nextStep()"
+          [disabled]="!canGoNext() || loading()"
+        >
+          Próximo →
+        </button>
       } @else {
-      <button
-        type="button"
-        class="btn-finish"
-        (click)="onSubmit()"
-        [disabled]="loading()">
-        @if (loading()) {
-          <span class="spinner-small"></span>
-          Criando...
-        } @else {
-          ✓ Finalizar
-        }
-      </button>
+        <button type="button" class="btn-finish" (click)="onSubmit()" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner-small"></span>
+            Criando...
+          } @else {
+            ✓ Finalizar
+          }
+        </button>
       }
     </div>
   </div>
 </div>
-

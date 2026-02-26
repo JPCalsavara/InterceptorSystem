@@ -2,12 +2,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { NgxMaskDirective } from 'ngx-mask';
 import { CondominioService } from '../../../services/condominio.service';
 
 @Component({
   selector: 'app-condominio-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
   templateUrl: './condominio-form.component.html',
   styleUrl: './condominio-form.component.scss',
 })
@@ -41,10 +42,7 @@ export class CondominioFormComponent implements OnInit {
   buildForm(): void {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cnpj: [
-        '',
-        [Validators.required, Validators.pattern(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/)],
-      ],
+      cnpj: ['', [Validators.required, this.cnpjValidator]],
       endereco: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(300)]],
       // FASE 5 - Número de postos e funcionários por posto
       numeroPostos: [1, [Validators.required, Validators.min(1), Validators.max(10)]],
@@ -52,7 +50,7 @@ export class CondominioFormComponent implements OnInit {
       // Input type="time" retorna HH:mm (sem segundos), adicionamos :00 no submit
       horarioTrocaTurno: ['', [Validators.required]],
       emailGestor: ['', [Validators.email]],
-      telefoneEmergencia: ['', [Validators.pattern(/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/)]],
+      telefoneEmergencia: ['', [this.telefoneValidator]],
     });
 
     // Calcular quantidade inicial
@@ -65,6 +63,22 @@ export class CondominioFormComponent implements OnInit {
     this.quantidadeTotalFuncionarios.set(numeroPostos * funcionariosPorPosto);
   }
 
+  private cnpjValidator(control: any) {
+    if (!control.value) return null;
+    if (control.value.length !== 14) {
+      return { cnpjInvalid: true };
+    }
+    return null;
+  }
+
+  private telefoneValidator(control: any) {
+    if (!control.value) return null;
+    if (control.value.length < 10 || control.value.length > 11) {
+      return { telefoneInvalid: true };
+    }
+    return null;
+  }
+
   loadCondominio(id: string): void {
     this.loading.set(true);
 
@@ -75,16 +89,14 @@ export class CondominioFormComponent implements OnInit {
           ? data.horarioTrocaTurno.substring(0, 5)
           : '';
 
-        // Calcular número de postos e funcionários por posto a partir da quantidade ideal
-        const quantidadeIdeal = data.quantidadeFuncionariosIdeal || 0;
-        const numeroPostos = Math.max(1, Math.ceil(quantidadeIdeal / 2)); // Assumindo 2 funcionários por posto
-        const funcionariosPorPosto = quantidadeIdeal > 0 ? Math.ceil(quantidadeIdeal / numeroPostos) : 1;
+        // quantidadeIdealPorTurno é diretamente o nº de funcionários por turno
+        const funcionariosPorPosto = data.quantidadeIdealPorTurno || 1;
 
         this.form.patchValue({
           nome: data.nome,
           cnpj: data.cnpj,
           endereco: data.endereco,
-          numeroPostos: numeroPostos,
+          numeroPostos: 1, // numeroPostos pertence ao contrato, não ao condomínio
           funcionariosPorPosto: funcionariosPorPosto,
           horarioTrocaTurno: horarioFormatado,
           emailGestor: data.emailGestor,
@@ -120,17 +132,12 @@ export class CondominioFormComponent implements OnInit {
       formValue.horarioTrocaTurno = formValue.horarioTrocaTurno + ':00';
     }
 
-    // Formatar telefone sem parênteses: (11) 99999-9999 -> 11999999999
-    if (formValue.telefoneEmergencia) {
-      formValue.telefoneEmergencia = formValue.telefoneEmergencia.replace(/\D/g, '');
-    }
-
-    // Calcular quantidadeFuncionariosIdeal (backend ainda usa esse campo)
-    const numeroPostos = formValue.numeroPostos || 1;
+    // quantidadeIdealPorTurno = funcionários por turno (campo do condomínio)
+    // numeroPostos pertence ao contrato, não é enviado aqui
     const funcionariosPorPosto = formValue.funcionariosPorPosto || 1;
-    formValue.quantidadeFuncionariosIdeal = numeroPostos * funcionariosPorPosto;
+    formValue.quantidadeIdealPorTurno = funcionariosPorPosto;
 
-    // Remover campos temporários
+    // Remover campos temporários de UI
     delete formValue.numeroPostos;
     delete formValue.funcionariosPorPosto;
 
@@ -146,7 +153,11 @@ export class CondominioFormComponent implements OnInit {
         // Detectar tipo de erro e mostrar mensagem específica
         const errorMessage = err.error?.message || err.message || '';
 
-        if (err.status === 409 || errorMessage.toLowerCase().includes('cnpj') || errorMessage.toLowerCase().includes('duplicate')) {
+        if (
+          err.status === 409 ||
+          errorMessage.toLowerCase().includes('cnpj') ||
+          errorMessage.toLowerCase().includes('duplicate')
+        ) {
           this.error.set('⚠️ Este CNPJ já está cadastrado. Por favor, use um CNPJ diferente.');
         } else if (err.status === 400) {
           this.error.set('❌ Dados inválidos. Verifique os campos obrigatórios e tente novamente.');
@@ -154,7 +165,7 @@ export class CondominioFormComponent implements OnInit {
           this.error.set(
             this.isEdit()
               ? '❌ Erro ao atualizar condomínio. Tente novamente.'
-              : '❌ Erro ao criar condomínio. Tente novamente.'
+              : '❌ Erro ao criar condomínio. Tente novamente.',
           );
         }
         this.loading.set(false);
@@ -191,10 +202,8 @@ export class CondominioFormComponent implements OnInit {
     if (errors['required']) return 'Este campo é obrigatório';
     if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['pattern']) {
-      if (fieldName === 'cnpj') return 'CNPJ inválido (ex: 12.345.678/0001-90)';
-      if (fieldName === 'telefone') return 'Telefone inválido (ex: (11) 99999-9999)';
-    }
+    if (errors['cnpjInvalid']) return 'CNPJ deve conter 14 dígitos (ex: 12.345.678/0001-90)';
+    if (errors['telefoneInvalid']) return 'Telefone inválido (ex: (11) 99999-9999)';
     if (errors['email']) return 'Email inválido';
 
     return 'Campo inválido';

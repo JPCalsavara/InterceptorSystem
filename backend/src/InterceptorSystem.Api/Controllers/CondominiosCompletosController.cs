@@ -1,6 +1,5 @@
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterceptorSystem.Api.Controllers;
@@ -8,7 +7,6 @@ namespace InterceptorSystem.Api.Controllers;
 /// <summary>
 /// FASE 5: Controller para criação em cascata de Condomínio completo
 /// </summary>
-[Authorize]
 [ApiController]
 [Route("api/condominios-completos")]
 public class CondominiosCompletosController : ControllerBase

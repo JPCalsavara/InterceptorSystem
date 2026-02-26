@@ -25,16 +25,16 @@
 
   <!-- Error Message -->
   @if (error()) {
-  <div class="alert alert-error">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        clip-rule="evenodd"
-      />
-    </svg>
-    {{ error() }}
-  </div>
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      {{ error() }}
+    </div>
   }
 
   <!-- Form -->
@@ -54,7 +54,7 @@
           placeholder="Ex: Condomínio Horizonte Verde"
         />
         @if (hasError('nome')) {
-        <span class="error-message">{{ getErrorMessage('nome') }}</span>
+          <span class="error-message">{{ getErrorMessage('nome') }}</span>
         }
       </div>
 
@@ -68,9 +68,11 @@
           class="form-input"
           [class.error]="hasError('cnpj')"
           placeholder="Ex: 12.345.678/0001-90"
+          mask="00.000.000/0000-00"
+          maxlength="18"
         />
         @if (hasError('cnpj')) {
-        <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
+          <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
         }
         <span class="help-text">Formato: 00.000.000/0000-00</span>
       </div>
@@ -87,7 +89,7 @@
           placeholder="Ex: Rua das Flores, 123 - Centro - São Paulo/SP"
         ></textarea>
         @if (hasError('endereco')) {
-        <span class="error-message">{{ getErrorMessage('endereco') }}</span>
+          <span class="error-message">{{ getErrorMessage('endereco') }}</span>
         }
       </div>
 
@@ -111,7 +113,7 @@
             (input)="calcularQuantidadeFuncionarios()"
           />
           @if (hasError('numeroPostos')) {
-          <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
+            <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
           }
           <span class="help-text">Quantidade de postos (1-10)</span>
         </div>
@@ -132,7 +134,7 @@
             (input)="calcularQuantidadeFuncionarios()"
           />
           @if (hasError('funcionariosPorPosto')) {
-          <span class="error-message">{{ getErrorMessage('funcionariosPorPosto') }}</span>
+            <span class="error-message">{{ getErrorMessage('funcionariosPorPosto') }}</span>
           }
           <span class="help-text">Funcionários por posto (1-5)</span>
         </div>
@@ -163,7 +165,7 @@
           [class.error]="hasError('horarioTrocaTurno')"
         />
         @if (hasError('horarioTrocaTurno')) {
-        <span class="error-message">{{ getErrorMessage('horarioTrocaTurno') }}</span>
+          <span class="error-message">{{ getErrorMessage('horarioTrocaTurno') }}</span>
         }
         <span class="help-text">Ex: 06:00 (horário de início do turno diurno)</span>
       </div>
@@ -181,7 +183,7 @@
             placeholder="gestor@condominio.com.br"
           />
           @if (hasError('emailGestor')) {
-          <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
+            <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
           }
         </div>
 
@@ -194,9 +196,11 @@
             class="form-input"
             [class.error]="hasError('telefoneEmergencia')"
             placeholder="(11) 98765-4321"
+            mask="(00) 0000-0000||(00) 00000-0000"
+            maxlength="15"
           />
           @if (hasError('telefoneEmergencia')) {
-          <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
+            <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
           }
         </div>
       </div>
@@ -210,9 +214,10 @@
           </button>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             @if (loading()) {
-            <span class="spinner-small"></span>
-            Salvando... } @else {
-            {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
+              <span class="spinner-small"></span>
+              Salvando...
+            } @else {
+              {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
             }
           </button>
         </div>

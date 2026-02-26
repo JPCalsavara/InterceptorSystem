@@ -4,8 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
-using InterceptorSystem.Tests.Integration;
-using Xunit;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -32,7 +30,7 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 Nome: $"Residencial Integração {Guid.NewGuid()}",
                 Cnpj: GerarCnpjFake(),
                 Endereco: "Rua Teste de Integração, 999",
-                QuantidadeFuncionariosIdeal: 12,
+                QuantidadeIdealPorTurno: 12,
                 HorarioTrocaTurno: TimeSpan.FromHours(6),
                 EmailGestor: "integracao@test.com",
                 TelefoneEmergencia: "+5511988776655"
@@ -44,12 +42,11 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
                 PercentualImpostos: 0.15m,
-                QuantidadeFuncionarios: 12,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
                 DataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-                Status: StatusContrato.PAGO
+                Status: StatusContrato.ATIVO
             ),
             CriarPostosAutomaticamente: true,
             NumeroDePostos: 2
@@ -87,7 +84,7 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 Nome: "Residencial Validação",
                 Cnpj: GerarCnpjFake(),
                 Endereco: "Rua Validação, 111",
-                QuantidadeFuncionariosIdeal: 12,
+                QuantidadeIdealPorTurno: 12,
                 HorarioTrocaTurno: TimeSpan.FromHours(6),
                 EmailGestor: "validacao@test.com",
                 TelefoneEmergencia: "+5511999887766"
@@ -99,12 +96,11 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
                 PercentualImpostos: 0.15m,
-                QuantidadeFuncionarios: 12,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
                 DataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-                Status: StatusContrato.PAGO
+                Status: StatusContrato.ATIVO
             ),
             CriarPostosAutomaticamente: true,
             NumeroDePostos: 2
@@ -117,8 +113,8 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Fact(DisplayName = "POST /api/condominios-completos/validar - Deve retornar 400 quando quantidade difere")]
-    public async Task PostValidar_DeveRetornar400_QuandoQuantidadeDifere()
+    [Fact(DisplayName = "POST /api/condominios-completos/validar - Deve retornar 400 quando data de início no passado")]
+    public async Task PostValidar_DeveRetornar400_QuandoDataInicioNoPassado()
     {
         // Arrange
         var input = new CreateCondominioCompletoDtoInput(
@@ -126,7 +122,7 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 Nome: "Residencial Erro",
                 Cnpj: GerarCnpjFake(),
                 Endereco: "Rua Erro, 666",
-                QuantidadeFuncionariosIdeal: 12,
+                QuantidadeIdealPorTurno: 12,
                 HorarioTrocaTurno: TimeSpan.FromHours(6),
                 EmailGestor: null,
                 TelefoneEmergencia: null
@@ -138,15 +134,52 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
                 PercentualImpostos: 0.15m,
-                QuantidadeFuncionarios: 10, // ❌ Diferente de 12
+                MargemLucroPercentual: 0.20m,
+                MargemCoberturaFaltasPercentual: 0.10m,
+                DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(-10)), // ❌ Data no passado
+                DataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
+                Status: StatusContrato.ATIVO
+            ),
+            CriarPostosAutomaticamente: true,
+            NumeroDePostos: 2
+        );
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/condominios-completos/validar", input);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact(DisplayName = "POST /api/condominios-completos/validar - Deve retornar 400 quando número de postos inválido")]
+    public async Task PostValidar_DeveRetornar400_QuandoNumeroPostosInvalido()
+    {
+        // Arrange
+        var input = new CreateCondominioCompletoDtoInput(
+            Condominio: new CreateCondominioDtoInput(
+                Nome: "Residencial Postos Inválidos",
+                Cnpj: GerarCnpjFake(),
+                Endereco: "Rua Postos, 999",
+                QuantidadeIdealPorTurno: 12,
+                HorarioTrocaTurno: TimeSpan.FromHours(6),
+                EmailGestor: "teste@postos.com",
+                TelefoneEmergencia: "+5511999887766"
+            ),
+            Contrato: new CreateContratoCompletoDtoInput(
+                Descricao: "Contrato Postos",
+                ValorTotalMensal: 36000m,
+                ValorDiariaCobrada: 120m,
+                PercentualAdicionalNoturno: 0.30m,
+                ValorBeneficiosExtrasMensal: 3600m,
+                PercentualImpostos: 0.15m,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
                 DataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-                Status: StatusContrato.PAGO
+                Status: StatusContrato.ATIVO
             ),
             CriarPostosAutomaticamente: true,
-            NumeroDePostos: 2
+            NumeroDePostos: 5 // ❌ Número inválido (deve ser 2-4)
         );
 
         // Act
@@ -165,7 +198,7 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 Nome: $"Residencial Horários {Guid.NewGuid()}",
                 Cnpj: GerarCnpjFake(),
                 Endereco: "Rua Horários, 123",
-                QuantidadeFuncionariosIdeal: 16,
+                QuantidadeIdealPorTurno: 16,
                 HorarioTrocaTurno: TimeSpan.FromHours(6), // 06:00
                 EmailGestor: "horarios@test.com",
                 TelefoneEmergencia: "+5511999888777"
@@ -177,12 +210,11 @@ public class CondominiosCompletosControllerIntegrationTests : IClassFixture<Cust
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 4800m,
                 PercentualImpostos: 0.15m,
-                QuantidadeFuncionarios: 16,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
                 DataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-                Status: StatusContrato.PAGO
+                Status: StatusContrato.ATIVO
             ),
             CriarPostosAutomaticamente: true,
             NumeroDePostos: 2

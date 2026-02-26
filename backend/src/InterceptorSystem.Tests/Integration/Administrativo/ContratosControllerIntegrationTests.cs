@@ -36,7 +36,7 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             0.2m,
             800,
             0.18m,
-            10,
+            2,
             0.15m,
             0.05m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -60,7 +60,7 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             0.2m,
             1200,
             0.2m,
-            20,
+            2,
             0.2m,
             0.08m,
             DateOnly.FromDateTime(DateTime.Today),
@@ -87,12 +87,12 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
             0.25m,
             1300,
             0.22m,
-            22,
+            2,
             0.25m,
             0.1m,
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(10)),
-            StatusContrato.PAGO);
+            StatusContrato.ATIVO);
 
         var response = await Client.PutAsJsonAsync($"/api/contratos/{contrato.Id}", input);
 
@@ -100,7 +100,7 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
         var result = await ReadAsAsync<ContratoDtoOutput>(response);
         Assert.NotNull(result);
         Assert.Equal(input.Descricao, result!.Descricao);
-        Assert.Equal(StatusContrato.PAGO, result.Status);
+        Assert.Equal(StatusContrato.ATIVO, result.Status);
     }
 
     [Fact]

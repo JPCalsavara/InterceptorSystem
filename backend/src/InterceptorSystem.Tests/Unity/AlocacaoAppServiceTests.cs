@@ -53,7 +53,7 @@ public class AlocacaoAppServiceTests
             "test@test.com",
             "+5511999999999");
         
-        var posto = new PostoDeTrabalho(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
+        var posto = new PostoDeTrabalho(condominioId, empresaId, Guid.NewGuid(), TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
         
         // Usar reflection para configurar a propriedade de navegação Condominio
         var condominioProperty = typeof(PostoDeTrabalho).GetProperty("Condominio");

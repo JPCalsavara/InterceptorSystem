@@ -5,6 +5,7 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 public interface IAlocacaoAppService
 {
     Task<AlocacaoDtoOutput> CreateAsync(CreateAlocacaoDtoInput input);
+    Task<List<AlocacaoDtoOutput>> CreateBatchAsync(CreateAlocacoesBatchDtoInput batch);
     Task<AlocacaoDtoOutput> UpdateAsync(Guid id, UpdateAlocacaoDtoInput input);
     Task DeleteAsync(Guid id);
     Task<AlocacaoDtoOutput?> GetByIdAsync(Guid id);

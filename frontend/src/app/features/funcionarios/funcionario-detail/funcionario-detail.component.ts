@@ -14,11 +14,12 @@ import {
   Contrato,
   StatusAlocacao,
 } from '../../../models/index';
+import { AlocacoesViewComponent } from '../../../shared/components/alocacoes-view/alocacoes-view.component';
 
 @Component({
   selector: 'app-funcionario-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AlocacoesViewComponent],
   templateUrl: './funcionario-detail.component.html',
   styleUrl: './funcionario-detail.component.scss',
 })
@@ -41,12 +42,12 @@ export class FuncionarioDetailComponent implements OnInit {
   // Computeds
   totalAlocacoes = computed(() => this.alocacoes().length);
 
-  alocacoesConfirmadas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA).length
+  alocacoesConfirmadas = computed(
+    () => this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA).length,
   );
 
   faltas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA)
+    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA),
   );
 
   totalFaltas = computed(() => this.faltas().length);
@@ -176,4 +177,3 @@ export class FuncionarioDetailComponent implements OnInit {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 }
-

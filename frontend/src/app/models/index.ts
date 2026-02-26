@@ -41,10 +41,10 @@ export interface Condominio {
   nome: string;
   cnpj: string;
   endereco: string;
-  quantidadeFuncionariosIdeal: number;  // FASE 1 backend
-  horarioTrocaTurno: string;            // FASE 1 backend - formato "HH:mm"
-  emailGestor?: string;                 // FASE 1 backend
-  telefoneEmergencia?: string;          // FASE 1 backend
+  quantidadeIdealPorTurno: number; // Funcionários ideais por turno
+  horarioTrocaTurno: string; // formato "HH:mm:ss"
+  emailGestor?: string;
+  telefoneEmergencia?: string;
   ativo: boolean;
   empresaId?: string;
   dataCriacao?: Date;
@@ -54,20 +54,20 @@ export interface CreateCondominioDto {
   nome: string;
   cnpj: string;
   endereco: string;
-  quantidadeFuncionariosIdeal: number;  // FASE 1 backend
-  horarioTrocaTurno: string;            // FASE 1 backend
-  emailGestor?: string;                 // FASE 1 backend
-  telefoneEmergencia?: string;          // FASE 1 backend
+  quantidadeIdealPorTurno: number; // Funcionários ideais por turno
+  horarioTrocaTurno: string; // formato "HH:mm:ss"
+  emailGestor?: string;
+  telefoneEmergencia?: string;
 }
 
 export interface UpdateCondominioDto {
   nome: string;
   cnpj: string;
   endereco: string;
-  quantidadeFuncionariosIdeal: number;  // FASE 1 backend
-  horarioTrocaTurno: string;            // FASE 1 backend
-  emailGestor?: string;                 // FASE 1 backend
-  telefoneEmergencia?: string;          // FASE 1 backend
+  quantidadeIdealPorTurno: number; // Funcionários ideais por turno
+  horarioTrocaTurno: string; // formato "HH:mm:ss"
+  emailGestor?: string;
+  telefoneEmergencia?: string;
 }
 
 // Contrato
@@ -80,13 +80,13 @@ export interface Contrato {
   percentualAdicionalNoturno: number;
   valorBeneficiosExtrasMensal: number;
   percentualImpostos: number;
-  quantidadeFuncionarios: number;
+  numeroDePostos: number; // Número de turnos/postos
+  quantidadeFuncionarios: number; // Read-only: calculado pelo backend (quantidadeIdealPorTurno × numeroDePostos)
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
-  valorTotalContrato?: number; // Calculado
 }
 
 export interface CreateContratoDto {
@@ -97,7 +97,7 @@ export interface CreateContratoDto {
   percentualAdicionalNoturno: number;
   valorBeneficiosExtrasMensal: number;
   percentualImpostos: number;
-  quantidadeFuncionarios: number;
+  numeroDePostos: number; // Backend calcula quantidadeFuncionarios a partir disso
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
@@ -112,7 +112,7 @@ export interface UpdateContratoDto {
   percentualAdicionalNoturno: number;
   valorBeneficiosExtrasMensal: number;
   percentualImpostos: number;
-  quantidadeFuncionarios: number;
+  numeroDePostos: number; // Backend calcula quantidadeFuncionarios a partir disso
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
@@ -124,7 +124,7 @@ export interface UpdateContratoDto {
 export interface Funcionario {
   id: string;
   condominioId: string;
-  contratoId: string;                   // FASE 2 backend - obrigatório
+  contratoId: string; // FASE 2 backend - obrigatório
   nome: string;
   cpf: string;
   celular: string;
@@ -142,7 +142,7 @@ export interface Funcionario {
 
 export interface CreateFuncionarioDto {
   condominioId: string;
-  contratoId: string;                   // FASE 2 backend - obrigatório
+  contratoId: string; // FASE 2 backend - obrigatório
   nome: string;
   cpf: string;
   celular: string;
@@ -163,28 +163,28 @@ export interface UpdateFuncionarioDto {
 export interface PostoDeTrabalho {
   id: string;
   condominioId: string;
-  horarioInicio: string;               // FASE 5 - formato "HH:mm:ss"
-  horarioFim: string;                  // FASE 5 - formato "HH:mm:ss"
-  horario: string;                     // FASE 5 - formato "HH:mm - HH:mm" (display)
+  contratoId: string;
+  horarioInicio: string; // FASE 5 - formato "HH:mm:ss"
+  horarioFim: string; // FASE 5 - formato "HH:mm:ss"
+  horario: string; // FASE 5 - formato "HH:mm - HH:mm" (display)
   quantidadeIdealFuncionarios: number; // FASE 5 - calculado do condomínio
-  permiteDobrarEscala: boolean;        // FASE 5
-  capacidadeMaximaPorDobras: number;   // FASE 5
-  condominio?: Condominio;             // Pode vir populado em alguns endpoints
+  permiteDobrarEscala: boolean; // FASE 5
+  capacidadeMaximaPorDobras: number; // FASE 5
+  condominio?: Condominio; // Pode vir populado em alguns endpoints
 }
 
 export interface CreatePostoDeTrabalhoDto {
   condominioId: string;
-  horarioInicio: string;             // formato "HH:mm:ss"
-  horarioFim: string;                // formato "HH:mm:ss"
+  contratoId: string;
+  horarioInicio: string; // formato "HH:mm:ss"
+  horarioFim: string; // formato "HH:mm:ss"
   permiteDobrarEscala: boolean;
-  capacidadeMaximaExtraPorTerceiros?: number;
 }
 
 export interface UpdatePostoDeTrabalhoDto {
   horarioInicio: string;
   horarioFim: string;
   permiteDobrarEscala: boolean;
-  capacidadeMaximaExtraPorTerceiros?: number;
 }
 
 // Alocacao - FASE 3
@@ -192,17 +192,17 @@ export interface Alocacao {
   id: string;
   funcionarioId: string;
   postoDeTrabalhoId: string;
-  data: string;                      // formato "yyyy-MM-dd"
+  data: string; // formato "yyyy-MM-dd"
   statusAlocacao: StatusAlocacao;
   tipoAlocacao: TipoAlocacao;
-  funcionario?: Funcionario;         // Pode vir populado
+  funcionario?: Funcionario; // Pode vir populado
   postoDeTrabalho?: PostoDeTrabalho; // Pode vir populado
 }
 
 export interface CreateAlocacaoDto {
   funcionarioId: string;
   postoDeTrabalhoId: string;
-  data: string;                      // formato "yyyy-MM-dd"
+  data: string; // formato "yyyy-MM-dd"
   statusAlocacao: StatusAlocacao;
   tipoAlocacao: TipoAlocacao;
 }
@@ -214,4 +214,3 @@ export interface UpdateAlocacaoDto {
 
 // Cálculo de Contrato
 export * from './contrato-calculo.models';
-

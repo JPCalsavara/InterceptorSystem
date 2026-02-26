@@ -30,11 +30,11 @@ public class CondominioAppService : ICondominioAppService
         }
         
         var condominio = new Condominio(
-            empresaId: empresaId,
-            nome: input.Nome,
-            cnpj: input.Cnpj,
-            endereco: input.Endereco,
-            quantidadeFuncionariosIdeal: input.QuantidadeFuncionariosIdeal,
+            empresaId,
+            input.Nome,
+            input.Cnpj,
+            input.Endereco,
+            quantidadeIdealPorTurno: input.QuantidadeIdealPorTurno,
             horarioTrocaTurno: input.HorarioTrocaTurno,
             emailGestor: input.EmailGestor,
             telefoneEmergencia: input.TelefoneEmergencia);
@@ -53,7 +53,7 @@ public class CondominioAppService : ICondominioAppService
         
         condominio.AtualizarDados(input.Nome, input.Endereco);
         condominio.AtualizarConfiguracoesOperacionais(
-            input.QuantidadeFuncionariosIdeal,
+            input.QuantidadeIdealPorTurno,
             input.HorarioTrocaTurno,
             input.EmailGestor,
             input.TelefoneEmergencia);

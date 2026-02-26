@@ -54,16 +54,33 @@ public class FuncionarioAppServiceTests
         var condominioId = Guid.NewGuid();
         var contratoId = Guid.NewGuid();
         // FASE 3: Sem parâmetros de salário
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "João", "123", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+        var input = new CreateFuncionarioDtoInput(condominioId,
+            contratoId,
+            "João",
+            "123",
+            "+5511999999999",
+            StatusFuncionario.ATIVO,
+            TipoEscala.DOZE_POR_TRINTA_SEIS,
+            TipoFuncionario.CLT);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
         
         // FASE 2: Mock de contrato vigente
-        var contrato = new Contrato(empresaId, condominioId, "Contrato Teste", 10000m, 100m, 0.30m, 500m, 0.15m, 5, 0.20m, 0.10m, 
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
-            StatusContrato.PAGO);
+        var contrato = new Contrato(empresaId,
+            condominioId,
+            "Contrato Teste",
+            10000m,
+            100m,
+            0.30m,
+            500m,
+            0.15m,
+            2,
+            0.20m,
+            0.10m,
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)),
+            DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
+            status: StatusContrato.ATIVO);
         _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
         
         _funcionarioRepo.Setup(r => r.GetByCpfAsync(input.Cpf)).ReturnsAsync((Funcionario?)null);
@@ -99,10 +116,20 @@ public class FuncionarioAppServiceTests
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
         
         // FASE 2: Mock de contrato vigente
-        var contrato = new Contrato(empresaId, condominioId, "Contrato Teste", 10000m, 100m, 0.30m, 500m, 0.15m, 5, 0.20m, 0.10m, 
+        var contrato = new Contrato(empresaId,
+            condominioId,
+            "Contrato Teste",
+            10000m,
+            100m,
+            0.30m,
+            500m,
+            0.15m,
+            2,
+            0.20m,
+            0.10m, 
             DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
-            StatusContrato.PAGO);
+            status: StatusContrato.ATIVO);
         _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
         
         // FASE 3: Sem parâmetros de salário

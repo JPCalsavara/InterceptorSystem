@@ -52,7 +52,7 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
                 PercentualAdicionalNoturno: input.Contrato.PercentualAdicionalNoturno,
                 ValorBeneficiosExtrasMensal: input.Contrato.ValorBeneficiosExtrasMensal,
                 PercentualImpostos: input.Contrato.PercentualImpostos,
-                QuantidadeFuncionarios: input.Contrato.QuantidadeFuncionarios,
+                NumeroDePostos: input.NumeroDePostos, // QuantidadeFuncionarios calculado automaticamente
                 MargemLucroPercentual: input.Contrato.MargemLucroPercentual,
                 MargemCoberturaFaltasPercentual: input.Contrato.MargemCoberturaFaltasPercentual,
                 DataInicio: input.Contrato.DataInicio,
@@ -68,8 +68,9 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
             if (input.CriarPostosAutomaticamente)
             {
                 postos.AddRange(await CriarPostosAutomaticamenteAsync(
-                    condominio.Id, 
-                    condominio.HorarioTrocaTurno, 
+                    condominio.Id,
+                    contrato.Id,
+                    condominio.HorarioTrocaTurno,
                     input.NumeroDePostos));
             }
 
@@ -89,39 +90,26 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
 
     public Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateCondominioCompletoDtoInput input)
     {
-        // Validação 1: Quantidade de funcionários do contrato deve bater com o ideal do condomínio
-        if (input.Contrato.QuantidadeFuncionarios != input.Condominio.QuantidadeFuncionariosIdeal)
-        {
-            return Task.FromResult<(bool, string?)>((false, 
-                $"Quantidade de funcionários do contrato ({input.Contrato.QuantidadeFuncionarios}) " +
-                $"deve ser igual à quantidade ideal do condomínio ({input.Condominio.QuantidadeFuncionariosIdeal})."));
-        }
-
-        // Validação 2: Número de postos deve ser divisor da quantidade de funcionários
-        if (input.CriarPostosAutomaticamente)
-        {
-            if (input.Condominio.QuantidadeFuncionariosIdeal % input.NumeroDePostos != 0)
-            {
-                return Task.FromResult<(bool, string?)>((false,
-                    $"Quantidade de funcionários ({input.Condominio.QuantidadeFuncionariosIdeal}) " +
-                    $"deve ser divisível pelo número de postos ({input.NumeroDePostos})."));
-            }
-        }
-
-        // Validação 3: Data de início do contrato não pode ser no passado
+        // Validação 1: Data de início do contrato não pode ser no passado
         var hoje = DateOnly.FromDateTime(DateTime.Today);
         if (input.Contrato.DataInicio < hoje)
         {
             return Task.FromResult<(bool, string?)>((false, "Data de início do contrato não pode ser no passado."));
         }
 
-        // Validação 4: Data de fim deve ser posterior à data de início
+        // Validação 2: Data de fim deve ser posterior à data de início
         if (input.Contrato.DataFim <= input.Contrato.DataInicio)
         {
             return Task.FromResult<(bool, string?)>((false, "Data de fim do contrato deve ser posterior à data de início."));
         }
 
-        // Validação 5: CNPJ não pode estar duplicado (verificar no service)
+        // Validação 3: Número de postos válido (2 a 4)
+        if (input.NumeroDePostos < 2 || input.NumeroDePostos > 4)
+        {
+            return Task.FromResult<(bool, string?)>((false, "Número de postos deve estar entre 2 e 4 (ex: 2=12x36, 3=8h, 4=6h)."));
+        }
+
+        // Validação 4: CNPJ não pode estar duplicado (verificar no service)
         // Essa validação já é feita no CondominioAppService
 
         return Task.FromResult<(bool, string?)>((true, null));
@@ -131,15 +119,16 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
     /// Cria postos de trabalho automaticamente baseado no horário de troca de turno
     /// </summary>
     private async Task<IEnumerable<PostoDeTrabalhoDto>> CriarPostosAutomaticamenteAsync(
-        Guid condominioId, 
+        Guid condominioId,
+        Guid contratoId,
         string horarioTrocaTurno,
         int numeroDePostos)
     {
         var postos = new List<PostoDeTrabalhoDto>();
-        
+
         // Parse do horário de troca de turno
         var horarioTroca = TimeSpan.Parse(horarioTrocaTurno);
-        
+
         // Calcular intervalo entre postos (24 horas / número de postos)
         var intervaloHoras = 24.0 / numeroDePostos;
 
@@ -156,6 +145,7 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
 
             var postoInput = new CreatePostoInput(
                 CondominioId: condominioId,
+                ContratoId: contratoId,
                 HorarioInicio: inicio,
                 HorarioFim: fim,
                 PermiteDobrarEscala: true

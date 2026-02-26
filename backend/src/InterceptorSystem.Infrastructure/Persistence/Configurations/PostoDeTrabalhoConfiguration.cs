@@ -33,9 +33,19 @@ public class PostoDeTrabalhoConfiguration : IEntityTypeConfiguration<PostoDeTrab
             .HasForeignKey(p => p.CondominioId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Foreign Key para Contrato
+        builder.Property(p => p.ContratoId).IsRequired();
+
+        // Relacionamento 1:N com Contrato
+        builder.HasOne(p => p.Contrato)
+            .WithMany(c => c.PostosDeTrabalho)
+            .HasForeignKey(p => p.ContratoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Índices
         builder.HasIndex(p => p.EmpresaId);
         builder.HasIndex(p => p.CondominioId);
+        builder.HasIndex(p => p.ContratoId);
 
         // FASE 4: QuantidadeIdealFuncionarios removido (calculado automaticamente)
         // Propriedade marcada como [NotMapped] na entidade

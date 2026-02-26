@@ -4,9 +4,10 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
 // FASE 4: CreatePostoInput sem QuantidadeIdealFuncionarios (calculado do Condomínio)
 public record CreatePostoInput(
-    Guid CondominioId, 
-    TimeSpan HorarioInicio, 
-    TimeSpan HorarioFim, 
+    Guid CondominioId,
+    Guid ContratoId,
+    TimeSpan HorarioInicio,
+    TimeSpan HorarioFim,
     bool PermiteDobrarEscala = true);
 
 // FASE 4: UpdatePostoInput sem QuantidadeIdealFuncionarios (calculado do Condomínio)
@@ -17,13 +18,14 @@ public record UpdatePostoInput(
 
 // Saída - QuantidadeIdealFuncionarios continua no output (propriedade calculada)
 public record PostoDeTrabalhoDto(
-    Guid Id, 
+    Guid Id,
     Guid CondominioId,
+    Guid ContratoId,
     string HorarioInicio,              // FASE 5 - formato "HH:mm:ss"
     string HorarioFim,                 // FASE 5 - formato "HH:mm:ss"
     string Horario,                    // FASE 5 - formato "HH:mm - HH:mm" (display)
     int QuantidadeIdealFuncionarios,   // Calculado automaticamente
-    bool PermiteDobrarEscala, 
+    bool PermiteDobrarEscala,
     int CapacidadeMaximaPorDobras)
 {
     public static PostoDeTrabalhoDto FromEntity(PostoDeTrabalho posto)
@@ -31,6 +33,7 @@ public record PostoDeTrabalhoDto(
         return new PostoDeTrabalhoDto(
             posto.Id,
             posto.CondominioId,
+            posto.ContratoId,
             posto.HorarioInicio.ToString(@"hh\:mm\:ss"),
             posto.HorarioFim.ToString(@"hh\:mm\:ss"),
             $"{posto.HorarioInicio:hh\\:mm} - {posto.HorarioFim:hh\\:mm}",

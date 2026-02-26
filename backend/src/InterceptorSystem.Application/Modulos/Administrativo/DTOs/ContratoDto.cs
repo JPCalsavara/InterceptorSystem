@@ -11,7 +11,7 @@ public record CreateContratoDtoInput(
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualImpostos,
-    int QuantidadeFuncionarios,
+    int NumeroDePostos, // Número de postos/turnos (QuantidadeFuncionarios será calculado automaticamente)
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
@@ -25,7 +25,7 @@ public record UpdateContratoDtoInput(
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualImpostos,
-    int QuantidadeFuncionarios,
+    int NumeroDePostos, // Número de postos/turnos (QuantidadeFuncionarios será calculado automaticamente)
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
@@ -42,6 +42,7 @@ public record ContratoDtoOutput(
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualImpostos,
     int QuantidadeFuncionarios,
+    int NumeroDePostos, // ADICIONADO: Número de postos/turnos
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
@@ -61,6 +62,7 @@ public record ContratoDtoOutput(
             entity.ValorBeneficiosExtrasMensal,
             entity.PercentualImpostos,
             entity.QuantidadeFuncionarios,
+            entity.NumeroDePostos, // ADICIONADO
             entity.MargemLucroPercentual,
             entity.MargemCoberturaFaltasPercentual,
             entity.DataInicio,

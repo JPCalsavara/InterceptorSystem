@@ -100,7 +100,7 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int>("QuantidadeFuncionariosIdeal")
+                    b.Property<int>("QuantidadeIdealPorTurno")
                         .HasColumnType("integer");
 
                     b.Property<string>("TelefoneEmergencia")
@@ -151,14 +151,14 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<decimal>("MargemLucroPercentual")
                         .HasColumnType("decimal(5,4)");
 
+                    b.Property<int>("NumeroDePostos")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("PercentualAdicionalNoturno")
                         .HasColumnType("decimal(5,4)");
 
                     b.Property<decimal>("PercentualImpostos")
                         .HasColumnType("decimal(5,4)");
-
-                    b.Property<int>("QuantidadeFuncionarios")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -254,6 +254,9 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Property<Guid>("CondominioId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -274,6 +277,8 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CondominioId");
+
+                    b.HasIndex("ContratoId");
 
                     b.HasIndex("EmpresaId");
 
@@ -337,7 +342,15 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", "Contrato")
+                        .WithMany("PostosDeTrabalho")
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Condominio");
+
+                    b.Navigation("Contrato");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", b =>
@@ -352,6 +365,8 @@ namespace InterceptorSystem.Infrastructure.Migrations
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
                 {
                     b.Navigation("Funcionarios");
+
+                    b.Navigation("PostosDeTrabalho");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>

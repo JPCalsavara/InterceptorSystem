@@ -29,13 +29,29 @@ public class Funcionario : Entity, IAggregateRoot
     public decimal SalarioBase => Contrato?.CalcularSalarioBasePorFuncionario() ?? 0m;
     
     /// <summary>
-    /// Adicional noturno (aplicado apenas para escala 12x36)
+    /// Adicional noturno (aplicado quando trabalha em posto noturno - 22h às 5h conforme CLT).
+    /// Verifica se o funcionário possui alocações confirmadas em postos de trabalho com horário noturno.
+    /// CLT Art. 73: Trabalho noturno urbano é o executado entre 22h de um dia e 5h do dia seguinte.
     /// </summary>
     [NotMapped]
-    public decimal AdicionalNoturno => 
-        (Contrato != null && TipoEscala == TipoEscala.DOZE_POR_TRINTA_SEIS) 
-            ? Contrato.CalcularAdicionalNoturno(SalarioBase) 
-            : 0m;
+    public decimal AdicionalNoturno
+    {
+        get
+        {
+            if (Contrato == null)
+                return 0m;
+
+            // Verifica se tem alocações confirmadas em postos noturnos
+            var temAlocacaoNoturna = Alocacoes
+                .Any(a => a.StatusAlocacao == StatusAlocacao.CONFIRMADA && 
+                         a.PostoDeTrabalho != null && 
+                         a.PostoDeTrabalho.TemHorarioNoturno);
+
+            return temAlocacaoNoturna 
+                ? Contrato.CalcularAdicionalNoturno(SalarioBase) 
+                : 0m;
+        }
+    }
     
     /// <summary>
     /// Benefícios mensais calculados automaticamente

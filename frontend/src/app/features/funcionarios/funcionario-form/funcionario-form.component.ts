@@ -2,15 +2,22 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { NgxMaskDirective } from 'ngx-mask';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { CondominioService } from '../../../services/condominio.service';
 import { ContratoService } from '../../../services/contrato.service';
-import { StatusFuncionario, TipoFuncionario, TipoEscala, Contrato, StatusContrato } from '../../../models';
+import {
+  StatusFuncionario,
+  TipoFuncionario,
+  TipoEscala,
+  Contrato,
+  StatusContrato,
+} from '../../../models';
 
 @Component({
   selector: 'app-funcionario-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
   templateUrl: './funcionario-form.component.html',
   styleUrl: './funcionario-form.component.scss',
 })
@@ -90,7 +97,7 @@ export class FuncionarioFormComponent implements OnInit {
     this.contratoService.getAll().subscribe({
       next: (data) => {
         const contratosDoCondominio = data.filter(
-          (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO
+          (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO,
         );
         this.contratos.set(contratosDoCondominio);
       },
@@ -108,14 +115,11 @@ export class FuncionarioFormComponent implements OnInit {
       tipoFuncionario: [TipoFuncionario.CLT, Validators.required],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
     });
-
-    this.setupFormatListeners();
   }
 
   private cpfValidator(control: any) {
     if (!control.value) return null;
-    const cleaned = control.value.replace(/\D/g, '');
-    if (cleaned.length !== 11) {
+    if (control.value.length !== 11) {
       return { cpfInvalid: true };
     }
     return null;
@@ -123,51 +127,10 @@ export class FuncionarioFormComponent implements OnInit {
 
   private celularValidator(control: any) {
     if (!control.value) return null;
-    const cleaned = control.value.replace(/\D/g, '');
-    if (cleaned.length < 10 || cleaned.length > 11) {
+    if (control.value.length < 10 || control.value.length > 11) {
       return { celularInvalid: true };
     }
     return null;
-  }
-
-  private setupFormatListeners(): void {
-    this.form.get('cpf')?.valueChanges.subscribe((value) => {
-      if (value) {
-        const cleaned = value.replace(/\D/g, '');
-        const formatted = this.formatCPF(cleaned);
-        if (formatted !== value) {
-          this.form.get('cpf')?.setValue(formatted, { emitEvent: false });
-        }
-      }
-    });
-
-    this.form.get('celular')?.valueChanges.subscribe((value) => {
-      if (value) {
-        const cleaned = value.replace(/\D/g, '');
-        const formatted = this.formatCelular(cleaned);
-        if (formatted !== value) {
-          this.form.get('celular')?.setValue(formatted, { emitEvent: false });
-        }
-      }
-    });
-  }
-
-  private formatCPF(value: string): string {
-    if (!value) return '';
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
-  }
-
-  private formatCelular(value: string): string {
-    if (!value) return '';
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   }
 
   loadFuncionario(id: string): void {
@@ -194,8 +157,10 @@ export class FuncionarioFormComponent implements OnInit {
     }
 
     if (this.contratos().length === 0 && !this.isEdit()) {
-        this.error.set('Não há contratos ativos para o condomínio selecionado. Cadastre um contrato primeiro.');
-        return;
+      this.error.set(
+        'Não há contratos ativos para o condomínio selecionado. Cadastre um contrato primeiro.',
+      );
+      return;
     }
 
     this.loading.set(true);
@@ -203,8 +168,6 @@ export class FuncionarioFormComponent implements OnInit {
 
     const formValue = {
       ...this.form.value,
-      cpf: this.form.value.cpf.replace(/\D/g, ''),
-      celular: this.form.value.celular.replace(/\D/g, ''),
       contratoId: this.isEdit() ? this.form.value.contratoId : this.contratos()[0].id,
     };
 
@@ -221,7 +184,7 @@ export class FuncionarioFormComponent implements OnInit {
         this.error.set(
           this.isEdit()
             ? 'Erro ao atualizar funcionário. Tente novamente.'
-            : 'Erro ao criar funcionário. Tente novamente.'
+            : 'Erro ao criar funcionário. Tente novamente.',
         );
         this.loading.set(false);
         console.error('Erro:', err);
