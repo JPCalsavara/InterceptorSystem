@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InterceptorSystem.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/condominios")]
 public class CondominiosController : ControllerBase

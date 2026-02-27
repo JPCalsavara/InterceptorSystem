@@ -3,22 +3,44 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using InterceptorSystem.Application.Common.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
+using InterceptorSystem.Infrastructure.Auth;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
+using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace InterceptorSystem.Tests.Integration;
 
 /// <summary>
-/// Factory customizado para criar uma aplicação de teste com banco de dados em memória
+/// EmpresaId fixo compartilhado por todos os testes de integração.
+/// Garante que todos os requests dentro de uma sessão de testes pertencem ao mesmo tenant.
+/// </summary>
+public static class TestTenant
+{
+    public static readonly Guid EmpresaId = Guid.Parse("d3b07384-d9a1-4d3b-923f-561917637840");
+}
+
+/// <summary>
+/// Implementação no-op do IEmailService para testes (não envia e-mails de verdade).
+/// </summary>
+public class NoOpEmailService : IEmailService
+{
+    public Task EnviarVerificacaoEmailAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
+    public Task EnviarResetSenhaAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
+    public Task EnviarConfirmacaoAlteracaoEmailAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
+}
+
+/// <summary>
+/// Factory customizado para criar uma aplicação de teste com banco de dados em memória.
 /// </summary>
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
@@ -27,10 +49,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     public CustomWebApplicationFactory()
     {
-        // Força o ambiente de teste antes da construção do host
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
         Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Testing");
-        // Cria um nome único para o banco de dados em memória
         _databaseName = $"InMemoryTestDb_{Interlocked.Increment(ref _databaseCounter)}_{Guid.NewGuid()}";
     }
 
@@ -43,7 +63,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
             services.RemoveAll<ApplicationDbContext>();
 
-            // Adiciona DbContext com banco de dados em memória único
+            // Adiciona DbContext com banco de dados em memória único por factory
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseInMemoryDatabase(_databaseName);
@@ -67,21 +87,27 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     .Build();
             });
 
-            // Registra repositórios necessários para os services
+            // Repositórios do domínio administrativo
             services.AddScoped<ICondominioRepository, CondominioRepository>();
             services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
             services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
             services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
 
+            // Repositório e serviços de autenticação
+            services.AddScoped<IContaRepository, ContaRepository>();
+            services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
+            services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+            // E-mail no-op para testes
+            services.AddScoped<IEmailService, NoOpEmailService>();
+
             // Garante que o banco de dados seja criado
             var sp = services.BuildServiceProvider();
             using (var scope = sp.CreateScope())
             {
-                var scopedServices = scope.ServiceProvider;
-                var db = scopedServices.GetRequiredService<ApplicationDbContext>();
-                
-                // Garante que o banco está limpo e criado
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
             }
@@ -90,7 +116,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 }
 
 /// <summary>
-/// Handler de autenticação fake para testes
+/// Handler de autenticação fake para testes.
+/// Usa um EmpresaId fixo e o claim "empresaId" (lowercase) para corresponder ao CurrentTenantService.
 /// </summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -104,12 +131,12 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // Cria claims fake para testes
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, "Test User"),
             new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-            new Claim("EmpresaId", Guid.NewGuid().ToString()) // EmpresaId fake para multi-tenancy
+            // "empresaId" lowercase para corresponder ao CurrentTenantService
+            new Claim("empresaId", TestTenant.EmpresaId.ToString()),
         };
 
         var identity = new ClaimsIdentity(claims, "Test");
@@ -119,4 +146,3 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }
-

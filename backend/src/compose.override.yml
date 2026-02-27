@@ -16,9 +16,27 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       # Essencial para o Docker no Linux perceber mudanças de arquivo rapidamente
       - DOTNET_USE_POLLING_FILE_WATCHER=true
+      # SMTP — aponta para o MailHog em desenvolvimento
+      - Smtp__Host=mailhog
+      - Smtp__Port=1025
+      - Smtp__Username=
+      - Smtp__Password=
+      - Smtp__SecureSocket=None
+
+    depends_on:
+      - mailhog
 
     # Substitui o "dotnet InterceptorSystem.Api.dll" pelo modo Watch
     command: ["dotnet", "watch", "run", "--no-launch-profile"]
+
+  # --- SERVIDOR SMTP FAKE (apenas desenvolvimento) ---
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: interceptor_mailhog
+    ports:
+      - "8025:8025" # Interface web para ver os emails
+    networks:
+      - interceptor-network
 
   # --- FRONTEND EM MODO DESENVOLVIMENTO ---
   frontend:

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,7 @@ namespace InterceptorSystem.Api.Controllers;
 /// <summary>
 /// Endpoints auxiliares para cálculos de contrato
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("api/contratos/calculos")]
 public class ContratoCalculosController : ControllerBase

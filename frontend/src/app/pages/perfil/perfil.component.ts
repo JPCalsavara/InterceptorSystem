@@ -1,0 +1,685 @@
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ContaService, ContaPerfilOutput } from '../../services/conta.service';
+import { AuthService } from '../../services/auth.service';
+
+@Component({
+  selector: 'app-perfil',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="perfil-page">
+      <div class="page-header">
+        <h1>Perfil da Empresa</h1>
+        <p class="page-subtitle">Gerencie as informações da sua conta</p>
+      </div>
+
+      @if (loading()) {
+        <div class="loading">Carregando...</div>
+      } @else if (perfil()) {
+        <!-- Banner de aviso quando a API falhou (dados vindos do token) -->
+        @if (erroCarregamento()) {
+          <div class="alert-warning">
+            <strong>Dados parciais.</strong>
+            O servidor retornou um erro ao carregar o perfil completo. Você pode editar as
+            informações disponíveis abaixo, mas campos como CNPJ e data de cadastro podem não estar
+            disponíveis.
+          </div>
+        }
+
+        <!-- Visualização -->
+        @if (!modoEdicao()) {
+          <div class="card">
+            <div class="card-header">
+              <h2>Informações da Conta</h2>
+              <button class="btn-edit" (click)="iniciarEdicao()">Editar</button>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Nome da Empresa</span>
+                <span class="info-value">{{ perfil()!.nomeEmpresa }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">E-mail</span>
+                <span class="info-value">{{ perfil()!.email }}</span>
+              </div>
+              @if (perfil()!.cnpj) {
+                <div class="info-item">
+                  <span class="info-label">CNPJ</span>
+                  <span class="info-value">{{ perfil()!.cnpj }}</span>
+                </div>
+              }
+              <div class="info-item">
+                <span class="info-label">Plano</span>
+                <span class="info-value">
+                  <span [class]="'badge badge-' + perfil()!.plano.toLowerCase()">
+                    {{ perfil()!.plano }}
+                  </span>
+                </span>
+              </div>
+              @if (!erroCarregamento()) {
+                <div class="info-item">
+                  <span class="info-label">Membro desde</span>
+                  <span class="info-value">{{ perfil()!.createdAt | date: 'dd/MM/yyyy' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <!-- Modo edição -->
+          <div class="card">
+            <div class="card-header">
+              <h2>Editar Informações</h2>
+            </div>
+
+            @if (erro()) {
+              <div class="error-message">{{ erro() }}</div>
+            }
+            @if (sucesso()) {
+              <div class="success-message">{{ sucesso() }}</div>
+            }
+
+            <form class="edit-form" (ngSubmit)="salvar()">
+              <div class="form-group">
+                <label for="nomeEmpresa">Nome da Empresa</label>
+                <input
+                  id="nomeEmpresa"
+                  type="text"
+                  [(ngModel)]="editNomeEmpresa"
+                  name="nomeEmpresa"
+                  placeholder="Nome da empresa"
+                />
+              </div>
+              <div class="form-group">
+                <label for="email">E-mail</label>
+                <input
+                  id="email"
+                  type="email"
+                  [(ngModel)]="editEmail"
+                  name="email"
+                  placeholder="E-mail da conta"
+                />
+              </div>
+
+              <div class="section-divider">
+                <span>Alterar Senha (opcional)</span>
+              </div>
+
+              <div class="form-group">
+                <label for="senhaAtual">Senha Atual</label>
+                <div class="input-password-wrapper">
+                  <input
+                    id="senhaAtual"
+                    [type]="mostrarSenhaAtual() ? 'text' : 'password'"
+                    [(ngModel)]="senhaAtual"
+                    name="senhaAtual"
+                    placeholder="Digite sua senha atual"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-senha"
+                    (click)="mostrarSenhaAtual.set(!mostrarSenhaAtual())"
+                    [title]="mostrarSenhaAtual() ? 'Ocultar senha' : 'Mostrar senha'"
+                  >
+                    @if (mostrarSenhaAtual()) {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"
+                        />
+                        <path
+                          d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    } @else {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="novaSenha">Nova Senha</label>
+                <div class="input-password-wrapper">
+                  <input
+                    id="novaSenha"
+                    [type]="mostrarNovaSenha() ? 'text' : 'password'"
+                    [(ngModel)]="novaSenha"
+                    name="novaSenha"
+                    placeholder="Mínimo 8 caracteres"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-senha"
+                    (click)="mostrarNovaSenha.set(!mostrarNovaSenha())"
+                    [title]="mostrarNovaSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+                  >
+                    @if (mostrarNovaSenha()) {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"
+                        />
+                        <path
+                          d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    } @else {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="confirmarSenha">Confirmar Nova Senha</label>
+                <div class="input-password-wrapper">
+                  <input
+                    id="confirmarSenha"
+                    [type]="mostrarConfirmarSenha() ? 'text' : 'password'"
+                    [(ngModel)]="confirmarSenha"
+                    name="confirmarSenha"
+                    placeholder="Repita a nova senha"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-senha"
+                    (click)="mostrarConfirmarSenha.set(!mostrarConfirmarSenha())"
+                    [title]="mostrarConfirmarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+                  >
+                    @if (mostrarConfirmarSenha()) {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"
+                        />
+                        <path
+                          d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    } @else {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="cancelarEdicao()">
+                  Cancelar
+                </button>
+                <button type="submit" class="btn-save" [disabled]="salvando()">
+                  @if (salvando()) {
+                    Salvando...
+                  } @else {
+                    Salvar Alterações
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+      } @else {
+        <div class="empty-state">Nenhum dado disponível. Tente fazer login novamente.</div>
+      }
+    </div>
+  `,
+  styles: [
+    `
+      .perfil-page {
+        max-width: 700px;
+      }
+
+      .page-header {
+        margin-bottom: 2rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .page-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+      }
+
+      .loading,
+      .empty-state {
+        color: var(--text-secondary);
+        padding: 2rem 0;
+      }
+
+      .alert-warning {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        background: rgba(245, 158, 11, 0.1);
+        color: #92400e;
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        margin-bottom: 1.25rem;
+        line-height: 1.5;
+
+        strong {
+          font-weight: 700;
+        }
+      }
+
+      .card {
+        background: var(--surface-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.75rem;
+      }
+
+      .card-header h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .btn-edit {
+        padding: 0.5rem 1.25rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background: var(--primary-dark);
+        }
+      }
+
+      .info-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid var(--border-subtle);
+
+        &:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+      }
+
+      .info-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .info-value {
+        font-size: 1rem;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .badge-free {
+        background: rgba(100, 116, 139, 0.15);
+        color: #64748b;
+      }
+
+      .badge-basic {
+        background: rgba(33, 150, 243, 0.15);
+        color: #2196f3;
+      }
+
+      .badge-pro {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+      }
+
+      .edit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+
+        label {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        input {
+          padding: 0.75rem 1rem;
+          border: 1px solid var(--border-strong);
+          border-radius: 8px;
+          background: var(--input-bg);
+          color: var(--text-primary);
+          font-size: 0.95rem;
+          transition: border-color 0.2s;
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
+          }
+        }
+      }
+
+      .input-password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input {
+          width: 100%;
+          padding-right: 2.75rem;
+        }
+      }
+
+      .toggle-senha {
+        position: absolute;
+        right: 0.75rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        padding: 0;
+        line-height: 1;
+
+        &:hover {
+          color: var(--text-primary);
+        }
+      }
+
+      .section-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 0.5rem 0;
+
+        &::before,
+        &::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: var(--border-subtle);
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+      }
+
+      .btn-cancel {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--border-strong);
+        background: transparent;
+        color: var(--text-primary);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }
+      }
+
+      .btn-save {
+        padding: 0.75rem 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+          background: var(--primary-dark);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .error-message {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .success-message {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+    `,
+  ],
+})
+export class PerfilComponent implements OnInit {
+  private contaService = inject(ContaService);
+  private authService = inject(AuthService);
+
+  perfil = signal<ContaPerfilOutput | null>(null);
+  loading = signal(true);
+  erroCarregamento = signal<string | null>(null);
+  modoEdicao = signal(false);
+  salvando = signal(false);
+  erro = signal<string | null>(null);
+  sucesso = signal<string | null>(null);
+
+  editNomeEmpresa = '';
+  editEmail = '';
+  senhaAtual = '';
+  novaSenha = '';
+  confirmarSenha = '';
+  mostrarSenhaAtual = signal(false);
+  mostrarNovaSenha = signal(false);
+  mostrarConfirmarSenha = signal(false);
+
+  ngOnInit(): void {
+    // Pre-populate immediately with token data so the page is never blank
+    const user = this.authService.currentUser();
+    if (user) {
+      this.perfil.set({
+        empresaId: user.empresaId,
+        nomeEmpresa: user.nomeEmpresa,
+        email: user.email,
+        cnpj: null,
+        plano: user.plano,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    this.contaService.getPerfil().subscribe({
+      next: (data) => {
+        this.perfil.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        const msg =
+          err?.error?.mensagem ?? `Erro ${err?.status ?? ''} ao buscar dados do servidor.`;
+        this.erroCarregamento.set(msg);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  iniciarEdicao(): void {
+    const p = this.perfil();
+    if (!p) return;
+    this.editNomeEmpresa = p.nomeEmpresa;
+    this.editEmail = p.email;
+    this.senhaAtual = '';
+    this.novaSenha = '';
+    this.confirmarSenha = '';
+    this.erro.set(null);
+    this.sucesso.set(null);
+    this.modoEdicao.set(true);
+  }
+
+  cancelarEdicao(): void {
+    this.modoEdicao.set(false);
+    this.erro.set(null);
+  }
+
+  salvar(): void {
+    this.erro.set(null);
+
+    if (this.novaSenha && this.novaSenha !== this.confirmarSenha) {
+      this.erro.set('A nova senha e a confirmação não coincidem.');
+      return;
+    }
+
+    this.salvando.set(true);
+
+    const input: Record<string, string> = {};
+    if (this.editNomeEmpresa !== this.perfil()?.nomeEmpresa) {
+      input['nomeEmpresa'] = this.editNomeEmpresa;
+    }
+    if (this.editEmail !== this.perfil()?.email) {
+      input['email'] = this.editEmail;
+    }
+    if (this.novaSenha) {
+      input['senhaAtual'] = this.senhaAtual;
+      input['novaSenha'] = this.novaSenha;
+    }
+
+    this.contaService.atualizarPerfil(input).subscribe({
+      next: (updated) => {
+        this.perfil.set(updated);
+        this.authService.atualizarUser({
+          nomeEmpresa: updated.nomeEmpresa,
+          email: updated.email,
+          plano: updated.plano,
+        });
+        this.salvando.set(false);
+        this.modoEdicao.set(false);
+        this.sucesso.set('Informações atualizadas com sucesso!');
+        setTimeout(() => this.sucesso.set(null), 4000);
+      },
+      error: (err) => {
+        this.salvando.set(false);
+        const msg = err?.error?.mensagem;
+        this.erro.set(msg ?? 'Erro ao salvar. Tente novamente.');
+      },
+    });
+  }
+}

@@ -16,17 +16,17 @@ public class CurrentTenantService : ICurrentTenantService
     {
         get
         {
-            // 1. Tenta pegar do Header (Postman/Curl)
+            // 1. Pega do JWT claim "empresaId" (caminho principal em produção)
+            var jwtClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("empresaId")?.Value;
+            if (Guid.TryParse(jwtClaim, out var tenantIdFromJwt))
+                return tenantIdFromJwt;
+
+            // 2. Tenta pegar do Header (Postman/Swagger manual)
             var headerValue = _httpContextAccessor.HttpContext?.Request.Headers["X-Tenant-Id"].FirstOrDefault();
             if (Guid.TryParse(headerValue, out var tenantIdFromHeader))
-            {
                 return tenantIdFromHeader;
-            }
 
-            // 2. MODO DESENVOLVIMENTO (O "Pulo do Gato" para o Swagger funcionar)
-            // Se não achou nada, retornamos um ID fixo de teste.
-            // Assim o Swagger funciona sem precisar configurar headers complexos.
-            return Guid.Parse("d3b07384-d9a1-4d3b-923f-561917637840"); 
+            return null;
         }
     }
 
@@ -34,7 +34,6 @@ public class CurrentTenantService : ICurrentTenantService
     {
         get
         {
-            // Pega o ID padrão do usuário (ClaimTypes.NameIdentifier ou "sub")
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }

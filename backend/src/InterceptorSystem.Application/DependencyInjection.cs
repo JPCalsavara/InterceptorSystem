@@ -1,5 +1,7 @@
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
+using InterceptorSystem.Application.Modulos.Auth.Interfaces;
+using InterceptorSystem.Application.Modulos.Auth.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InterceptorSystem.Application;
@@ -14,12 +16,13 @@ public static class DependencyInjection
         services.AddScoped<IFuncionarioAppService, FuncionarioAppService>();
         services.AddScoped<IAlocacaoAppService, AlocacaoAppService>();
         services.AddScoped<IContratoAppService, ContratoAppService>();
-        
+
         // FASE 5: Serviço Orquestrador para Criação em Cascata
         services.AddScoped<ICondominioOrquestradorService, CondominioOrquestradorService>();
-        
-        // Aqui também entra: AutoMapper, MediatR, FluentValidation se formos usar
-        
+
+        // Auth
+        services.AddScoped<IAuthAppService, AuthAppService>();
+
         return services;
     }
 }

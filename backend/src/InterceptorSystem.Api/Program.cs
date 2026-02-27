@@ -3,7 +3,10 @@ using InterceptorSystem.Application;
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Infrastructure;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,7 +51,27 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 4. Serviço de Tenant (Especifico da API pois depende de HttpContext)
+// 4. JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("Jwt:Key não configurado.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        };
+    });
+
+// 5. Serviço de Tenant (Específico da API pois depende de HttpContext)
 builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
 
 var app = builder.Build();
@@ -59,7 +82,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        
+
         // Em testes, o InMemory não usa migrações
         if (!builder.Environment.IsEnvironment("Testing") && context.Database.GetPendingMigrations().Any())
         {
@@ -81,10 +104,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// CORS deve vir ANTES de UseHttpsRedirection e UseAuthorization
+// CORS deve vir ANTES de UseAuthentication e UseAuthorization
 app.UseCors("AllowAngularApp");
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

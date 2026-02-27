@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterceptorSystem.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/contratos")]
 public class ContratosController : ControllerBase
