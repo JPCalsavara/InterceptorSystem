@@ -13,6 +13,7 @@ import {
   PostoDeTrabalho,
   Contrato,
   StatusAlocacao,
+  TipoEscala,
 } from '../../../models/index';
 import { AlocacoesViewComponent } from '../../../shared/components/alocacoes-view/alocacoes-view.component';
 
@@ -58,6 +59,72 @@ export class FuncionarioDetailComponent implements OnInit {
 
     const valorDiaria = contrato.valorDiariaCobrada || 0;
     return this.totalFaltas() * valorDiaria;
+  });
+
+  alocacoesCanceladas = computed(() =>
+    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA),
+  );
+
+  totalCanceladas = computed(() => this.alocacoesCanceladas().length);
+
+  multaPorCancelamentos = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+    return this.totalCanceladas() * (contrato.valorDiariaCobrada || 0);
+  });
+
+  salarioSimulado = computed(() => {
+    const contrato = this.contrato();
+    const func = this.funcionario();
+    if (!contrato || !func) return 0;
+
+    const hoje = new Date();
+    const mes = hoje.getMonth();
+    const ano = hoje.getFullYear();
+
+    const alocacoesMes = this.alocacoes().filter((a) => {
+      if (a.statusAlocacao !== StatusAlocacao.CONFIRMADA) return false;
+      const d = new Date(a.data + 'T12:00:00');
+      return d.getMonth() === mes && d.getFullYear() === ano;
+    });
+
+    // Fallback: sem alocações no mês usa média por tipo de escala
+    if (alocacoesMes.length === 0) {
+      const diasMedio = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+      return (
+        diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
+      );
+    }
+
+    let total = 0;
+    for (const aloc of alocacoesMes) {
+      let valor = contrato.valorDiariaCobrada || 0;
+      const data = new Date(aloc.data + 'T12:00:00');
+      const diaSemana = data.getDay(); // 0=Dom, 6=Sáb
+
+      if (diaSemana === 0)
+        valor *= 2.0; // +100% domingo
+      else if (diaSemana === 6) valor *= 1.5; // +50% sábado
+
+      const posto = this.postos().find((p) => p.id === aloc.postoDeTrabalhoId);
+      if (posto && this.isNightShift(posto)) {
+        valor *= 1 + (contrato.percentualAdicionalNoturno || 0) / 100;
+      }
+
+      total += valor;
+    }
+
+    return total + (contrato.valorBeneficiosExtrasMensal || 0);
+  });
+
+  salarioMesCompleto = computed(() => {
+    const contrato = this.contrato();
+    const func = this.funcionario();
+    if (!contrato || !func) return 0;
+    const diasMedio = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+    return (
+      diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
+    );
   });
 
   taxaPresenca = computed(() => {
@@ -164,6 +231,11 @@ export class FuncionarioDetailComponent implements OnInit {
       [StatusAlocacao.FALTA_REGISTRADA]: 'Falta',
     };
     return labels[status] || 'Desconhecido';
+  }
+
+  private isNightShift(posto: PostoDeTrabalho): boolean {
+    const hora = parseInt(posto.horarioInicio.substring(0, 2), 10);
+    return hora >= 22 || hora < 5;
   }
 
   formatCurrency(value: number): string {

@@ -4,12 +4,14 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { CondominioService } from '../../../services/condominio.service';
+import { ContratoService } from '../../../services/contrato.service';
 import {
   Funcionario,
   StatusFuncionario,
   TipoFuncionario,
   TipoEscala,
   Condominio,
+  Contrato,
 } from '../../../models/index';
 
 @Component({
@@ -22,9 +24,11 @@ import {
 export class FuncionarioListComponent implements OnInit {
   private service = inject(FuncionarioService);
   private condominioService = inject(CondominioService);
+  private contratoService = inject(ContratoService);
 
   funcionarios = signal<Funcionario[]>([]);
   condominios = signal<Condominio[]>([]);
+  contratos = signal<Contrato[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -64,12 +68,20 @@ export class FuncionarioListComponent implements OnInit {
   ngOnInit(): void {
     this.loadFuncionarios();
     this.loadCondominios();
+    this.loadContratos();
   }
 
   loadCondominios(): void {
     this.condominioService.getAll().subscribe({
       next: (data) => this.condominios.set(data),
       error: (err) => console.error('Erro ao carregar condomínios:', err),
+    });
+  }
+
+  loadContratos(): void {
+    this.contratoService.getAll().subscribe({
+      next: (data) => this.contratos.set(data),
+      error: (err) => console.error('Erro ao carregar contratos:', err),
     });
   }
 
@@ -180,5 +192,14 @@ export class FuncionarioListComponent implements OnInit {
     this.filtroCondominio.set('');
     this.filtroTipo.set('');
     this.filtroEscala.set('');
+  }
+
+  getSalarioSimuladoMensal(func: Funcionario): number {
+    const contrato = this.contratos().find((c) => c.id === func.contratoId);
+    if (!contrato) return 0;
+    const diasMedio = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+    return (
+      diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
+    );
   }
 }

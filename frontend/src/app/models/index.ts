@@ -210,6 +210,7 @@ export interface CreateAlocacaoDto {
 export interface UpdateAlocacaoDto {
   statusAlocacao: StatusAlocacao;
   tipoAlocacao: TipoAlocacao;
+  data?: string;
 }
 
 // Cálculo de Contrato

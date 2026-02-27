@@ -479,6 +479,34 @@
       opacity: 0.35;
     }
 
+    &.dia-sabado {
+      background: color-mix(in srgb, #3b82f6 10%, var(--bg-secondary));
+      .cell-date {
+        color: #2563eb;
+      }
+    }
+
+    &.dia-domingo {
+      background: color-mix(in srgb, #ef4444 10%, var(--bg-secondary));
+      .cell-date {
+        color: #dc2626;
+      }
+    }
+
+    &.dia-feriado {
+      background: color-mix(in srgb, #f59e0b 12%, var(--bg-secondary));
+      .cell-date {
+        color: #b45309;
+        text-decoration: underline dotted;
+        cursor: help;
+      }
+    }
+
+    &.dia-feriado.dia-sabado,
+    &.dia-feriado.dia-domingo {
+      background: color-mix(in srgb, #f59e0b 18%, var(--bg-secondary));
+    }
+
     .cell-date {
       font-weight: 600;
       color: var(--text-primary);
@@ -587,6 +615,10 @@
   background: #b45309;
   color: #fff;
 }
+.emp-cancelada {
+  background: #6b7280;
+  color: #fff;
+}
 
 .emp-color-0 {
   background: #7c3aed;
@@ -646,6 +678,10 @@
     background: #fde68a;
     color: #713f12;
   }
+  .emp-cancelada {
+    background: #9ca3af;
+    color: #111827;
+  }
 
   .emp-color-0 {
     background: #a78bfa;
@@ -694,5 +730,32 @@
   .emp-color-11 {
     background: #5eead4;
     color: #134e4a;
+  }
+}
+
+[data-theme='dark'] {
+  .calendar-cell {
+    &.dia-sabado {
+      background: rgba(59, 130, 246, 0.12);
+      .cell-date {
+        color: #93c5fd;
+      }
+    }
+    &.dia-domingo {
+      background: rgba(239, 68, 68, 0.12);
+      .cell-date {
+        color: #fca5a5;
+      }
+    }
+    &.dia-feriado {
+      background: rgba(245, 158, 11, 0.14);
+      .cell-date {
+        color: #fcd34d;
+      }
+    }
+    &.dia-feriado.dia-sabado,
+    &.dia-feriado.dia-domingo {
+      background: rgba(245, 158, 11, 0.2);
+    }
   }
 }

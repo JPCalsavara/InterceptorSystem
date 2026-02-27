@@ -4,6 +4,10 @@
   padding: 2rem;
 }
 
+.form-container-embedded {
+  padding: 1.5rem;
+}
+
 .form-header {
   display: flex;
   align-items: center;
@@ -319,4 +323,3 @@ select.form-control {
     transform: rotate(360deg);
   }
 }
-

@@ -1,7 +1,8 @@
-import { Component, input, signal, computed } from '@angular/core';
+import { Component, input, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { FeriadosService } from '../../../services/feriados.service';
 import {
   Alocacao,
   Funcionario,
@@ -39,6 +40,8 @@ interface WeekColumn {
   styleUrl: './alocacoes-view.component.scss',
 })
 export class AlocacoesViewComponent {
+  private feriadosService = inject(FeriadosService);
+
   readonly alocacoes = input<Alocacao[]>([]);
   readonly funcionarios = input<Funcionario[]>([]);
   readonly postos = input<PostoDeTrabalho[]>([]);
@@ -199,6 +202,7 @@ export class AlocacoesViewComponent {
 
   getAlocacaoMonthlyClass(alocacao: Alocacao): string {
     if (alocacao.statusAlocacao === 'FALTA_REGISTRADA') return 'emp-falta';
+    if (alocacao.statusAlocacao === 'CANCELADA') return 'emp-cancelada';
     if (alocacao.tipoAlocacao === 'SUBSTITUICAO') return 'emp-substituicao';
     const index = this.getFuncionarioLegendaIndex(alocacao.funcionarioId);
     return `emp-color-${index % 12}`;
@@ -307,5 +311,16 @@ export class AlocacoesViewComponent {
       'Dezembro',
     ];
     return months[date.getMonth()];
+  }
+
+  getDayCellClasses(cell: DayCell): Record<string, boolean> {
+    return {
+      'other-month': !cell.isCurrentMonth,
+      ...this.feriadosService.getDayCellClasses(cell.date, cell.dateStr),
+    };
+  }
+
+  getFeriadoNome(dateStr: string): string | null {
+    return this.feriadosService.getFeriadoNome(dateStr);
   }
 }

@@ -1,7 +1,17 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
@@ -18,11 +28,11 @@ import {
 @Component({
   selector: 'app-alocacao-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './alocacao-form.component.html',
   styleUrl: './alocacao-form.component.scss',
 })
-export class AlocacaoFormComponent implements OnInit {
+export class AlocacaoFormComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private service = inject(AlocacaoService);
   private funcionarioService = inject(FuncionarioService);
@@ -30,6 +40,14 @@ export class AlocacaoFormComponent implements OnInit {
   private condominioService = inject(CondominioService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  @Input() embeddedAlocacaoId: string | null = null;
+  @Output() savedEvent = new EventEmitter<void>();
+  @Output() cancelledEvent = new EventEmitter<void>();
+
+  get isEmbedded(): boolean {
+    return this.embeddedAlocacaoId !== null;
+  }
 
   form!: FormGroup;
   funcionarios = signal<Funcionario[]>([]);
@@ -53,9 +71,6 @@ export class AlocacaoFormComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.alocacaoId = this.route.snapshot.paramMap.get('id');
-    this.isEditMode.set(!!this.alocacaoId);
-
     this.form = this.fb.group({
       funcionarioId: ['', Validators.required],
       postoDeTrabalhoId: ['', Validators.required],
@@ -65,9 +80,27 @@ export class AlocacaoFormComponent implements OnInit {
     });
 
     this.loadDependencies();
+    this.initFromSource();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['embeddedAlocacaoId'] && this.form) {
+      this.initFromSource();
+    }
+  }
+
+  private initFromSource(): void {
+    this.alocacaoId = this.embeddedAlocacaoId ?? this.route.snapshot.paramMap.get('id');
+    this.isEditMode.set(!!this.alocacaoId);
 
     if (this.isEditMode() && this.alocacaoId) {
       this.loadAlocacao(this.alocacaoId);
+    } else {
+      this.form.enable();
+      this.form.reset({
+        statusAlocacao: StatusAlocacao.CONFIRMADA,
+        tipoAlocacao: TipoAlocacao.REGULAR,
+      });
     }
   }
 
@@ -102,7 +135,6 @@ export class AlocacaoFormComponent implements OnInit {
         // Em modo de edição, funcionario e posto não podem ser alterados
         this.form.get('funcionarioId')?.disable();
         this.form.get('postoDeTrabalhoId')?.disable();
-        this.form.get('data')?.disable();
         this.loading.set(false);
       },
       error: (err) => {
@@ -141,11 +173,17 @@ export class AlocacaoFormComponent implements OnInit {
       const updateDto = {
         statusAlocacao: formValue.statusAlocacao,
         tipoAlocacao: formValue.tipoAlocacao,
+        data: formValue.data,
       };
 
       this.service.update(this.alocacaoId, updateDto).subscribe({
         next: () => {
-          this.router.navigate(['/alocacoes']);
+          this.loading.set(false);
+          if (this.isEmbedded) {
+            this.savedEvent.emit();
+          } else {
+            this.router.navigate(['/alocacoes']);
+          }
         },
         error: (err) => {
           this.error.set(err.error?.message || 'Erro ao atualizar alocação.');
@@ -164,7 +202,12 @@ export class AlocacaoFormComponent implements OnInit {
 
       this.service.create(createDto).subscribe({
         next: () => {
-          this.router.navigate(['/alocacoes']);
+          this.loading.set(false);
+          if (this.isEmbedded) {
+            this.savedEvent.emit();
+          } else {
+            this.router.navigate(['/alocacoes']);
+          }
         },
         error: (err) => {
           this.error.set(err.error?.message || 'Erro ao criar alocação.');
@@ -178,5 +221,12 @@ export class AlocacaoFormComponent implements OnInit {
   dismissError(): void {
     this.error.set(null);
   }
-}
 
+  cancel(): void {
+    if (this.isEmbedded) {
+      this.cancelledEvent.emit();
+    } else {
+      this.router.navigate(['/alocacoes']);
+    }
+  }
+}

@@ -1,47 +1,52 @@
-<div class="form-container">
-  <!-- Header -->
-  <div class="form-header">
-    <button class="btn-back" routerLink="/alocacoes">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fill-rule="evenodd"
-          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-          clip-rule="evenodd"
-        />
-      </svg>
-      Voltar
-    </button>
-    <h1>{{ isEditMode() ? '✏️ Editar Alocação' : '➕ Nova Alocação' }}</h1>
-  </div>
+<div [class]="isEmbedded ? 'form-container-embedded' : 'form-container'">
+  <!-- Header (apenas na página standalone) -->
+  @if (!isEmbedded) {
+    <div class="form-header">
+      <button class="btn-back" (click)="cancel()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>{{ isEditMode() ? 'Editar Alocação' : 'Nova Alocação' }}</h1>
+    </div>
+  }
 
   <!-- Error Alert -->
   @if (error()) {
-  <div class="alert alert-error">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        clip-rule="evenodd"
-      />
-    </svg>
-    {{ error() }}
-    <button class="alert-close" (click)="dismissError()">×</button>
-  </div>
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      {{ error() }}
+      <button class="alert-close" (click)="dismissError()">×</button>
+    </div>
   }
 
   <!-- Form -->
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card">
     @if (isEditMode()) {
-    <div class="info-box">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fill-rule="evenodd"
-          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-          clip-rule="evenodd"
-        />
-      </svg>
-      <p>Em modo de edição, você só pode alterar o status e o tipo da alocação.</p>
-    </div>
+      <div class="info-box">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <p>
+          Em modo de edição, funcionário e posto não podem ser alterados. Data, status e tipo podem
+          ser modificados.
+        </p>
+      </div>
     }
 
     <!-- Funcionário -->
@@ -64,11 +69,11 @@
       >
         <option value="">Selecione um funcionário</option>
         @for (func of funcionarios(); track func.id) {
-        <option [value]="func.id">{{ func.nome }} - {{ func.cpf }}</option>
+          <option [value]="func.id">{{ func.nome }} - {{ func.cpf }}</option>
         }
       </select>
       @if (form.get('funcionarioId')?.invalid && form.get('funcionarioId')?.touched) {
-      <span class="error-message">Funcionário é obrigatório</span>
+        <span class="error-message">Funcionário é obrigatório</span>
       }
     </div>
 
@@ -94,11 +99,11 @@
       >
         <option value="">Selecione um posto</option>
         @for (posto of postos(); track posto.id) {
-        <option [value]="posto.id">{{ getPostoLabel(posto) }}</option>
+          <option [value]="posto.id">{{ getPostoLabel(posto) }}</option>
         }
       </select>
       @if (form.get('postoDeTrabalhoId')?.invalid && form.get('postoDeTrabalhoId')?.touched) {
-      <span class="error-message">Posto de trabalho é obrigatório</span>
+        <span class="error-message">Posto de trabalho é obrigatório</span>
       }
     </div>
 
@@ -122,7 +127,7 @@
         [class.invalid]="form.get('data')?.invalid && form.get('data')?.touched"
       />
       @if (form.get('data')?.invalid && form.get('data')?.touched) {
-      <span class="error-message">Data é obrigatória</span>
+        <span class="error-message">Data é obrigatória</span>
       }
     </div>
 
@@ -145,11 +150,11 @@
         [class.invalid]="form.get('statusAlocacao')?.invalid && form.get('statusAlocacao')?.touched"
       >
         @for (option of statusOptions; track option.value) {
-        <option [value]="option.value">{{ option.label }}</option>
+          <option [value]="option.value">{{ option.label }}</option>
         }
       </select>
       @if (form.get('statusAlocacao')?.invalid && form.get('statusAlocacao')?.touched) {
-      <span class="error-message">Status é obrigatório</span>
+        <span class="error-message">Status é obrigatório</span>
       }
     </div>
 
@@ -170,38 +175,37 @@
         [class.invalid]="form.get('tipoAlocacao')?.invalid && form.get('tipoAlocacao')?.touched"
       >
         @for (option of tipoOptions; track option.value) {
-        <option [value]="option.value">{{ option.label }}</option>
+          <option [value]="option.value">{{ option.label }}</option>
         }
       </select>
       @if (form.get('tipoAlocacao')?.invalid && form.get('tipoAlocacao')?.touched) {
-      <span class="error-message">Tipo é obrigatório</span>
+        <span class="error-message">Tipo é obrigatório</span>
       }
       @if (form.get('tipoAlocacao')?.value === 'DOBRA_PROGRAMADA') {
-      <p class="help-text warning">
-        ⚠️ Dobra programada: funcionário deve descansar após esta alocação.
-      </p>
+        <p class="help-text warning">
+          ⚠️ Dobra programada: funcionário deve descansar após esta alocação.
+        </p>
       }
     </div>
 
     <!-- Actions -->
     <div class="form-actions">
-      <button type="button" class="btn-secondary" routerLink="/alocacoes" [disabled]="loading()">
+      <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
         Cancelar
       </button>
       <button type="submit" class="btn-primary" [disabled]="loading() || form.invalid">
         @if (loading()) {
-        <span class="spinner-small"></span>
-        Salvando...
+          <span class="spinner-small"></span>
+          Salvando...
         } @else {
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"
-          />
-        </svg>
-        {{ isEditMode() ? 'Atualizar' : 'Criar' }} Alocação
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"
+            />
+          </svg>
+          {{ isEditMode() ? 'Atualizar' : 'Criar' }} Alocação
         }
       </button>
     </div>
   </form>
 </div>
-

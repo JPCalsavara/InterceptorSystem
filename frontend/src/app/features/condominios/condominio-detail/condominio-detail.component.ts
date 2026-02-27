@@ -152,7 +152,9 @@ export class CondominioDetailComponent implements OnInit {
     const total = this.alocacoesPeriodo().length;
     if (total === 0) return 0;
     const faltas = this.alocacoesPeriodo().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
+      (a) =>
+        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
+        a.statusAlocacao === StatusAlocacao.CANCELADA,
     ).length;
     return (faltas / total) * 100;
   });
@@ -204,7 +206,11 @@ export class CondominioDetailComponent implements OnInit {
     const faltasPorPosto = new Map<string, number>();
 
     this.alocacoesPeriodo()
-      .filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA)
+      .filter(
+        (a) =>
+          a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
+          a.statusAlocacao === StatusAlocacao.CANCELADA,
+      )
       .forEach((a) => {
         const count = faltasPorPosto.get(a.postoDeTrabalhoId) || 0;
         faltasPorPosto.set(a.postoDeTrabalhoId, count + 1);
@@ -408,7 +414,9 @@ export class CondominioDetailComponent implements OnInit {
   getFaltasByFuncionario(funcionarioId: string): number {
     return this.alocacoes().filter(
       (a) =>
-        a.funcionarioId === funcionarioId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
+        a.funcionarioId === funcionarioId &&
+        (a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
+          a.statusAlocacao === StatusAlocacao.CANCELADA),
     ).length;
   }
 
@@ -499,7 +507,9 @@ export class CondominioDetailComponent implements OnInit {
 
   alocacoesFaltas = computed(() => {
     return this.alocacoesPeriodo().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
+      (a) =>
+        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
+        a.statusAlocacao === StatusAlocacao.CANCELADA,
     ).length;
   });
 }

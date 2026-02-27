@@ -46,15 +46,17 @@ export class AlocacaoBatchFormComponent implements OnInit {
   submitted = signal(false);
 
   summary = computed(() => {
-    const contrato = this.contratos().find(c => c.id === this.form.get('contratoId')?.value);
-    const funcionario = this.funcionarios().find(f => f.id === this.form.get('funcionarioId')?.value);
+    const contrato = this.contratos().find((c) => c.id === this.form.get('contratoId')?.value);
+    const funcionario = this.funcionarios().find(
+      (f) => f.id === this.form.get('funcionarioId')?.value,
+    );
 
     if (!contrato || !funcionario) {
       return '';
     }
 
     const alocacoes = this.generateAlocacoesPreview();
-    return `Serão geradas ${alocacoes.length} alocações para ${funcionario.nome} entre ${new Date(contrato.dataInicio).toLocaleDateString()} e ${new Date(contrato.dataFim).toLocaleDateString()}.`;
+    return `Serão geradas ${alocacoes.length} alocações para ${funcionario.nome} entre ${new Date(contrato.dataInicio + 'T12:00:00').toLocaleDateString()} e ${new Date(contrato.dataFim + 'T12:00:00').toLocaleDateString()}.`;
   });
 
   ngOnInit(): void {
@@ -100,7 +102,11 @@ export class AlocacaoBatchFormComponent implements OnInit {
   loadContratos(condominioId: string): void {
     this.contratoService.getAll().subscribe({
       next: (data) => {
-        this.contratos.set(data.filter(c => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO));
+        this.contratos.set(
+          data.filter(
+            (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO,
+          ),
+        );
       },
       error: (err) => this.handleError('Erro ao carregar contratos.', err),
     });
@@ -108,46 +114,51 @@ export class AlocacaoBatchFormComponent implements OnInit {
 
   loadPostos(condominioId: string): void {
     this.postoService.getAll().subscribe({
-      next: (data) => this.postos.set(data.filter(p => p.condominioId === condominioId)),
+      next: (data) => this.postos.set(data.filter((p) => p.condominioId === condominioId)),
       error: (err) => this.handleError('Erro ao carregar postos.', err),
     });
   }
 
   loadFuncionarios(condominioId: string): void {
     this.funcionarioService.getAll().subscribe({
-      next: (data) => this.funcionarios.set(data.filter(f => f.condominioId === condominioId)),
+      next: (data) => this.funcionarios.set(data.filter((f) => f.condominioId === condominioId)),
       error: (err) => this.handleError('Erro ao carregar funcionários.', err),
     });
   }
 
   generateAlocacoesPreview(): CreateAlocacaoDto[] {
     const formValue = this.form.getRawValue();
-    const contrato = this.contratos().find(c => c.id === formValue.contratoId);
-    const funcionario = this.funcionarios().find(f => f.id === formValue.funcionarioId);
+    const contrato = this.contratos().find((c) => c.id === formValue.contratoId);
+    const funcionario = this.funcionarios().find((f) => f.id === formValue.funcionarioId);
 
     if (!contrato || !funcionario || !formValue.postoDeTrabalhoId) {
       return [];
     }
 
     const alocacoes: CreateAlocacaoDto[] = [];
-    const dataInicio = new Date(contrato.dataInicio);
-    const dataFim = new Date(contrato.dataFim);
+    const dataInicio = new Date(contrato.dataInicio + 'T12:00:00');
+    const dataFim = new Date(contrato.dataFim + 'T12:00:00');
     let dataAtual = new Date(dataInicio);
 
     if (funcionario.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) {
       let trabalha = true;
       while (dataAtual <= dataFim) {
         if (trabalha) {
-          alocacoes.push(this.createAlocacaoDto(formValue.funcionarioId, formValue.postoDeTrabalhoId, dataAtual));
+          alocacoes.push(
+            this.createAlocacaoDto(formValue.funcionarioId, formValue.postoDeTrabalhoId, dataAtual),
+          );
         }
         trabalha = !trabalha;
         dataAtual.setDate(dataAtual.getDate() + 1);
       }
     } else if (funcionario.tipoEscala === TipoEscala.SEMANAL_COMERCIAL) {
       while (dataAtual <= dataFim) {
-        const diaSemana = dataAtual.getUTCDay();
-        if (diaSemana >= 1 && diaSemana <= 5) { // Monday to Friday
-          alocacoes.push(this.createAlocacaoDto(formValue.funcionarioId, formValue.postoDeTrabalhoId, dataAtual));
+        const diaSemana = dataAtual.getDay();
+        if (diaSemana >= 1 && diaSemana <= 5) {
+          // Monday to Friday
+          alocacoes.push(
+            this.createAlocacaoDto(formValue.funcionarioId, formValue.postoDeTrabalhoId, dataAtual),
+          );
         }
         dataAtual.setDate(dataAtual.getDate() + 1);
       }
@@ -180,7 +191,11 @@ export class AlocacaoBatchFormComponent implements OnInit {
     });
   }
 
-  private createAlocacaoDto(funcionarioId: string, postoDeTrabalhoId: string, data: Date): CreateAlocacaoDto {
+  private createAlocacaoDto(
+    funcionarioId: string,
+    postoDeTrabalhoId: string,
+    data: Date,
+  ): CreateAlocacaoDto {
     return {
       funcionarioId,
       postoDeTrabalhoId,

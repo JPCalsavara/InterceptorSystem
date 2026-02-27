@@ -184,8 +184,7 @@
                 <div class="funcionarios-cards">
                   @for (alocacao of item.alocacoes; track alocacao.id) {
                     <div
-                      class="funcionario-card"
-                      [class]="'status-' + alocacao.statusAlocacao.toLowerCase()"
+                      [class]="'funcionario-card status-' + alocacao.statusAlocacao.toLowerCase()"
                     >
                       <div class="func-name">{{ getFuncionarioNome(alocacao.funcionarioId) }}</div>
                       <div class="func-badges">
@@ -251,6 +250,10 @@
             <span class="legend-number emp-substituicao">S</span>
             <span class="legend-name">Substituição</span>
           </div>
+          <div class="legend-item">
+            <span class="legend-number emp-cancelada">C</span>
+            <span class="legend-name">Cancelada</span>
+          </div>
         </div>
       </div>
 
@@ -268,8 +271,10 @@
 
         <div class="calendar-grid">
           @for (cell of monthData(); track cell.dateStr) {
-            <div class="calendar-cell" [class.other-month]="!cell.isCurrentMonth">
-              <div class="cell-date">{{ cell.date.getDate() }}</div>
+            <div class="calendar-cell" [ngClass]="getDayCellClasses(cell)">
+              <div class="cell-date" [title]="getFeriadoNome(cell.dateStr) ?? ''">
+                {{ cell.date.getDate() }}
+              </div>
 
               @if (cell.alocacoes.length > 0) {
                 <div class="cell-alocacoes">

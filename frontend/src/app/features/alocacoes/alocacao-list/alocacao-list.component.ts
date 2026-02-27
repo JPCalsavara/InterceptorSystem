@@ -6,6 +6,8 @@ import { AlocacaoService } from '../../../services/alocacao.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
 import { CondominioService } from '../../../services/condominio.service';
+import { AlocacaoFormComponent } from '../alocacao-form/alocacao-form.component';
+import { FeriadosService } from '../../../services/feriados.service';
 import {
   Alocacao,
   Funcionario,
@@ -38,7 +40,7 @@ interface WeekColumn {
 @Component({
   selector: 'app-alocacao-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, AlocacaoFormComponent],
   templateUrl: './alocacao-list.component.html',
   styleUrl: './alocacao-list.component.scss',
 })
@@ -47,6 +49,7 @@ export class AlocacaoListComponent implements OnInit {
   private funcionarioService = inject(FuncionarioService);
   private postoService = inject(PostoDeTrabalhoService);
   private condominioService = inject(CondominioService);
+  private feriadosService = inject(FeriadosService);
 
   alocacoes = signal<Alocacao[]>([]);
   funcionarios = signal<Funcionario[]>([]);
@@ -55,6 +58,7 @@ export class AlocacaoListComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
+  editingAlocacaoId = signal<string | null>(null);
 
   // View mode
   viewMode = signal<ViewMode>('daily');
@@ -421,6 +425,7 @@ export class AlocacaoListComponent implements OnInit {
 
   getAlocacaoMonthlyClass(alocacao: Alocacao): string {
     if (alocacao.statusAlocacao === 'FALTA_REGISTRADA') return 'emp-falta';
+    if (alocacao.statusAlocacao === 'CANCELADA') return 'emp-cancelada';
     if (alocacao.tipoAlocacao === 'SUBSTITUICAO') return 'emp-substituicao';
     const index = this.getFuncionarioLegendaIndex(alocacao.funcionarioId);
     return `emp-color-${index % 12}`;
@@ -512,5 +517,35 @@ export class AlocacaoListComponent implements OnInit {
 
   dismissSuccess(): void {
     this.successMessage.set(null);
+  }
+
+  navigateToEdit(id: string): void {
+    this.openEditModal(id);
+  }
+
+  openEditModal(id: string): void {
+    this.editingAlocacaoId.set(id);
+  }
+
+  closeEditModal(): void {
+    this.editingAlocacaoId.set(null);
+  }
+
+  onAlocacaoSaved(): void {
+    this.closeEditModal();
+    this.successMessage.set('Alocação atualizada com sucesso!');
+    this.loadAll();
+    setTimeout(() => this.dismissSuccess(), 5000);
+  }
+
+  getDayCellClasses(cell: DayCell): Record<string, boolean> {
+    return {
+      'other-month': !cell.isCurrentMonth,
+      ...this.feriadosService.getDayCellClasses(cell.date, cell.dateStr),
+    };
+  }
+
+  getFeriadoNome(dateStr: string): string | null {
+    return this.feriadosService.getFeriadoNome(dateStr);
   }
 }
