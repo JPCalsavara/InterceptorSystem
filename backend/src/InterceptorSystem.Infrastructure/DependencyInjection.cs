@@ -1,11 +1,13 @@
-using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
+using InterceptorSystem.Infrastructure.Auth;
+using InterceptorSystem.Infrastructure.Email;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 
 namespace InterceptorSystem.Infrastructure;
 
@@ -24,9 +26,15 @@ public static class DependencyInjection
         services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
         services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
         services.AddScoped<IContratoRepository, ContratoRepository>();
-        
+        services.AddScoped<IContaRepository, ContaRepository>();
+        services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
 
-        // Dica: Podemos usar reflection aqui no futuro para registrar todos os repositórios de uma vez
+        // 3. Auth Services
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+
+        // 4. Email Service
+        services.AddScoped<IEmailService, SmtpEmailService>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.Modulos.Auth.Entidades;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterceptorSystem.Infrastructure.Persistence.Contexts;
@@ -25,6 +26,8 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     public DbSet<Funcionario> Funcionarios { get; set; }
     public DbSet<Alocacao> Alocacoes { get; set; }
     public DbSet<Contrato> Contratos => Set<Contrato>();
+    public DbSet<Conta> Contas { get; set; }
+    public DbSet<TokenVerificacao> TokensVerificacao { get; set; }
 
     // --- Configuração do Modelo (Filtros de Leitura) ---
     protected override void OnModelCreating(ModelBuilder builder)
@@ -74,12 +77,12 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
                         // Usamos Reflection ou um setter internal/public se alterarmos a visibilidade
                         // Como o set é protected, o EF consegue setar, mas aqui precisamos de um truque
                         // ou garantir que o Construtor da entidade já exigiu o ID (Minha recomendação anterior).
-                        
+
                         // Se o construtor da Entidade já obriga passar o ID (como fizemos no Condominio),
                         // esse bloco é apenas uma segurança extra.
                     }
                     break;
-                    
+
                 case EntityState.Modified:
                     // Segurança: Impede que alguém mude o dono do registro (Tenant) via Update
                     entry.Property(x => x.EmpresaId).IsModified = false;

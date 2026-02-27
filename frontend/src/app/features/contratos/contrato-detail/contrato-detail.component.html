@@ -1,0 +1,145 @@
+<div class="detail-page">
+  @if (loading()) {
+    <div class="loading-state">Carregando contrato...</div>
+  } @else if (erro()) {
+    <div class="error-state">
+      <p>{{ erro() }}</p>
+      <a routerLink="/contratos" class="btn-back">Voltar para contratos</a>
+    </div>
+  } @else if (contrato()) {
+    <!-- Header -->
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a routerLink="/contratos" class="breadcrumb-link">Contratos</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">{{ contrato()!.descricao }}</span>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/contratos" class="btn-secondary">Voltar</a>
+        <a [routerLink]="['/contratos', contrato()!.id, 'editar']" class="btn-primary">Editar</a>
+      </div>
+    </div>
+
+    <!-- Title + Status -->
+    <div class="title-row">
+      <h1 class="contrato-title">{{ contrato()!.descricao }}</h1>
+      <span [class]="'status-badge ' + getStatusClass(contrato()!.status)">
+        {{ getStatusLabel(contrato()!.status) }}
+      </span>
+    </div>
+
+    <div class="cards-grid">
+      <!-- Informações Gerais -->
+      <div class="card">
+        <h2 class="card-title">Informações Gerais</h2>
+        <div class="info-list">
+          <div class="info-item">
+            <span class="info-label">Condomínio</span>
+            <span class="info-value">{{ condominioNome() || contrato()!.condominioId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Início</span>
+            <span class="info-value">{{ contrato()!.dataInicio | date: 'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Término</span>
+            <span class="info-value">{{ contrato()!.dataFim | date: 'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Nº de Postos</span>
+            <span class="info-value">{{ contrato()!.numeroDePostos }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Funcionários Necessários</span>
+            <span class="info-value">{{ contrato()!.quantidadeFuncionarios }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breakdown Financeiro -->
+      <div class="card">
+        <h2 class="card-title">Breakdown Financeiro Mensal</h2>
+        <div class="financial-list">
+          <div class="financial-row primary">
+            <span>Valor Total do Contrato</span>
+            <span class="value">{{ contrato()!.valorTotalMensal | currency: 'BRL' }}</span>
+          </div>
+          <div class="financial-row">
+            <span>Impostos ({{ contrato()!.percentualImpostos }}%)</span>
+            <span class="value deduction">- {{ impostosMensal() | currency: 'BRL' }}</span>
+          </div>
+          <div class="financial-row">
+            <span>Benefícios / Extras</span>
+            <span class="value deduction"
+              >- {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+            >
+          </div>
+          <div class="financial-divider"></div>
+          <div class="financial-row total">
+            <span>Lucro Estimado</span>
+            <span [class]="'value ' + (lucro() >= 0 ? 'positive' : 'negative')">
+              {{ lucro() | currency: 'BRL' }}
+            </span>
+          </div>
+          <div class="financial-row sub">
+            <span>Margem de Lucro</span>
+            <span class="value">{{ contrato()!.margemLucroPercentual }}%</span>
+          </div>
+          <div class="financial-row sub">
+            <span>Margem Cobertura Faltas</span>
+            <span class="value">{{ contrato()!.margemCoberturaFaltasPercentual }}%</span>
+          </div>
+          <div class="financial-row sub">
+            <span>Adicional Noturno</span>
+            <span class="value">{{ contrato()!.percentualAdicionalNoturno }}%</span>
+          </div>
+          <div class="financial-row sub">
+            <span>Diária Cobrada</span>
+            <span class="value">{{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Postos de Trabalho -->
+    <div class="card postos-card">
+      <h2 class="card-title">Postos de Trabalho ({{ postos().length }})</h2>
+      @if (postos().length === 0) {
+        <p class="empty-state">Nenhum posto de trabalho vinculado ainda.</p>
+      } @else {
+        <div class="table-wrapper">
+          <table class="postos-table">
+            <thead>
+              <tr>
+                <th>Horário</th>
+                <th>Capacidade Ideal</th>
+                <th>Permite Dobra</th>
+                <th>Cap. Máx. Dobras</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (posto of postos(); track posto.id) {
+                <tr>
+                  <td class="horario">
+                    {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
+                  </td>
+                  <td>{{ posto.quantidadeIdealFuncionarios }}</td>
+                  <td>
+                    <span [class]="'badge ' + (posto.permiteDobrarEscala ? 'success' : 'inactive')">
+                      {{ posto.permiteDobrarEscala ? 'Sim' : 'Não' }}
+                    </span>
+                  </td>
+                  <td>{{ posto.capacidadeMaximaPorDobras }}</td>
+                  <td>
+                    <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

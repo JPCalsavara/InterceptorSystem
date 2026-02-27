@@ -16,15 +16,15 @@ interface NavItem {
     <aside class="sidebar">
       <nav class="nav">
         @for (item of navItems; track item.route) {
-        <a
-          [routerLink]="item.route"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: item.route === '/' }"
-          class="nav-item"
-        >
-          <span class="icon">{{ item.icon }}</span>
-          <span class="label">{{ item.label }}</span>
-        </a>
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+            class="nav-item"
+          >
+            <span class="icon">{{ item.icon }}</span>
+            <span class="label">{{ item.label }}</span>
+          </a>
         }
       </nav>
     </aside>
@@ -41,7 +41,9 @@ interface NavItem {
         left: 0;
         overflow-y: auto;
         padding: 1.5rem 1rem;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
+        transition:
+          background-color 0.3s ease,
+          border-color 0.3s ease;
       }
 
       .nav {
@@ -121,7 +123,7 @@ interface NavItem {
 })
 export class SidebarComponent {
   navItems: NavItem[] = [
-    { label: 'Resumo', route: '/', icon: '📊' },
+    { label: 'Resumo', route: '/dashboard', icon: '📊' },
     { label: 'Condomínios', route: '/condominios', icon: '🏢' },
     { label: 'Contratos', route: '/contratos', icon: '📄' },
     { label: 'Funcionários', route: '/funcionarios', icon: '👥' },

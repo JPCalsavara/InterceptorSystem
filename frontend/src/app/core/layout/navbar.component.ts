@@ -1,14 +1,25 @@
-import { Component, signal, effect, OnInit, Inject, PLATFORM_ID, computed } from '@angular/core';
+import {
+  Component,
+  signal,
+  effect,
+  OnInit,
+  Inject,
+  PLATFORM_ID,
+  computed,
+  inject,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <nav class="navbar">
       <div class="navbar-brand">
-        <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img">
+        <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img" />
       </div>
 
       <div class="navbar-actions">
@@ -20,19 +31,19 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           [title]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
         >
           @if (isDarkMode()) {
-          <!-- Sun Icon -->
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fill-rule="evenodd"
-              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-              clip-rule="evenodd"
-            />
-          </svg>
+            <!-- Sun Icon -->
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                clip-rule="evenodd"
+              />
+            </svg>
           } @else {
-          <!-- Moon Icon -->
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-          </svg>
+            <!-- Moon Icon -->
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </svg>
           }
         </button>
 
@@ -58,40 +69,50 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           </div>
 
           @if (isDropdownOpen()) {
-          <div class="dropdown-menu">
-            <button class="dropdown-item">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              Perfil
-            </button>
-            <button class="dropdown-item">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                <path
-                  fill-rule="evenodd"
-                  d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              Contrato
-            </button>
-            <div class="dropdown-divider"></div>
-            <button class="dropdown-item danger">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              Sair
-            </button>
-          </div>
+            <div class="dropdown-menu">
+              <a routerLink="/perfil" class="dropdown-item" (click)="isDropdownOpen.set(false)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Perfil
+              </a>
+              <a routerLink="/conta" class="dropdown-item" (click)="isDropdownOpen.set(false)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Minha Conta
+              </a>
+              <a routerLink="/plano" class="dropdown-item" (click)="isDropdownOpen.set(false)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Plano
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item danger" (click)="logout()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Sair
+              </button>
+            </div>
           }
         </div>
       </div>
@@ -112,7 +133,9 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
         left: 0;
         right: 0;
         z-index: 100;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
+        transition:
+          background-color 0.3s ease,
+          border-color 0.3s ease;
       }
 
       .navbar-brand {
@@ -241,6 +264,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
         font-size: 0.875rem;
         color: var(--text-primary);
         transition: background 0.2s;
+        text-decoration: none;
 
         &:hover {
           background: var(--dropdown-item-hover);
@@ -280,13 +304,13 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
   ],
 })
 export class NavbarComponent implements OnInit {
-  companyName = signal('Empresa Interceptor');
+  private authService = inject(AuthService);
+
+  companyName = computed(() => this.authService.currentUser()?.nomeEmpresa ?? 'Minha Empresa');
   isDropdownOpen = signal(false);
   isDarkMode = signal(false);
 
-  logoSrc = computed(() =>
-    this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png'
-  );
+  logoSrc = computed(() => (this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png'));
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     // Effect to apply theme changes
@@ -343,6 +367,10 @@ export class NavbarComponent implements OnInit {
 
   toggleDropdown(): void {
     this.isDropdownOpen.update((v) => !v);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   getInitials(): string {

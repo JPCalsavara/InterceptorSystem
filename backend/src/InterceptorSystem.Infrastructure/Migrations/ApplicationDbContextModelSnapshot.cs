@@ -285,6 +285,97 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.ToTable("PostosDeTrabalho", (string)null);
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.Conta", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Cnpj")
+                        .HasMaxLength(18)
+                        .HasColumnType("character varying(18)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("EmailPendente")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("EmailVerificado")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NomeEmpresa")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Plano")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SenhaHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Contas", (string)null);
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.TokenVerificacao", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ContaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DadosAdicionais")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<bool>("Usado")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("ContaId", "Tipo", "Usado");
+
+                    b.ToTable("TokensVerificacao", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>
                 {
                     b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", "Funcionario")
@@ -351,6 +442,15 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.Navigation("Condominio");
 
                     b.Navigation("Contrato");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.TokenVerificacao", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Auth.Entidades.Conta", null)
+                        .WithMany()
+                        .HasForeignKey("ContaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Condominio", b =>
