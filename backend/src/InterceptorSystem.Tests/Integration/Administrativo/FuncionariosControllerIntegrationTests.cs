@@ -59,7 +59,7 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
             condominioId,
             contratoId,
             "Funcionario Teste",
-            Guid.NewGuid().ToString(),
+            GerarCpfFake(),
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
@@ -84,7 +84,7 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     {
         var (condominioId, contratoId) = await CriarCondominioComContratoAsync();
         // FASE 3: Sem parâmetros de salário
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", Guid.NewGuid().ToString(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", GerarCpfFake(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
 

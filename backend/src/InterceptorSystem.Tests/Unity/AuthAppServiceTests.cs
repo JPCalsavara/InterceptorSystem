@@ -1,6 +1,7 @@
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Auth.DTOs;
 using InterceptorSystem.Application.Modulos.Auth.Services;
+using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
 using InterceptorSystem.Domain.Modulos.Auth.Entidades;
 using InterceptorSystem.Domain.Modulos.Auth.Enums;
 using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
@@ -17,9 +18,10 @@ public class AuthAppServiceTests
     private readonly Mock<IEmailService> _emailService = new();
     private readonly Mock<ITokenVerificacaoRepository> _tokenRepo = new();
     private readonly Mock<IConfiguration> _configuration = new();
+    private readonly Mock<IWhatsappMessageSender> _whatsappSender = new();
     private readonly AuthAppService _service;
 
-    private const string SenhaPlana = "minhasenha123";
+    private const string SenhaPlana = "MinhaSenha123!";
     private const string SenhaHash = "$2b$hash_fake";
     private const string TokenFake = "jwt.token.fake";
     private const string TokenVerificacaoFake = "token-verificacao-fake";
@@ -41,7 +43,8 @@ public class AuthAppServiceTests
             _passwordHasher.Object,
             _emailService.Object,
             _tokenRepo.Object,
-            _configuration.Object
+            _configuration.Object,
+            _whatsappSender.Object
         );
     }
 

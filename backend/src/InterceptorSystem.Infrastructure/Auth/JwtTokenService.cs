@@ -1,6 +1,7 @@
 using InterceptorSystem.Application.Common.Interfaces;
+using InterceptorSystem.Application.Common.Settings;
 using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,22 +11,16 @@ namespace InterceptorSystem.Infrastructure.Auth;
 
 public class JwtTokenService : IJwtTokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly JwtSettings _settings;
 
-    public JwtTokenService(IConfiguration configuration)
+    public JwtTokenService(IOptions<JwtSettings> options)
     {
-        _configuration = configuration;
+        _settings = options.Value;
     }
 
     public string GerarToken(Conta conta)
     {
-        var jwtKey = _configuration["Jwt:Key"]
-            ?? throw new InvalidOperationException("Jwt:Key não configurado.");
-        var issuer = _configuration["Jwt:Issuer"] ?? "InterceptorSystem";
-        var audience = _configuration["Jwt:Audience"] ?? "InterceptorSystem";
-        var expiresInHours = int.Parse(_configuration["Jwt:ExpiresInHours"] ?? "24");
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
@@ -39,10 +34,10 @@ public class JwtTokenService : IJwtTokenService
         };
 
         var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
+            issuer: _settings.Issuer,
+            audience: _settings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(expiresInHours),
+            expires: DateTime.UtcNow.AddHours(_settings.ExpiresInHours),
             signingCredentials: credentials
         );
 

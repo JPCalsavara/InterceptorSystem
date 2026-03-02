@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -50,6 +50,8 @@ export class AlocacaoListComponent implements OnInit {
   private postoService = inject(PostoDeTrabalhoService);
   private condominioService = inject(CondominioService);
   private feriadosService = inject(FeriadosService);
+
+  condominioIdFixed = input<string>('');
 
   alocacoes = signal<Alocacao[]>([]);
   funcionarios = signal<Funcionario[]>([]);
@@ -223,6 +225,10 @@ export class AlocacaoListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    const fixedId = this.condominioIdFixed();
+    if (fixedId) {
+      this.filtroCondominioId.set(fixedId);
+    }
     this.loadAll();
   }
 
@@ -427,6 +433,7 @@ export class AlocacaoListComponent implements OnInit {
     if (alocacao.statusAlocacao === 'FALTA_REGISTRADA') return 'emp-falta';
     if (alocacao.statusAlocacao === 'CANCELADA') return 'emp-cancelada';
     if (alocacao.tipoAlocacao === 'SUBSTITUICAO') return 'emp-substituicao';
+    if (alocacao.tipoAlocacao === 'DOBRA_PROGRAMADA') return 'emp-dobra';
     const index = this.getFuncionarioLegendaIndex(alocacao.funcionarioId);
     return `emp-color-${index % 12}`;
   }
@@ -462,7 +469,7 @@ export class AlocacaoListComponent implements OnInit {
   getStatusLabel(status: StatusAlocacao): string {
     const labels: Record<StatusAlocacao, string> = {
       CONFIRMADA: 'Confirmada',
-      CANCELADA: 'Cancelada',
+      CANCELADA: 'Cancelamento',
       FALTA_REGISTRADA: 'Falta',
     };
     return labels[status] || status;
@@ -480,7 +487,7 @@ export class AlocacaoListComponent implements OnInit {
   getTipoLabel(tipo: TipoAlocacao): string {
     const labels: Record<TipoAlocacao, string> = {
       REGULAR: 'Regular',
-      DOBRA_PROGRAMADA: 'Dobra',
+      DOBRA_PROGRAMADA: 'Alocação Extra',
       SUBSTITUICAO: 'Substituição',
     };
     return labels[tipo] || tipo;

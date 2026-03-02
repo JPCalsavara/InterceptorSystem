@@ -99,7 +99,8 @@ public class Contrato : Entity, IAggregateRoot
         get
         {
             if (Condominio == null)
-                return 0; // Fallback quando navegação não está carregada
+                throw new InvalidOperationException(
+                    "Navegação 'Condominio' não carregada. Use .Include(c => c.Condominio) na query.");
             
             return Condominio.QuantidadeIdealPorTurno * NumeroDePostos;
         }
@@ -155,7 +156,10 @@ public class Contrato : Entity, IAggregateRoot
         CheckRule(numeroDePostos < 2 || numeroDePostos > 4, "Número de postos deve estar entre 2 e 4 (ex: 2=12x36, 3=8h, 4=6h).");
         CheckPercentual(margemLucroPercentual, "Margem de lucro inválida.");
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
-        CheckRule(dataFim < dataInicio, "A data final deve ser maior ou igual à data inicial.");
+        CheckRule(dataFim <= dataInicio, "A data final deve ser posterior à data inicial.");
+        CheckRule(
+            percentualImpostos + margemLucroPercentual + margemCoberturaFaltasPercentual >= 1m,
+            "A soma dos percentuais (impostos + lucro + faltas) não pode ser >= 100%.");
         CheckRule(!Enum.IsDefined(status), "Status do contrato é obrigatório.");
 
         EmpresaId = empresaId;
@@ -196,7 +200,10 @@ public class Contrato : Entity, IAggregateRoot
         CheckRule(numeroDePostos < 2 || numeroDePostos > 4, "Número de postos deve estar entre 2 e 4.");
         CheckPercentual(margemLucroPercentual, "Margem de lucro inválida.");
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
-        CheckRule(dataFim < dataInicio, "A data final deve ser maior ou igual à data inicial.");
+        CheckRule(dataFim <= dataInicio, "A data final deve ser posterior à data inicial.");
+        CheckRule(
+            percentualImpostos + margemLucroPercentual + margemCoberturaFaltasPercentual >= 1m,
+            "A soma dos percentuais (impostos + lucro + faltas) não pode ser >= 100%.");
 
         Descricao = descricao;
         ValorTotalMensal = valorTotalMensal;

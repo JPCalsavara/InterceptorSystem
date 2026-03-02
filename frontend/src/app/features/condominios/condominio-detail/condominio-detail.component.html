@@ -349,7 +349,7 @@
                 <th>CPF</th>
                 <th>Tipo</th>
                 <th>Status</th>
-                <th>Salário Total</th>
+                <th>Estimativa Mês Atual</th>
                 <th>Faltas</th>
                 <th class="actions-column">Ações</th>
               </tr>
@@ -369,7 +369,7 @@
                       {{ getStatusFuncionarioLabel(func.statusFuncionario) }}
                     </span>
                   </td>
-                  <td>{{ formatCurrency(func.salarioTotal || 0) }}</td>
+                  <td>{{ formatCurrency(calcularSalarioFuncionario(func)) }}</td>
                   <td>
                     @if (getFaltasByFuncionario(func.id) > 0) {
                       <span class="badge badge-warning">{{ getFaltasByFuncionario(func.id) }}</span>
@@ -398,11 +398,7 @@
         <a [routerLink]="['/alocacoes']" class="btn-view-all">Ver todas →</a>
       </div>
 
-      @if (alocacoesPeriodo().length === 0) {
-        <div class="empty-state">
-          <p>Nenhuma alocação no período selecionado</p>
-        </div>
-      } @else {
+      @if (alocacoesPeriodo().length > 0) {
         <div class="alocacoes-stats">
           <div class="stat-item">
             <span class="stat-value">{{ alocacoesConfirmadas() }}</span>
@@ -420,15 +416,14 @@
             <span class="stat-value">{{ alocacoesFaltas() }}</span>
             <span class="stat-label badge-error">Faltas</span>
           </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ alocacoesCancelamentos() }}</span>
+            <span class="stat-label badge-secondary">Cancelamentos</span>
+          </div>
         </div>
-
-        <app-alocacoes-view
-          [alocacoes]="alocacoesPeriodo()"
-          [funcionarios]="funcionarios()"
-          [postos]="postos()"
-          [condominios]="condominio() ? [condominio()!] : []"
-        />
       }
+
+      <app-alocacao-list [condominioIdFixed]="condominio()!.id" />
     </section>
   }
 </div>

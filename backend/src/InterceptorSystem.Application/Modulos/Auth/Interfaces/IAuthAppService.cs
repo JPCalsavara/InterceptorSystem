@@ -14,4 +14,10 @@ public interface IAuthAppService
     Task ConfirmarResetSenhaAsync(ConfirmarResetSenhaDtoInput input);
     Task SolicitarAlteracaoEmailAsync(Guid empresaId, SolicitarAlteracaoEmailDtoInput input);
     Task ConfirmarAlteracaoEmailAsync(ConfirmarTokenDtoInput input);
+
+    /// <summary>Registra um telefone na conta e envia OTP de 6 dígitos via WhatsApp para verificação.</summary>
+    Task CadastrarTelefoneAsync(Guid contaId, string telefone);
+
+    /// <summary>Confirma o telefone via token OTP enviado pelo bot do WhatsApp.</summary>
+    Task ConfirmarTelefoneAsync(string token);
 }

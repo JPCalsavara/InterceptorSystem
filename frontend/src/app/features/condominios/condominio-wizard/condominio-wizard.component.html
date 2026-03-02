@@ -399,7 +399,7 @@
 
                 <div class="form-group">
                   <label for="percentualImpostos" class="form-label">
-                    Impostos (%) <span class="required">*</span>
+                    Encargos e Provisões (%) <span class="required">*</span>
                   </label>
                   <input
                     id="percentualImpostos"
@@ -419,7 +419,7 @@
                     formContrato.get('percentualImpostos')?.invalid &&
                     formContrato.get('percentualImpostos')?.touched
                   ) {
-                    <span class="error-message">Percentual de impostos é obrigatório</span>
+                    <span class="error-message">Percentual de encargos e provisões é obrigatório</span>
                   }
                   <span class="help-text">INSS, FGTS, PIS, etc. Recomendado: 15%</span>
                 </div>
@@ -572,16 +572,18 @@
                   <div class="breakdown-card">
                     <div class="breakdown-header">
                       <span class="icon">💵</span>
-                      <span class="label">Custo Base</span>
+                      <span class="label">Custo Base Real</span>
                     </div>
                     <div class="breakdown-value">{{ custoOperacional() | currency: 'BRL' }}</div>
-                    <div class="breakdown-detail">Salários + Benefícios + Impostos</div>
+                    <div class="breakdown-detail">
+                      Salários + Benefícios + Encargos Trabalhistas (65%) + Encargos e Provisões
+                    </div>
                   </div>
 
                   <div class="breakdown-card success">
                     <div class="breakdown-header">
                       <span class="icon">📈</span>
-                      <span class="label">Margem de Lucro</span>
+                      <span class="label">Lucro Bruto</span>
                     </div>
                     <div class="breakdown-value">{{ margemLucro() | currency: 'BRL' }}</div>
                     <div class="breakdown-detail">
@@ -606,6 +608,27 @@
                   <div class="total-amount">{{ faturamentoMensal() | currency: 'BRL' }}</div>
                   <div class="total-detail">Valor cobrado mensalmente do condomínio</div>
                 </div>
+
+                <!-- Estimativa por escala -->
+                @if (formContrato.get('valorDiariaCobrada')?.value) {
+                  <div class="escala-estimate">
+                    <h4 class="escala-estimate-title">🧮 Custo estimado por funcionário / mês</h4>
+                    <div class="escala-estimate-cards">
+                      <div class="escala-card">
+                        <div class="escala-icon">🌙</div>
+                        <div class="escala-label">12×36</div>
+                        <div class="escala-days">~15 dias</div>
+                        <div class="escala-value">{{ custoEstimado12x36() | currency: 'BRL' }}</div>
+                      </div>
+                      <div class="escala-card">
+                        <div class="escala-icon">☀️</div>
+                        <div class="escala-label">5×2</div>
+                        <div class="escala-days">~22 dias</div>
+                        <div class="escala-value">{{ custoEstimado5x2() | currency: 'BRL' }}</div>
+                      </div>
+                    </div>
+                  </div>
+                }
               </div>
 
               <div class="required-note">

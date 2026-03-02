@@ -327,10 +327,23 @@ namespace InterceptorSystem.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Telefone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("TelefoneVerificado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("Telefone")
+                        .IsUnique()
+                        .HasFilter("\"Telefone\" IS NOT NULL");
 
                     b.ToTable("Contas", (string)null);
                 });
@@ -374,6 +387,56 @@ namespace InterceptorSystem.Infrastructure.Migrations
                     b.HasIndex("ContaId", "Tipo", "Usado");
 
                     b.ToTable("TokensVerificacao", (string)null);
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Whatsapp.Entidades.SessaoWhatsapp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AlocacaoIdParaSubstituir")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CondominioIdSelecionado")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ContaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly?>("DataSelecionada")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("FuncionarioSubstitutoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OpcoesCacheJson")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("PostoIdSelecionado")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UltimaAtividade")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Telefone")
+                        .IsUnique();
+
+                    b.ToTable("SessoesWhatsapp", (string)null);
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>

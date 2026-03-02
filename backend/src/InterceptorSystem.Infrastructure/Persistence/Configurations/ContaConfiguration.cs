@@ -45,5 +45,18 @@ public class ContaConfiguration : IEntityTypeConfiguration<Conta>
 
         builder.Property(c => c.EmailPendente)
             .HasMaxLength(255);
+
+        builder.Property(c => c.Telefone)
+            .HasMaxLength(20);
+
+        builder.Property(c => c.TelefoneVerificado)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        // Índice único parcial: apenas quando Telefone não é nulo
+        // Impede dois contas com o mesmo telefone verificado
+        builder.HasIndex(c => c.Telefone)
+            .IsUnique()
+            .HasFilter("\"Telefone\" IS NOT NULL");
     }
 }

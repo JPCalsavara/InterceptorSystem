@@ -84,6 +84,17 @@ export class CondominioWizardComponent implements OnInit {
     return this.breakdown()?.valorTotalMensal || 0;
   });
 
+  // Custo estimado por escala (diária × dias, sem contar benefícios pois varia)
+  custoEstimado12x36 = computed(() => {
+    const diaria = this.formContrato?.get('valorDiariaCobrada')?.value || 0;
+    return 15 * diaria;
+  });
+
+  custoEstimado5x2 = computed(() => {
+    const diaria = this.formContrato?.get('valorDiariaCobrada')?.value || 0;
+    return 22 * diaria;
+  });
+
   totalFuncionariosPorPostos = computed(() => {
     return this.funcionarios?.length || 0;
   });

@@ -23,16 +23,16 @@
   </div>
 
   @if (error()) {
-  <div class="alert alert-error">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        clip-rule="evenodd"
-      />
-    </svg>
-    {{ error() }}
-  </div>
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      {{ error() }}
+    </div>
   }
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
@@ -50,11 +50,11 @@
         >
           <option value="">Selecione um condomínio</option>
           @for (cond of condominios(); track cond.id) {
-          <option [value]="cond.id">{{ cond.nome }}</option>
+            <option [value]="cond.id">{{ cond.nome }}</option>
           }
         </select>
         @if (hasError('condominioId')) {
-        <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+          <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
         }
       </div>
 
@@ -72,7 +72,7 @@
         >
         </textarea>
         @if (hasError('descricao')) {
-        <span class="error-message">{{ getErrorMessage('descricao') }}</span>
+          <span class="error-message">{{ getErrorMessage('descricao') }}</span>
         }
       </div>
 
@@ -88,14 +88,26 @@
                 class="info-tooltip-button"
                 (click)="toggleTooltip('valorDiaria')"
                 [attr.aria-label]="'Informações sobre Valor da Diária'"
-                [attr.aria-expanded]="activeTooltip() === 'valorDiaria'">
+                [attr.aria-expanded]="activeTooltip() === 'valorDiaria'"
+              >
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"
+                  />
                 </svg>
               </button>
               @if (activeTooltip() === 'valorDiaria') {
                 <div class="tooltip-content" role="tooltip">
-                  <button type="button" class="tooltip-close" (click)="toggleTooltip('valorDiaria')" aria-label="Fechar">×</button>
+                  <button
+                    type="button"
+                    class="tooltip-close"
+                    (click)="toggleTooltip('valorDiaria')"
+                    aria-label="Fechar"
+                  >
+                    ×
+                  </button>
                   <p><strong>Valor da Diária por Funcionário</strong></p>
                   <p>Valor cobrado por dia de trabalho de cada funcionário.</p>
                   <p><strong>Mercado:</strong> R$ 80-150</p>
@@ -114,40 +126,48 @@
             step="0.01"
           />
           @if (hasError('valorDiariaCobrada')) {
-          <span class="error-message">{{ getErrorMessage('valorDiariaCobrada') }}</span>
+            <span class="error-message">{{ getErrorMessage('valorDiariaCobrada') }}</span>
           }
         </div>
 
         <div class="form-group">
-          <label for="quantidadeFuncionarios" class="form-label">
-            Quantidade de Funcionários <span class="required">*</span>
-            <span class="info-tooltip" title="Total absoluto de funcionários que trabalharão neste condomínio (soma de todos os turnos). Exemplo: 6 funcionários no turno diurno + 6 no noturno = 12 funcionários total.">
+          <label class="form-label"
+            >Funcionários Estimados
+            <span
+              class="info-tooltip"
+              title="Calculado automaticamente: Quantidade Ideal por Turno do condomínio × Número de Postos"
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </span>
           </label>
-          <input
-            id="quantidadeFuncionarios"
-            type="number"
-            formControlName="quantidadeFuncionarios"
-            class="form-input"
-            [class.error]="hasError('quantidadeFuncionarios')"
-            placeholder="Ex: 12 (total de todos os turnos)"
-            step="1"
-            min="1"
-          />
-          @if (hasError('quantidadeFuncionarios')) {
-          <span class="error-message">{{ getErrorMessage('quantidadeFuncionarios') }}</span>
-          }
+          <div class="form-input computed-field">
+            {{
+              getQuantidadeFuncionariosTotal(form.value.condominioId, form.value.numeroDePostos) ||
+                '—'
+            }}
+            <span class="computed-hint">func. necessários</span>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="numeroDePostos" class="form-label">
             Número de Postos de Trabalho <span class="required">*</span>
-            <span class="info-tooltip" title="Quantidade de turnos/postos diferentes. Exemplos: 2 postos = turnos de 12h (diurno/noturno), 3 postos = turnos de 8h, 4 postos = turnos de 6h. Padrão recomendado: 2 postos (escala 12x36).">
+            <span
+              class="info-tooltip"
+              title="Quantidade de turnos/postos diferentes. Exemplos: 2 postos = turnos de 12h (diurno/noturno), 3 postos = turnos de 8h, 4 postos = turnos de 6h. Padrão recomendado: 2 postos (escala 12x36)."
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </span>
           </label>
@@ -163,36 +183,42 @@
             max="6"
           />
           @if (hasError('numeroDePostos')) {
-          <span class="error-message">{{ getErrorMessage('numeroDePostos') }}</span>
+            <span class="error-message">{{ getErrorMessage('numeroDePostos') }}</span>
           }
           <small class="field-hint">
             💡 2 postos = 12h cada (padrão) | 3 postos = 8h cada | 4 postos = 6h cada
           </small>
         </div>
-      <div class="form-group">
-        <label for="valorBeneficiosExtrasMensal" class="form-label">
-          Benefícios Extras Mensais (R$) <span class="required">*</span>
-          <span class="info-tooltip" title="Valor total mensal de benefícios como vale-transporte, vale-alimentação, plano de saúde, etc. Valor recomendado: R$ 350-500/funcionário.">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-            </svg>
-          </span>
-        </label>
-        <input
-          id="valorBeneficiosExtrasMensal"
-          type="number"
-          formControlName="valorBeneficiosExtrasMensal"
-          class="form-input"
-          [class.error]="hasError('valorBeneficiosExtrasMensal')"
-          placeholder="Ex: 350.00"
-          step="0.01"
-        />
-        @if (hasError('valorBeneficiosExtrasMensal')) {
-        <span class="error-message">{{ getErrorMessage('valorBeneficiosExtrasMensal') }}</span>
-        }
+        <div class="form-group">
+          <label for="valorBeneficiosExtrasMensal" class="form-label">
+            Benefícios Extras Mensais (R$) <span class="required">*</span>
+            <span
+              class="info-tooltip"
+              title="Valor total mensal de benefícios como vale-transporte, vale-alimentação, plano de saúde, etc. Valor recomendado: R$ 350-500/funcionário."
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </span>
+          </label>
+          <input
+            id="valorBeneficiosExtrasMensal"
+            type="number"
+            formControlName="valorBeneficiosExtrasMensal"
+            class="form-input"
+            [class.error]="hasError('valorBeneficiosExtrasMensal')"
+            placeholder="Ex: 350.00"
+            step="0.01"
+          />
+          @if (hasError('valorBeneficiosExtrasMensal')) {
+            <span class="error-message">{{ getErrorMessage('valorBeneficiosExtrasMensal') }}</span>
+          }
+        </div>
       </div>
-      </div>
-
 
       <h3 class="section-title">📊 Percentuais e Margens</h3>
 
@@ -200,9 +226,16 @@
         <div class="form-group">
           <label for="percentualAdicionalNoturno" class="form-label">
             Adicional Noturno (%) <span class="required">*</span>
-            <span class="info-tooltip" title="Adicional obrigatório por CLT (Art. 73) para trabalho noturno (22h-5h). Mínimo legal: 20%. Recomendado: 20-30% dependendo da convenção coletiva.">
+            <span
+              class="info-tooltip"
+              title="Adicional obrigatório por CLT (Art. 73) para trabalho noturno (22h-5h). Mínimo legal: 20%. Recomendado: 20-30% dependendo da convenção coletiva."
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </span>
           </label>
@@ -218,16 +251,23 @@
             max="100"
           />
           @if (hasError('percentualAdicionalNoturno')) {
-          <span class="error-message">{{ getErrorMessage('percentualAdicionalNoturno') }}</span>
+            <span class="error-message">{{ getErrorMessage('percentualAdicionalNoturno') }}</span>
           }
         </div>
 
         <div class="form-group">
           <label for="percentualImpostos" class="form-label">
-            Impostos (%) <span class="required">*</span>
-            <span class="info-tooltip" title="Encargos sociais e impostos: INSS (20%), FGTS (8%), PIS (0.65%), etc. Total médio: 12-18%. Recomendado: 15% (cobre INSS + FGTS + outros).">
+            Encargos e Provisões (%) <span class="required">*</span>
+            <span
+              class="info-tooltip"
+              title="Encargos sociais e impostos: INSS (20%), FGTS (8%), PIS (0.65%), etc. Total médio: 12-18%. Recomendado: 15% (cobre INSS + FGTS + outros)."
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </span>
           </label>
@@ -243,7 +283,7 @@
             max="100"
           />
           @if (hasError('percentualImpostos')) {
-          <span class="error-message">{{ getErrorMessage('percentualImpostos') }}</span>
+            <span class="error-message">{{ getErrorMessage('percentualImpostos') }}</span>
           }
         </div>
       </div>
@@ -252,9 +292,16 @@
         <div class="form-group">
           <label for="margemLucroPercentual" class="form-label">
             Margem de Lucro (%) <span class="required">*</span>
-            <span class="info-tooltip" title="Percentual de lucro desejado sobre o contrato. Mercado de segurança: 10-20%. Recomendado: 15% (equilibra competitividade e rentabilidade).">
+            <span
+              class="info-tooltip"
+              title="Percentual de lucro desejado sobre o contrato. Mercado de segurança: 10-20%. Recomendado: 15% (equilibra competitividade e rentabilidade)."
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </span>
           </label>
@@ -270,16 +317,23 @@
             max="100"
           />
           @if (hasError('margemLucroPercentual')) {
-          <span class="error-message">{{ getErrorMessage('margemLucroPercentual') }}</span>
+            <span class="error-message">{{ getErrorMessage('margemLucroPercentual') }}</span>
           }
         </div>
 
         <div class="form-group">
           <label for="margemCoberturaFaltasPercentual" class="form-label">
             Margem Cobertura de Faltas (%) <span class="required">*</span>
-            <span class="info-tooltip" title="Reserva para cobrir custos de faltas, substituições e imprevistos. Recomendado: 8-12%. Valor de 10% cobre aproximadamente 2-3 faltas por mês.">
+            <span
+              class="info-tooltip"
+              title="Reserva para cobrir custos de faltas, substituições e imprevistos. Recomendado: 8-12%. Valor de 10% cobre aproximadamente 2-3 faltas por mês."
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </span>
           </label>
@@ -295,9 +349,9 @@
             max="100"
           />
           @if (hasError('margemCoberturaFaltasPercentual')) {
-          <span class="error-message">{{
-            getErrorMessage('margemCoberturaFaltasPercentual')
-          }}</span>
+            <span class="error-message">{{
+              getErrorMessage('margemCoberturaFaltasPercentual')
+            }}</span>
           }
         </div>
       </div>
@@ -317,7 +371,7 @@
             [class.error]="hasError('dataInicio')"
           />
           @if (hasError('dataInicio')) {
-          <span class="error-message">{{ getErrorMessage('dataInicio') }}</span>
+            <span class="error-message">{{ getErrorMessage('dataInicio') }}</span>
           }
         </div>
 
@@ -336,7 +390,7 @@
             [class.error]="hasError('dataFim')"
           />
           @if (hasError('dataFim')) {
-          <span class="error-message">{{ getErrorMessage('dataFim') }}</span>
+            <span class="error-message">{{ getErrorMessage('dataFim') }}</span>
           }
         </div>
       </div>
@@ -350,87 +404,139 @@
           [class.error]="hasError('status')"
         >
           @for (opt of statusOptions; track opt.value) {
-          <option [value]="opt.value">{{ opt.label }}</option>
+            <option [value]="opt.value">{{ opt.label }}</option>
           }
         </select>
         @if (hasError('status')) {
-        <span class="error-message">{{ getErrorMessage('status') }}</span>
+          <span class="error-message">{{ getErrorMessage('status') }}</span>
         }
       </div>
 
       <!-- Breakdown de Custos -->
       @if (temBreakdown || calculando()) {
-      <div class="breakdown-section">
-        <h3 class="section-title">📊 Breakdown de Custos</h3>
+        <div class="breakdown-section">
+          <h3 class="section-title">📊 Breakdown de Custos</h3>
 
-        <!-- Loading -->
-        @if (calculando()) {
-        <div class="loading-state">
-          <span class="spinner"></span>
-          <span>Calculando valores...</span>
+          <!-- Loading -->
+          @if (calculando()) {
+            <div class="loading-state">
+              <span class="spinner"></span>
+              <span>Calculando valores...</span>
+            </div>
+          }
+
+          <!-- Erro -->
+          @if (erroCalculo()) {
+            <div class="alert alert-error">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              {{ erroCalculo() }}
+            </div>
+          }
+
+          <!-- Breakdown -->
+          @if (breakdown() && !calculando()) {
+            <div class="bk-group">
+              <div class="bk-group-header bk-receita">
+                <span class="bk-group-label">📈 Faturamento</span>
+                <span class="bk-group-total">{{
+                  breakdown()!.valorTotalMensal | currency: 'BRL'
+                }}</span>
+              </div>
+            </div>
+
+            <div class="bk-group">
+              <div class="bk-group-header bk-custo">
+                <span class="bk-group-label">📉 Custo Operacional</span>
+                <span class="bk-group-total">{{
+                  breakdown()!.baseParaSalarios +
+                    breakdown()!.valorEncargosTrabalhistas +
+                    breakdown()!.valorImpostos +
+                    breakdown()!.valorBeneficios | currency: 'BRL'
+                }}</span>
+              </div>
+              <div class="bk-items">
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Custo Base (Salários)
+                    <span class="bk-formula"
+                      >{{
+                        getQuantidadeFuncionariosTotal(
+                          form.value.condominioId,
+                          form.value.numeroDePostos
+                        )
+                      }}
+                      func.</span
+                    >
+                  </span>
+                  <span class="bk-item-value deduction">{{
+                    breakdown()!.baseParaSalarios | currency: 'BRL'
+                  }}</span>
+                </div>
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Encargos/Provisões
+                    <span class="bk-formula">~65% ref. Trabalhista</span>
+                  </span>
+                  <span class="bk-item-value deduction">{{
+                    breakdown()!.valorEncargosTrabalhistas | currency: 'BRL'
+                  }}</span>
+                </div>
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Encargos e Provisões
+                    <span class="bk-formula">{{ form.value.percentualImpostos }}%</span>
+                  </span>
+                  <span class="bk-item-value deduction">{{
+                    breakdown()!.valorImpostos | currency: 'BRL'
+                  }}</span>
+                </div>
+                <div class="bk-item">
+                  <span class="bk-item-label">Benefícios Mês</span>
+                  <span class="bk-item-value deduction">{{
+                    breakdown()!.valorBeneficios | currency: 'BRL'
+                  }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bk-group">
+              <div class="bk-group-header bk-lucro">
+                <span class="bk-group-label">📊 Lucro Esperado (Sobra)</span>
+                <span class="bk-group-total">{{
+                  breakdown()!.valorMargemLucro | currency: 'BRL'
+                }}</span>
+              </div>
+              <div class="bk-items">
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Margem de Lucro Bruto
+                    <span class="bk-formula">{{ form.value.margemLucroPercentual }}%</span>
+                  </span>
+                  <span class="bk-item-value positive">{{
+                    breakdown()!.valorMargemLucro | currency: 'BRL'
+                  }}</span>
+                </div>
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Margem Custo C/ Faltas
+                    <span class="bk-formula"
+                      >{{ form.value.margemCoberturaFaltasPercentual }}%</span
+                    >
+                  </span>
+                  <span class="bk-item-value positive">{{
+                    breakdown()!.valorMargemFaltas | currency: 'BRL'
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          }
         </div>
-        }
-
-        <!-- Erro -->
-        @if (erroCalculo()) {
-        <div class="alert alert-error">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          {{ erroCalculo() }}
-        </div>
-        }
-
-        <!-- Breakdown -->
-        @if (breakdown() && !calculando()) {
-        <div class="breakdown-grid">
-          <div class="breakdown-item total">
-            <span class="label">💰 Valor Total Mensal</span>
-            <span class="value">{{ breakdown()!.valorTotalMensal | currency : 'BRL' }}</span>
-          </div>
-
-          <div class="breakdown-item">
-            <span class="label">📦 Custo Base</span>
-            <span class="value">{{ breakdown()!.custoBaseMensal | currency : 'BRL' }}</span>
-          </div>
-
-          <div class="breakdown-item">
-            <span class="label"
-              >🏛️ Impostos ({{ form.value.percentualImpostos }}%)</span
-            >
-            <span class="value">{{ breakdown()!.valorImpostos | currency : 'BRL' }}</span>
-          </div>
-
-          <div class="breakdown-item">
-            <span class="label"
-              >📈 Margem Lucro ({{ form.value.margemLucroPercentual }}%)</span
-            >
-            <span class="value">{{ breakdown()!.valorMargemLucro | currency : 'BRL' }}</span>
-          </div>
-
-          <div class="breakdown-item">
-            <span class="label"
-              >🛡️ Margem Faltas ({{ form.value.margemCoberturaFaltasPercentual }}%)</span
-            >
-            <span class="value">{{ breakdown()!.valorMargemFaltas | currency : 'BRL' }}</span>
-          </div>
-
-          <div class="breakdown-item">
-            <span class="label">🎁 Benefícios</span>
-            <span class="value">{{ breakdown()!.valorBeneficios | currency : 'BRL' }}</span>
-          </div>
-
-          <div class="breakdown-item highlight">
-            <span class="label">💵 Base para Salários</span>
-            <span class="value">{{ breakdown()!.baseParaSalarios | currency : 'BRL' }}</span>
-          </div>
-        </div>
-        }
-      </div>
       }
 
       <!-- Valor Total Calculado (mantido para compatibilidade) -->
@@ -448,10 +554,8 @@
           </div>
           <div class="result-content">
             <p class="result-label">Valor Total do Contrato</p>
-            <h2 class="result-value">{{ valorTotalCalculado | currency : 'BRL' }}</h2>
-            <p class="result-info">
-              Calculado automaticamente com base nos valores informados
-            </p>
+            <h2 class="result-value">{{ valorTotalCalculado | currency: 'BRL' }}</h2>
+            <p class="result-info">Calculado automaticamente com base nos valores informados</p>
           </div>
         </div>
       </div>
@@ -464,9 +568,10 @@
           </button>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             @if (loading()) {
-            <span class="spinner-small"></span>
-            Salvando... } @else {
-            {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
+              <span class="spinner-small"></span>
+              Salvando...
+            } @else {
+              {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
             }
           </button>
         </div>

@@ -2,6 +2,8 @@ using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using InterceptorSystem.Application.Modulos.Auth.Interfaces;
 using InterceptorSystem.Application.Modulos.Auth.Services;
+using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
+using InterceptorSystem.Application.Modulos.Whatsapp.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InterceptorSystem.Application;
@@ -22,6 +24,10 @@ public static class DependencyInjection
 
         // Auth
         services.AddScoped<IAuthAppService, AuthAppService>();
+
+        // WhatsApp Bot
+        services.AddScoped<IWhatsappBotService, WhatsappBotService>();
+        services.AddScoped<SubstitutoRankerService>();
 
         return services;
     }

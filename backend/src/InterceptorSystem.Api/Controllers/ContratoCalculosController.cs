@@ -18,44 +18,44 @@ public class ContratoCalculosController : ControllerBase
     /// <remarks>
     /// **FÓRMULA COMPLETA (v2.1 - com Postos de Trabalho):**
     /// 
-    /// **Etapa 1 - Cálculo por Posto/Turno:**
+    /// **Etapa 1 - Cálculo Base Salarial:**
     /// ```
     /// Funcionários por Posto = Total Funcionários ÷ Número de Postos
     /// Custo Diário por Posto = ValorDiaria × Funcionários por Posto
-    /// Custo Mensal por Posto = Custo Diário × 30 dias
+    /// Custo Salarial Direto = NumeroDePostos × ValorDiaria × 30 dias
     /// ```
     /// 
-    /// **Etapa 2 - Custo Salarial Total:**
+    /// **Etapa 2 - Encargos e Benefícios:**
     /// ```
-    /// Custo Diário Total = Custo Diário por Posto × Número de Postos
-    /// Custo Mensal Total = Custo Diário Total × 30 dias
-    /// Adicional Noturno = Custo Mensal Total × PercentualNoturno
-    /// Custo Base = Custo Mensal + Adicional Noturno + Benefícios
+    /// Adicional Noturno = Custo Salarial Direto × PercentualNoturno
+    /// Base Salarial com Adicional = Custo Salarial Direto + Adicional Noturno
+    /// Encargos Trabalhistas (65%) = Base Salarial com Adicional × 0.65
+    /// Benefícios Totais = ValorBeneficioUnitário × QuantidadeFuncionarios (Total)
+    /// 
+    /// Custo Base Real = Base Salarial com Adicional + Encargos + Benefícios
     /// ```
     /// 
-    /// **Etapa 3 - Aplicar Markup:**
+    /// **Etapa 3 - Aplicar Markup (NF, Margem Líquida, Faltas):**
     /// ```
     /// Soma Margens = Impostos + Lucro + Faltas (em decimal)
-    /// Valor Total = Custo Base ÷ (1 - Soma Margens)
+    /// Valor Total Mensal = Custo Base Real ÷ (1 - Soma Margens)
     /// ```
     /// 
-    /// **Exemplo Prático (2 funcionários, 2 postos = 1 por turno):**
+    /// **Exemplo Prático (4 funcionários, 2 postos = 2 por turno):**
     /// ```
-    /// Diária: R$ 100
-    /// Funcionários Total: 2
-    /// Postos: 2 (turno 12x36)
-    /// Funcionários/Posto: 2 ÷ 2 = 1
+    /// Diária: R$ 100 | Ben: R$ 350 | Fat: 4 func | Postos: 2 | Noturno: 20%
     /// 
-    /// Custo Diário/Posto: 100 × 1 = R$ 100
-    /// Custo Mensal/Posto: 100 × 30 = R$ 3.000
-    /// Custo Total: 3.000 × 2 postos = R$ 6.000
-    /// 
-    /// Benefícios: R$ 350
+    /// Custo Mensal Salários: 2 postos × 100 × 30 = R$ 6.000
     /// Adicional Noturno (20%): 6.000 × 0.20 = R$ 1.200
-    /// Custo Base: 6.000 + 1.200 + 350 = R$ 7.550
+    /// Base Salarial: 6.000 + 1.200 = R$ 7.200
+    /// 
+    /// Encargos Trabalhistas (65%): 7.200 × 0.65 = R$ 4.680
+    /// Benefícios Totais: 4 func × 350 = R$ 1.400
+    /// 
+    /// Custo Base Real: 7.200 + 4.680 + 1.400 = R$ 13.280
     /// 
     /// Margens (40%): 0.15 + 0.15 + 0.10 = 0.40
-    /// Valor Total: 7.550 ÷ 0.60 = R$ 12.583,33
+    /// Valor Faturado Final: 13.280 ÷ 0.60 = R$ 22.133,33
     /// ```
     /// </remarks>
     [HttpPost("calcular-valor-total")]
@@ -88,44 +88,56 @@ public class ContratoCalculosController : ControllerBase
             if (somaMargens >= 1m)
                 return BadRequest(new { error = "Soma das margens não pode ser >= 100% (deve ser < 1.0)." });
             
-            // ETAPA 1: Calcular total de funcionários (funcionários × postos)
-            var totalFuncionarios = input.QuantidadeFuncionarios * input.NumeroDePostos;
-            var custoDiarioTotal = input.ValorDiariaCobrada * totalFuncionarios;
-            var custoMensalTotal = custoDiarioTotal * 30; // 30 dias/mês
+            // ETAPA 1: Calcular custo salarial
+            var totalFuncionarios = input.QuantidadeFuncionarios;
+            var funcionariosPorPosto = totalFuncionarios / input.NumeroDePostos;
             
-            // ETAPA 2: Calcular custo base com adicionais
-            // 2.1 - Adicional noturno (aplicado sobre custo salarial total)
-            var valorAdicionalNoturno = custoMensalTotal * input.PercentualAdicionalNoturno;
+            // O custo direto de salários equivale ao número de postos simultâneos cobertos no mês (30 dias)
+            // Ou seja, 2 postos de R$ 100 = R$ 200 diários da operação (independentemente se são 4 funcionários revezando)
+            var custoDiarioOperacao = input.ValorDiariaCobrada * input.NumeroDePostos;
+            var custoMensalSalarios = custoDiarioOperacao * 30; 
             
-            // 2.2 - Custo base total (salários + adicional + benefícios)
-            var custoBaseMensal = custoMensalTotal + valorAdicionalNoturno + input.ValorBeneficiosExtrasMensal;
+            // ETAPA 2: Custos Trabalhistas e Benefícios
+            // 2.1 - Adicional noturno
+            var valorAdicionalNoturno = custoMensalSalarios * input.PercentualAdicionalNoturno;
+            var baseSalarialComAdicional = custoMensalSalarios + valorAdicionalNoturno;
             
-            // ETAPA 3: Aplicar markup para cobrir todas as margens
-            var valorTotalMensal = custoBaseMensal / (1 - somaMargens);
+            // 2.2 - Encargos e Provisões (Risco Operacional Trabalhista - ~65%)
+            const decimal percentualEncargos = 0.65m;
+            var valorEncargos = baseSalarialComAdicional * percentualEncargos;
+
+            // 2.3 - Benefícios Totais (multiplica pelo total de funcionários na operação)
+            var valorBeneficiosTotais = input.ValorBeneficiosExtrasMensal * totalFuncionarios;
             
-            // ETAPA 4: Calcular breakdown para transparência
+            // 2.4 - Custo Base Real (com Encargos)
+            var custoBaseMensalReal = baseSalarialComAdicional + valorEncargos + valorBeneficiosTotais;
+            
+            // ETAPA 3: Aplicar markup final
+            var valorTotalMensal = custoBaseMensalReal / (1 - somaMargens);
+            
+            // ETAPA 4: Calcular breakdown
             var valorImpostos = valorTotalMensal * input.PercentualImpostos;
             var valorLucro = valorTotalMensal * input.MargemLucroPercentual;
             var valorFaltas = valorTotalMensal * input.MargemCoberturaFaltasPercentual;
             
-            // Base para salários = Valor total - todos os descontos
-            var baseParaSalarios = valorTotalMensal - valorImpostos - valorLucro - valorFaltas - input.ValorBeneficiosExtrasMensal;
+            var baseParaSalarios = custoMensalSalarios;
             
             // Breakdown por posto
-            var custoPorPostoDiario = custoDiarioTotal / input.NumeroDePostos;
-            var custoPorPostoMensal = custoMensalTotal / input.NumeroDePostos;
+            var custoPorPostoDiario = custoDiarioOperacao / input.NumeroDePostos;
+            var custoPorPostoMensal = custoMensalSalarios / input.NumeroDePostos;
             
             return Ok(new CalculoValorTotalOutput(
                 ValorTotalMensal: Math.Round(valorTotalMensal, 2),
-                CustoBaseMensal: Math.Round(custoBaseMensal, 2),
+                CustoBaseMensal: Math.Round(custoBaseMensalReal, 2), // Retorna o custo final com encargos para o front sumário
                 ValorAdicionalNoturno: Math.Round(valorAdicionalNoturno, 2),
                 ValorImpostos: Math.Round(valorImpostos, 2),
                 ValorMargemLucro: Math.Round(valorLucro, 2),
                 ValorMargemFaltas: Math.Round(valorFaltas, 2),
-                ValorBeneficios: Math.Round(input.ValorBeneficiosExtrasMensal, 2),
+                ValorBeneficios: Math.Round(valorBeneficiosTotais, 2),
+                ValorEncargosTrabalhistas: Math.Round(valorEncargos, 2),
                 BaseParaSalarios: Math.Round(baseParaSalarios, 2),
                 NumeroDePostos: input.NumeroDePostos,
-                FuncionariosPorPosto: input.QuantidadeFuncionarios, // Funcionários por posto
+                FuncionariosPorPosto: funcionariosPorPosto,
                 CustoPorPostoDiario: Math.Round(custoPorPostoDiario, 2),
                 CustoPorPostoMensal: Math.Round(custoPorPostoMensal, 2)
             ));

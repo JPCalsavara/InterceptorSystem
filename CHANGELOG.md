@@ -2,6 +2,60 @@
 
 ---
 
+## [3.0.0] - 2026-02-28
+
+### 🎉 Autenticação, SaaS & Integrações
+
+**Impacto:** Alto — novo módulo Auth, novas entidades, 3 migrations, integração externa
+
+#### ✨ Novidades
+
+**Autenticação JWT completa:**
+- Registro de conta (`POST /api/auth/registrar`) — cria tenant/empresa automaticamente
+- Login com JWT Bearer (`POST /api/auth/login`)
+- Verificação de e-mail via token (`POST /api/auth/email/confirmar`)
+- Reenvio de e-mail de verificação (`POST /api/auth/email/reenviar`)
+- Solicitação e confirmação de reset de senha (`/api/auth/senha/*`)
+- Solicitação e confirmação de alteração de e-mail (`/api/auth/email/*-alteracao`)
+
+**Gestão de Conta SaaS:**
+- Perfil da conta (`GET /api/conta`)
+- Atualização de dados (`PUT /api/conta` — nome empresa, e-mail, senha)
+- Cadastro e verificação de telefone via WhatsApp (`/api/conta/telefone/*`)
+- Planos de assinatura: `FREE`, `BASIC`, `PRO`
+
+**Notificações por E-mail (SMTP):**
+- Implementação com MailKit
+- Templates HTML para: verificação de e-mail, reset de senha, alteração de e-mail
+- Configuração via variáveis de ambiente (`SMTP__HOST`, `SMTP__PORT`, etc.)
+
+**WhatsApp Bot (Meta API):**
+- Webhook para receber mensagens (`GET/POST /api/whatsapp/webhook`)
+- Máquina de estados conversacional (`EstadoConversa`) para substituição de alocações
+- Sessão persistida por telefone (`SessaoWhatsapp`) com expiração de 15 minutos
+- Processamento assíncrono (fire-and-forget)
+
+**Frontend — Páginas de Autenticação:**
+- Landing page pública
+- Login, cadastro, esqueci a senha, nova senha, verificar e-mail
+- Perfil, conta, seleção de plano
+- Auth Guard protegendo rotas
+- Auth Interceptor injetando JWT
+
+#### 📦 Novas Entidades
+
+- `Conta` — conta SaaS (Id = EmpresaId do tenant)
+- `TokenVerificacao` — tokens temporários com expiração
+- `SessaoWhatsapp` — estado da conversa do bot
+
+#### 🔧 Migrations
+
+- `AddContaAuth` — tabela de contas
+- `AddEmailVerification` — tokens de verificação
+- `AddSessaoWhatsappTable` — sessões do WhatsApp
+
+---
+
 ## [2.2.0] - 2026-02-06
 
 ### Refatoração: QuantidadeFuncionarios → Calculado Automaticamente

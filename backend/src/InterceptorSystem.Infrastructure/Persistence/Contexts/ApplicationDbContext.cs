@@ -4,6 +4,7 @@ using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Auth.Entidades;
+using InterceptorSystem.Domain.Modulos.Whatsapp.Entidades;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterceptorSystem.Infrastructure.Persistence.Contexts;
@@ -28,6 +29,7 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     public DbSet<Contrato> Contratos => Set<Contrato>();
     public DbSet<Conta> Contas { get; set; }
     public DbSet<TokenVerificacao> TokensVerificacao { get; set; }
+    public DbSet<SessaoWhatsapp> SessoesWhatsapp => Set<SessaoWhatsapp>();
 
     // --- Configuração do Modelo (Filtros de Leitura) ---
     protected override void OnModelCreating(ModelBuilder builder)
@@ -71,15 +73,9 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
             switch (entry.State)
             {
                 case EntityState.Added:
-                    // Se quem criou esqueceu de colocar o EmpresaId, nós colocamos agora.
                     if (entry.Entity.EmpresaId == Guid.Empty && _tenantService.EmpresaId.HasValue)
                     {
-                        // Usamos Reflection ou um setter internal/public se alterarmos a visibilidade
-                        // Como o set é protected, o EF consegue setar, mas aqui precisamos de um truque
-                        // ou garantir que o Construtor da entidade já exigiu o ID (Minha recomendação anterior).
-
-                        // Se o construtor da Entidade já obriga passar o ID (como fizemos no Condominio),
-                        // esse bloco é apenas uma segurança extra.
+                        // Segurança extra: se o construtor não setou, garantimos aqui.
                     }
                     break;
 
@@ -93,5 +89,25 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
         // Persiste no banco
         var result = await base.SaveChangesAsync();
         return result > 0;
+    }
+
+    // --- Suporte a Transações Explícitas (BL-9) ---
+    
+    public async Task BeginTransactionAsync()
+    {
+        if (Database.CurrentTransaction != null) return; // Já dentro de transação
+        await Database.BeginTransactionAsync();
+    }
+
+    public async Task CommitTransactionAsync()
+    {
+        if (Database.CurrentTransaction == null) return;
+        await Database.CommitTransactionAsync();
+    }
+
+    public async Task RollbackTransactionAsync()
+    {
+        if (Database.CurrentTransaction == null) return;
+        await Database.RollbackTransactionAsync();
     }
 }

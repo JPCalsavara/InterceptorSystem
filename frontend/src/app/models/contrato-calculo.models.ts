@@ -19,6 +19,7 @@ export interface CalculoValorTotalOutput {
   valorMargemLucro: number;        // R$  1.887,50
   valorMargemFaltas: number;       // R$  1.258,33
   valorBeneficios: number;         // R$    350,00
+  valorEncargosTrabalhistas: number; // R$ 4.680,00
   baseParaSalarios: number;        // R$  7.200,00
   // Breakdown por turno/posto
   numeroDePostos: number;          // 2 postos

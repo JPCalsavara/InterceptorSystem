@@ -1,6 +1,6 @@
 # Documentação — InterceptorSystem
 
-**Última atualização:** 2026-02-26
+**Última atualização:** 2026-02-28
 
 ---
 
@@ -15,14 +15,15 @@ docs/
 
 ## Documentos Principais
 
-| Arquivo                     | Descrição                                                        |
-| --------------------------- | ---------------------------------------------------------------- |
-| `/README.md`                | Visão geral, regras de negócio, arquitetura, Docker, tecnologias |
-| `/CHANGELOG.md`             | Histórico de versões (v1.0 → v2.2)                               |
-| `docs/guias/QUICK_START.md` | Referência rápida: Docker, migrations, testes, payloads          |
+| Arquivo                     | Descrição                                                                          |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| `/README.md`                | Visão geral, auth, regras de negócio, arquitetura, Docker, WhatsApp, tecnologias   |
+| `/CHANGELOG.md`             | Histórico de versões (v1.0 → v3.0)                                                 |
+| `docs/guias/QUICK_START.md` | Referência rápida: Docker, migrations, testes, payloads                            |
 
 ## Versões
 
+- **v3.0** — Autenticação JWT, gestão de contas SaaS (FREE/BASIC/PRO), notificações por e-mail (SMTP), integração WhatsApp Bot (Meta API)
 - **v2.2** — Refatoração `QuantidadeFuncionarios`: agora calculado (`QuantidadeIdealPorTurno × NumeroDePostos`)
 - **v2.1** — Correção Adicional Noturno: baseado no horário do posto (CLT Art. 73)
 - **v2.0** — Refatoração completa em 5 fases (criação em cascata, salários automáticos, vínculo contrato)

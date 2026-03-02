@@ -4,5 +4,6 @@ public enum TipoTokenVerificacao
 {
     EmailVerificacao,
     AlteracaoSenha,
-    AlteracaoEmail
+    AlteracaoEmail,
+    VerificacaoTelefone
 }

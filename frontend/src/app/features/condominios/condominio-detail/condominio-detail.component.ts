@@ -19,7 +19,7 @@ import {
   TipoAlocacao,
 } from '../../../models/index';
 import { forkJoin } from 'rxjs';
-import { AlocacoesViewComponent } from '../../../shared/components/alocacoes-view/alocacoes-view.component';
+import { AlocacaoListComponent } from '../../alocacoes/alocacao-list/alocacao-list.component';
 
 type PeriodoAnalise = 'mensal' | 'trimestral' | 'semestral' | 'anual';
 
@@ -34,7 +34,7 @@ interface MetricaPeriodo {
 @Component({
   selector: 'app-condominio-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, AlocacoesViewComponent],
+  imports: [CommonModule, RouterLink, FormsModule, AlocacaoListComponent],
   templateUrl: './condominio-detail.component.html',
   styleUrl: './condominio-detail.component.scss',
 })
@@ -152,9 +152,7 @@ export class CondominioDetailComponent implements OnInit {
     const total = this.alocacoesPeriodo().length;
     if (total === 0) return 0;
     const faltas = this.alocacoesPeriodo().filter(
-      (a) =>
-        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
-        a.statusAlocacao === StatusAlocacao.CANCELADA,
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
     return (faltas / total) * 100;
   });
@@ -437,6 +435,25 @@ export class CondominioDetailComponent implements OnInit {
     }
   }
 
+  calcularSalarioFuncionario(func: Funcionario): number {
+    const contrato = this.contratos().find((c) => c.id === func.contratoId);
+    if (!contrato) return func.salarioTotal || 0; // fallback
+
+    const agora = new Date();
+    const mesAtual = agora.getMonth();
+    const anoAtual = agora.getFullYear();
+
+    const alocacoesConfirmadas = this.alocacoes().filter((a) => {
+      if (a.funcionarioId !== func.id) return false;
+      if (a.statusAlocacao !== StatusAlocacao.CONFIRMADA) return false;
+      const d = new Date(a.data + 'T12:00:00');
+      return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+    });
+
+    const totalAlocacoes = alocacoesConfirmadas.length * (contrato.valorDiariaCobrada || 0);
+    return totalAlocacoes + (contrato.valorBeneficiosExtrasMensal || 0);
+  }
+
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -507,9 +524,12 @@ export class CondominioDetailComponent implements OnInit {
 
   alocacoesFaltas = computed(() => {
     return this.alocacoesPeriodo().filter(
-      (a) =>
-        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
-        a.statusAlocacao === StatusAlocacao.CANCELADA,
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
+  });
+
+  alocacoesCancelamentos = computed(() => {
+    return this.alocacoesPeriodo().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA)
+      .length;
   });
 }

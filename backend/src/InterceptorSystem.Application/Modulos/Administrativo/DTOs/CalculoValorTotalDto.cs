@@ -25,6 +25,7 @@ public record CalculoValorTotalOutput(
     decimal ValorMargemLucro,
     decimal ValorMargemFaltas,
     decimal ValorBeneficios,
+    decimal ValorEncargosTrabalhistas,
     decimal BaseParaSalarios,
     // Informações de breakdown por turno
     int NumeroDePostos,

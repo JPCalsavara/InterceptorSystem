@@ -121,19 +121,21 @@
         />
       </div>
 
-      <div class="filter-group">
-        <label>Condomínio:</label>
-        <select
-          [ngModel]="filtroCondominioId()"
-          (ngModelChange)="filtroCondominioId.set($event)"
-          class="form-control"
-        >
-          <option value="">Todos</option>
-          @for (cond of condominios(); track cond.id) {
-            <option [value]="cond.id">{{ cond.nome }}</option>
-          }
-        </select>
-      </div>
+      @if (!condominioIdFixed()) {
+        <div class="filter-group">
+          <label>Condomínio:</label>
+          <select
+            [ngModel]="filtroCondominioId()"
+            (ngModelChange)="filtroCondominioId.set($event)"
+            class="form-control"
+          >
+            <option value="">Todos</option>
+            @for (cond of condominios(); track cond.id) {
+              <option [value]="cond.id">{{ cond.nome }}</option>
+            }
+          </select>
+        </div>
+      }
 
       <div class="filter-group">
         <label>Funcionário:</label>
@@ -158,8 +160,8 @@
         >
           <option value="">Todos</option>
           <option value="CONFIRMADA">Confirmada</option>
-          <option value="CANCELADA">Cancelada</option>
-          <option value="FALTA_REGISTRADA">Falta Registrada</option>
+          <option value="CANCELADA">Cancelamento</option>
+          <option value="FALTA_REGISTRADA">Falta</option>
         </select>
       </div>
 
@@ -172,7 +174,7 @@
         >
           <option value="">Todos</option>
           <option value="REGULAR">Regular</option>
-          <option value="DOBRA_PROGRAMADA">Dobra Programada</option>
+          <option value="DOBRA_PROGRAMADA">Alocação Extra</option>
           <option value="SUBSTITUICAO">Substituição</option>
         </select>
       </div>
@@ -182,19 +184,21 @@
   <!-- Filtros simplificados (para semanal e mensal) -->
   @if (viewMode() !== 'daily') {
     <div class="filters-section-simple">
-      <div class="filter-group">
-        <label>Condomínio:</label>
-        <select
-          [ngModel]="filtroCondominioId()"
-          (ngModelChange)="filtroCondominioId.set($event)"
-          class="form-control"
-        >
-          <option value="">Todos</option>
-          @for (cond of condominios(); track cond.id) {
-            <option [value]="cond.id">{{ cond.nome }}</option>
-          }
-        </select>
-      </div>
+      @if (!condominioIdFixed()) {
+        <div class="filter-group">
+          <label>Condomínio:</label>
+          <select
+            [ngModel]="filtroCondominioId()"
+            (ngModelChange)="filtroCondominioId.set($event)"
+            class="form-control"
+          >
+            <option value="">Todos</option>
+            @for (cond of condominios(); track cond.id) {
+              <option [value]="cond.id">{{ cond.nome }}</option>
+            }
+          </select>
+        </div>
+      }
 
       <div class="filter-group">
         <label>Status:</label>
@@ -205,8 +209,8 @@
         >
           <option value="">Todos</option>
           <option value="CONFIRMADA">Confirmada</option>
-          <option value="CANCELADA">Cancelada</option>
-          <option value="FALTA_REGISTRADA">Falta Registrada</option>
+          <option value="CANCELADA">Cancelamento</option>
+          <option value="FALTA_REGISTRADA">Falta</option>
         </select>
       </div>
     </div>
@@ -272,7 +276,11 @@
     @if (alocacoesFiltradas().length > 0) {
       <div class="alocacoes-list">
         @for (alocacao of alocacoesFiltradas(); track alocacao.id) {
-          <div class="alocacao-card">
+          <div
+            class="alocacao-card"
+            [class.card-cancelada]="alocacao.statusAlocacao === 'CANCELADA'"
+            [class.card-dobra]="alocacao.tipoAlocacao === 'DOBRA_PROGRAMADA'"
+          >
             <div class="card-header">
               <div class="card-title">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -285,9 +293,11 @@
                 <span>{{ getFuncionarioNome(alocacao.funcionarioId) }}</span>
               </div>
               <div class="card-badges">
-                <span class="badge" [ngClass]="getStatusClass(alocacao.statusAlocacao)">
-                  {{ getStatusLabel(alocacao.statusAlocacao) }}
-                </span>
+                @if (alocacao.statusAlocacao !== 'CANCELADA') {
+                  <span class="badge" [ngClass]="getStatusClass(alocacao.statusAlocacao)">
+                    {{ getStatusLabel(alocacao.statusAlocacao) }}
+                  </span>
+                }
                 <span class="badge" [ngClass]="getTipoClass(alocacao.tipoAlocacao)">
                   {{ getTipoLabel(alocacao.tipoAlocacao) }}
                 </span>
@@ -400,12 +410,14 @@
                     >
                       <div class="func-name">{{ getFuncionarioNome(alocacao.funcionarioId) }}</div>
                       <div class="func-badges">
-                        <span
-                          class="mini-badge"
-                          [ngClass]="getStatusClass(alocacao.statusAlocacao)"
-                        >
-                          {{ getStatusLabel(alocacao.statusAlocacao) }}
-                        </span>
+                        @if (alocacao.statusAlocacao !== 'CANCELADA') {
+                          <span
+                            class="mini-badge"
+                            [ngClass]="getStatusClass(alocacao.statusAlocacao)"
+                          >
+                            {{ getStatusLabel(alocacao.statusAlocacao) }}
+                          </span>
+                        }
                         @if (alocacao.tipoAlocacao !== 'REGULAR') {
                           <span class="mini-badge" [ngClass]="getTipoClass(alocacao.tipoAlocacao)">
                             {{ getTipoLabel(alocacao.tipoAlocacao) }}
@@ -463,8 +475,8 @@
             <span class="legend-name">Substituição</span>
           </div>
           <div class="legend-item">
-            <span class="legend-number emp-cancelada">C</span>
-            <span class="legend-name">Cancelada</span>
+            <span class="legend-number emp-dobra">E</span>
+            <span class="legend-name">Alocação Extra</span>
           </div>
         </div>
       </div>

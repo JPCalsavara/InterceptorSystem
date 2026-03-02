@@ -114,6 +114,26 @@ public class ContratoAppService : IContratoAppService
     public async Task<IEnumerable<ContratoDtoOutput>> GetAllAsync()
     {
         var contratos = await _repository.GetAllAsync();
+        
+        // BL-10: Auto-finalização de contratos vencidos
+        var hoje = DateOnly.FromDateTime(DateTime.Today);
+        var alterados = false;
+        
+        foreach (var contrato in contratos)
+        {
+            if (contrato.Status != StatusContrato.FINALIZADO && contrato.DataFim < hoje)
+            {
+                contrato.AtualizarStatus(StatusContrato.FINALIZADO);
+                _repository.Update(contrato);
+                alterados = true;
+            }
+        }
+        
+        if (alterados)
+        {
+            await _repository.UnitOfWork.CommitAsync();
+        }
+        
         return contratos.Select(ContratoDtoOutput.FromEntity)!;
     }
 }
