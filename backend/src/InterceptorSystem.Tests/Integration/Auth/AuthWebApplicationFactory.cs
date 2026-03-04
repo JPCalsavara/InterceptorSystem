@@ -84,6 +84,7 @@ public class AuthWebApplicationFactory : WebApplicationFactory<Program>
 
             // E-mail no-op para testes
             services.AddScoped<IEmailService, NoOpEmailService>();
+            services.AddScoped<InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
 
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();

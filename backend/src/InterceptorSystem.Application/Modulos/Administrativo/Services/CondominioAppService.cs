@@ -23,7 +23,8 @@ public class CondominioAppService : ICondominioAppService
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
-        var cnpjExist = await _repository.GetByCnpjAsync(input.Cnpj);
+        var cnpjApenasDigitos = new string(input.Cnpj.Where(char.IsDigit).ToArray());
+        var cnpjExist = await _repository.GetByCnpjAsync(cnpjApenasDigitos);
         if (cnpjExist != null)
         {
             throw new InvalidOperationException("Já existe um condomínio cadastrado com este CNPJ.");

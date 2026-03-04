@@ -95,18 +95,21 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     
     public async Task BeginTransactionAsync()
     {
+        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
         if (Database.CurrentTransaction != null) return; // Já dentro de transação
         await Database.BeginTransactionAsync();
     }
 
     public async Task CommitTransactionAsync()
     {
+        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
         if (Database.CurrentTransaction == null) return;
         await Database.CommitTransactionAsync();
     }
 
     public async Task RollbackTransactionAsync()
     {
+        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
         if (Database.CurrentTransaction == null) return;
         await Database.RollbackTransactionAsync();
     }

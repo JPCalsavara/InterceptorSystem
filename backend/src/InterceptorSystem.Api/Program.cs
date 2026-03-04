@@ -102,7 +102,7 @@ builder.Services.AddRateLimiter(options =>
     
     options.AddFixedWindowLimiter("auth", limiterOptions =>
     {
-        limiterOptions.PermitLimit = 10;
+        limiterOptions.PermitLimit = builder.Environment.IsEnvironment("Testing") ? int.MaxValue : 10;
         limiterOptions.Window = TimeSpan.FromMinutes(1);
         limiterOptions.QueueLimit = 0;
     });

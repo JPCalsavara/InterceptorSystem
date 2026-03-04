@@ -33,7 +33,11 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/registrar", input);
 
-        // Assert
+        var bodyStr = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode != HttpStatusCode.Created)
+        {
+            throw new Exception($"Expected Created but got {response.StatusCode}. Body: {bodyStr}");
+        }
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         var result = await response.Content.ReadFromJsonAsync<AuthResultDtoOutput>(JsonOptions);

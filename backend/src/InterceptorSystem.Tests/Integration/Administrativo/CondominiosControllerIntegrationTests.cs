@@ -25,7 +25,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
     {
         var input = new CreateCondominioDtoInput(
             Nome: $"Condomínio Teste {DateTime.Now.Ticks}",
-            Cnpj: cnpjCustomizado ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
+            Cnpj: cnpjCustomizado ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{Random.Shared.Next(10, 100)}",
             Endereco: "Rua Teste, 123",
             QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6),
@@ -66,7 +66,7 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
         Assert.NotNull(result);
         Assert.NotEqual(Guid.Empty, result.Id);
         Assert.Equal(input.Nome, result.Nome);
-        Assert.Equal(input.Cnpj, result.Cnpj);
+        Assert.Equal(new string(input.Cnpj.Where(char.IsDigit).ToArray()), result.Cnpj);
         Assert.Equal(input.Endereco, result.Endereco);
         Assert.Equal(10, result.QuantidadeIdealPorTurno);
         Assert.Equal("06:00:00", result.HorarioTrocaTurno);
@@ -304,7 +304,8 @@ public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebAppl
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(cnpjOriginal, result.Cnpj); // CNPJ permanece inalterado
+        var expectedCnpjNum = new string(cnpjOriginal.Where(char.IsDigit).ToArray());
+        Assert.Equal(expectedCnpjNum, result.Cnpj); // CNPJ permanece inalterado
     }
 
     #endregion

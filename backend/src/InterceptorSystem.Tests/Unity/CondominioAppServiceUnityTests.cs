@@ -57,7 +57,7 @@ public class CondominioAppServiceTests
         // --- ASSERT ---
         Assert.NotNull(result);
         Assert.Equal(input.Nome, result.Nome);
-        Assert.Equal(input.Cnpj, result.Cnpj);
+        Assert.Equal("12345678000190", result.Cnpj); // Espera apenas dígitos
         Assert.Equal(10, result.QuantidadeIdealPorTurno);
         Assert.Equal("06:00:00", result.HorarioTrocaTurno);
         Assert.Equal("gestor@solar.com.br", result.EmailGestor);
@@ -66,7 +66,7 @@ public class CondominioAppServiceTests
         _mockRepo.Verify(r => r.Add(It.Is<Condominio>(c => 
             c.EmpresaId == empresaId && 
             c.Nome == input.Nome && 
-            c.Cnpj == input.Cnpj &&
+            c.Cnpj == "12345678000190" &&
             c.QuantidadeIdealPorTurno == 10
         )), Times.Once);
         
@@ -88,9 +88,9 @@ public class CondominioAppServiceTests
         
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
 
-        // Simula que JÁ EXISTE um condomínio com esse CNPJ
+        // Simula que JÁ EXISTE um condomínio com esse CNPJ (passando apenas os dígitos para o setup mock)
         var existente = new Condominio(empresaId, "Existente", input.Cnpj, "Rua Y", 10, TimeSpan.FromHours(6));
-        _mockRepo.Setup(r => r.GetByCnpjAsync(input.Cnpj)).ReturnsAsync(existente);
+        _mockRepo.Setup(r => r.GetByCnpjAsync("11111111000111")).ReturnsAsync(existente);
 
         // --- ACT & ASSERT ---
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));

@@ -41,6 +41,14 @@ public class NoOpEmailService : IEmailService
 }
 
 /// <summary>
+/// Implementação no-op do IWhatsappMessageSender para testes (não envia mensagens de verdade).
+/// </summary>
+public class NoOpWhatsappMessageSender : InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender
+{
+    public Task EnviarTextoAsync(string telefoneDestino, string mensagem, CancellationToken ct = default) => Task.CompletedTask;
+}
+
+/// <summary>
 /// Factory customizado para criar uma aplicação de teste com banco de dados em memória.
 /// </summary>
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
@@ -126,6 +134,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             // E-mail no-op para testes
             services.AddScoped<IEmailService, NoOpEmailService>();
+            services.AddScoped<InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
 
             // Garante que o banco de dados seja criado
             var sp = services.BuildServiceProvider();

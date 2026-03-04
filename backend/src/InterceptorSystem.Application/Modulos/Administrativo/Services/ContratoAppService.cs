@@ -56,7 +56,10 @@ public class ContratoAppService : IContratoAppService
         _repository.Add(contrato);
         await _repository.UnitOfWork.CommitAsync();
 
-        return ContratoDtoOutput.FromEntity(contrato)!;
+        var saved = await _repository.GetByIdAsync(contrato.Id)
+            ?? throw new InvalidOperationException("Contrato não encontrado após persistência.");
+
+        return ContratoDtoOutput.FromEntity(saved)!;
     }
 
     public async Task<ContratoDtoOutput> UpdateAsync(Guid id, UpdateContratoDtoInput input)
@@ -93,7 +96,10 @@ public class ContratoAppService : IContratoAppService
         _repository.Update(contrato);
         await _repository.UnitOfWork.CommitAsync();
 
-        return ContratoDtoOutput.FromEntity(contrato)!;
+        var saved = await _repository.GetByIdAsync(contrato.Id)
+            ?? throw new InvalidOperationException("Contrato não encontrado após atualização.");
+
+        return ContratoDtoOutput.FromEntity(saved)!;
     }
 
     public async Task DeleteAsync(Guid id)

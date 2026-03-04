@@ -298,7 +298,7 @@ public class AlocacoesBatchControllerIntegrationTests : IntegrationTestBase
     {
         var input = new CreateCondominioDtoInput(
             Nome: $"Condomínio Teste {Guid.NewGuid().ToString()[..8]}",
-            Cnpj: cnpj ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
+            Cnpj: cnpj ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{Random.Shared.Next(10, 100)}",
             Endereco: "Rua Teste, 123",
             QuantidadeIdealPorTurno: 4,
             HorarioTrocaTurno: new TimeSpan(6, 0, 0),

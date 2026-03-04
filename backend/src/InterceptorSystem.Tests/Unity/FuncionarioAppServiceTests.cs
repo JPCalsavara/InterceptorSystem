@@ -57,14 +57,14 @@ public class FuncionarioAppServiceTests
         var input = new CreateFuncionarioDtoInput(condominioId,
             contratoId,
             "João",
-            "123",
+            "11111111111",
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
             TipoFuncionario.CLT);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
+        _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
@@ -113,7 +113,7 @@ public class FuncionarioAppServiceTests
         var input = CriarInputValido(condominioId, contratoId);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6)));
+        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
@@ -204,8 +204,8 @@ public class FuncionarioAppServiceTests
         // FASE 3: Sem parâmetros de salário
         var lista = new List<Funcionario>
         {
-            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT),
-            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "222", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO)
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "11111111111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT),
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "11111111111", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO)
         };
         _funcionarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
 
