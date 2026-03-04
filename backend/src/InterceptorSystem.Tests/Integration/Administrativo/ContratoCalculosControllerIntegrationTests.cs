@@ -25,6 +25,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,      // 1 dos 2 postos tem horário noturno
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualImpostos: 0.15m,    
             PercentualAdicionalNoturno: 0.2m,// 15%
@@ -74,6 +75,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualImpostos: 0.50m, 
             PercentualAdicionalNoturno: 0.2m,// 50%
@@ -103,6 +105,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: -100m,              // ❌ Negativo!
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualImpostos: 0.15m,
             PercentualAdicionalNoturno: 0.2m,
@@ -131,6 +134,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 0,
             NumeroDePostos: 2,              // ❌ Zero!
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualAdicionalNoturno: 0.2m,
             PercentualImpostos: 0.15m,
@@ -159,6 +163,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: -100m,     // ❌ Negativo!
             PercentualImpostos: 0.15m,
             PercentualAdicionalNoturno: 0.2m,
@@ -187,6 +192,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 50m,                // Diária baixa
             QuantidadeFuncionarios: 1,
             NumeroDePostos: 2,              // 1 funcionário
+            NumeroDePostosNoturnos: 0,      // Sem postos noturnos (cenário mínimo)
             ValorBeneficiosExtrasMensal: 0m,        // Sem benefícios
             PercentualImpostos: 0m,      
             PercentualAdicionalNoturno: 0m,// Sem impostos
@@ -231,6 +237,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 200m,
             QuantidadeFuncionarios: 50,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,      // 1 dos 2 postos tem horário noturno
             ValorBeneficiosExtrasMensal: 15000m,
             PercentualImpostos: 0.25m,       
             PercentualAdicionalNoturno: 0.2m,// 25%
