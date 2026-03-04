@@ -1,18 +1,19 @@
 using InterceptorSystem.Application.Common.Interfaces;
+using InterceptorSystem.Application.Common.Settings;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace InterceptorSystem.Infrastructure.Email;
 
 public class SmtpEmailService : IEmailService
 {
-    private readonly IConfiguration _configuration;
+    private readonly SmtpSettings _settings;
 
-    public SmtpEmailService(IConfiguration configuration)
+    public SmtpEmailService(IOptions<SmtpSettings> settings)
     {
-        _configuration = configuration;
+        _settings = settings.Value;
     }
 
     public async Task EnviarVerificacaoEmailAsync(string destinatario, string nomeEmpresa, string link)
@@ -59,30 +60,22 @@ public class SmtpEmailService : IEmailService
 
     private async Task EnviarAsync(string destinatario, string assunto, string corpoHtml)
     {
-        var host = _configuration["Smtp:Host"] ?? "localhost";
-        var port = int.Parse(_configuration["Smtp:Port"] ?? "587");
-        var username = _configuration["Smtp:Username"] ?? "";
-        var password = _configuration["Smtp:Password"] ?? "";
-        var fromAddress = _configuration["Smtp:FromAddress"] ?? "noreply@interceptorsystem.com";
-        var fromName = _configuration["Smtp:FromName"] ?? "Interceptor System";
-
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(fromName, fromAddress));
+        message.From.Add(new MailboxAddress(_settings.FromName, _settings.FromAddress));
         message.To.Add(MailboxAddress.Parse(destinatario));
         message.Subject = assunto;
 
         var builder = new BodyBuilder { HtmlBody = corpoHtml };
         message.Body = builder.ToMessageBody();
 
-        var secureSocketRaw = _configuration["Smtp:SecureSocket"] ?? "StartTls";
-        var secureSocket = Enum.TryParse<SecureSocketOptions>(secureSocketRaw, out var parsed)
+        var secureSocket = Enum.TryParse<SecureSocketOptions>(_settings.SecureSocket, out var parsed)
             ? parsed
             : SecureSocketOptions.StartTls;
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(host, port, secureSocket);
-        if (!string.IsNullOrEmpty(username))
-            await client.AuthenticateAsync(username, password);
+        await client.ConnectAsync(_settings.Host, _settings.Port, secureSocket);
+        if (!string.IsNullOrEmpty(_settings.Username))
+            await client.AuthenticateAsync(_settings.Username, _settings.Password);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
     }

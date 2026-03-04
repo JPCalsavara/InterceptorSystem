@@ -96,7 +96,7 @@ public class AlocacaoAppService : IAlocacaoAppService
             throw new InvalidOperationException("Funcionário e Posto devem pertencer ao mesmo condomínio.");
         }
 
-        // Criar todas as alocações
+        // Criar todas as alocações com validação
         var alocacoesCriadas = new List<Alocacao>();
         
         foreach (var input in batch.Alocacoes)
@@ -105,6 +105,20 @@ public class AlocacaoAppService : IAlocacaoAppService
             if (input.FuncionarioId != funcionario.Id || input.PostoDeTrabalhoId != posto.Id)
             {
                 throw new InvalidOperationException("Todas as alocações devem ser do mesmo funcionário e posto.");
+            }
+
+            // BL-7: Validar regras de negócio para cada alocação do batch
+            var existeAlocacaoMesmaData = await _repository.ExisteAlocacaoNaDataAsync(funcionario.Id, input.Data);
+            if (existeAlocacaoMesmaData)
+            {
+                throw new InvalidOperationException($"Funcionário já possui alocação na data {input.Data:dd/MM/yyyy}.");
+            }
+
+            await ValidarRegrasDeConsecutividade(funcionario.Id, input.Data, input.TipoAlocacao);
+
+            if (!await ValidarCapacidadeDoPosto(posto, input.Data))
+            {
+                throw new InvalidOperationException($"Capacidade máxima do posto atingida para a data {input.Data:dd/MM/yyyy}.");
             }
 
             var alocacao = new Alocacao(
@@ -180,6 +194,35 @@ public class AlocacaoAppService : IAlocacaoAppService
     {
         var alocacoes = await _repository.GetAllAsync();
         return alocacoes.Select(AlocacaoDtoOutput.FromEntity)!;
+    }
+
+    public async Task<IEnumerable<AlocacaoComFuncionarioDto>> GetByPostoEDataAsync(Guid postoId, DateOnly data)
+    {
+        var alocacoes = await _repository.GetByPostoEDataAsync(postoId, data);
+        var resultado = new List<AlocacaoComFuncionarioDto>();
+
+        foreach (var alocacao in alocacoes.Where(a => a.StatusAlocacao != StatusAlocacao.CANCELADA))
+        {
+            var funcionario = await _funcionarioRepository.GetByIdAsync(alocacao.FuncionarioId);
+            resultado.Add(new AlocacaoComFuncionarioDto(
+                alocacao.Id,
+                alocacao.FuncionarioId,
+                funcionario?.Nome ?? "Desconhecido",
+                alocacao.TipoAlocacao,
+                alocacao.StatusAlocacao));
+        }
+
+        return resultado;
+    }
+
+    public async Task UpdateStatusAsync(Guid id, StatusAlocacao novoStatus)
+    {
+        var alocacao = await _repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException("Alocação não encontrada.");
+
+        alocacao.AtualizarStatus(novoStatus, alocacao.TipoAlocacao);
+        _repository.Update(alocacao);
+        await _repository.UnitOfWork.CommitAsync();
     }
 
     public async Task<bool> FuncionarioExisteAsync(Guid funcionarioId)

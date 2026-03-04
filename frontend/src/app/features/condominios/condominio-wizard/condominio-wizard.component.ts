@@ -84,6 +84,17 @@ export class CondominioWizardComponent implements OnInit {
     return this.breakdown()?.valorTotalMensal || 0;
   });
 
+  // Custo estimado por escala (diária × dias, sem contar benefícios pois varia)
+  custoEstimado12x36 = computed(() => {
+    const diaria = this.formContrato?.get('valorDiariaCobrada')?.value || 0;
+    return 15 * diaria;
+  });
+
+  custoEstimado5x2 = computed(() => {
+    const diaria = this.formContrato?.get('valorDiariaCobrada')?.value || 0;
+    return 22 * diaria;
+  });
+
   totalFuncionariosPorPostos = computed(() => {
     return this.funcionarios?.length || 0;
   });
@@ -127,8 +138,12 @@ export class CondominioWizardComponent implements OnInit {
               (this.formCondominio.get('funcionariosPorPosto')?.value || 0) *
               (this.formCondominio.get('numeroPostos')?.value || 2),
             numeroDePostos: this.formCondominio.get('numeroPostos')?.value || 2,
+            // Padrão: metade dos postos são noturnos (12x36 típico: 1 diurno + 1 noturno)
+            numeroDePostosNoturnos: Math.floor(
+              (this.formCondominio.get('numeroPostos')?.value || 2) / 2,
+            ),
             valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
-            percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
+            percentualImpostos: (valores.percentualImpostos || 0) / 100,
             percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
             margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
             margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,

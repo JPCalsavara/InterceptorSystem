@@ -28,12 +28,16 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
-        var input = new RegistrarContaDtoInput("novo@empresa.com", "senha123456", "Empresa Nova");
+        var input = new RegistrarContaDtoInput("novo@empresa.com", "Senha1234!", "Empresa Nova");
 
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/registrar", input);
 
-        // Assert
+        var bodyStr = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode != HttpStatusCode.Created)
+        {
+            throw new Exception($"Expected Created but got {response.StatusCode}. Body: {bodyStr}");
+        }
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         var result = await response.Content.ReadFromJsonAsync<AuthResultDtoOutput>(JsonOptions);
@@ -50,7 +54,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
-        var input = new RegistrarContaDtoInput("semcnpj@empresa.com", "senha123456", "Empresa Sem CNPJ");
+        var input = new RegistrarContaDtoInput("semcnpj@empresa.com", "Senha1234!", "Empresa Sem CNPJ");
 
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/registrar", input);
@@ -68,7 +72,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
-        var input = new RegistrarContaDtoInput("duplicado@empresa.com", "senha123456", "Empresa A");
+        var input = new RegistrarContaDtoInput("duplicado@empresa.com", "Senha1234!", "Empresa A");
 
         // Primeiro cadastro
         var primeiraResposta = await client.PostAsJsonAsync("/api/auth/registrar", input);
@@ -89,7 +93,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
-        var input = new RegistrarContaDtoInput("MAIUSCULO@EMPRESA.COM", "senha123456", "Empresa Maiúsculo");
+        var input = new RegistrarContaDtoInput("MAIUSCULO@EMPRESA.COM", "Senha1234!", "Empresa Maiúsculo");
 
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/registrar", input);
@@ -108,11 +112,11 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange - registra conta antes
         var client = _factory.CreateUnauthenticatedClient();
-        var registrar = new RegistrarContaDtoInput("login.valido@empresa.com", "senha123456", "Empresa Login");
+        var registrar = new RegistrarContaDtoInput("login.valido@empresa.com", "Senha1234!", "Empresa Login");
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar", registrar);
         regResponse.EnsureSuccessStatusCode();
 
-        var loginInput = new LoginDtoInput("login.valido@empresa.com", "senha123456");
+        var loginInput = new LoginDtoInput("login.valido@empresa.com", "Senha1234!");
 
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/login", loginInput);
@@ -133,7 +137,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
-        var input = new LoginDtoInput("naoexiste@empresa.com", "senha123456");
+        var input = new LoginDtoInput("naoexiste@empresa.com", "Senha1234!");
 
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/login", input);
@@ -150,7 +154,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange - registra conta antes
         var client = _factory.CreateUnauthenticatedClient();
-        var registrar = new RegistrarContaDtoInput("senha.errada@empresa.com", "senha123456", "Empresa Senha");
+        var registrar = new RegistrarContaDtoInput("senha.errada@empresa.com", "Senha1234!", "Empresa Senha");
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar", registrar);
         regResponse.EnsureSuccessStatusCode();
 
@@ -168,12 +172,12 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange - registra com lowercase
         var client = _factory.CreateUnauthenticatedClient();
-        var registrar = new RegistrarContaDtoInput("caixa.mista@empresa.com", "senha123456", "Empresa Case");
+        var registrar = new RegistrarContaDtoInput("caixa.mista@empresa.com", "Senha1234!", "Empresa Case");
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar", registrar);
         regResponse.EnsureSuccessStatusCode();
 
         // Act - login com uppercase
-        var loginInput = new LoginDtoInput("CAIXA.MISTA@EMPRESA.COM", "senha123456");
+        var loginInput = new LoginDtoInput("CAIXA.MISTA@EMPRESA.COM", "Senha1234!");
         var response = await client.PostAsJsonAsync("/api/auth/login", loginInput);
 
         // Assert
@@ -188,7 +192,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Arrange - registra e obtém token real
         var (client, auth) = await _factory.CreateAuthenticatedClientAsync(
             email: "e2e.registro@empresa.com",
-            senha: "senha123456",
+            senha: "Senha1234!",
             nomeEmpresa: "Empresa E2E Registro");
 
         // Act - acessa rota protegida com o JWT
@@ -203,12 +207,12 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         // Arrange - registra manualmente
         var client = _factory.CreateUnauthenticatedClient();
-        var registrar = new RegistrarContaDtoInput("e2e.login@empresa.com", "senha123456", "Empresa E2E Login");
+        var registrar = new RegistrarContaDtoInput("e2e.login@empresa.com", "Senha1234!", "Empresa E2E Login");
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar", registrar);
         regResponse.EnsureSuccessStatusCode();
 
         // Faz login para obter token fresco
-        var loginInput = new LoginDtoInput("e2e.login@empresa.com", "senha123456");
+        var loginInput = new LoginDtoInput("e2e.login@empresa.com", "Senha1234!");
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", loginInput);
         loginResponse.EnsureSuccessStatusCode();
 
@@ -246,7 +250,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar",
-            new RegistrarContaDtoInput("confirmar.valido@empresa.com", "senha123456", "Empresa Confirmar"));
+            new RegistrarContaDtoInput("confirmar.valido@empresa.com", "Senha1234!", "Empresa Confirmar"));
         regResponse.EnsureSuccessStatusCode();
 
         var auth = await regResponse.Content.ReadFromJsonAsync<AuthResultDtoOutput>(JsonOptions);
@@ -287,7 +291,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar",
-            new RegistrarContaDtoInput("token.ja.usado@empresa.com", "senha123456", "Empresa Token Usado"));
+            new RegistrarContaDtoInput("token.ja.usado@empresa.com", "Senha1234!", "Empresa Token Usado"));
         regResponse.EnsureSuccessStatusCode();
 
         var auth = await regResponse.Content.ReadFromJsonAsync<AuthResultDtoOutput>(JsonOptions);
@@ -312,7 +316,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Arrange
         var client = _factory.CreateUnauthenticatedClient();
         const string email = "login.pos.confirmacao@empresa.com";
-        const string senha = "senha123456";
+        const string senha = "Senha1234!";
 
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar",
             new RegistrarContaDtoInput(email, senha, "Empresa Login Pós Confirmação"));
@@ -340,7 +344,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Arrange
         var (client, _) = await _factory.CreateAuthenticatedClientAsync(
             email: "reenviar.ok@empresa.com",
-            senha: "senha123456",
+            senha: "Senha1234!",
             nomeEmpresa: "Empresa Reenviar");
 
         // Act
@@ -371,7 +375,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         // Arrange - registra, confirma e-mail, e então tenta reenviar
         var (client, auth) = await _factory.CreateAuthenticatedClientAsync(
             email: "ja.verificado.reenviar@empresa.com",
-            senha: "senha123456",
+            senha: "Senha1234!",
             nomeEmpresa: "Empresa Já Verificada");
 
         var tokenStr = _factory.ObterTokenVerificacao(auth.EmpresaId);
@@ -395,7 +399,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
     {
         var client = _factory.CreateUnauthenticatedClient();
         const string email = "e2e.verificacao@empresa.com";
-        const string senha = "senha123456";
+        const string senha = "Senha1234!";
 
         // 1. Registrar — EmailVerificado deve ser false
         var regResponse = await client.PostAsJsonAsync("/api/auth/registrar",

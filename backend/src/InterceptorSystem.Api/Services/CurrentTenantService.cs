@@ -6,6 +6,7 @@ namespace InterceptorSystem.Api.Services;
 public class CurrentTenantService : ICurrentTenantService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private Guid? _overrideEmpresaId;
 
     public CurrentTenantService(IHttpContextAccessor httpContextAccessor)
     {
@@ -16,6 +17,10 @@ public class CurrentTenantService : ICurrentTenantService
     {
         get
         {
+            // 0. Override programático (usado pelo bot do WhatsApp, sem JWT)
+            if (_overrideEmpresaId.HasValue)
+                return _overrideEmpresaId;
+
             // 1. Pega do JWT claim "empresaId" (caminho principal em produção)
             var jwtClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("empresaId")?.Value;
             if (Guid.TryParse(jwtClaim, out var tenantIdFromJwt))
@@ -36,5 +41,10 @@ public class CurrentTenantService : ICurrentTenantService
         {
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
+    }
+
+    public void SetEmpresaId(Guid empresaId)
+    {
+        _overrideEmpresaId = empresaId;
     }
 }

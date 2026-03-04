@@ -1,10 +1,10 @@
 # InterceptorSystem
 
-## **Status:** ✅ Backend | ✅ Frontend | ✅ Docker Compose | ✅ CI/CD
+## **Status:** ✅ Backend | ✅ Frontend | ✅ Docker Compose | ✅ CI/CD | ✅ Auth & SaaS | ✅ WhatsApp Bot
 
 ## 📋 Sobre o Projeto
 
-## **InterceptorSystem** é uma plataforma de gestão de segurança patrimonial para condomínios, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **condomínios, funcionários, postos de trabalho, alocações e contratos** com regras de negócio robustas em Clean Architecture.
+**InterceptorSystem** é uma plataforma SaaS de gestão de segurança patrimonial para condomínios, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **condomínios, funcionários, postos de trabalho, alocações e contratos** com regras de negócio robustas em Clean Architecture. Inclui **autenticação JWT**, **gestão de contas e assinaturas** (FREE/BASIC/PRO), **notificações por e-mail** (SMTP) e **integração WhatsApp** para substituição de alocações via chatbot.
 
 ## 🚀 Quick Start
 
@@ -28,6 +28,8 @@ docker compose up -d
 ## 📑 Índice
 
 - [Funcionalidades](#-funcionalidades)
+- [Autenticação & Contas](#-autenticação--contas)
+- [WhatsApp Bot](#-whatsapp-bot)
 - [Regras de Negócio](#-regras-de-negócio-por-entidade)
 - [Arquitetura](#️-arquitetura)
 - [Docker Compose](#-docker-compose)
@@ -51,18 +53,27 @@ docker compose up -d
 - **Auto-finalização de contratos** vencidos ao listar
 - **Multi-tenant** com filtros globais por `EmpresaId`
 - **Quantidade ideal de funcionários por posto** calculada do condomínio
+- **Autenticação JWT** com registro, login, verificação de e-mail e reset de senha
+- **Gestão de contas SaaS** com planos de assinatura (FREE, BASIC, PRO)
+- **Notificações por e-mail** via SMTP (MailKit) — verificação, reset de senha, alteração de e-mail
+- **Integração WhatsApp** via Meta API — chatbot para substituição de alocações
 
 ### Frontend
 
+- **Landing page pública** com informações do sistema
+- **Fluxo de autenticação completo**: login, cadastro, esqueci a senha, nova senha, verificação de e-mail
+- **Gestão de conta**: perfil, alteração de dados, seleção de plano
 - **Dashboard financeiro** com análise por período (mensal, trimestral, semestral, anual)
 - **Wizard de criação de condomínio** em 3 steps com validação progressiva
 - **3 modos de visualização de alocações**: Diário (lista), Semanal (kanban), Mensal (calendário)
 - **Dark mode / Light mode** com toggle no navbar e persistência em localStorage
 - **Cálculos em tempo real** nos formulários de contrato e condomínio
-- **Formulários com máscaras**: CNPJ, CPF, celular
+- **Formulários com máscaras** (ngx-mask): CNPJ, CPF, celular — formatação visual com `dropSpecialCharacters`
 - **Detail de condomínio** com breakdown financeiro completo
-- **Detail de funcionário** com alocações, faltas e cálculo de custo
+- **Detail de funcionário** com alocações, faltas, salário simulado e projeção de mês completo
 - **Detail de posto de trabalho** com alocações e estatísticas
+- **Auth Guard** protegendo rotas autenticadas
+- **Auth Interceptor** injetando token JWT em todas as requisições
 
 ### Infraestrutura
 
@@ -71,6 +82,135 @@ docker compose up -d
 - **npm 11.10.1** atualizado na imagem Docker do frontend
 - **CI/CD GitHub Actions** testando Backend + Frontend + Docker em cada PR
 - **Nginx** como reverse proxy para a API
+
+---
+
+## 🔐 Autenticação & Contas
+
+### Sistema de Autenticação (JWT)
+
+| Endpoint                         | Método | Descrição                                   | Autenticado |
+| -------------------------------- | ------ | ------------------------------------------- | ----------- |
+| `/api/auth/registrar`            | POST   | Registro de nova conta (cria tenant/empresa) | ❌          |
+| `/api/auth/login`                | POST   | Login com e-mail e senha → retorna JWT       | ❌          |
+| `/api/auth/email/confirmar`      | POST   | Confirma verificação de e-mail via token     | ❌          |
+| `/api/auth/email/reenviar`       | POST   | Reenvia e-mail de verificação                | ✅          |
+| `/api/auth/senha/solicitar-reset`| POST   | Solicita link de redefinição de senha        | ❌          |
+| `/api/auth/senha/confirmar-reset`| POST   | Confirma nova senha via token                | ❌          |
+| `/api/auth/email/solicitar-alteracao` | POST | Solicita alteração de e-mail            | ✅          |
+| `/api/auth/email/confirmar-alteracao` | POST | Confirma novo e-mail via token           | ❌          |
+
+### Gestão de Conta (SaaS)
+
+| Endpoint                    | Método | Descrição                                    |
+| --------------------------- | ------ | -------------------------------------------- |
+| `/api/conta`                | GET    | Retorna perfil da conta autenticada          |
+| `/api/conta`                | PUT    | Atualiza nome da empresa, e-mail ou senha    |
+| `/api/conta/telefone`       | POST   | Cadastra telefone e envia código via WhatsApp |
+| `/api/conta/telefone/confirmar` | POST | Confirma telefone com token de verificação   |
+
+### Planos de Assinatura
+
+| Plano   | Descrição                  |
+| ------- | -------------------------- |
+| `FREE`  | Plano gratuito (padrão)    |
+| `BASIC` | Funcionalidades básicas    |
+| `PRO`   | Funcionalidades completas  |
+
+### Entidades de Autenticação
+
+| Entidade           | Descrição                                                              |
+| ------------------ | ---------------------------------------------------------------------- |
+| `Conta`            | Conta SaaS — o "dono" do tenant. O `Id` é o `EmpresaId` de todo o sistema |
+| `TokenVerificacao` | Token temporário para verificação de e-mail, reset de senha e alteração de e-mail |
+
+### Enums de Autenticação
+
+| Enum                   | Valores                                                                   |
+| ---------------------- | ------------------------------------------------------------------------- |
+| `PlanoAssinatura`      | `FREE`, `BASIC`, `PRO`                                                    |
+| `TipoTokenVerificacao` | `EmailVerificacao`, `AlteracaoSenha`, `AlteracaoEmail`, `VerificacaoTelefone` |
+
+### Notificações por E-mail (SMTP)
+
+O sistema envia e-mails transacionais via **MailKit** (SMTP) para:
+
+- ✅ **Verificação de e-mail** ao registrar nova conta
+- ✅ **Redefinição de senha** com link de expiração (1 hora)
+- ✅ **Confirmação de alteração de e-mail** para o novo endereço
+
+Configuração via variáveis de ambiente:
+```env
+SMTP__HOST=smtp.example.com
+SMTP__PORT=587
+SMTP__USERNAME=user@example.com
+SMTP__PASSWORD=senha
+SMTP__FROMADDRESS=noreply@interceptorsystem.com
+SMTP__FROMNAME=Interceptor System
+SMTP__SECURESOCKET=StartTls
+```
+
+### Frontend — Páginas de Autenticação
+
+| Página             | Rota                | Descrição                            |
+| ------------------ | ------------------- | ------------------------------------ |
+| Landing            | `/`                 | Página pública de apresentação       |
+| Login              | `/login`            | Formulário de login                  |
+| Cadastro           | `/cadastro`         | Registro de nova conta               |
+| Esqueci a Senha    | `/esqueci-senha`    | Solicitar reset de senha             |
+| Nova Senha         | `/nova-senha`       | Redefinir senha via token            |
+| Verificar E-mail   | `/verificar-email`  | Confirmar verificação de e-mail      |
+| Perfil             | `/perfil`           | Visualizar/editar dados da conta     |
+| Conta              | `/conta`            | Configurações da conta               |
+| Plano              | `/plano`            | Seleção/alteração de plano           |
+
+---
+
+## 📱 WhatsApp Bot
+
+### Integração com Meta (WhatsApp Business API)
+
+O sistema possui um **chatbot WhatsApp** integrado via **Meta Webhook** para processar substituições de alocações de segurança de forma conversacional.
+
+| Endpoint              | Método | Descrição                                    |
+| --------------------- | ------ | -------------------------------------------- |
+| `/api/whatsapp/webhook` | GET  | Verificação de webhook exigida pela Meta     |
+| `/api/whatsapp/webhook` | POST | Recebe mensagens — processamento em background |
+
+### Fluxo Conversacional (Estado da Sessão)
+
+O bot guia o usuário por um fluxo de substituição de alocação:
+
+```
+AguardandoCondominio → AguardandoPosto → AguardandoData
+→ AguardandoFuncionarioSubstituido → AguardandoFuncionarioSubstituto
+→ AguardandoConfirmacao → Concluida / Cancelada
+```
+
+- Atalhos globais: `0`, `cancelar`, `sair` → cancela a sessão
+- Telefones não autorizados recebem mensagem de bloqueio
+
+### Ranking de Substitutos (`SubstitutoRankerService`)
+
+- Funcionário deve estar `ATIVO` e sem alocação no dia
+- Score = quantidade de alocações nos últimos 30 dias (menos = mais disponível)
+- Indicador de disponibilidade: Alta / Média / Baixa
+
+### Entidade `SessaoWhatsapp`
+
+- Persiste o estado da conversa por número de telefone
+- Vinculada à `Conta` (tenant) pelo telefone verificado
+- Cache de opções numeradas (`OpcoesCacheJson`) para mapear respostas
+- Expiração automática após 15 minutos de inatividade
+- **Background cleanup service** remove sessões expiradas a cada 5 minutos
+
+### Configuração
+
+```env
+META__WEBHOOKVERIFYTOKEN=seu-token-de-verificacao
+META__ACCESSTOKEN=seu-access-token-meta
+META__PHONENUMBERID=seu-phone-number-id
+```
 
 ---
 
@@ -96,6 +236,8 @@ docker compose up -d
 | ------------------------- | ------------------------------------------------------------------------------- |
 | Turno de 12h              | Diferença entre `HorarioInicio` e `HorarioFim` deve ser exatamente 12 horas     |
 | Vinculado ao condomínio   | `CondominioId` obrigatório e deve pertencer à mesma empresa                     |
+| Vinculado ao contrato     | `ContratoId` obrigatório — contrato deve estar `ATIVO` ou `PENDENTE`            |
+| Limite de postos          | Não pode exceder `Contrato.NumeroDePostos` postos por contrato                  |
 | Permite dobra de escala   | `PermiteDobrarEscala` define se funcionários podem fazer dobra                  |
 | Horário noturno detectado | `TemHorarioNoturno` (calculado) — `true` se o turno passa pelo intervalo 22h–5h |
 
@@ -176,11 +318,12 @@ valorTotal   = custoBase / (1 - somaMargens)
 ### Criação em Cascata (`POST /api/condominios-completos`)
 
 Cria Condomínio + Contrato + Postos em **1 único request**.
-| Regra | Descrição |
-|-------|-----------|
-| Consistência | `QuantidadeIdealPorTurno` == `QuantidadeFuncionarios` do contrato |
-| Divisibilidade | Quantidade de funcionários divisível pelo número de postos |
-| Horários automáticos | `24h / NumeroDePostos` por turno |
+
+| Regra            | Descrição                                                       |
+| ---------------- | --------------------------------------------------------------- |
+| Consistência     | `QuantidadeIdealPorTurno` == `QuantidadeFuncionarios` do contrato |
+| Divisibilidade   | Quantidade de funcionários divisível pelo número de postos      |
+| Horários automáticos | `24h / NumeroDePostos` por turno                            |
 
 ```json
 POST /api/condominios-completos
@@ -222,34 +365,50 @@ POST /api/condominios-completos
 ```
 InterceptorSystem.Domain/         → Entidades, Enums, Interfaces de Repositório
 InterceptorSystem.Application/    → DTOs, AppServices, Interfaces de Serviço
-InterceptorSystem.Infrastructure/ → DbContext, Configurations, Repositórios
+InterceptorSystem.Infrastructure/ → DbContext, Configurations, Repositórios, Email, WhatsApp
 InterceptorSystem.Api/            → Controllers, Program, Middlewares
 InterceptorSystem.Tests/          → Unity + Integration tests
 ```
 
-**Enums:**
-| Enum | Valores |
-|------|---------|
-| `StatusContrato` | `ATIVO`, `PENDENTE`, `FINALIZADO` |
-| `StatusFuncionario` | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO` |
-| `TipoEscala` | `DOZE_POR_TRINTA_SEIS`, `SEIS_POR_UM` |
-| `TipoFuncionario` | `CLT`, `TERCEIRIZADO`, `FREELANCE` |
-| `StatusAlocacao` | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA` |
-| `TipoAlocacao` | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO` |
+### Módulos de Domínio
+
+| Módulo            | Descrição                                                    |
+| ----------------- | ------------------------------------------------------------ |
+| `Administrativo`  | Condomínio, Funcionário, PostoDeTrabalho, Alocação, Contrato |
+| `Auth`            | Conta (SaaS), TokenVerificacao, PlanoAssinatura              |
+| `Whatsapp`        | SessaoWhatsapp, EstadoConversa                               |
+
+### Enums
+
+| Enum                  | Valores                                                                   |
+| --------------------- | ------------------------------------------------------------------------- |
+| `StatusContrato`      | `ATIVO`, `PENDENTE`, `FINALIZADO`                                         |
+| `StatusFuncionario`   | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO`                                |
+| `TipoEscala`          | `DOZE_POR_TRINTA_SEIS`, `SEIS_POR_UM`                                    |
+| `TipoFuncionario`     | `CLT`, `TERCEIRIZADO`, `FREELANCE`                                        |
+| `StatusAlocacao`      | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                             |
+| `TipoAlocacao`        | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                             |
+| `PlanoAssinatura`     | `FREE`, `BASIC`, `PRO`                                                    |
+| `TipoTokenVerificacao`| `EmailVerificacao`, `AlteracaoSenha`, `AlteracaoEmail`, `VerificacaoTelefone` |
+| `EstadoConversa`      | `AguardandoCondominio`, `AguardandoPosto`, `AguardandoData`, `AguardandoFuncionarioSubstituido`, `AguardandoFuncionarioSubstituto`, `AguardandoConfirmacao`, `Concluida`, `Cancelada` |
 
 ### Frontend (Angular 21 Standalone)
 
 ```
+core/
+  guards/            → auth.guard.ts
+  interceptors/      → auth.interceptor.ts
 features/
-  condominios/    → list/, form/, detail/, condominio-wizard/
-  funcionarios/   → list/, form/, detail/
-  contratos/      → list/, form/
-  postos/         → list/, form/, detail/
-  alocacoes/      → list/, form/, detail/
-services/         → comunicação com API
-models/           → interfaces TypeScript (alinhados com DTOs)
-shared/           → navbar, sidebar, layout
-pages/            → dashboard
+  condominios/       → list/, form/, detail/, condominio-wizard/
+  funcionarios/      → list/, form/, detail/
+  contratos/         → list/, form/
+  postos/            → list/, form/, detail/
+  alocacoes/         → list/, form/, detail/
+services/            → comunicação com API (auth, condominios, contratos, etc.)
+models/              → interfaces TypeScript (alinhados com DTOs)
+shared/              → navbar, sidebar, layout
+pages/               → landing, login, cadastro, esqueci-senha, nova-senha,
+                       verificar-email, dashboard, perfil, conta, plano
 ```
 
 ---
@@ -289,6 +448,14 @@ POSTGRES_PASSWORD=Interceptor@2024
 POSTGRES_DB=interceptordb
 ASPNETCORE_ENVIRONMENT=Development
 ConnectionStrings__DefaultConnection=Host=db;Database=interceptordb;Username=interceptor;Password=Interceptor@2024
+JWT__SECRET=sua-chave-secreta-jwt-256-bits
+SMTP__HOST=smtp.example.com
+SMTP__PORT=587
+SMTP__USERNAME=user@example.com
+SMTP__PASSWORD=senha
+META__WEBHOOKVERIFYTOKEN=seu-token
+META__ACCESSTOKEN=seu-access-token
+META__PHONENUMBERID=seu-phone-id
 ```
 
 ### Hot-Reload
@@ -301,11 +468,13 @@ ConnectionStrings__DefaultConnection=Host=db;Database=interceptordb;Username=int
 ## 🔄 CI/CD
 
 Pipeline GitHub Actions executado em todo PR para `main`:
-| Job | O que testa |
-|-----|-------------|
+
+| Job         | O que testa                                                      |
+| ----------- | ---------------------------------------------------------------- |
 | **Backend** | Restore → Build → 167 testes (unit + integration) com PostgreSQL |
-| **Frontend** | `npm ci` → Build produção (`--configuration=production`) |
-| **Docker** | `docker compose build` valida Dockerfiles |
+| **Frontend**| `npm ci` → Build produção (`--configuration=production`)         |
+| **Docker**  | `docker compose build` valida Dockerfiles                        |
+
 Arquivo: `.github/workflows/ci.yml`
 
 ---
@@ -321,6 +490,8 @@ Arquivo: `.github/workflows/ci.yml`
 | PostgreSQL            | 15     |
 | xUnit + Moq           | 2.6+   |
 | Swashbuckle (Swagger) | 6.x    |
+| MailKit (SMTP)        | 4.x    |
+| JWT Bearer Auth       | 8.x    |
 
 ### Frontend
 
@@ -334,11 +505,12 @@ Arquivo: `.github/workflows/ci.yml`
 
 ### Infraestrutura
 
-| Ferramenta         | Uso           |
-| ------------------ | ------------- |
-| Docker Compose 2.x | Orquestração  |
-| Nginx Alpine       | Reverse proxy |
-| GitHub Actions     | CI/CD         |
+| Ferramenta         | Uso                         |
+| ------------------ | --------------------------- |
+| Docker Compose 2.x | Orquestração                |
+| Nginx Alpine       | Reverse proxy               |
+| GitHub Actions     | CI/CD                       |
+| Meta WhatsApp API  | Chatbot de substituições    |
 
 ---
 
@@ -395,32 +567,64 @@ InterceptorSystem/
 ├── backend/
 │   └── src/
 │       ├── InterceptorSystem.Api/
+│       │   └── Controllers/
+│       │       ├── AuthController.cs
+│       │       ├── ContaController.cs
+│       │       ├── WhatsappWebhookController.cs
+│       │       ├── CondominioController.cs
+│       │       ├── CondominiosCompletosController.cs
+│       │       ├── ContratosController.cs
+│       │       ├── ContratoCalculosController.cs
+│       │       ├── FuncionariosController.cs
+│       │       ├── PostosDeTrabalhoController.cs
+│       │       └── AlocacoesController.cs
 │       ├── InterceptorSystem.Application/
+│       │   └── Modulos/
+│       │       ├── Administrativo/    → Services, DTOs, Interfaces
+│       │       ├── Auth/              → AuthAppService, AuthDto
+│       │       └── Whatsapp/          → WhatsappBotService, DTOs
 │       ├── InterceptorSystem.Domain/
+│       │   └── Modulos/
+│       │       ├── Administrativo/    → Entities, Enums, Interfaces
+│       │       ├── Auth/              → Conta, TokenVerificacao, PlanoAssinatura
+│       │       └── Whatsapp/          → SessaoWhatsapp, EstadoConversa
 │       ├── InterceptorSystem.Infrastructure/
+│       │   ├── Auth/                  → JwtTokenService
+│       │   ├── Email/                 → SmtpEmailService
+│       │   ├── Whatsapp/              → MetaWhatsappMessageSender
+│       │   └── Persistence/           → DbContext, Configurations, Repositories
 │       ├── InterceptorSystem.Tests/
+│       │   ├── Unity/                 → Testes unitários
+│       │   └── Integration/           → Testes de integração (incl. Auth/)
 │       ├── compose.yml
 │       ├── compose.override.yml
 │       └── nginx.conf
 │
 ├── frontend/
 │   ├── src/app/
-│   │   ├── features/
-│   │   ├── services/
-│   │   ├── models/
-│   │   ├── shared/
-│   │   └── pages/
+│   │   ├── core/
+│   │   │   ├── guards/               → auth.guard.ts
+│   │   │   └── interceptors/         → auth.interceptor.ts
+│   │   ├── features/                 → condominios, funcionarios, contratos,
+│   │   │                               postos, alocacoes
+│   │   ├── services/                 → auth.service.ts + outros
+│   │   ├── models/                   → interfaces TypeScript
+│   │   ├── shared/                   → navbar, sidebar, layout
+│   │   └── pages/                    → landing, login, cadastro, esqueci-senha,
+│   │                                   nova-senha, verificar-email, dashboard,
+│   │                                   perfil, conta, plano
 │   ├── Dockerfile
 │   ├── angular.json
 │   └── package.json
 │
 ├── docs/
-│   ├── backend/
-│   ├── frontend/
-│   └── refatoracao/
+│   ├── INDEX.md
+│   └── guias/
+│       └── QUICK_START.md
 │
 ├── .env.example
 ├── .github/workflows/ci.yml
+├── CHANGELOG.md
 └── README.md
 ```
 
@@ -448,19 +652,118 @@ dotnet test --filter "Category=Integration"
 | Cálculos Contrato | ✅               | ✅                   |
 | Alocações Batch   | ✅               | ✅                   |
 | Criação Cascata   | ✅               | ✅                   |
+| Autenticação      | ✅               | ✅                   |
 
-## **Total: 167 testes automatizados**
+## **Total: 167+ testes automatizados**
+
+---
+
+## 🎯 Endpoints da API
+
+### Autenticação & Conta
+
+```http
+POST   /api/auth/registrar
+POST   /api/auth/login
+POST   /api/auth/email/confirmar
+POST   /api/auth/email/reenviar
+POST   /api/auth/senha/solicitar-reset
+POST   /api/auth/senha/confirmar-reset
+POST   /api/auth/email/solicitar-alteracao
+POST   /api/auth/email/confirmar-alteracao
+GET    /api/conta
+PUT    /api/conta
+POST   /api/conta/telefone
+POST   /api/conta/telefone/confirmar
+```
+
+### WhatsApp Webhook
+
+```http
+GET    /api/whatsapp/webhook       (verificação Meta)
+POST   /api/whatsapp/webhook       (recebe mensagens)
+```
+
+### Criação em Cascata
+
+```http
+POST   /api/condominios-completos
+POST   /api/condominios-completos/validar
+```
+
+### CRUD Principal
+
+```http
+GET/POST/PUT/DELETE  /api/condominios
+GET/POST/PUT/DELETE  /api/contratos
+GET/POST/PUT/DELETE  /api/funcionarios
+GET/POST/PUT/DELETE  /api/postos-de-trabalho
+GET/POST/PUT/DELETE  /api/alocacoes
+```
+
+### Cálculos
+
+```http
+POST   /api/contrato-calculos/calcular-valor-total
+```
+
+---
 
 ## ⏭️ Próximos Passos
 
-- [ ] Sistema de login e autenticação
-- [ ] Gerenciamento de assinaturas e contas
-- [ ] Notificações por email/SMS (contratos vencendo, faltas)
-- [ ] Relatórios em PDF (escalas, folha de pagamento)
+### 🔧 Dívida Técnica / Refatoração
+
+- [ ] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (Domain, DTOs, Tests, Frontend, Migration — 71+ arquivos)
+- [ ] Configuração `IOptions<T>` com validação estrita via Data Annotations para todos os settings (SMTP, Meta, JWT já feito)
+- [ ] Ajustar BCrypt work factor para 12 (explícito, ao invés do default 11)
+- [ ] Value Objects (Email, Telefone, Dinheiro, Cnpj)
+- [ ] Domain Events para notificações automáticas
+- [ ] CQRS para relatórios financeiros
+
+### 🧪 Qualidade
+
 - [ ] Testes E2E com Playwright
 - [ ] Observabilidade (logs estruturados + métricas)
-- [ ] Subir na nuvem (AWS / GCP)
-- [ ] Acesso via WhatsApp (integração)
+
+### ☁️ Infraestrutura / DevOps
+
+- [ ] Subir na nuvem (AWS Free Tier — t3.micro)
+- [ ] Cache com Redis
+- [ ] Rate limiting (login, API pública)
+- [ ] Migração futura BCrypt → Argon2id (quando instância ≥ 4 GiB RAM)
+
+### 💰 Módulo Financeiro
+
+- [ ] Geração de folha de pagamento baseada em escalas reais
+- [ ] Relatórios em PDF (escalas, folha de pagamento)
+- [ ] Geração de PDFs dinâmicos e boletos bancários
+- [ ] Integração com gateway de pagamento
+
+### 🤖 AI & RAG
+
+- [ ] Sistema RAG para WhatsApp (atendimento premium)
+- [ ] Agente de suporte ao cliente via LLM + RAG
+- [ ] AI Profiler: eficiência operacional, ausências, alocações dupla vs normal
+
+### 🔑 Controle de Acesso & Ponto
+
+- [ ] Reconhecimento facial para entrada no condomínio
+- [ ] Reconhecimento facial para batida de ponto (clock-in)
+- [ ] Analytics: ponto planejado vs realizado
+- [ ] Avaliação de funcionários por pontualidade e assiduidade
+
+### 🏢 Ecossistema Admin
+
+- [ ] Super-Admin Dashboard (gráficos de uso, receita total, "Valor Economizado")
+- [ ] Gestão de amenidades (salão de festas, áreas comuns)
+
+### 💼 UX & Business Logic
+
+- [ ] Contratos: redesign com datas em formato natural para não-programadores
+- [ ] Exibição de valores mensais ao invés de total anual nos contratos
+- [ ] Cálculo de 13º salário conforme operação
+- [ ] Preview de salário base por tipo de escala (12x36, 5x2)
+- [ ] Configuração específica para terceirizados multi-condomínio
 
 ---
 
@@ -469,4 +772,5 @@ dotnet test --filter "Category=Integration"
 - Abra issues detalhando Situação, Tarefa, Ação, Resultado esperados
 - Pull Requests devem incluir testes e seguir o padrão de validação existente
 - Dúvidas sobre regras de negócio? Consulte os módulos de domínio primeiro
-  **Licença:** MIT
+
+**Licença:** MIT

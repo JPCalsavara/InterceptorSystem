@@ -1,10 +1,14 @@
 using InterceptorSystem.Application.Common.Interfaces;
+using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
+using InterceptorSystem.Domain.Modulos.Whatsapp.Interfaces;
 using InterceptorSystem.Infrastructure.Auth;
 using InterceptorSystem.Infrastructure.Email;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
+using InterceptorSystem.Infrastructure.Whatsapp;
+using InterceptorSystem.Infrastructure.Whatsapp.BackgroundServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +39,12 @@ public static class DependencyInjection
 
         // 4. Email Service
         services.AddScoped<IEmailService, SmtpEmailService>();
+
+        // 5. WhatsApp Bot
+        services.AddScoped<ISessaoWhatsappRepository, SessaoWhatsappRepository>();
+        services.AddScoped<IWhatsappMessageSender, MetaWhatsappMessageSender>();
+        services.AddHttpClient<MetaWhatsappMessageSender>();
+        services.AddHostedService<SessaoExpiradaCleanupService>();
 
         return services;
     }

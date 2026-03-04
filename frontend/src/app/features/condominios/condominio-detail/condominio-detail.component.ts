@@ -19,7 +19,7 @@ import {
   TipoAlocacao,
 } from '../../../models/index';
 import { forkJoin } from 'rxjs';
-import { AlocacoesViewComponent } from '../../../shared/components/alocacoes-view/alocacoes-view.component';
+import { AlocacaoListComponent } from '../../alocacoes/alocacao-list/alocacao-list.component';
 
 type PeriodoAnalise = 'mensal' | 'trimestral' | 'semestral' | 'anual';
 
@@ -34,7 +34,7 @@ interface MetricaPeriodo {
 @Component({
   selector: 'app-condominio-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, AlocacoesViewComponent],
+  imports: [CommonModule, RouterLink, FormsModule, AlocacaoListComponent],
   templateUrl: './condominio-detail.component.html',
   styleUrl: './condominio-detail.component.scss',
 })
@@ -152,9 +152,7 @@ export class CondominioDetailComponent implements OnInit {
     const total = this.alocacoesPeriodo().length;
     if (total === 0) return 0;
     const faltas = this.alocacoesPeriodo().filter(
-      (a) =>
-        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
-        a.statusAlocacao === StatusAlocacao.CANCELADA,
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
     return (faltas / total) * 100;
   });
@@ -437,6 +435,95 @@ export class CondominioDetailComponent implements OnInit {
     }
   }
 
+  // Computed map: funcionarioId → salário real do mês atual
+  // Usa computed() para garantir reatividade correta quando contratos/alocações/postos carregam
+  salariosPorFuncionario = computed(() => {
+    const map = new Map<string, number>();
+    const contratos = this.contratos();
+    const alocacoes = this.alocacoes();
+    const postos = this.postos();
+
+    if (contratos.length === 0) return map; // aguarda contratos
+
+    const agora = new Date();
+    const mesAtual = agora.getMonth();
+    const anoAtual = agora.getFullYear();
+
+    for (const func of this.funcionarios()) {
+      const contrato = contratos.find((c) => c.id === func.contratoId);
+      if (!contrato) {
+        map.set(func.id, func.salarioTotal || 0);
+        continue;
+      }
+
+      const alocacoesConfirmadas = alocacoes.filter((a) => {
+        if (a.funcionarioId !== func.id) return false;
+        if (a.statusAlocacao !== StatusAlocacao.CONFIRMADA) return false;
+        const d = new Date(a.data + 'T12:00:00');
+        return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+      });
+
+      let totalAlocacoes = 0;
+      for (const aloc of alocacoesConfirmadas) {
+        let valor = contrato.valorDiariaCobrada || 0;
+        const diaSemana = new Date(aloc.data + 'T12:00:00').getDay();
+        if (diaSemana === 0) valor *= 2.0;
+        else if (diaSemana === 6) valor *= 1.5;
+
+        const posto = postos.find((p) => p.id === aloc.postoDeTrabalhoId);
+        if (posto) {
+          const proporcaoNoturna = this.calcularProporcaoNoturna(posto);
+          if (proporcaoNoturna > 0) {
+            valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
+          }
+        }
+        totalAlocacoes += valor;
+      }
+
+      const total = totalAlocacoes + (contrato.valorBeneficiosExtrasMensal || 0);
+      console.log(`[salarios] ${func.nome}: ${alocacoesConfirmadas.length} alocs confirmadas → R$${total.toFixed(2)}`);
+      map.set(func.id, total);
+    }
+
+    console.log(`[salarios] contratos:${contratos.length} alocacoes:${alocacoes.length} postos:${postos.length}`);
+    return map;
+  });
+
+  // Proporção de horas noturnas do turno (CLT Art. 73: 22h–05h) — 0.0 a 1.0
+  private calcularProporcaoNoturna(posto: PostoDeTrabalho): number {
+    const inicio = parseInt(posto.horarioInicio.substring(0, 2), 10);
+    const fim = parseInt(posto.horarioFim.substring(0, 2), 10);
+    const duracao = inicio > fim ? 24 - inicio + fim : fim - inicio;
+    if (duracao === 0) return 0;
+    let horasNoturnas = 0;
+    for (let i = 0; i < duracao; i++) {
+      const hora = (inicio + i) % 24;
+      if (hora >= 22 || hora < 5) horasNoturnas++;
+    }
+    return horasNoturnas / duracao;
+  }
+
+  // Custo noturno adicional do período (embutido no custoPeriodo, exposto para exibição)
+  custoNoturnoPeriodo = computed(() => {
+    const contrato = this.contratoAtual();
+    if (!contrato || !contrato.percentualAdicionalNoturno) return 0;
+
+    const alocacoesConf = this.alocacoesPeriodo().filter(
+      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+    );
+
+    let totalAdicional = 0;
+    for (const aloc of alocacoesConf) {
+      const baseValor = contrato.valorDiariaCobrada || 0;
+      const posto = this.postos().find((p) => p.id === aloc.postoDeTrabalhoId);
+      if (posto) {
+        const proporcao = this.calcularProporcaoNoturna(posto);
+        totalAdicional += baseValor * proporcao * (contrato.percentualAdicionalNoturno || 0);
+      }
+    }
+    return totalAdicional;
+  });
+
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -507,9 +594,12 @@ export class CondominioDetailComponent implements OnInit {
 
   alocacoesFaltas = computed(() => {
     return this.alocacoesPeriodo().filter(
-      (a) =>
-        a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA ||
-        a.statusAlocacao === StatusAlocacao.CANCELADA,
+      (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
     ).length;
+  });
+
+  alocacoesCancelamentos = computed(() => {
+    return this.alocacoesPeriodo().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA)
+      .length;
   });
 }

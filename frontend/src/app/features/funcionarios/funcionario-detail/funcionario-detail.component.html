@@ -185,14 +185,124 @@
 
     <!-- Histórico de Alocações -->
     <section class="alocacoes-section">
-      <h2 class="section-title">📋 Histórico de Alocações</h2>
+      <div class="section-header-with-nav">
+        <h2 class="section-title">📋 Histórico de Alocações</h2>
+        <div class="month-nav">
+          <button class="btn-nav" (click)="previousMonth()" title="Mês anterior">←</button>
+          <span class="month-label">{{ getSelectedMonthLabel() }}</span>
+          <button class="btn-nav" (click)="nextMonth()" title="Próximo mês">→</button>
+          <button class="btn-today" (click)="currentMonth()">Hoje</button>
+        </div>
+      </div>
 
-      <app-alocacoes-view
-        [alocacoes]="alocacoes()"
-        [funcionarios]="funcionario() ? [funcionario()!] : []"
-        [postos]="postos()"
-        [condominios]="condominio() ? [condominio()!] : []"
-      />
+      <!-- Breakdown Noturno do Mês -->
+      @if (nocturnoBreakdown()) {
+        <div class="noturno-breakdown-card">
+          <div class="noturno-header">
+            <span class="noturno-title">🌙 Breakdown Noturno — {{ getSelectedMonthLabel() }}</span>
+            <span class="noturno-badge">CLT Art. 73</span>
+          </div>
+          <div class="noturno-stats">
+            <div class="noturno-stat diurno">
+              <span class="noturno-stat-count">{{ nocturnoBreakdown()!.countDiurnas }}</span>
+              <span class="noturno-stat-label">Diurnas</span>
+            </div>
+            <div class="noturno-stat noturno">
+              <span class="noturno-stat-count">{{ nocturnoBreakdown()!.countNoturnas }}</span>
+              <span class="noturno-stat-label">c/ Noturno</span>
+            </div>
+          </div>
+          <div class="noturno-rows">
+            <div class="noturno-row">
+              <span class="noturno-row-label">Base (sem adicional)</span>
+              <span class="noturno-row-value">{{
+                formatCurrency(nocturnoBreakdown()!.totalBase)
+              }}</span>
+            </div>
+            <div class="noturno-row highlight">
+              <span class="noturno-row-label">
+                🌙 Adicional Noturno
+                <span class="noturno-formula"
+                  >{{ nocturnoBreakdown()!.percentualNoturno | number: '1.0-1' }}%
+                  proporcional</span
+                >
+              </span>
+              <span class="noturno-row-value positive"
+                >+ {{ formatCurrency(nocturnoBreakdown()!.totalAdicional) }}</span
+              >
+            </div>
+            <div class="noturno-row total">
+              <span class="noturno-row-label">Total com Adicional</span>
+              <span class="noturno-row-value total">{{
+                formatCurrency(nocturnoBreakdown()!.totalComAdicional)
+              }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (alocacoesFiltradas().length === 0) {
+        <div class="empty-state">
+          <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M3 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm7 8a1 1 0 000 2h3a1 1 0 000-2h-3z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <p>Nenhuma alocação encontrada em {{ getSelectedMonthLabel() }}</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="alocacoes-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Posto de Trabalho</th>
+                <th>Status</th>
+                <th>Tipo</th>
+                <th class="col-valor">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (alocacao of alocacoesFiltradas(); track alocacao.id) {
+                <tr
+                  [class.row-falta]="alocacao.statusAlocacao === 'FALTA_REGISTRADA'"
+                  [class.row-cancelada]="alocacao.statusAlocacao === 'CANCELADA'"
+                >
+                  <td>{{ formatDate(alocacao.data) }}</td>
+                  <td>{{ getPostoNome(alocacao.postoDeTrabalhoId) }}</td>
+                  <td>
+                    <span [class]="'badge ' + getStatusBadgeClass(alocacao.statusAlocacao)">
+                      {{ getStatusLabel(alocacao.statusAlocacao) }}
+                    </span>
+                  </td>
+                  <td>{{ getTipoLabel(alocacao.tipoAlocacao) }}</td>
+                  <td class="col-valor">
+                    @if (alocacao.statusAlocacao === 'CONFIRMADA') {
+                      <span class="valor-positivo">{{
+                        formatCurrency(calcularValorAlocacao(alocacao))
+                      }}</span>
+                    } @else {
+                      <span class="valor-zero">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+            @if (contrato()) {
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="4"><strong>Total do Mês (Confirmadas)</strong></td>
+                  <td class="col-valor">
+                    <strong class="valor-total">{{ formatCurrency(totalGanhoMes()) }}</strong>
+                  </td>
+                </tr>
+              </tfoot>
+            }
+          </table>
+        </div>
+      }
     </section>
 
     <!-- Detalhes de Faltas -->

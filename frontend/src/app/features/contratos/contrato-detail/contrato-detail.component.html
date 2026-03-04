@@ -29,8 +29,8 @@
     </div>
 
     <div class="cards-grid">
-      <!-- Informações Gerais -->
-      <div class="card">
+      <!-- COL 1, ROW 1: Informações Gerais -->
+      <div class="card card-col1-row1">
         <h2 class="card-title">Informações Gerais</h2>
         <div class="info-list">
           <div class="info-item">
@@ -56,90 +56,239 @@
         </div>
       </div>
 
-      <!-- Breakdown Financeiro -->
-      <div class="card">
-        <h2 class="card-title">Breakdown Financeiro Mensal</h2>
-        <div class="financial-list">
-          <div class="financial-row primary">
-            <span>Valor Total do Contrato</span>
-            <span class="value">{{ contrato()!.valorTotalMensal | currency: 'BRL' }}</span>
+      <!-- COL 2, ROWS 1-2: Indicadores com % e valor em BRL -->
+      <div class="card card-col2-rows12">
+        <h2 class="card-title">📊 Indicadores do Contrato</h2>
+        <div class="indicadores-list">
+          <div class="indicador-item">
+            <div class="indicador-label">Encargos e Provisões</div>
+            <div class="indicador-pct">
+              {{ contrato()!.percentualImpostos * 100 | number: '1.0-2' }}%
+            </div>
+            <div class="indicador-valor">= {{ impostosMensal() | currency: 'BRL' }}</div>
           </div>
-          <div class="financial-row">
-            <span>Impostos ({{ contrato()!.percentualImpostos }}%)</span>
-            <span class="value deduction">- {{ impostosMensal() | currency: 'BRL' }}</span>
+
+          <div class="indicador-item">
+            <div class="indicador-label">Margem de Lucro</div>
+            <div class="indicador-pct">
+              {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%
+            </div>
+            <div class="indicador-valor">
+              =
+              {{
+                contrato()!.valorTotalMensal * contrato()!.margemLucroPercentual | currency: 'BRL'
+              }}
+            </div>
           </div>
-          <div class="financial-row">
-            <span>Benefícios / Extras</span>
-            <span class="value deduction"
-              >- {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
-            >
+
+          <div class="indicador-item">
+            <div class="indicador-label">Margem Cobertura Faltas</div>
+            <div class="indicador-pct">
+              {{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%
+            </div>
+            <div class="indicador-valor">
+              =
+              {{
+                contrato()!.valorTotalMensal * contrato()!.margemCoberturaFaltasPercentual
+                  | currency: 'BRL'
+              }}
+            </div>
           </div>
-          <div class="financial-divider"></div>
-          <div class="financial-row total">
-            <span>Lucro Estimado</span>
-            <span [class]="'value ' + (lucro() >= 0 ? 'positive' : 'negative')">
-              {{ lucro() | currency: 'BRL' }}
-            </span>
+
+          <div class="indicador-item">
+            <div class="indicador-label">Adicional Noturno</div>
+            <div class="indicador-pct">
+              {{ contrato()!.percentualAdicionalNoturno * 100 | number: '1.0-2' }}%
+            </div>
+            <div class="indicador-valor">
+              =
+              {{
+                contrato()!.valorDiariaCobrada * contrato()!.percentualAdicionalNoturno
+                  | currency: 'BRL'
+              }}/diária
+            </div>
           </div>
-          <div class="financial-row sub">
-            <span>Margem de Lucro</span>
-            <span class="value">{{ contrato()!.margemLucroPercentual }}%</span>
+
+          <div class="indicador-item indicador-highlight">
+            <div class="indicador-label">Diária Cobrada</div>
+            <div class="indicador-pct">{{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</div>
+            <div class="indicador-valor">por turno / funcionário</div>
           </div>
-          <div class="financial-row sub">
-            <span>Margem Cobertura Faltas</span>
-            <span class="value">{{ contrato()!.margemCoberturaFaltasPercentual }}%</span>
-          </div>
-          <div class="financial-row sub">
-            <span>Adicional Noturno</span>
-            <span class="value">{{ contrato()!.percentualAdicionalNoturno }}%</span>
-          </div>
-          <div class="financial-row sub">
-            <span>Diária Cobrada</span>
-            <span class="value">{{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</span>
+
+          <div class="indicador-item indicador-highlight">
+            <div class="indicador-label">Benefícios / Func.</div>
+            <div class="indicador-pct">
+              {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}
+            </div>
+            <div class="indicador-valor">por funcionário / mês</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Postos de Trabalho -->
-    <div class="card postos-card">
-      <h2 class="card-title">Postos de Trabalho ({{ postos().length }})</h2>
-      @if (postos().length === 0) {
-        <p class="empty-state">Nenhum posto de trabalho vinculado ainda.</p>
-      } @else {
-        <div class="table-wrapper">
-          <table class="postos-table">
-            <thead>
-              <tr>
-                <th>Horário</th>
-                <th>Capacidade Ideal</th>
-                <th>Permite Dobra</th>
-                <th>Cap. Máx. Dobras</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (posto of postos(); track posto.id) {
-                <tr>
-                  <td class="horario">
-                    {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
-                  </td>
-                  <td>{{ posto.quantidadeIdealFuncionarios }}</td>
-                  <td>
-                    <span [class]="'badge ' + (posto.permiteDobrarEscala ? 'success' : 'inactive')">
-                      {{ posto.permiteDobrarEscala ? 'Sim' : 'Não' }}
-                    </span>
-                  </td>
-                  <td>{{ posto.capacidadeMaximaPorDobras }}</td>
-                  <td>
-                    <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+      <!-- COL 3, ROWS 1-2: Breakdown Financeiro (valores absolutos) -->
+      <div class="card card-col3-rows12">
+        <h2 class="card-title">💰 Breakdown Financeiro Mensal</h2>
+
+        <!-- FATURAMENTO -->
+        <div class="bk-group">
+          <div class="bk-group-header bk-receita">
+            <span class="bk-group-label">📈 Faturamento</span>
+            <span class="bk-group-total">{{ contrato()!.valorTotalMensal | currency: 'BRL' }}</span>
+          </div>
         </div>
-      }
+
+        <!-- CUSTO -->
+        <div class="bk-group">
+          <div class="bk-group-header bk-custo">
+            <span class="bk-group-label">📉 Custo</span>
+            <span class="bk-group-total">- {{ custoTotal() | currency: 'BRL' }}</span>
+          </div>
+          <div class="bk-items">
+            <div class="bk-item">
+              <span class="bk-item-label"
+                >Encargos e Provisões
+                <span class="bk-formula">~65% ref. Trabalhista</span>
+              </span>
+              <span class="bk-item-value deduction"
+                >- {{ impostosMensal() | currency: 'BRL' }}</span
+              >
+            </div>
+
+            <div class="bk-item">
+              <span class="bk-item-label">
+                Benefícios / Extras
+                @if (custoFuncionariosDetalhado().length > 0) {
+                  <span class="bk-formula"
+                    >{{ custoFuncionariosDetalhado().length }} func. ×
+                    {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+                  >
+                } @else {
+                  <span class="bk-formula"
+                    >{{ contrato()!.quantidadeFuncionarios }} × 2 ×
+                    {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+                  >
+                }
+              </span>
+              <span class="bk-item-value deduction"
+                >- {{ beneficiosTotais() | currency: 'BRL' }}</span
+              >
+            </div>
+
+            @if (totalCustoFuncionarios() > 0) {
+              <div class="bk-item">
+                <span class="bk-item-label">Custo Base (Salários)</span>
+                <span class="bk-item-value deduction"
+                  >- {{ totalCustoFuncionarios() | currency: 'BRL' }}</span
+                >
+              </div>
+              @for (item of custoFuncionariosDetalhado(); track item.funcionario.id) {
+                <div class="bk-sub-item">
+                  <span class="bk-sub-label">
+                    {{ item.funcionario.nome }}
+                    <span class="func-escala-badge">{{ item.escala }}</span>
+                  </span>
+                  <span class="bk-sub-value">{{ item.custo | currency: 'BRL' }}</span>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- LUCRO ESTIMADO -->
+        <div class="bk-group">
+          <div class="bk-group-header bk-lucro" [class.bk-prejuizo]="lucro() < 0">
+            <span class="bk-group-label">{{ lucro() >= 0 ? '📊' : '⚠️' }} Lucro Estimado</span>
+            <span class="bk-group-total">{{ lucro() | currency: 'BRL' }}</span>
+          </div>
+          <div class="bk-items">
+            <div class="bk-item">
+              <span class="bk-item-label"
+                >Margem de Lucro
+                <span class="bk-formula"
+                  >{{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%</span
+                >
+              </span>
+              <span class="bk-item-value positive">{{ margemLucroValor() | currency: 'BRL' }}</span>
+            </div>
+
+            <div class="bk-item bk-item-summary">
+              <span class="bk-item-label">Esperado Mínimo</span>
+              <span
+                [class]="'bk-item-value ' + (margemLucroValor() >= 0 ? 'positive' : 'negative')"
+              >
+                {{ margemLucroValor() | currency: 'BRL' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COL 1, ROW 2: Custo Estimado por Escala -->
+      <div class="card card-col1-row2">
+        <h2 class="card-title">🧮 Custo por Escala / Mês</h2>
+        <p class="card-hint">Diária {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</p>
+        <div class="escala-cards">
+          <div class="escala-card">
+            <div class="escala-icon">🌙</div>
+            <div class="escala-info">
+              <span class="escala-label">12×36</span>
+              <span class="escala-desc">~15 dias/mês</span>
+              <span class="escala-valor">{{ custoFuncionario12x36() | currency: 'BRL' }}</span>
+            </div>
+          </div>
+          <div class="escala-card">
+            <div class="escala-icon">📅</div>
+            <div class="escala-info">
+              <span class="escala-label">5×2</span>
+              <span class="escala-desc">~22 dias/mês</span>
+              <span class="escala-valor">{{ custoFuncionario5x2() | currency: 'BRL' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3, COLS 1-2: Postos de Trabalho -->
+      <div class="card card-postos">
+        <h2 class="card-title">Postos de Trabalho ({{ postos().length }})</h2>
+        @if (postos().length === 0) {
+          <p class="empty-state">Nenhum posto de trabalho vinculado ainda.</p>
+        } @else {
+          <div class="table-wrapper">
+            <table class="postos-table">
+              <thead>
+                <tr>
+                  <th>Horário</th>
+                  <th>Capacidade Ideal</th>
+                  <th>Permite Dobra</th>
+                  <th>Cap. Máx. Dobras</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (posto of postos(); track posto.id) {
+                  <tr>
+                    <td class="horario">
+                      {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
+                    </td>
+                    <td>{{ posto.quantidadeIdealFuncionarios }}</td>
+                    <td>
+                      <span
+                        [class]="'badge ' + (posto.permiteDobrarEscala ? 'success' : 'inactive')"
+                      >
+                        {{ posto.permiteDobrarEscala ? 'Sim' : 'Não' }}
+                      </span>
+                    </td>
+                    <td>{{ posto.capacidadeMaximaPorDobras }}</td>
+                    <td>
+                      <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
     </div>
   }
 </div>

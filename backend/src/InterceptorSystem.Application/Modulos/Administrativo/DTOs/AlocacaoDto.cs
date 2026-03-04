@@ -34,3 +34,14 @@ public record AlocacaoDtoOutput(
             entity.TipoAlocacao);
     }
 }
+
+/// <summary>
+/// DTO enriquecido com nome do funcionário, usado pelo bot do WhatsApp para
+/// exibir as alocações de um posto em uma data específica.
+/// </summary>
+public record AlocacaoComFuncionarioDto(
+    Guid Id,
+    Guid FuncionarioId,
+    string NomeFuncionario,
+    TipoAlocacao TipoAlocacao,
+    StatusAlocacao StatusAlocacao);

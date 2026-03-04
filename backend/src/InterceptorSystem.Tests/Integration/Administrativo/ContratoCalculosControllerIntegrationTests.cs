@@ -25,6 +25,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,      // 1 dos 2 postos tem horário noturno
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualImpostos: 0.15m,    
             PercentualAdicionalNoturno: 0.2m,// 15%
@@ -44,22 +45,26 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
         var result = await response.Content.ReadFromJsonAsync<CalculoValorTotalOutput>();
         Assert.NotNull(result);
 
-        // Validações do cálculo (com NumeroDePostos multiplicador):
-        // Total Funcionários: 12 × 2 postos = 24 funcionários
-        // Custo Diário: 100 × 24 = 2400
-        // Custo Mensal Salários: 2400 × 30 = 72000
-        // Adicional Noturno: 72000 × 0.20 = 14400
-        // Custo Base: 72000 + 14400 + 3600 = 90000
-        // Margens totais: 45%
-        // Valor Total: 90000 / 0.55 = 163636.36
-        Assert.Equal(163636.36m, result.ValorTotalMensal);
-        Assert.Equal(90000m, result.CustoBaseMensal);
-        Assert.Equal(14400m, result.ValorAdicionalNoturno);
-        Assert.Equal(24545.45m, result.ValorImpostos);   // 163636.36 × 0.15
-        Assert.Equal(32727.27m, result.ValorMargemLucro); // 163636.36 × 0.20
-        Assert.Equal(16363.64m, result.ValorMargemFaltas); // 163636.36 × 0.10
-        Assert.Equal(3600m, result.ValorBeneficios);
-        Assert.Equal(86400m, result.BaseParaSalarios); // 163636.36 - 24545.45 - 32727.27 - 16363.64 - 3600
+        // Validações do cálculo:
+        // Custo Diário Operação = 100 * 2 postos = 200
+        // Custo Mensal Salários : 200 * 30 = 6000
+        // Adicional Noturno: 6000 * 0.5 * 0.20 = 600
+        // Base Com Adicional: 6600
+        // Encargos (65%): 6600 * 0.65 = 4290
+        // Benefícios Totais (qtd total funcionários = 12): 3600 * 12 = 43200
+        // Custo Base Real (com encargos): 6600 + 4290 + 43200 = 54090
+        
+        // Margens totais: 15% Impostos + 20% Lucro + 10% Faltas = 45% (Sobra 55%)
+        // Valor Total: 54090 / 0.55 = 98345.45
+        Assert.Equal(98345.45m, result.ValorTotalMensal);
+        Assert.Equal(54090m, result.CustoBaseMensal);
+        Assert.Equal(600m, result.ValorAdicionalNoturno);
+        Assert.Equal(14751.82m, result.ValorImpostos);   // 98345.45 × 0.15
+        Assert.Equal(19669.09m, result.ValorMargemLucro); // 98345.45 × 0.20
+        Assert.Equal(9834.55m, result.ValorMargemFaltas); // 98345.45 × 0.10
+        Assert.Equal(43200m, result.ValorBeneficios);
+        Assert.Equal(4290m, result.ValorEncargosTrabalhistas);
+        Assert.Equal(6600m, result.BaseParaSalarios); 
     }
 
     [Fact]
@@ -70,6 +75,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualImpostos: 0.50m, 
             PercentualAdicionalNoturno: 0.2m,// 50%
@@ -99,6 +105,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: -100m,              // ❌ Negativo!
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualImpostos: 0.15m,
             PercentualAdicionalNoturno: 0.2m,
@@ -127,6 +134,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 0,
             NumeroDePostos: 2,              // ❌ Zero!
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualAdicionalNoturno: 0.2m,
             PercentualImpostos: 0.15m,
@@ -155,6 +163,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 100m,
             QuantidadeFuncionarios: 12,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: -100m,     // ❌ Negativo!
             PercentualImpostos: 0.15m,
             PercentualAdicionalNoturno: 0.2m,
@@ -183,6 +192,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 50m,                // Diária baixa
             QuantidadeFuncionarios: 1,
             NumeroDePostos: 2,              // 1 funcionário
+            NumeroDePostosNoturnos: 0,      // Sem postos noturnos (cenário mínimo)
             ValorBeneficiosExtrasMensal: 0m,        // Sem benefícios
             PercentualImpostos: 0m,      
             PercentualAdicionalNoturno: 0m,// Sem impostos
@@ -202,13 +212,18 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
         var result = await response.Content.ReadFromJsonAsync<CalculoValorTotalOutput>();
         Assert.NotNull(result);
 
-        // Custo com multiplicação de postos:
-        // Total Funcionários: 1 × 2 postos = 2 funcionários
-        // Custo Mensal: 50 × 30 × 2 = 3000
+        // Custo Diário da operação: 50 * 2 postos = 100
+        // Custo Mensal Salarios: 100 * 30 = 3000
+        // Adicional Noturno: 0
+        // Encargos (65%): 3000 * 0.65 = 1950
+        // Benefícios: 0 * 1 = 0
+        // Custo Base Real: 3000 + 1950 = 4950
+        
         // Margens: 0%
-        // Valor Total: 3000 / 1 = 3000
-        Assert.Equal(3000m, result.ValorTotalMensal);
-        Assert.Equal(3000m, result.CustoBaseMensal);
+        // Valor Total: 4950 / 1 = 4950
+        Assert.Equal(4950m, result.ValorTotalMensal);
+        Assert.Equal(4950m, result.CustoBaseMensal);
+        Assert.Equal(1950m, result.ValorEncargosTrabalhistas);
         Assert.Equal(0m, result.ValorImpostos);
         Assert.Equal(0m, result.ValorMargemLucro);
         Assert.Equal(0m, result.ValorMargemFaltas);
@@ -222,6 +237,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             ValorDiariaCobrada: 200m,
             QuantidadeFuncionarios: 50,
             NumeroDePostos: 2,
+            NumeroDePostosNoturnos: 1,      // 1 dos 2 postos tem horário noturno
             ValorBeneficiosExtrasMensal: 15000m,
             PercentualImpostos: 0.25m,       
             PercentualAdicionalNoturno: 0.2m,// 25%
@@ -242,16 +258,18 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
         var result = await response.Content.ReadFromJsonAsync<CalculoValorTotalOutput>();
         Assert.NotNull(result);
 
-        // Custo com multiplicação de postos:
-        // Total Funcionários: 50 × 2 postos = 100 funcionários
-        // Custo Diário: 200 × 100 = 20000
-        // Custo Mensal Salários: 20000 × 30 = 600000
-        // Adicional Noturno: 600000 × 0.20 = 120000
-        // Custo Base: 600000 + 120000 + 15000 = 735000
-        // Margens: 70%
-        // Valor Total: 735000 / 0.30 = 2450000
-        Assert.Equal(2450000m, result.ValorTotalMensal);
-        Assert.Equal(735000m, result.CustoBaseMensal);
+        // Custo Diário da operação: 200 * 2 postos = 400
+        // Custo Mensal Salários: 400 * 30 = 12000
+        // Adicional Noturno (20% sobre 1 posto): 6000 * 0.20 = 1200
+        // Base c/ Adicional: 13200
+        // Encargos Trabalhistas (65%): 13200 * 0.65 = 8580
+        // Benefícios Totais (50 func): 15000 * 50 = 750000
+        // Custo Base Real: 13200 + 8580 + 750000 = 771780
+        
+        // Margens totais: 70% (Divisor 0.3)
+        // Valor Total Final: 771780 / 0.3 = 2572600
+        Assert.Equal(2572600m, result.ValorTotalMensal);
+        Assert.Equal(771780m, result.CustoBaseMensal);
 
         // Validar proporções
         Assert.Equal(result.ValorTotalMensal * 0.25m, result.ValorImpostos);

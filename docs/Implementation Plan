@@ -1,0 +1,64 @@
+# Allocation History Earnings & Batch Start Day Offset
+
+## Feature 1: Allocation History — Earned Value + Month Filter ✅
+
+The `funcionario-detail` page already shows allocations in a table (Date, Posto, Status, Tipo) and has `salarioSimulado` for the current month. We added:
+- ✅ **Month filter** (prev/next arrows + month/year label + "Hoje" button) above the allocation table
+- ✅ **"Valor" column** in the table showing the calculated daily value for each allocation
+- ✅ **Month total** summary row at the bottom of the table showing earnings for the selected month
+
+### Implemented Changes
+
+#### [DONE] [funcionario-detail.component.ts](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/funcionarios/funcionario-detail/funcionario-detail.component.ts)
+- ✅ Added `selectedMonth` signal (default: current month/year)
+- ✅ Added `alocacoesFiltradas` computed that filters by `selectedMonth`
+- ✅ Added `calcularValorAlocacao(alocacao)` method — applies weekend bonuses (+100% Sun, +50% Sat) + night shift bonus
+- ✅ Updated `salarioSimulado` to use `selectedMonth` via `alocacoesFiltradas()` instead of hardcoded current month
+- ✅ Added `totalGanhoMes` computed = sum of all confirmed allocation values for selected month
+- ✅ Added `previousMonth()`, `nextMonth()`, `currentMonth()`, `getSelectedMonthLabel()` navigation methods
+- ✅ Added `formatCurrency()` and `formatDate()` helpers
+
+#### [DONE] [funcionario-detail.component.html](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/funcionarios/funcionario-detail/funcionario-detail.component.html)
+- ✅ Added month selector (prev/next arrows + month/year label + "Hoje" button) above allocation table
+- ✅ Added "Valor" column to allocation table showing `calcularValorAlocacao()` for confirmed allocations
+- ✅ Updated table to iterate `alocacoesFiltradas()` instead of `alocacoes()`
+- ✅ Added month total row (`tfoot`) at the bottom of the table with `totalGanhoMes()`
+- ✅ Added empty state message when no allocations found for selected month
+- ✅ Rows styled with `.row-falta` / `.row-cancelada` for visual differentiation
+
+#### [DONE] [funcionario-detail.component.scss](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/funcionarios/funcionario-detail/funcionario-detail.component.scss)
+- ✅ Added `.section-header-with-nav`, `.month-nav`, `.btn-nav`, `.month-label`, `.btn-today` styles
+- ✅ Added `.valor-positivo`, `.valor-zero`, `.valor-total` value display styles
+- ✅ Added `.col-valor` right-aligned column styles with `font-variant-numeric: tabular-nums`
+- ✅ Added `.row-falta`, `.row-cancelada` row highlight styles
+- ✅ Added `.empty-state` styling
+
+---
+
+## Feature 2: 12x36 Batch — Start Day Offset ✅
+
+Currently, 12x36 batch generation always starts with `trabalha = true` on the contract start date. This means all employees in 12x36 work on the same days. 
+
+Adding a **"Dia de Partida"** (`diaPartida`) field allows the manager to toggle the start pattern — even employees start working on day 1, odd employees start resting on day 1.
+
+### Implemented Changes
+
+#### [DONE] [alocacao-batch-form.component.ts](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/alocacoes/alocacao-batch-form/alocacao-batch-form.component.ts)
+- ✅ Added `diaPartida` form control: `'TRABALHA'` (default) or `'FOLGA'`
+- ✅ Added `selectedFuncionarioEscala` signal to track selected employee's scale type
+- ✅ Added `setupFuncionarioChange()` to update scale and reset `diaPartida` on employee change
+- ✅ Updated `generateAlocacoesPreview()`: `let trabalha = formValue.diaPartida !== 'FOLGA'`
+
+#### [DONE] [alocacao-batch-form.component.html](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/alocacoes/alocacao-batch-form/alocacao-batch-form.component.html)
+- ✅ Added radio buttons: "Começa Trabalhando" 🔵 / "Começa de Folga" ⚪
+- ✅ Only visible when `selectedFuncionarioEscala() === 'DOZE_POR_TRINTA_SEIS'`
+- ✅ Added helper hint text explaining the purpose of the field
+
+#### [DONE] [alocacao-batch-form.component.scss](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/alocacoes/alocacao-batch-form/alocacao-batch-form.component.scss)
+- ✅ Added `.field-hint`, `.radio-group`, `.radio-option` styles with active state highlighting
+
+## Verification
+
+- ✅ `ng serve` running — Funcionário detail page shows month filter, "Valor" column, and month total
+- ✅ Batch form shows "Dia de Partida" toggle only for 12x36 employees
+- [ ] Manual test: Create 2 batch allocations for 12x36 employees with opposite start patterns → verify they alternate on opposite days

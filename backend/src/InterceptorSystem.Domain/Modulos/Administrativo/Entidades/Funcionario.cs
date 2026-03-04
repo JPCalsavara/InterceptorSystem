@@ -83,6 +83,7 @@ public class Funcionario : Entity, IAggregateRoot
         CheckRule(contratoId == Guid.Empty, "O funcionário deve estar vinculado a um contrato.");
         CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
+        CheckRule(!ValidarFormatoCpf(cpf), "CPF deve conter exatamente 11 dígitos numéricos.");
         CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
         CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
         CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
@@ -92,7 +93,7 @@ public class Funcionario : Entity, IAggregateRoot
         CondominioId = condominioId;
         ContratoId = contratoId;
         Nome = nome;
-        Cpf = cpf;
+        Cpf = ExtrairDigitos(cpf);
         Celular = celular;
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
@@ -117,5 +118,23 @@ public class Funcionario : Entity, IAggregateRoot
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
+    }
+
+    /// <summary>
+    /// Valida o formato do CPF (11 dígitos numéricos após remoção de máscara).
+    /// </summary>
+    private static bool ValidarFormatoCpf(string cpf)
+    {
+        if (string.IsNullOrWhiteSpace(cpf)) return false;
+        var digitos = ExtrairDigitos(cpf);
+        return digitos.Length == 11;
+    }
+
+    /// <summary>
+    /// Extrai apenas os dígitos numéricos de uma string (remove pontos, traços, barras).
+    /// </summary>
+    private static string ExtrairDigitos(string valor)
+    {
+        return new string(valor.Where(char.IsDigit).ToArray());
     }
 }

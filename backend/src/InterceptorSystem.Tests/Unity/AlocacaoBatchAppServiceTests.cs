@@ -75,6 +75,7 @@ public class AlocacaoBatchAppServiceTests
         );
         // Setar ID usando reflection
         typeof(PostoDeTrabalho).BaseType!.GetProperty("Id")!.SetValue(posto, postoId);
+        typeof(PostoDeTrabalho).GetProperty("Condominio")!.SetValue(posto, new Condominio(empresaId, "Condominio A", "12345678000190", "Rua A", 1, new TimeSpan(6, 0, 0)));
 
         var alocacoes = new List<CreateAlocacaoDtoInput>
         {
@@ -321,6 +322,7 @@ public class AlocacaoBatchAppServiceTests
             true
         );
         typeof(PostoDeTrabalho).BaseType!.GetProperty("Id")!.SetValue(posto, postoId);
+        typeof(PostoDeTrabalho).GetProperty("Condominio")!.SetValue(posto, new Condominio(empresaId, "Condominio A", "12345678000190", "Rua A", 1, new TimeSpan(6, 0, 0)));
 
         // Gerar alocações para 6 meses (escala 12x36 - trabalha 1 dia sim, 1 não)
         var alocacoes = new List<CreateAlocacaoDtoInput>();
@@ -392,6 +394,7 @@ public class AlocacaoBatchAppServiceTests
             false
         );
         typeof(PostoDeTrabalho).BaseType!.GetProperty("Id")!.SetValue(posto, postoId);
+        typeof(PostoDeTrabalho).GetProperty("Condominio")!.SetValue(posto, new Condominio(empresaId, "Condominio A", "12345678000190", "Rua A", 1, new TimeSpan(6, 0, 0)));
 
         // Gerar alocações para 6 meses (escala semanal - seg a sex)
         var alocacoes = new List<CreateAlocacaoDtoInput>();

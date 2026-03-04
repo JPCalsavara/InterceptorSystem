@@ -59,7 +59,7 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
             condominioId,
             resolvedContratoId,
             "Funcionario Teste",
-            Guid.NewGuid().ToString(),
+            GerarCpfFake(),
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
@@ -68,6 +68,8 @@ public class AlocacoesControllerIntegrationTests : IntegrationTestBase
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();
     }
+
+    private static string GerarCpfFake() => $"{DateTime.Now.Ticks % 100000000000:00000000000}";
 
     private async Task<PostoDeTrabalhoDto> CriarPostoAsync(Guid condominioId, Guid? contratoId = null)
     {

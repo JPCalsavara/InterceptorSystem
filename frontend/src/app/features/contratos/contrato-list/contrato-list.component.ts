@@ -180,21 +180,34 @@ export class ContratoListComponent implements OnInit {
   }
 
   getContratoLucro(contrato: Contrato): number {
-    const valorMensal = this.getValorMensal(contrato);
-    const custo = this.getContratoCusto(contrato);
-    return valorMensal - custo;
+    return this.getValorMensal(contrato) - this.getContratoCusto(contrato);
   }
 
   getContratoCusto(contrato: Contrato): number {
-    const funcionariosCondominio = this.funcionarios().filter(
-      (f) =>
-        f.condominioId === contrato.condominioId && f.statusFuncionario === StatusFuncionario.ATIVO
+    const valorTotal = contrato.valorTotalMensal || 0;
+    const diaria = contrato.valorDiariaCobrada || 0;
+    const beneficioUnit = contrato.valorBeneficiosExtrasMensal || 0;
+
+    // Impostos: percentualImpostos já é decimal (0.15 = 15%)
+    const impostos = valorTotal * (contrato.percentualImpostos || 0);
+
+    // Funcionários ativos deste condomínio
+    const ativos = this.funcionarios().filter(
+      (f) => f.condominioId === contrato.condominioId && f.statusFuncionario === StatusFuncionario.ATIVO
     );
 
-    return funcionariosCondominio.reduce(
-      (sum, f) => sum + (f.salarioTotal || 0),
-      0
-    );
+    // Benefícios: se há ativos reais, usa qtd real; senao usa estimativa do contrato
+    const qtdBeneficios = ativos.length > 0 ? ativos.length : (contrato.quantidadeFuncionarios || 0) * 2;
+    const beneficios = qtdBeneficios * beneficioUnit;
+
+    // Custo por funcionário (diaria × dias de escala)
+    const custoFuncionarios = ativos.reduce((sum, f) => {
+      // Sem TipoEscala disponível aqui — usar 15 dias como padrão (12×36)
+      const dias = 15;
+      return sum + dias * diaria + beneficioUnit;
+    }, 0);
+
+    return impostos + beneficios + custoFuncionarios;
   }
 
   getValorMensal(contrato: Contrato): number {

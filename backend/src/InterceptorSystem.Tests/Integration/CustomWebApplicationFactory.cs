@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -40,6 +41,14 @@ public class NoOpEmailService : IEmailService
 }
 
 /// <summary>
+/// Implementação no-op do IWhatsappMessageSender para testes (não envia mensagens de verdade).
+/// </summary>
+public class NoOpWhatsappMessageSender : InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender
+{
+    public Task EnviarTextoAsync(string telefoneDestino, string mensagem, CancellationToken ct = default) => Task.CompletedTask;
+}
+
+/// <summary>
 /// Factory customizado para criar uma aplicação de teste com banco de dados em memória.
 /// </summary>
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
@@ -57,6 +66,29 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        
+        // Fornecer configurações válidas para IOptions + ValidateOnStart (SEC-2)
+        builder.ConfigureAppConfiguration((hostingContext, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:Key"] = "TestKeyMuitoGrandeParaPassarValidacao1234567890!@#$%^&*",
+                ["Jwt:Issuer"] = "InterceptorSystem.Tests",
+                ["Jwt:Audience"] = "InterceptorSystem.Tests",
+                ["Jwt:ExpiresInHours"] = "24",
+                ["Smtp:Host"] = "localhost",
+                ["Smtp:Port"] = "587",
+                ["Smtp:Username"] = "test@test.com",
+                ["Smtp:Password"] = "test-password",
+                ["Smtp:FromAddress"] = "noreply@test.com",
+                ["Smtp:FromName"] = "Test System",
+                ["Meta:PhoneNumberId"] = "test-phone-id",
+                ["Meta:AccessToken"] = "test-access-token",
+                ["Meta:WebhookVerifyToken"] = "test-verify-token",
+                ["App:FrontendBaseUrl"] = "http://localhost:4200"
+            });
+        });
+
         builder.ConfigureServices(services =>
         {
             // Remove o DbContext configurado na aplicação (ex: Npgsql)
@@ -102,6 +134,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             // E-mail no-op para testes
             services.AddScoped<IEmailService, NoOpEmailService>();
+            services.AddScoped<InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
 
             // Garante que o banco de dados seja criado
             var sp = services.BuildServiceProvider();

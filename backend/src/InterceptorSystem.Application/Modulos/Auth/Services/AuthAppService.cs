@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Auth.DTOs;
 using InterceptorSystem.Application.Modulos.Auth.Interfaces;
+using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
 using InterceptorSystem.Domain.Modulos.Auth.Entidades;
 using InterceptorSystem.Domain.Modulos.Auth.Enums;
 using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
@@ -17,6 +18,7 @@ public class AuthAppService : IAuthAppService
     private readonly IEmailService _emailService;
     private readonly ITokenVerificacaoRepository _tokenRepository;
     private readonly IConfiguration _configuration;
+    private readonly IWhatsappMessageSender _whatsappSender;
 
     public AuthAppService(
         IContaRepository contaRepository,
@@ -24,7 +26,8 @@ public class AuthAppService : IAuthAppService
         IPasswordHasher passwordHasher,
         IEmailService emailService,
         ITokenVerificacaoRepository tokenRepository,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IWhatsappMessageSender whatsappSender)
     {
         _contaRepository = contaRepository;
         _jwtTokenService = jwtTokenService;
@@ -32,10 +35,13 @@ public class AuthAppService : IAuthAppService
         _emailService = emailService;
         _tokenRepository = tokenRepository;
         _configuration = configuration;
+        _whatsappSender = whatsappSender;
     }
 
     public async Task<AuthResultDtoOutput> RegistrarAsync(RegistrarContaDtoInput input)
     {
+        ValidarPoliticaSenha(input.Senha);
+        
         var emailExistente = await _contaRepository.GetByEmailAsync(input.Email);
         if (emailExistente != null)
             throw new InvalidOperationException("Já existe uma conta com este e-mail.");
@@ -179,6 +185,8 @@ public class AuthAppService : IAuthAppService
 
     public async Task ConfirmarResetSenhaAsync(ConfirmarResetSenhaDtoInput input)
     {
+        ValidarPoliticaSenha(input.NovaSenha);
+        
         var tokenVerificacao = await _tokenRepository.GetByTokenAsync(input.Token, TipoTokenVerificacao.AlteracaoSenha)
             ?? throw new InvalidOperationException("Token inválido ou expirado.");
 
@@ -236,6 +244,56 @@ public class AuthAppService : IAuthAppService
         await _tokenRepository.CommitAsync();
     }
 
+    public async Task CadastrarTelefoneAsync(Guid contaId, string telefone)
+    {
+        if (string.IsNullOrWhiteSpace(telefone))
+            throw new InvalidOperationException("O telefone é obrigatório.");
+
+        var telefoneNormalizado = telefone.Trim();
+
+        var contaExistente = await _contaRepository.GetByTelefoneVerificadoAsync(telefoneNormalizado);
+        if (contaExistente != null && contaExistente.Id != contaId)
+            throw new InvalidOperationException("Este telefone já está em uso por outra conta.");
+
+        var conta = await _contaRepository.GetByIdAsync(contaId)
+            ?? throw new KeyNotFoundException("Conta não encontrada.");
+
+        conta.IniciarCadastroTelefone(telefoneNormalizado);
+
+        await _tokenRepository.InvalidarTokensAnterioresAsync(conta.Id, TipoTokenVerificacao.VerificacaoTelefone);
+
+        var otp = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        var tokenVerificacao = new TokenVerificacao(
+            conta.Id, otp, TipoTokenVerificacao.VerificacaoTelefone,
+            DateTime.UtcNow.AddMinutes(10));
+
+        _tokenRepository.Add(tokenVerificacao);
+        await _contaRepository.CommitAsync();
+        await _tokenRepository.CommitAsync();
+
+        await _whatsappSender.EnviarTextoAsync(
+            telefoneNormalizado,
+            $"Seu código de verificação do Interceptor System é: *{otp}*\nEle expira em 10 minutos.");
+    }
+
+    public async Task ConfirmarTelefoneAsync(string token)
+    {
+        var tokenVerificacao = await _tokenRepository.GetByTokenAsync(token, TipoTokenVerificacao.VerificacaoTelefone)
+            ?? throw new InvalidOperationException("Código inválido ou expirado.");
+
+        if (!tokenVerificacao.EstaValido())
+            throw new InvalidOperationException("Código inválido ou expirado.");
+
+        var conta = await _contaRepository.GetByIdAsync(tokenVerificacao.ContaId)
+            ?? throw new KeyNotFoundException("Conta não encontrada.");
+
+        conta.MarcarTelefoneComoVerificado();
+        tokenVerificacao.Consumir();
+
+        await _contaRepository.CommitAsync();
+        await _tokenRepository.CommitAsync();
+    }
+
     private static string GerarTokenSeguro()
     {
         var bytes = RandomNumberGenerator.GetBytes(64);
@@ -243,6 +301,19 @@ public class AuthAppService : IAuthAppService
             .Replace("+", "-")
             .Replace("/", "_")
             .Replace("=", "");
+    }
+
+    /// <summary>
+    /// SEC-7: Política de senha — mínimo 8 caracteres, 1 maiúscula, 1 dígito.
+    /// </summary>
+    private static void ValidarPoliticaSenha(string senha)
+    {
+        if (string.IsNullOrWhiteSpace(senha) || senha.Length < 8)
+            throw new InvalidOperationException("A senha deve ter pelo menos 8 caracteres.");
+        if (!senha.Any(char.IsUpper))
+            throw new InvalidOperationException("A senha deve conter pelo menos uma letra maiúscula.");
+        if (!senha.Any(char.IsDigit))
+            throw new InvalidOperationException("A senha deve conter pelo menos um número.");
     }
 
     private string ConstruirLink(string rota, string token)

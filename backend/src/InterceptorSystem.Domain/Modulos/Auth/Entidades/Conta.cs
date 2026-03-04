@@ -20,6 +20,8 @@ public class Conta : IAggregateRoot
     public DateTime CreatedAt { get; private set; }
     public bool EmailVerificado { get; private set; }
     public string? EmailPendente { get; private set; }
+    public string? Telefone { get; private set; }
+    public bool TelefoneVerificado { get; private set; }
 
     // Construtor vazio para o EF Core
     protected Conta() { }
@@ -28,6 +30,8 @@ public class Conta : IAggregateRoot
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new InvalidOperationException("O e-mail é obrigatório.");
+        if (!ValidarFormatoEmail(email))
+            throw new InvalidOperationException("O formato do e-mail é inválido.");
         if (string.IsNullOrWhiteSpace(senhaHash))
             throw new InvalidOperationException("A senha é obrigatória.");
         if (string.IsNullOrWhiteSpace(nomeEmpresa))
@@ -43,6 +47,7 @@ public class Conta : IAggregateRoot
         CreatedAt = DateTime.UtcNow;
         EmailVerificado = false;
         EmailPendente = null;
+        TelefoneVerificado = false;
     }
 
     public void AtualizarNomeEmpresa(string novoNome)
@@ -56,6 +61,8 @@ public class Conta : IAggregateRoot
     {
         if (string.IsNullOrWhiteSpace(novoEmail))
             throw new InvalidOperationException("O e-mail é obrigatório.");
+        if (!ValidarFormatoEmail(novoEmail))
+            throw new InvalidOperationException("O formato do e-mail é inválido.");
         Email = novoEmail.ToLower().Trim();
     }
 
@@ -92,6 +99,8 @@ public class Conta : IAggregateRoot
     {
         if (string.IsNullOrWhiteSpace(novoEmail))
             throw new InvalidOperationException("O e-mail é obrigatório.");
+        if (!ValidarFormatoEmail(novoEmail))
+            throw new InvalidOperationException("O formato do e-mail é inválido.");
         EmailPendente = novoEmail.ToLower().Trim();
     }
 
@@ -102,5 +111,36 @@ public class Conta : IAggregateRoot
         Email = EmailPendente;
         EmailPendente = null;
         EmailVerificado = true;
+    }
+
+    public void IniciarCadastroTelefone(string telefone)
+    {
+        if (string.IsNullOrWhiteSpace(telefone))
+            throw new InvalidOperationException("O telefone é obrigatório.");
+        Telefone = telefone.Trim();
+        TelefoneVerificado = false;
+    }
+
+    public void MarcarTelefoneComoVerificado()
+    {
+        if (string.IsNullOrWhiteSpace(Telefone))
+            throw new InvalidOperationException("Nenhum telefone cadastrado para verificar.");
+        TelefoneVerificado = true;
+    }
+
+    /// <summary>
+    /// Valida formato básico de e-mail usando System.Net.Mail.MailAddress.
+    /// </summary>
+    private static bool ValidarFormatoEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email.Trim();
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

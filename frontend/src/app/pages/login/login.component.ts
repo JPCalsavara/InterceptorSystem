@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -10,9 +10,15 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div class="auth-page">
-      <div class="auth-card">
+    <div class="auth-card">
+    <a routerLink="/" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+      </svg>
+      Voltar ao início
+    </a>
         <div class="auth-header">
-          <img src="/logo-preta.png" alt="Interceptor System" class="auth-logo" />
+          <img [src]="logoSrc()" alt="Interceptor System" class="auth-logo" />
           <h1 class="auth-title">Entrar na sua conta</h1>
           <p class="auth-subtitle">Gerencie suas operações de segurança</p>
         </div>
@@ -113,10 +119,34 @@ import { AuthService } from '../../services/auth.service';
       .auth-page {
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         background: var(--bg-primary);
         padding: 1rem;
+      }
+
+      .back-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1.25rem;
+        align-self: flex-start;
+        max-width: 420px;
+        width: 100%;
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--primary-color);
+        }
+
+        svg {
+          flex-shrink: 0;
+        }
       }
 
       .auth-card {
@@ -135,7 +165,7 @@ import { AuthService } from '../../services/auth.service';
       }
 
       .auth-logo {
-        height: 60px;
+        height: 12rem;
         margin-bottom: 1rem;
       }
 
@@ -304,17 +334,24 @@ import { AuthService } from '../../services/auth.service';
     `,
   ],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   senha = '';
   erro = signal<string | null>(null);
   carregando = signal(false);
   mostrarSenha = signal(false);
+  isDarkMode = signal(false);
+  logoSrc = computed(() => this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png');
 
   constructor(
     private authService: AuthService,
     private router: Router,
   ) {}
+
+  ngOnInit(): void {
+    const saved = localStorage.getItem('theme');
+    this.isDarkMode.set(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  }
 
   onSubmit(): void {
     if (!this.email || !this.senha) return;

@@ -1,0 +1,61 @@
+# ==========================================
+# InterceptorSystem — Produção (EC2 + RDS)
+# ==========================================
+# Uso: docker compose -f compose.ec2.yml up -d
+#
+# ⚠️ BANCO DE DADOS: Use AWS RDS PostgreSQL (Free Tier db.t3.micro)
+#    Não tem serviço 'db' aqui — o PostgreSQL roda no RDS separado.
+#    Isso libera ~200MB de RAM na EC2 para a API .NET.
+#
+# Requer: arquivo .env preenchido com RDS_CONNECTION_STRING e demais variáveis
+
+services:
+
+  # --- API .NET 8 ---
+  api:
+    image: interceptor-api:latest   # Carregada via 'docker load' pelo CI/CD
+    container_name: interceptor_api
+    restart: always
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Aponta diretamente para o endpoint do RDS
+      - ConnectionStrings__DefaultConnection=${RDS_CONNECTION_STRING}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__ExpiresInHours=${JWT_EXPIRESIN:-24}
+      - Smtp__Host=${SMTP_HOST}
+      - Smtp__Port=${SMTP_PORT}
+      - Smtp__Username=${SMTP_USERNAME}
+      - Smtp__Password=${SMTP_PASSWORD}
+      - Smtp__FromAddress=${SMTP_FROMADDRESS}
+      - Smtp__FromName=${SMTP_FROMNAME}
+      - Smtp__SecureSocket=${SMTP_SECURESOCKET:-StartTls}
+      - Meta__PhoneNumberId=${META_PHONENUMBERID}
+      - Meta__AccessToken=${META_ACCESSTOKEN}
+      - Meta__WebhookVerifyToken=${META_WEBHOOKVERIFYTOKEN}
+      - App__AllowedOrigins__0=${CLOUDFRONT_URL}
+    expose:
+      - "8080"
+    networks:
+      - interceptor-network
+
+  # --- NGINX (proxy para a API) ---
+  nginx:
+    image: nginx:alpine
+    container_name: interceptor_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.ec2.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - interceptor-network
+
+networks:
+  interceptor-network:
+    driver: bridge
+

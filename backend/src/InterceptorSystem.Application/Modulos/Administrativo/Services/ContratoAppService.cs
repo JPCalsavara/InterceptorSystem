@@ -56,7 +56,10 @@ public class ContratoAppService : IContratoAppService
         _repository.Add(contrato);
         await _repository.UnitOfWork.CommitAsync();
 
-        return ContratoDtoOutput.FromEntity(contrato)!;
+        var saved = await _repository.GetByIdAsync(contrato.Id)
+            ?? throw new InvalidOperationException("Contrato não encontrado após persistência.");
+
+        return ContratoDtoOutput.FromEntity(saved)!;
     }
 
     public async Task<ContratoDtoOutput> UpdateAsync(Guid id, UpdateContratoDtoInput input)
@@ -93,7 +96,10 @@ public class ContratoAppService : IContratoAppService
         _repository.Update(contrato);
         await _repository.UnitOfWork.CommitAsync();
 
-        return ContratoDtoOutput.FromEntity(contrato)!;
+        var saved = await _repository.GetByIdAsync(contrato.Id)
+            ?? throw new InvalidOperationException("Contrato não encontrado após atualização.");
+
+        return ContratoDtoOutput.FromEntity(saved)!;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -114,6 +120,26 @@ public class ContratoAppService : IContratoAppService
     public async Task<IEnumerable<ContratoDtoOutput>> GetAllAsync()
     {
         var contratos = await _repository.GetAllAsync();
+        
+        // BL-10: Auto-finalização de contratos vencidos
+        var hoje = DateOnly.FromDateTime(DateTime.Today);
+        var alterados = false;
+        
+        foreach (var contrato in contratos)
+        {
+            if (contrato.Status != StatusContrato.FINALIZADO && contrato.DataFim < hoje)
+            {
+                contrato.AtualizarStatus(StatusContrato.FINALIZADO);
+                _repository.Update(contrato);
+                alterados = true;
+            }
+        }
+        
+        if (alterados)
+        {
+            await _repository.UnitOfWork.CommitAsync();
+        }
+        
         return contratos.Select(ContratoDtoOutput.FromEntity)!;
     }
 }

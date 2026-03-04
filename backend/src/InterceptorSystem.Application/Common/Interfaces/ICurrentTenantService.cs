@@ -8,4 +8,8 @@ public interface ICurrentTenantService
 
     // O ID do Usuário logado (útil para auditoria: "Quem criou este registro?").
     string? UsuarioId { get; }
+
+    // Permite sobrescrever o EmpresaId de forma programática.
+    // Usado pelo bot do WhatsApp, que não possui JWT mas identifica o tenant pelo telefone.
+    void SetEmpresaId(Guid empresaId);
 }

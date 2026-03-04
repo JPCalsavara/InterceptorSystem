@@ -1,6 +1,7 @@
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -14,17 +15,20 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
     private readonly IContratoAppService _contratoService;
     private readonly IPostoDeTrabalhoAppService _postoService;
     private readonly ICurrentTenantService _tenantService;
+    private readonly ICondominioRepository _condominioRepository; // BL-9: Para acessar UnitOfWork
 
     public CondominioOrquestradorService(
         ICondominioAppService condominioService,
         IContratoAppService contratoService,
         IPostoDeTrabalhoAppService postoService,
-        ICurrentTenantService tenantService)
+        ICurrentTenantService tenantService,
+        ICondominioRepository condominioRepository)
     {
         _condominioService = condominioService;
         _contratoService = contratoService;
         _postoService = postoService;
         _tenantService = tenantService;
+        _condominioRepository = condominioRepository;
     }
 
     public async Task<CondominioCompletoDtoOutput> CriarCondominioCompletoAsync(CreateCondominioCompletoDtoInput input)
@@ -38,6 +42,10 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
         if (!valido)
             throw new InvalidOperationException(mensagemErro);
 
+        // BL-9: Transação explícita para garantir atomicidade
+        var unitOfWork = _condominioRepository.UnitOfWork;
+        await unitOfWork.BeginTransactionAsync();
+        
         try
         {
             // 1. Criar Condomínio
@@ -52,7 +60,7 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
                 PercentualAdicionalNoturno: input.Contrato.PercentualAdicionalNoturno,
                 ValorBeneficiosExtrasMensal: input.Contrato.ValorBeneficiosExtrasMensal,
                 PercentualImpostos: input.Contrato.PercentualImpostos,
-                NumeroDePostos: input.NumeroDePostos, // QuantidadeFuncionarios calculado automaticamente
+                NumeroDePostos: input.NumeroDePostos,
                 MargemLucroPercentual: input.Contrato.MargemLucroPercentual,
                 MargemCoberturaFaltasPercentual: input.Contrato.MargemCoberturaFaltasPercentual,
                 DataInicio: input.Contrato.DataInicio,
@@ -74,6 +82,9 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
                     input.NumeroDePostos));
             }
 
+            // Commit da transação — tudo ou nada
+            await unitOfWork.CommitTransactionAsync();
+
             return new CondominioCompletoDtoOutput(
                 Condominio: condominio,
                 Contrato: contrato,
@@ -82,7 +93,8 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
         }
         catch (Exception ex)
         {
-            // Em caso de erro, poderia implementar rollback manual ou usar TransactionScope
+            // Rollback: desfaz Condomínio, Contrato e Postos parcialmente criados
+            await unitOfWork.RollbackTransactionAsync();
             throw new InvalidOperationException(
                 $"Erro ao criar condomínio completo: {ex.Message}", ex);
         }

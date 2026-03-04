@@ -86,6 +86,7 @@ export class ContratoFormComponent implements OnInit {
       valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]], // Vale-transporte + alimentação
       percentualImpostos: [15, [Validators.required, Validators.min(0), Validators.max(100)]], // Impostos médios (INSS + FGTS)
       numeroDePostos: [2, [Validators.required, Validators.min(2), Validators.max(6)]], // 2 turnos (12x36) é padrão
+      numeroDePostosNoturnos: [1, [Validators.required, Validators.min(0), Validators.max(6)]], // padrão: 1 de 2 postos é noturno
       margemLucroPercentual: [15, [Validators.required, Validators.min(0), Validators.max(100)]], // 15% margem razoável
       margemCoberturaFaltasPercentual: [
         10, // 10% para cobrir faltas e imprevistos
@@ -140,10 +141,14 @@ export class ContratoFormComponent implements OnInit {
           const input = {
             valorDiariaCobrada: valores.valorDiariaCobrada,
             quantidadeFuncionarios: quantidadeFuncionarios,
-            numeroDePostos: valores.numeroDePostos || 2, // Padrão: 2 postos (12x36)
+            numeroDePostos: valores.numeroDePostos || 2,
+            numeroDePostosNoturnos: Math.min(
+              valores.numeroDePostosNoturnos || 0,
+              valores.numeroDePostos || 2,
+            ),
             valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
-            percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
-            percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100, // UI: 20, Backend: 0.20
+            percentualImpostos: (valores.percentualImpostos || 0) / 100,
+            percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
             margemLucroPercentual: (valores.margemLucroPercentual || 0) / 100,
             margemCoberturaFaltasPercentual: (valores.margemCoberturaFaltasPercentual || 0) / 100,
           };
@@ -184,12 +189,13 @@ export class ContratoFormComponent implements OnInit {
           condominioId: data.condominioId,
           descricao: data.descricao,
           valorDiariaCobrada: data.valorDiariaCobrada,
-          percentualAdicionalNoturno: data.percentualAdicionalNoturno * 100, // Converter 0-1 para 0-100
+          percentualAdicionalNoturno: data.percentualAdicionalNoturno * 100,
           valorBeneficiosExtrasMensal: data.valorBeneficiosExtrasMensal,
-          percentualImpostos: data.percentualImpostos * 100, // Converter 0-1 para 0-100
+          percentualImpostos: data.percentualImpostos * 100,
           numeroDePostos: data.numeroDePostos,
-          margemLucroPercentual: data.margemLucroPercentual * 100, // Converter 0-1 para 0-100
-          margemCoberturaFaltasPercentual: data.margemCoberturaFaltasPercentual * 100, // Converter 0-1 para 0-100
+          numeroDePostosNoturnos: 0, // campo ainda não persistido na entidade Contrato
+          margemLucroPercentual: data.margemLucroPercentual * 100,
+          margemCoberturaFaltasPercentual: data.margemCoberturaFaltasPercentual * 100,
           dataInicio: data.dataInicio,
           dataFim: data.dataFim,
           status: data.status,

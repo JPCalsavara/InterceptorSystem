@@ -13,14 +13,14 @@ import {
   PostoDeTrabalho,
   Contrato,
   StatusAlocacao,
+  TipoAlocacao,
   TipoEscala,
 } from '../../../models/index';
-import { AlocacoesViewComponent } from '../../../shared/components/alocacoes-view/alocacoes-view.component';
 
 @Component({
   selector: 'app-funcionario-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, AlocacoesViewComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './funcionario-detail.component.html',
   styleUrl: './funcionario-detail.component.scss',
 })
@@ -39,6 +39,9 @@ export class FuncionarioDetailComponent implements OnInit {
   contrato = signal<Contrato | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+
+  // Month selector for allocation history
+  selectedMonth = signal({ month: new Date().getMonth(), year: new Date().getFullYear() });
 
   // Computeds
   totalAlocacoes = computed(() => this.alocacoes().length);
@@ -73,20 +76,23 @@ export class FuncionarioDetailComponent implements OnInit {
     return this.totalCanceladas() * (contrato.valorDiariaCobrada || 0);
   });
 
+  // Alocações filtradas pelo mês selecionado
+  alocacoesFiltradas = computed(() => {
+    const { month, year } = this.selectedMonth();
+    return this.alocacoes().filter((a) => {
+      const d = new Date(a.data + 'T12:00:00');
+      return d.getMonth() === month && d.getFullYear() === year;
+    });
+  });
+
   salarioSimulado = computed(() => {
     const contrato = this.contrato();
     const func = this.funcionario();
     if (!contrato || !func) return 0;
 
-    const hoje = new Date();
-    const mes = hoje.getMonth();
-    const ano = hoje.getFullYear();
-
-    const alocacoesMes = this.alocacoes().filter((a) => {
-      if (a.statusAlocacao !== StatusAlocacao.CONFIRMADA) return false;
-      const d = new Date(a.data + 'T12:00:00');
-      return d.getMonth() === mes && d.getFullYear() === ano;
-    });
+    const alocacoesMes = this.alocacoesFiltradas().filter(
+      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+    );
 
     // Fallback: sem alocações no mês usa média por tipo de escala
     if (alocacoesMes.length === 0) {
@@ -98,23 +104,20 @@ export class FuncionarioDetailComponent implements OnInit {
 
     let total = 0;
     for (const aloc of alocacoesMes) {
-      let valor = contrato.valorDiariaCobrada || 0;
-      const data = new Date(aloc.data + 'T12:00:00');
-      const diaSemana = data.getDay(); // 0=Dom, 6=Sáb
-
-      if (diaSemana === 0)
-        valor *= 2.0; // +100% domingo
-      else if (diaSemana === 6) valor *= 1.5; // +50% sábado
-
-      const posto = this.postos().find((p) => p.id === aloc.postoDeTrabalhoId);
-      if (posto && this.isNightShift(posto)) {
-        valor *= 1 + (contrato.percentualAdicionalNoturno || 0) / 100;
-      }
-
-      total += valor;
+      total += this.calcularValorAlocacao(aloc);
     }
 
     return total + (contrato.valorBeneficiosExtrasMensal || 0);
+  });
+
+  // Total ganho no mês selecionado (apenas confirmadas)
+  totalGanhoMes = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+
+    return this.alocacoesFiltradas()
+      .filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
+      .reduce((sum, a) => sum + this.calcularValorAlocacao(a), 0);
   });
 
   salarioMesCompleto = computed(() => {
@@ -233,9 +236,142 @@ export class FuncionarioDetailComponent implements OnInit {
     return labels[status] || 'Desconhecido';
   }
 
-  private isNightShift(posto: PostoDeTrabalho): boolean {
-    const hora = parseInt(posto.horarioInicio.substring(0, 2), 10);
-    return hora >= 22 || hora < 5;
+  getTipoLabel(tipo: TipoAlocacao): string {
+    const labels = {
+      [TipoAlocacao.REGULAR]: 'Regular',
+      [TipoAlocacao.DOBRA_PROGRAMADA]: 'Dobra Programada',
+      [TipoAlocacao.SUBSTITUICAO]: 'Substituição',
+    };
+    return labels[tipo] || tipo;
+  }
+
+  // Retorna a proporção de horas noturnas do turno (0.0 a 1.0) — CLT Art. 73: 22h–05h
+  // Ex: turno 18h–06h (12h) → 7h noturnas (22h–05h) → 7/12 ≈ 0.583
+  // Ex: turno 06h–18h (12h) → 0h noturnas → 0.0
+  // Ex: turno 22h–10h (12h) → 7h noturnas → 7/12 ≈ 0.583
+  private calcularProporcaoNoturna(posto: PostoDeTrabalho): number {
+    const inicio = parseInt(posto.horarioInicio.substring(0, 2), 10);
+    const fim = parseInt(posto.horarioFim.substring(0, 2), 10);
+
+    // Duração total do turno em horas (tratando cruzamento de meia-noite)
+    const duracao = inicio > fim ? 24 - inicio + fim : fim - inicio;
+    if (duracao === 0) return 0;
+
+    // Conta horas dentro do período noturno CLT Art. 73: 22h até 05h
+    let horasNoturnas = 0;
+    for (let i = 0; i < duracao; i++) {
+      const hora = (inicio + i) % 24;
+      if (hora >= 22 || hora < 5) horasNoturnas++;
+    }
+
+    return horasNoturnas / duracao;
+  }
+
+  // Calcula o valor de uma única alocação (bônus FDS + adicional noturno proporcional)
+  calcularValorAlocacao(alocacao: Alocacao): number {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+
+    let valor = contrato.valorDiariaCobrada || 0;
+    const data = new Date(alocacao.data + 'T12:00:00');
+    const diaSemana = data.getDay();
+
+    if (diaSemana === 0)
+      valor *= 2.0; // +100% domingo
+    else if (diaSemana === 6) valor *= 1.5; // +50% sábado
+
+    const posto = this.postos().find((p) => p.id === alocacao.postoDeTrabalhoId);
+    if (posto) {
+      const proporcaoNoturna = this.calcularProporcaoNoturna(posto);
+      if (proporcaoNoturna > 0) {
+        // Adicional proporcional às horas noturnas reais (CLT Art. 73)
+        // percentualAdicionalNoturno armazenado como decimal (0.20 = 20%)
+        valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
+      }
+    }
+
+    return valor;
+  }
+
+  // Breakdown noturno do mês selecionado (apenas alocações confirmadas)
+  nocturnoBreakdown = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato || this.postos().length === 0) return null;
+
+    const confirmadas = this.alocacoesFiltradas().filter(
+      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+    );
+    if (confirmadas.length === 0) return null;
+
+    let totalBase = 0;
+    let totalAdicional = 0;
+    let countNoturnas = 0;
+    let countDiurnas = 0;
+
+    for (const aloc of confirmadas) {
+      // Base com multiplicadores de fim de semana
+      let base = contrato.valorDiariaCobrada || 0;
+      const data = new Date(aloc.data + 'T12:00:00');
+      const diaSemana = data.getDay();
+      if (diaSemana === 0) base *= 2.0;
+      else if (diaSemana === 6) base *= 1.5;
+
+      totalBase += base;
+
+      const posto = this.postos().find((p) => p.id === aloc.postoDeTrabalhoId);
+      const proporcao = posto ? this.calcularProporcaoNoturna(posto) : 0;
+      const adicional = base * proporcao * (contrato.percentualAdicionalNoturno || 0);
+      totalAdicional += adicional;
+
+      if (proporcao > 0) countNoturnas++;
+      else countDiurnas++;
+    }
+
+    return {
+      totalBase,
+      totalAdicional,
+      totalComAdicional: totalBase + totalAdicional,
+      countNoturnas,
+      countDiurnas,
+      total: confirmadas.length,
+      percentualNoturno: (contrato.percentualAdicionalNoturno || 0) * 100,
+    };
+  });
+
+  // ── Month navigation ──
+  previousMonth(): void {
+    const { month, year } = this.selectedMonth();
+    if (month === 0) this.selectedMonth.set({ month: 11, year: year - 1 });
+    else this.selectedMonth.set({ month: month - 1, year });
+  }
+
+  nextMonth(): void {
+    const { month, year } = this.selectedMonth();
+    if (month === 11) this.selectedMonth.set({ month: 0, year: year + 1 });
+    else this.selectedMonth.set({ month: month + 1, year });
+  }
+
+  currentMonth(): void {
+    this.selectedMonth.set({ month: new Date().getMonth(), year: new Date().getFullYear() });
+  }
+
+  getSelectedMonthLabel(): string {
+    const months = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
+    ];
+    const { month, year } = this.selectedMonth();
+    return `${months[month]} ${year}`;
   }
 
   formatCurrency(value: number): string {

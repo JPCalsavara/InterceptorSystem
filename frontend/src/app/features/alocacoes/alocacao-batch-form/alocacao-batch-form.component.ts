@@ -63,7 +63,11 @@ export class AlocacaoBatchFormComponent implements OnInit {
     this.buildForm();
     this.loadCondominios();
     this.setupCondominioChange();
+    this.setupFuncionarioChange();
   }
+
+  // Escala do funcionário selecionado (para mostrar/ocultar diaPartida)
+  selectedFuncionarioEscala = signal<string | null>(null);
 
   buildForm(): void {
     this.form = this.fb.group({
@@ -71,6 +75,7 @@ export class AlocacaoBatchFormComponent implements OnInit {
       contratoId: [{ value: '', disabled: true }, Validators.required],
       postoDeTrabalhoId: [{ value: '', disabled: true }, Validators.required],
       funcionarioId: [{ value: '', disabled: true }, Validators.required],
+      diaPartida: ['TRABALHA'], // 'TRABALHA' ou 'FOLGA' — só usado em 12x36
     });
   }
 
@@ -96,6 +101,19 @@ export class AlocacaoBatchFormComponent implements OnInit {
         this.loadPostos(id);
         this.loadFuncionarios(id);
       }
+    });
+  }
+
+  setupFuncionarioChange(): void {
+    this.form.get('funcionarioId')?.valueChanges.subscribe((funcId) => {
+      if (!funcId) {
+        this.selectedFuncionarioEscala.set(null);
+        return;
+      }
+      const func = this.funcionarios().find(f => f.id === funcId);
+      this.selectedFuncionarioEscala.set(func?.tipoEscala ?? null);
+      // Reset diaPartida ao trocar funcionário
+      this.form.get('diaPartida')?.setValue('TRABALHA');
     });
   }
 
@@ -141,7 +159,7 @@ export class AlocacaoBatchFormComponent implements OnInit {
     let dataAtual = new Date(dataInicio);
 
     if (funcionario.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) {
-      let trabalha = true;
+      let trabalha = formValue.diaPartida !== 'FOLGA'; // Permite inverter padrão par/ímpar
       while (dataAtual <= dataFim) {
         if (trabalha) {
           alocacoes.push(

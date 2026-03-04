@@ -30,13 +30,14 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
     {
         var input = new CreateCondominioDtoInput(
             Nome: $"Condomínio Teste {DateTime.Now.Ticks}",
-            Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
+            Cnpj: $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{Random.Shared.Next(10, 100)}",
             Endereco: "Rua Teste",
             QuantidadeIdealPorTurno: 10,
             HorarioTrocaTurno: TimeSpan.FromHours(6)
         );
 
         var response = await _client.PostAsJsonAsync("/api/condominios", input);
+        response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadFromJsonAsync<CondominioDtoOutput>();
         return result!.Id;
     }
@@ -59,6 +60,7 @@ public class PostosDeTrabalhoControllerIntegrationTests : IClassFixture<CustomWe
             status);
 
         var response = await _client.PostAsJsonAsync("/api/contratos", input);
+        response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadFromJsonAsync<ContratoDtoOutput>(_jsonOptions);
         return result!.Id;
     }

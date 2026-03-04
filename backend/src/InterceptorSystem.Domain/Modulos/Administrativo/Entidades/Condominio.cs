@@ -41,11 +41,12 @@ public class Condominio : Entity, IAggregateRoot
         CheckRule(empresaId == Guid.Empty, "O Condomínio deve pertencer a uma empresa.");
         CheckRule(string.IsNullOrWhiteSpace(nome), "O nome do condomínio é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(cnpj), "O CNPJ é obrigatório.");
+        CheckRule(!ValidarFormatoCnpj(cnpj), "CNPJ deve conter exatamente 14 dígitos numéricos.");
         CheckRule(quantidadeIdealPorTurno <= 0, "Quantidade ideal por turno deve ser maior que zero.");
 
         EmpresaId = empresaId;
         Nome = nome;
-        Cnpj = cnpj;
+        Cnpj = ExtrairDigitos(cnpj);
         Endereco = endereco;
         QuantidadeIdealPorTurno = quantidadeIdealPorTurno;
         HorarioTrocaTurno = horarioTrocaTurno;
@@ -78,5 +79,23 @@ public class Condominio : Entity, IAggregateRoot
     public void Desativar()
     {
         Ativo = false;
+    }
+
+    /// <summary>
+    /// Valida o formato do CNPJ (14 dígitos numéricos após remoção de máscara).
+    /// </summary>
+    private static bool ValidarFormatoCnpj(string cnpj)
+    {
+        if (string.IsNullOrWhiteSpace(cnpj)) return false;
+        var digitos = ExtrairDigitos(cnpj);
+        return digitos.Length == 14;
+    }
+
+    /// <summary>
+    /// Extrai apenas os dígitos numéricos de uma string.
+    /// </summary>
+    private static string ExtrairDigitos(string valor)
+    {
+        return new string(valor.Where(char.IsDigit).ToArray());
     }
 }

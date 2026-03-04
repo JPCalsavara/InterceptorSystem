@@ -144,7 +144,7 @@ import { AuthService } from '../../services/auth.service';
       }
 
       .logo-img {
-        height: 90px;
+        height: 100px;
         transition: content 0.3s ease;
       }
 

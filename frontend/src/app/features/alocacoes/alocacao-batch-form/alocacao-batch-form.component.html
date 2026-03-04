@@ -84,6 +84,25 @@
         }
       </div>
 
+      @if (selectedFuncionarioEscala() === 'DOZE_POR_TRINTA_SEIS') {
+        <div class="form-group">
+          <label class="form-label">Dia de Partida</label>
+          <p class="field-hint">Define se o funcionário começa trabalhando ou de folga no primeiro dia do contrato. Use para alternar entre dias pares e ímpares.</p>
+          <div class="radio-group">
+            <label class="radio-option" [class.active]="form.get('diaPartida')?.value === 'TRABALHA'">
+              <input type="radio" formControlName="diaPartida" value="TRABALHA">
+              <span class="radio-icon">🔵</span>
+              <span class="radio-label">Começa Trabalhando</span>
+            </label>
+            <label class="radio-option" [class.active]="form.get('diaPartida')?.value === 'FOLGA'">
+              <input type="radio" formControlName="diaPartida" value="FOLGA">
+              <span class="radio-icon">⚪</span>
+              <span class="radio-label">Começa de Folga</span>
+            </label>
+          </div>
+        </div>
+      }
+
       @if (summary()) {
         <div class="summary-box">
             <h4 class="summary-title">Resumo da Geração</h4>

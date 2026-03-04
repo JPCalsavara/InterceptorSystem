@@ -277,15 +277,19 @@ public class AlocacoesBatchControllerIntegrationTests : IntegrationTestBase
         // Act
         var response = await Client.PostAsJsonAsync("/api/alocacoes/batch", batch);
 
-        // Assert - Comportamento atual do CreateBatchAsync: não valida duplicidade de data e cria em lote
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        // Assert - BL-7: Batch agora valida duplicidade de data e rejeita
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        // Verificar que existem 4 alocações para o funcionário (1 original + 3 do batch)
+        var error = await ReadAsAsync<Dictionary<string, string>>(response);
+        Assert.NotNull(error);
+        Assert.Contains("já possui alocação na data", error["error"]);
+
+        // Verificar que apenas a alocação original persiste (batch foi rejeitado)
         var getAllResponse = await Client.GetAsync("/api/alocacoes");
         var todasAlocacoes = await ReadAsAsync<List<AlocacaoDtoOutput>>(getAllResponse);
         
         var alocacoesFuncionario = todasAlocacoes!.Where(a => a.FuncionarioId == funcionarioId).ToList();
-        Assert.Equal(4, alocacoesFuncionario.Count);
+        Assert.Equal(1, alocacoesFuncionario.Count); // Apenas a original
     }
 
     // ========== Métodos auxiliares ==========
@@ -294,7 +298,7 @@ public class AlocacoesBatchControllerIntegrationTests : IntegrationTestBase
     {
         var input = new CreateCondominioDtoInput(
             Nome: $"Condomínio Teste {Guid.NewGuid().ToString()[..8]}",
-            Cnpj: cnpj ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{DateTime.Now.Millisecond:00}",
+            Cnpj: cnpj ?? $"{DateTime.Now.Ticks % 100000000:00000000}/0001-{Random.Shared.Next(10, 100)}",
             Endereco: "Rua Teste, 123",
             QuantidadeIdealPorTurno: 4,
             HorarioTrocaTurno: new TimeSpan(6, 0, 0),

@@ -3,11 +3,13 @@ using InterceptorSystem.Application.Modulos.Auth.DTOs;
 using InterceptorSystem.Application.Modulos.Auth.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InterceptorSystem.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
+[EnableRateLimiting("auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthAppService _authAppService;

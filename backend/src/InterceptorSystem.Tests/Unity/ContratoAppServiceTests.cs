@@ -45,7 +45,16 @@ public class ContratoAppServiceTests
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua", 10, TimeSpan.FromHours(6)));
+            .ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        
+        Contrato? savedContrato = null;
+        _contratoRepo.Setup(r => r.Add(It.IsAny<Contrato>())).Callback<Contrato>(c => 
+        {
+            typeof(Contrato).GetProperty("Condominio")!.SetValue(c, new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+            savedContrato = c;
+        });
+        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Guid id) => savedContrato?.Id == id ? savedContrato : null);
+        
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(input);
@@ -124,7 +133,7 @@ public class ContratoAppServiceTests
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11", "Rua", 10, TimeSpan.FromHours(6)));
+            .ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
@@ -148,6 +157,8 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.PENDENTE);
+
+        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, new Condominio(Guid.NewGuid(), "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
 
         var input = new UpdateContratoDtoInput(
             "Novo",
@@ -346,6 +357,8 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.FINALIZADO);
+
+        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
 
         var input = new UpdateContratoDtoInput(
             "Contrato ativado",

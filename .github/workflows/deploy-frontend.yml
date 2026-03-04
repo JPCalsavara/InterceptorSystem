@@ -1,0 +1,127 @@
+name: CD — Deploy Frontend (S3 + CloudFront)
+
+# ================================================
+# Roda APENAS em push para main
+# Só executa se o CI passar (via workflow separado)
+# ================================================
+on:
+  push:
+    branches: [main, master]
+    paths:
+      # Só dispara quando o frontend muda
+      - "frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+
+# Garante que só 1 deploy roda por vez no mesmo ambiente
+concurrency:
+  group: deploy-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  # ============================================
+  # JOB 1: Build Angular para produção
+  # ============================================
+  build:
+    name: Build Angular (Production)
+    runs-on: ubuntu-latest
+    outputs:
+      dist-path: frontend/dist/frontend/browser
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Build Angular (production)
+        working-directory: frontend
+        run: npm run build -- --configuration=production
+        env:
+          # Aumenta heap do Node para builds grandes
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
+      - name: Verify build output exists
+        run: |
+          ls -la frontend/dist/frontend/browser/
+          echo "✅ Build de produção concluído com sucesso"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-dist
+          path: frontend/dist/frontend/browser/
+          retention-days: 1
+
+  # ============================================
+  # JOB 2: Deploy para S3 + Invalida CloudFront
+  # ============================================
+  deploy:
+    name: Deploy to S3 + CloudFront
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production  # Requer aprovação manual se configurado no GitHub
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: angular-dist
+          path: ./dist
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Upload com cache headers otimizados:
+      # - Arquivos com hash (main.abc123.js) → cache longo (1 ano)
+      # - index.html → sem cache (sempre busca a última versão)
+      - name: Sync arquivos com hash (assets, JS, CSS)
+        run: |
+          aws s3 sync ./dist s3://${{ secrets.S3_BUCKET_NAME }} \
+            --exclude "index.html" \
+            --exclude "*.txt" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --delete
+
+      - name: Sync index.html e arquivos sem hash
+        run: |
+          aws s3 sync ./dist s3://${{ secrets.S3_BUCKET_NAME }} \
+            --exclude "*" \
+            --include "index.html" \
+            --include "*.txt" \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      - name: Invalidar cache do CloudFront
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*" \
+            --query "Invalidation.Id" \
+            --output text)
+          echo "✅ Invalidação criada: $INVALIDATION_ID"
+          echo "⏳ Aguardando propagação (pode levar 1-3 minutos)..."
+          aws cloudfront wait invalidation-completed \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --id "$INVALIDATION_ID"
+          echo "✅ Cache do CloudFront invalidado! Deploy concluído."
+
+      - name: 🚀 Deploy Summary
+        run: |
+          echo "============================================"
+          echo "✅ Frontend deployado com sucesso!"
+          echo "🌐 Bucket: s3://${{ secrets.S3_BUCKET_NAME }}"
+          echo "📡 CloudFront: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+          echo "🕐 Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "============================================"

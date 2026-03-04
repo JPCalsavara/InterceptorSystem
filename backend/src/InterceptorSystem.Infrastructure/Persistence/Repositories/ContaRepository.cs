@@ -24,6 +24,12 @@ public class ContaRepository : IContaRepository
         return await _context.Contas.FirstOrDefaultAsync(c => c.Email == email.ToLower().Trim());
     }
 
+    public async Task<Conta?> GetByTelefoneVerificadoAsync(string telefone)
+    {
+        return await _context.Contas.FirstOrDefaultAsync(
+            c => c.Telefone == telefone && c.TelefoneVerificado);
+    }
+
     public void Add(Conta conta)
     {
         _context.Contas.Add(conta);
