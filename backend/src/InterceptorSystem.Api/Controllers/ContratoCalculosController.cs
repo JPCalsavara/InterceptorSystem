@@ -80,6 +80,9 @@ public class ContratoCalculosController : ControllerBase
             
             if (input.PercentualAdicionalNoturno < 0 || input.PercentualAdicionalNoturno > 1)
                 return BadRequest(new { error = "Percentual adicional noturno deve estar entre 0 e 1 (ex: 0.20 = 20%)." });
+
+            if (input.NumeroDePostosNoturnos < 0 || input.NumeroDePostosNoturnos > input.NumeroDePostos)
+                return BadRequest(new { error = "Número de postos noturnos deve estar entre 0 e o total de postos." });
             
             var somaMargens = input.PercentualImpostos 
                 + input.MargemLucroPercentual 
@@ -98,8 +101,12 @@ public class ContratoCalculosController : ControllerBase
             var custoMensalSalarios = custoDiarioOperacao * 30; 
             
             // ETAPA 2: Custos Trabalhistas e Benefícios
-            // 2.1 - Adicional noturno
-            var valorAdicionalNoturno = custoMensalSalarios * input.PercentualAdicionalNoturno;
+            // 2.1 - Adicional noturno proporcional aos postos efetivamente noturnos
+            // Ex: 1 de 2 postos noturno = 50% da base salarial recebe o adicional
+            var proporcaoNoturna = input.NumeroDePostos > 0
+                ? (decimal)input.NumeroDePostosNoturnos / input.NumeroDePostos
+                : 0m;
+            var valorAdicionalNoturno = custoMensalSalarios * proporcaoNoturna * input.PercentualAdicionalNoturno;
             var baseSalarialComAdicional = custoMensalSalarios + valorAdicionalNoturno;
             
             // 2.2 - Encargos e Provisões (Risco Operacional Trabalhista - ~65%)
@@ -120,7 +127,7 @@ public class ContratoCalculosController : ControllerBase
             var valorLucro = valorTotalMensal * input.MargemLucroPercentual;
             var valorFaltas = valorTotalMensal * input.MargemCoberturaFaltasPercentual;
             
-            var baseParaSalarios = custoMensalSalarios;
+            var baseParaSalarios = baseSalarialComAdicional;
             
             // Breakdown por posto
             var custoPorPostoDiario = custoDiarioOperacao / input.NumeroDePostos;
@@ -128,7 +135,7 @@ public class ContratoCalculosController : ControllerBase
             
             return Ok(new CalculoValorTotalOutput(
                 ValorTotalMensal: Math.Round(valorTotalMensal, 2),
-                CustoBaseMensal: Math.Round(custoBaseMensalReal, 2), // Retorna o custo final com encargos para o front sumário
+                CustoBaseMensal: Math.Round(custoBaseMensalReal, 2),
                 ValorAdicionalNoturno: Math.Round(valorAdicionalNoturno, 2),
                 ValorImpostos: Math.Round(valorImpostos, 2),
                 ValorMargemLucro: Math.Round(valorLucro, 2),
@@ -137,6 +144,7 @@ public class ContratoCalculosController : ControllerBase
                 ValorEncargosTrabalhistas: Math.Round(valorEncargos, 2),
                 BaseParaSalarios: Math.Round(baseParaSalarios, 2),
                 NumeroDePostos: input.NumeroDePostos,
+                NumeroDePostosNoturnos: input.NumeroDePostosNoturnos,
                 FuncionariosPorPosto: funcionariosPorPosto,
                 CustoPorPostoDiario: Math.Round(custoPorPostoDiario, 2),
                 CustoPorPostoMensal: Math.Round(custoPorPostoMensal, 2)

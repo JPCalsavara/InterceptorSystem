@@ -388,7 +388,9 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 
   &:hover {
     transform: translateY(-4px);
@@ -492,6 +494,15 @@
     .breakdown-details {
       color: var(--text-secondary);
       font-size: 0.875rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .noturno-detail {
+        color: #4f46e5;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
     }
   }
 }
@@ -527,7 +538,9 @@
   border-radius: 0.75rem;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 
   &:hover {
     transform: translateY(-4px);
@@ -816,4 +829,3 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
-

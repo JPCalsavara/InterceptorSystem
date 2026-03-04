@@ -226,6 +226,11 @@
           <p class="breakdown-value">{{ formatCurrency(custoPeriodo()) }}</p>
           <div class="breakdown-details">
             <span>{{ funcionariosPeriodo().length }} funcionário(s) ativo(s)</span>
+            @if (custoNoturnoPeriodo() > 0) {
+              <span class="noturno-detail"
+                >🌙 Adicional noturno real: {{ formatCurrency(custoNoturnoPeriodo()) }}</span
+              >
+            }
           </div>
         </div>
 
@@ -349,7 +354,7 @@
                 <th>CPF</th>
                 <th>Tipo</th>
                 <th>Status</th>
-                <th>Estimativa Mês Atual</th>
+                <th>Real Mês Atual</th>
                 <th>Faltas</th>
                 <th class="actions-column">Ações</th>
               </tr>
@@ -369,7 +374,7 @@
                       {{ getStatusFuncionarioLabel(func.statusFuncionario) }}
                     </span>
                   </td>
-                  <td>{{ formatCurrency(calcularSalarioFuncionario(func)) }}</td>
+                  <td>{{ formatCurrency(salariosPorFuncionario().get(func.id) ?? 0) }}</td>
                   <td>
                     @if (getFaltasByFuncionario(func.id) > 0) {
                       <span class="badge badge-warning">{{ getFaltasByFuncionario(func.id) }}</span>

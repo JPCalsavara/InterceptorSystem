@@ -195,6 +195,52 @@
         </div>
       </div>
 
+      <!-- Breakdown Noturno do Mês -->
+      @if (nocturnoBreakdown()) {
+        <div class="noturno-breakdown-card">
+          <div class="noturno-header">
+            <span class="noturno-title">🌙 Breakdown Noturno — {{ getSelectedMonthLabel() }}</span>
+            <span class="noturno-badge">CLT Art. 73</span>
+          </div>
+          <div class="noturno-stats">
+            <div class="noturno-stat diurno">
+              <span class="noturno-stat-count">{{ nocturnoBreakdown()!.countDiurnas }}</span>
+              <span class="noturno-stat-label">Diurnas</span>
+            </div>
+            <div class="noturno-stat noturno">
+              <span class="noturno-stat-count">{{ nocturnoBreakdown()!.countNoturnas }}</span>
+              <span class="noturno-stat-label">c/ Noturno</span>
+            </div>
+          </div>
+          <div class="noturno-rows">
+            <div class="noturno-row">
+              <span class="noturno-row-label">Base (sem adicional)</span>
+              <span class="noturno-row-value">{{
+                formatCurrency(nocturnoBreakdown()!.totalBase)
+              }}</span>
+            </div>
+            <div class="noturno-row highlight">
+              <span class="noturno-row-label">
+                🌙 Adicional Noturno
+                <span class="noturno-formula"
+                  >{{ nocturnoBreakdown()!.percentualNoturno | number: '1.0-1' }}%
+                  proporcional</span
+                >
+              </span>
+              <span class="noturno-row-value positive"
+                >+ {{ formatCurrency(nocturnoBreakdown()!.totalAdicional) }}</span
+              >
+            </div>
+            <div class="noturno-row total">
+              <span class="noturno-row-label">Total com Adicional</span>
+              <span class="noturno-row-value total">{{
+                formatCurrency(nocturnoBreakdown()!.totalComAdicional)
+              }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
       @if (alocacoesFiltradas().length === 0) {
         <div class="empty-state">
           <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
@@ -220,8 +266,10 @@
             </thead>
             <tbody>
               @for (alocacao of alocacoesFiltradas(); track alocacao.id) {
-                <tr [class.row-falta]="alocacao.statusAlocacao === 'FALTA_REGISTRADA'"
-                    [class.row-cancelada]="alocacao.statusAlocacao === 'CANCELADA'">
+                <tr
+                  [class.row-falta]="alocacao.statusAlocacao === 'FALTA_REGISTRADA'"
+                  [class.row-cancelada]="alocacao.statusAlocacao === 'CANCELADA'"
+                >
                   <td>{{ formatDate(alocacao.data) }}</td>
                   <td>{{ getPostoNome(alocacao.postoDeTrabalhoId) }}</td>
                   <td>
@@ -232,7 +280,9 @@
                   <td>{{ getTipoLabel(alocacao.tipoAlocacao) }}</td>
                   <td class="col-valor">
                     @if (alocacao.statusAlocacao === 'CONFIRMADA') {
-                      <span class="valor-positivo">{{ formatCurrency(calcularValorAlocacao(alocacao)) }}</span>
+                      <span class="valor-positivo">{{
+                        formatCurrency(calcularValorAlocacao(alocacao))
+                      }}</span>
                     } @else {
                       <span class="valor-zero">—</span>
                     }
@@ -244,7 +294,9 @@
               <tfoot>
                 <tr class="total-row">
                   <td colspan="4"><strong>Total do Mês (Confirmadas)</strong></td>
-                  <td class="col-valor"><strong class="valor-total">{{ formatCurrency(totalGanhoMes()) }}</strong></td>
+                  <td class="col-valor">
+                    <strong class="valor-total">{{ formatCurrency(totalGanhoMes()) }}</strong>
+                  </td>
                 </tr>
               </tfoot>
             }

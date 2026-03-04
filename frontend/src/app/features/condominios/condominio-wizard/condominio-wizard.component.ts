@@ -138,8 +138,12 @@ export class CondominioWizardComponent implements OnInit {
               (this.formCondominio.get('funcionariosPorPosto')?.value || 0) *
               (this.formCondominio.get('numeroPostos')?.value || 2),
             numeroDePostos: this.formCondominio.get('numeroPostos')?.value || 2,
+            // Padrão: metade dos postos são noturnos (12x36 típico: 1 diurno + 1 noturno)
+            numeroDePostosNoturnos: Math.floor(
+              (this.formCondominio.get('numeroPostos')?.value || 2) / 2,
+            ),
             valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
-            percentualImpostos: (valores.percentualImpostos || 0) / 100, // UI: 15, Backend: 0.15
+            percentualImpostos: (valores.percentualImpostos || 0) / 100,
             percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
             margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
             margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,

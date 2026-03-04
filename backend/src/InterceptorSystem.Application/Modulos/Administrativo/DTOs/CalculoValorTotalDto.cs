@@ -7,6 +7,7 @@ public record CalculoValorTotalInput(
     decimal ValorDiariaCobrada,
     int QuantidadeFuncionarios,
     int NumeroDePostos, // Quantidade de turnos/postos (ex: 2 = 12x36)
+    int NumeroDePostosNoturnos, // Quantos desses postos têm horário noturno (CLT Art. 73)
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualImpostos,
     decimal PercentualAdicionalNoturno,
@@ -29,6 +30,7 @@ public record CalculoValorTotalOutput(
     decimal BaseParaSalarios,
     // Informações de breakdown por turno
     int NumeroDePostos,
+    int NumeroDePostosNoturnos,
     int FuncionariosPorPosto,
     decimal CustoPorPostoDiario,
     decimal CustoPorPostoMensal

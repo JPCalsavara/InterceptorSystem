@@ -711,15 +711,59 @@ POST   /api/contrato-calculos/calcular-valor-total
 
 ## ⏭️ Próximos Passos
 
-- [ ] Relatórios em PDF (escalas, folha de pagamento)
-- [ ] Testes E2E com Playwright
-- [ ] Observabilidade (logs estruturados + métricas)
-- [ ] Subir na nuvem (AWS / GCP)
-- [ ] Cache com Redis
-- [ ] Rate limiting
+### 🔧 Dívida Técnica / Refatoração
+
+- [ ] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (Domain, DTOs, Tests, Frontend, Migration — 71+ arquivos)
+- [ ] Configuração `IOptions<T>` com validação estrita via Data Annotations para todos os settings (SMTP, Meta, JWT já feito)
+- [ ] Ajustar BCrypt work factor para 12 (explícito, ao invés do default 11)
 - [ ] Value Objects (Email, Telefone, Dinheiro, Cnpj)
 - [ ] Domain Events para notificações automáticas
 - [ ] CQRS para relatórios financeiros
+
+### 🧪 Qualidade
+
+- [ ] Testes E2E com Playwright
+- [ ] Observabilidade (logs estruturados + métricas)
+
+### ☁️ Infraestrutura / DevOps
+
+- [ ] Subir na nuvem (AWS Free Tier — t3.micro)
+- [ ] Cache com Redis
+- [ ] Rate limiting (login, API pública)
+- [ ] Migração futura BCrypt → Argon2id (quando instância ≥ 4 GiB RAM)
+
+### 💰 Módulo Financeiro
+
+- [ ] Geração de folha de pagamento baseada em escalas reais
+- [ ] Relatórios em PDF (escalas, folha de pagamento)
+- [ ] Geração de PDFs dinâmicos e boletos bancários
+- [ ] Integração com gateway de pagamento
+
+### 🤖 AI & RAG
+
+- [ ] Sistema RAG para WhatsApp (atendimento premium)
+- [ ] Agente de suporte ao cliente via LLM + RAG
+- [ ] AI Profiler: eficiência operacional, ausências, alocações dupla vs normal
+
+### 🔑 Controle de Acesso & Ponto
+
+- [ ] Reconhecimento facial para entrada no condomínio
+- [ ] Reconhecimento facial para batida de ponto (clock-in)
+- [ ] Analytics: ponto planejado vs realizado
+- [ ] Avaliação de funcionários por pontualidade e assiduidade
+
+### 🏢 Ecossistema Admin
+
+- [ ] Super-Admin Dashboard (gráficos de uso, receita total, "Valor Economizado")
+- [ ] Gestão de amenidades (salão de festas, áreas comuns)
+
+### 💼 UX & Business Logic
+
+- [ ] Contratos: redesign com datas em formato natural para não-programadores
+- [ ] Exibição de valores mensais ao invés de total anual nos contratos
+- [ ] Cálculo de 13º salário conforme operação
+- [ ] Preview de salário base por tipo de escala (12x36, 5x2)
+- [ ] Configuração específica para terceirizados multi-condomínio
 
 ---
 

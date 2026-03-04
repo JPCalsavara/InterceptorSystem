@@ -1,0 +1,187 @@
+name: CD — Deploy API (.NET → EC2)
+
+# ================================================
+# Roda APENAS em push para main
+# Só dispara quando o backend muda
+# ================================================
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-api.yml"
+
+concurrency:
+  group: deploy-api-production
+  cancel-in-progress: false  # Nunca cancela um deploy em andamento
+
+jobs:
+  # ============================================
+  # JOB 1: Testa antes de deployar
+  # Garante que nada quebrado chegue em produção
+  # ============================================
+  test:
+    name: Test Backend (pre-deploy gate)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: interceptor_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore & Build
+        run: |
+          dotnet restore backend/src/InterceptorSystem.sln
+          dotnet build backend/src/InterceptorSystem.sln --no-restore --configuration Release
+
+      - name: Run all tests (unit + integration)
+        run: dotnet test backend/src/InterceptorSystem.sln --no-build --configuration Release --verbosity normal
+
+  # ============================================
+  # JOB 2: Build Docker image
+  # ============================================
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test  # Só builda se os testes passarem
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (production)
+        working-directory: backend/src
+        run: |
+          docker build \
+            -f InterceptorSystem.Api/Dockerfile \
+            -t interceptor-api:latest \
+            -t interceptor-api:${{ github.sha }} \
+            .
+          echo "✅ Imagem construída: interceptor-api:${{ github.sha }}"
+
+      - name: Save image as tarball
+        run: |
+          docker save interceptor-api:latest | gzip > interceptor-api.tar.gz
+          du -sh interceptor-api.tar.gz
+          echo "✅ Imagem salva como tarball"
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: interceptor-api.tar.gz
+          retention-days: 1
+
+  # ============================================
+  # JOB 3: Deploy na EC2 via SSH
+  # ============================================
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+
+    steps:
+      - name: Checkout code (para pegar compose.ec2.yml e nginx.ec2.conf)
+        uses: actions/checkout@v4
+
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: ./
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key.pem
+          chmod 600 ~/.ssh/ec2_key.pem
+          # Adiciona a EC2 como host conhecido (evita prompt interativo)
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      # Copia a imagem Docker e os arquivos de infra para a EC2
+      - name: Copiar arquivos para EC2
+        run: |
+          # Imagem Docker
+          scp -i ~/.ssh/ec2_key.pem \
+            interceptor-api.tar.gz \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+
+          # Arquivos de infraestrutura
+          scp -i ~/.ssh/ec2_key.pem \
+            backend/src/compose.ec2.yml \
+            backend/src/nginx.ec2.conf \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+
+          echo "✅ Arquivos copiados para a EC2"
+
+      # Deploy na EC2: carrega a imagem e reinicia o serviço
+      - name: Deploy na EC2
+        run: |
+          ssh -i ~/.ssh/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'DEPLOY_SCRIPT'
+            set -e  # Para o script se qualquer comando falhar
+
+            echo "📦 Carregando nova imagem Docker..."
+            docker load < interceptor-api.tar.gz
+
+            echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
+            docker compose -f compose.ec2.yml pull --ignore-pull-failures || true
+            docker compose -f compose.ec2.yml up -d --no-deps api nginx
+
+            echo "⏳ Aguardando API ficar saudável..."
+            sleep 10
+
+            # Verifica se o container está rodando
+            docker compose -f compose.ec2.yml ps api | grep -q "Up" || {
+              echo "❌ ERRO: Container da API não está rodando!"
+              docker compose -f compose.ec2.yml logs api --tail=50
+              exit 1
+            }
+
+            # Healthcheck da API
+            for attempt in 1 2 3 4 5; do
+              if curl -sf http://localhost/health > /dev/null 2>&1; then
+                echo "✅ API respondendo na tentativa $attempt"
+                break
+              fi
+              echo "⏳ Tentativa $attempt falhou, aguardando 5s..."
+              sleep 5
+              if [ $attempt -eq 5 ]; then
+                echo "❌ ERRO: API não respondeu após 5 tentativas. Verificando logs..."
+                docker compose -f compose.ec2.yml logs api --tail=100
+                exit 1
+              fi
+            done
+
+            # Limpa imagens antigas (economiza espaço no disco da EC2)
+            echo "🧹 Limpando imagens antigas..."
+            docker image prune -f --filter "until=24h"
+
+            echo "============================================"
+            echo "✅ Deploy da API concluído com sucesso!"
+            echo "🕐 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "============================================"
+          DEPLOY_SCRIPT
+
+      - name: Limpar chave SSH (segurança)
+        if: always()
+        run: rm -f ~/.ssh/ec2_key.pem

@@ -1,4 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.interceptorsystem.com', // Ajustar para domínio de produção
+  // Caminho relativo — CloudFront roteia /api/* para a EC2 automaticamente.
+  // Não precisa de CORS porque frontend e API ficam no mesmo domínio CloudFront.
+  apiUrl: '',
 };
