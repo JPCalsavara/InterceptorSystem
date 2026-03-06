@@ -2,33 +2,121 @@
    Responsive Breakpoints
    ========================================================================== */
 
-$bp-xs: 480px;
-$bp-sm: 640px;
-$bp-md: 768px;
-$bp-lg: 1024px;
-$bp-xl: 1280px;
-$bp-2xl: 1536px;
+// --- Breakpoint scale ---
+// Matches the project's actual usage across all page components.
+// Always prefer these variables over raw pixel values in media queries.
 
+$bp-xs: 480px; // Extra-small  — kanban/calendar single-col collapse
+$bp-sm: 640px; // Small mobile — dashboard metrics single-col fallback
+$bp-ph: 900px; // Phablet      — landing nav collapse, cadastro hero stack
+$bp-md: 768px; // Mobile       — most page layouts stack here (MOST USED)
+$bp-lg: 1024px; // Tablet/large — dashboard main grid collapses
+$bp-xl: 1280px; // Desktop      — wide content areas
+$bp-2xl: 1536px; // Ultra-wide
+
+// ==========================================================================
+// Desktop-first mixins (max-width)
+// Use these to progressively simplify layouts as screen shrinks.
+// ==========================================================================
+
+/// Extra-small devices (< 480px): kanban single-column, tiny calendars
+@mixin xs {
+  @media (max-width: #{$bp-xs - 1px}) {
+    @content;
+  } // max-width: 479px
+}
+
+/// Small mobile (< 640px): metrics single-column fallback
 @mixin mobile {
   @media (max-width: #{$bp-sm - 1px}) {
     @content;
-  }
+  } // max-width: 639px
 }
 
+/// Phablet (< 900px): nav collapse, two-column hero to single
+@mixin phablet {
+  @media (max-width: #{$bp-ph - 1px}) {
+    @content;
+  } // max-width: 899px
+}
+
+/// Tablet and below (< 768px): most page layouts stack — MOST USED
 @mixin tablet {
+  @media (max-width: #{$bp-md - 1px}) {
+    @content;
+  } // max-width: 767px
+}
+
+/// Below desktop (< 1024px): dashboard 3-col grid collapses
+@mixin below-desktop {
   @media (max-width: #{$bp-lg - 1px}) {
     @content;
-  }
+  } // max-width: 1023px
 }
 
+/// Desktop and wider (>= 1024px)
 @mixin desktop {
-  @media (min-width: #{$bp-lg}) {
+  @media (min-width: $bp-lg) {
     @content;
   }
 }
 
+// ==========================================================================
+// Mobile-first mixins (min-width)
+// Prefer these for new components following progressive enhancement.
+// ==========================================================================
+
+/// From small mobile and up (>= 640px)
+@mixin from-mobile {
+  @media (min-width: $bp-sm) {
+    @content;
+  }
+}
+
+/// From phablet and up (>= 900px)
+@mixin from-phablet {
+  @media (min-width: $bp-ph) {
+    @content;
+  }
+}
+
+/// From medium and up (>= 768px)
+@mixin from-tablet {
+  @media (min-width: $bp-md) {
+    @content;
+  }
+}
+
+/// From desktop and up (>= 1024px) — alias for desktop
+@mixin from-desktop {
+  @media (min-width: $bp-lg) {
+    @content;
+  }
+}
+
+/// From xl and up (>= 1280px)
+@mixin from-xl {
+  @media (min-width: $bp-xl) {
+    @content;
+  }
+}
+
+// ==========================================================================
+// Generic breakpoint escape hatch — use sparingly
+// ==========================================================================
+
+/// Custom min-width breakpoint
+/// Usage: @include bp(1400px) { ... }
 @mixin bp($size) {
   @media (min-width: $size) {
+    @content;
+  }
+}
+
+/// Custom max-width breakpoint
+/// Usage: @include bp-max(1400px) { ... }
+@mixin bp-max($size) {
+  @media (max-width: $size) {
     @content;
   }
 }
