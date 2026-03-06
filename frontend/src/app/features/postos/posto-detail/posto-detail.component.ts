@@ -5,11 +5,13 @@ import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.serv
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { CondominioService } from '../../../services/condominio.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
+import { ContratoService } from '../../../services/contrato.service';
 import {
   PostoDeTrabalho,
   Alocacao,
   Condominio,
   Funcionario,
+  Contrato,
   StatusAlocacao,
   TipoAlocacao,
 } from '../../../models/index';
@@ -27,29 +29,34 @@ export class PostoDetailComponent implements OnInit {
   private alocacaoService = inject(AlocacaoService);
   private condominioService = inject(CondominioService);
   private funcionarioService = inject(FuncionarioService);
+  private contratoService = inject(ContratoService);
 
   posto = signal<PostoDeTrabalho | null>(null);
   alocacoes = signal<Alocacao[]>([]);
   condominio = signal<Condominio | null>(null);
   funcionarios = signal<Funcionario[]>([]);
+  contrato = signal<Contrato | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+
+  // Month selector for allocation history
+  selectedMonth = signal({ month: new Date().getMonth(), year: new Date().getFullYear() });
 
   // Computed properties
   totalAlocacoes = computed(() => this.alocacoes().length);
 
-  alocacoesConfirmadas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA).length
+  alocacoesConfirmadas = computed(
+    () => this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA).length,
   );
 
   faltas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA)
+    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA),
   );
 
   totalFaltas = computed(() => this.faltas().length);
 
-  alocacoesCanceladas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA).length
+  alocacoesCanceladas = computed(
+    () => this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA).length,
   );
 
   // Funcionários únicos que trabalharam neste posto
@@ -64,7 +71,6 @@ export class PostoDetailComponent implements OnInit {
   taxaPresenca = computed(() => {
     const total = this.totalAlocacoes();
     if (total === 0) return 100;
-
     const confirmadas = this.alocacoesConfirmadas();
     return (confirmadas / total) * 100;
   });
@@ -79,13 +85,13 @@ export class PostoDetailComponent implements OnInit {
     });
 
     return [
-      { tipo: 'Regular', count: tipos.get(TipoAlocacao.REGULAR) || 0, icon: '📅' },
-      { tipo: 'Dobra Programada', count: tipos.get(TipoAlocacao.DOBRA_PROGRAMADA) || 0, icon: '⏰' },
-      { tipo: 'Substituição', count: tipos.get(TipoAlocacao.SUBSTITUICAO) || 0, icon: '🔄' },
+      { tipo: 'Regular', count: tipos.get(TipoAlocacao.REGULAR) || 0, icon: 'R' },
+      { tipo: 'Dobra Programada', count: tipos.get(TipoAlocacao.DOBRA_PROGRAMADA) || 0, icon: 'D' },
+      { tipo: 'Substituição', count: tipos.get(TipoAlocacao.SUBSTITUICAO) || 0, icon: 'S' },
     ];
   });
 
-  // Ranking de funcionários por alocações
+  // Ranking de funcionários por alocações confirmadas
   rankingFuncionarios = computed(() => {
     const alocacoesPorFunc = new Map<string, number>();
 
@@ -103,7 +109,32 @@ export class PostoDetailComponent implements OnInit {
       }))
       .filter((item) => item.total > 0)
       .sort((a, b) => b.total - a.total)
-      .slice(0, 5); // Top 5
+      .slice(0, 5);
+  });
+
+  // Alocações filtradas pelo mês selecionado
+  alocacoesFiltradas = computed(() => {
+    const { month, year } = this.selectedMonth();
+    return this.alocacoes().filter((a) => {
+      const d = new Date(a.data + 'T12:00:00');
+      return d.getMonth() === month && d.getFullYear() === year;
+    });
+  });
+
+  // Se este posto recebe bônus noturno
+  recebeBonus = computed(() => {
+    const p = this.posto();
+    const c = this.contrato();
+    if (!p || !c) return false;
+    return this.calcularProporcaoNoturna(p) > 0 && (c.percentualAdicionalNoturno || 0) > 0;
+  });
+
+  // Total ganho no mês selecionado (apenas confirmadas)
+  totalGanhoMes = computed(() => {
+    if (!this.contrato()) return 0;
+    return this.alocacoesFiltradas()
+      .filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
+      .reduce((sum, a) => sum + this.calcularValorAlocacao(a), 0);
   });
 
   ngOnInit(): void {
@@ -117,7 +148,6 @@ export class PostoDetailComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    // Carregar posto primeiro
     this.postoService.getById(id).subscribe({
       next: (posto) => {
         this.posto.set(posto);
@@ -136,6 +166,12 @@ export class PostoDetailComponent implements OnInit {
     this.condominioService.getById(posto.condominioId).subscribe({
       next: (condominio) => this.condominio.set(condominio),
       error: (err) => console.warn('Erro ao carregar condomínio:', err),
+    });
+
+    // Carregar contrato
+    this.contratoService.getById(posto.contratoId).subscribe({
+      next: (contrato) => this.contrato.set(contrato),
+      error: (err) => console.warn('Erro ao carregar contrato:', err),
     });
 
     // Carregar alocações
@@ -160,6 +196,69 @@ export class PostoDetailComponent implements OnInit {
       },
       error: (err) => console.warn('Erro ao carregar funcionários:', err),
     });
+  }
+
+  // Proporção de horas noturnas do turno (CLT Art. 73: 22h–05h) — 0.0 a 1.0
+  private calcularProporcaoNoturna(posto: PostoDeTrabalho): number {
+    const inicio = parseInt(posto.horarioInicio.substring(0, 2), 10);
+    const fim = parseInt(posto.horarioFim.substring(0, 2), 10);
+    const duracao = inicio > fim ? 24 - inicio + fim : fim - inicio;
+    if (duracao === 0) return 0;
+    let horasNoturnas = 0;
+    for (let i = 0; i < duracao; i++) {
+      const hora = (inicio + i) % 24;
+      if (hora >= 22 || hora < 5) horasNoturnas++;
+    }
+    return horasNoturnas / duracao;
+  }
+
+  // Calcula o valor de uma alocação (multiplicador FDS + adicional noturno proporcional)
+  calcularValorAlocacao(alocacao: Alocacao): number {
+    const contrato = this.contrato();
+    const posto = this.posto();
+    if (!contrato) return 0;
+
+    let valor = contrato.valorDiariaCobrada || 0;
+    const data = new Date(alocacao.data + 'T12:00:00');
+    const diaSemana = data.getDay();
+
+    if (diaSemana === 0) valor *= 2.0;       // +100% domingo
+    else if (diaSemana === 6) valor *= 1.5;  // +50% sábado
+
+    if (posto) {
+      const proporcaoNoturna = this.calcularProporcaoNoturna(posto);
+      if (proporcaoNoturna > 0) {
+        valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
+      }
+    }
+
+    return valor;
+  }
+
+  // ── Month navigation ──
+  previousMonth(): void {
+    const { month, year } = this.selectedMonth();
+    if (month === 0) this.selectedMonth.set({ month: 11, year: year - 1 });
+    else this.selectedMonth.set({ month: month - 1, year });
+  }
+
+  nextMonth(): void {
+    const { month, year } = this.selectedMonth();
+    if (month === 11) this.selectedMonth.set({ month: 0, year: year + 1 });
+    else this.selectedMonth.set({ month: month + 1, year });
+  }
+
+  currentMonth(): void {
+    this.selectedMonth.set({ month: new Date().getMonth(), year: new Date().getFullYear() });
+  }
+
+  getSelectedMonthLabel(): string {
+    const months = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    ];
+    const { month, year } = this.selectedMonth();
+    return `${months[month]} ${year}`;
   }
 
   getFuncionarioNome(funcionarioId: string): string {
@@ -194,6 +293,13 @@ export class PostoDetailComponent implements OnInit {
     return labels[tipo] || 'Desconhecido';
   }
 
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  }
+
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('pt-BR');
   }
@@ -202,4 +308,3 @@ export class PostoDetailComponent implements OnInit {
     return `${inicio.substring(0, 5)} - ${fim.substring(0, 5)}`;
   }
 }
-

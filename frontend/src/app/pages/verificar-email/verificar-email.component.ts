@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
     <div class="auth-page">
       <div class="auth-card">
         <div class="auth-header">
-          <img src="/logo-preta.png" alt="Interceptor System" class="auth-logo" />
+          <img [src]="logoSrc()" alt="Interceptor System" class="auth-logo" />
           <h1 class="auth-title">Verificação de E-mail</h1>
         </div>
 
@@ -24,17 +24,21 @@ import { AuthService } from '../../services/auth.service';
 
         @if (!carregando() && sucesso()) {
           <div class="status-box success">
-            <div class="status-icon">✓</div>
+            <svg class="status-icon" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
             <p>E-mail verificado com sucesso!</p>
-            <a routerLink="/dashboard" class="btn-primary">Ir para o painel</a>
+            <a routerLink="/dashboard" class="btn-primary btn-lg action-btn">Ir para o painel</a>
           </div>
         }
 
         @if (!carregando() && erro()) {
           <div class="status-box error">
-            <div class="status-icon">✕</div>
+            <svg class="status-icon" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
             <p>{{ erro() }}</p>
-            <a routerLink="/dashboard" class="btn-secondary">Voltar ao painel</a>
+            <a routerLink="/dashboard" class="btn-secondary action-btn" style="padding: var(--space-3) var(--space-6); text-align: center; display: inline-block;">Voltar ao painel</a>
           </div>
         }
       </div>
@@ -45,35 +49,38 @@ import { AuthService } from '../../services/auth.service';
       .auth-page {
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         background: var(--bg-primary);
-        padding: 1rem;
+        padding: var(--space-4);
       }
 
       .auth-card {
         background: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 16px;
-        padding: 2.5rem;
+        border-radius: var(--radius-xl);
+        padding: clamp(var(--space-6), 8vw, var(--space-10));
         width: 100%;
         max-width: 420px;
         box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
         text-align: center;
       }
 
       .auth-header {
-        margin-bottom: 2rem;
+        margin-bottom: var(--space-8);
       }
 
       .auth-logo {
-        height: 60px;
-        margin-bottom: 1rem;
+        height: 12rem;
+        margin-bottom: var(--space-4);
       }
 
       .auth-title {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: var(--text-2xl);
+        font-weight: var(--fw-bold);
         color: var(--text-primary);
       }
 
@@ -81,13 +88,15 @@ import { AuthService } from '../../services/auth.service';
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1rem;
-        padding: 1.5rem;
-        border-radius: 8px;
+        gap: var(--space-4);
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
 
         p {
           color: var(--text-primary);
-          font-size: 1rem;
+          font-size: var(--text-base);
+          font-weight: var(--fw-medium);
+          margin: 0;
         }
 
         &.loading {
@@ -95,31 +104,33 @@ import { AuthService } from '../../services/auth.service';
         }
 
         &.success {
-          background: #d1fae5;
+          background: var(--surface-muted);
+          border: 1px solid var(--border-subtle);
           .status-icon {
-            color: #059669;
+            color: var(--primary-color);
           }
         }
 
         &.error {
-          background: #fee2e2;
+          background: var(--surface-muted);
+          border: 1px solid var(--border-strong);
           .status-icon {
-            color: #dc2626;
+            color: var(--kanban-error-border, #dc2626);
           }
         }
       }
 
       .status-icon {
-        font-size: 2.5rem;
-        font-weight: bold;
+        font-size: var(--text-5xl);
+        flex-shrink: 0;
       }
 
       .spinner {
-        width: 40px;
-        height: 40px;
+        width: 2.5rem;
+        height: 2.5rem;
         border: 3px solid var(--border-subtle);
         border-top-color: var(--primary-color);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         animation: spin 0.8s linear infinite;
       }
 
@@ -129,24 +140,14 @@ import { AuthService } from '../../services/auth.service';
         }
       }
 
-      .btn-primary,
-      .btn-secondary {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
+      .action-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-      }
-
-      .btn-primary {
-        background: var(--primary-color);
-        color: white;
-      }
-
-      .btn-secondary {
-        background: var(--surface-card);
-        color: var(--text-primary);
-        border: 1px solid var(--border-strong);
+        margin-top: var(--space-2);
+        box-sizing: border-box;
       }
     `,
   ],
@@ -158,8 +159,13 @@ export class VerificarEmailComponent implements OnInit {
   carregando = signal(true);
   sucesso = signal(false);
   erro = signal<string | null>(null);
+  isDarkMode = signal(false);
+  logoSrc = computed(() => this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png');
 
   ngOnInit(): void {
+    const saved = localStorage.getItem('theme');
+    this.isDarkMode.set(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches));
+
     const token = this.route.snapshot.queryParamMap.get('token');
     if (!token) {
       this.carregando.set(false);

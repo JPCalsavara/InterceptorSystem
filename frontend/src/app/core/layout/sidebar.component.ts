@@ -1,11 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { CondominioService } from '../../services/condominio.service';
+import { FuncionarioService } from '../../services/funcionario.service';
+import { PostoDeTrabalhoService } from '../../services/posto-de-trabalho.service';
+import { AlocacaoService } from '../../services/alocacao.service';
+import { ContratoService } from '../../services/contrato.service';
+import { StatusContrato, StatusAlocacao, StatusFuncionario } from '../../models/index';
+
 
 interface NavItem {
   label: string;
   route: string;
   icon: string;
+  countKey?: 'condominios' | 'funcionarios' | 'postos' | 'alocacoes' | 'contratos';
 }
 
 @Component({
@@ -22,8 +30,46 @@ interface NavItem {
             [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             class="nav-item"
           >
-            <span class="icon">{{ item.icon }}</span>
+            <span class="icon">
+              @switch (item.icon) {
+                @case ('chart-bar') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                  </svg>
+                }
+                @case ('building-office') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                  </svg>
+                }
+                @case ('document-text') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  </svg>
+                }
+                @case ('user-group') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                  </svg>
+                }
+                @case ('map-pin') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                  </svg>
+                }
+                @case ('calendar-days') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                  </svg>
+                }
+              }
+            </span>
+            
             <span class="label">{{ item.label }}</span>
+            @if (item.countKey && counts()[item.countKey] !== null) {
+              <span class="nav-badge">{{ counts()[item.countKey] }}</span>
+            }
           </a>
         }
       </nav>
@@ -34,13 +80,13 @@ interface NavItem {
       .sidebar {
         width: 260px;
         height: calc(100vh - 64px);
-        background: var(--sidebar-bg);
-        border-right: 1px solid var(--sidebar-border);
+        background: var(--surface-card);
+        border-right: 1px solid var(--border-subtle);
         position: fixed;
         top: 64px;
         left: 0;
         overflow-y: auto;
-        padding: 1.5rem 1rem;
+        padding: var(--space-6) var(--space-4);
         transition:
           background-color 0.3s ease,
           border-color 0.3s ease;
@@ -49,29 +95,29 @@ interface NavItem {
       .nav {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: var(--space-2);
       }
 
       .nav-item {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
+        gap: var(--space-4);
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
         text-decoration: none;
-        color: var(--sidebar-text);
-        font-weight: 500;
+        color: var(--text-secondary);
+        font-weight: var(--fw-medium);
         transition: all 0.2s;
 
         &:hover {
-          background: var(--sidebar-hover);
-          color: var(--sidebar-text-hover);
+          background: var(--bg-tertiary);
+          color: var(--primary-color);
         }
 
         &.active {
-          background: var(--sidebar-active-bg);
-          color: var(--sidebar-active-text);
-          box-shadow: var(--sidebar-active-shadow);
+          background: var(--bg-secondary);
+          color: var(--primary-color);
+          font-weight: var(--fw-semibold);
         }
       }
 
@@ -79,11 +125,34 @@ interface NavItem {
         font-size: 1.5rem;
         line-height: 1;
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        svg {
+          width: 100%;
+          height: 100%;
+        }
       }
 
       .label {
-        font-size: 0.9375rem;
+        font-size: var(--text-sm);
       }
+      .nav-badge {
+        margin-left: auto;
+        background: var(--bg-tertiary);
+        color: var(--primary-dark);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.15rem 0.6rem;
+        border-radius: 9999px;
+      }
+      .nav-item.active .nav-badge {
+        background: var(--surface-card);
+        color: var(--primary-color);
+      }
+
 
       /* Scrollbar customization */
       .sidebar::-webkit-scrollbar {
@@ -95,18 +164,18 @@ interface NavItem {
       }
 
       .sidebar::-webkit-scrollbar-thumb {
-        background: var(--sidebar-scrollbar);
-        border-radius: 3px;
+        background: var(--border-strong);
+        border-radius: var(--radius-sm);
       }
 
       .sidebar::-webkit-scrollbar-thumb:hover {
-        background: var(--sidebar-scrollbar-hover);
+        background: var(--primary-color);
       }
 
       @media (max-width: 768px) {
         .sidebar {
           width: 80px;
-          padding: 1rem 0.5rem;
+          padding: var(--space-4) var(--space-2);
         }
 
         .label {
@@ -115,19 +184,51 @@ interface NavItem {
 
         .nav-item {
           justify-content: center;
-          padding: 0.75rem;
+          padding: var(--space-3);
         }
       }
     `,
   ],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
+  private condominioService = inject(CondominioService);
+  private funcionarioService = inject(FuncionarioService);
+  private postoService = inject(PostoDeTrabalhoService);
+  private alocacaoService = inject(AlocacaoService);
+  private contratoService = inject(ContratoService);
+
+  counts = signal<Record<string, number | null>>({
+    condominios: null,
+    funcionarios: null,
+    postos: null,
+    alocacoes: null,
+    contratos: null
+  });
+
   navItems: NavItem[] = [
-    { label: 'Resumo', route: '/dashboard', icon: '📊' },
-    { label: 'Condomínios', route: '/condominios', icon: '🏢' },
-    { label: 'Contratos', route: '/contratos', icon: '📄' },
-    { label: 'Funcionários', route: '/funcionarios', icon: '👥' },
-    { label: 'Postos de Trabalho', route: '/postos', icon: '📍' },
-    { label: 'Alocações', route: '/alocacoes', icon: '📅' },
+    { label: 'Resumo', route: '/dashboard', icon: 'chart-bar' },
+    { label: 'Condomínios', route: '/condominios', icon: 'building-office', countKey: 'condominios' },
+    { label: 'Contratos', route: '/contratos', icon: 'document-text', countKey: 'contratos' },
+    { label: 'Funcionários', route: '/funcionarios', icon: 'user-group', countKey: 'funcionarios' },
+    { label: 'Postos de Trabalho', route: '/postos', icon: 'map-pin', countKey: 'postos' },
+    { label: 'Alocações', route: '/alocacoes', icon: 'calendar-days', countKey: 'alocacoes' },
   ];
+
+  ngOnInit() {
+    this.condominioService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, condominios: data.filter((x: any) => x.ativo).length }))
+    });
+    this.funcionarioService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, funcionarios: data.filter((x: any) => x.statusFuncionario === StatusFuncionario.ATIVO).length }))
+    });
+    this.postoService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, postos: data.length }))
+    });
+    this.alocacaoService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, alocacoes: data.filter((x: any) => x.statusAlocacao === StatusAlocacao.CONFIRMADA).length }))
+    });
+    this.contratoService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, contratos: data.filter((x: any) => x.status === StatusContrato.ATIVO).length }))
+    });
+  }
 }

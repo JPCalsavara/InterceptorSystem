@@ -23,7 +23,7 @@
     <!-- Title + Status -->
     <div class="title-row">
       <h1 class="contrato-title">{{ contrato()!.descricao }}</h1>
-      <span [class]="'status-badge ' + getStatusClass(contrato()!.status)">
+      <span [class]="'status-badge badge ' + getStatusClass(contrato()!.status)">
         {{ getStatusLabel(contrato()!.status) }}
       </span>
     </div>
@@ -58,7 +58,7 @@
 
       <!-- COL 2, ROWS 1-2: Indicadores com % e valor em BRL -->
       <div class="card card-col2-rows12">
-        <h2 class="card-title">📊 Indicadores do Contrato</h2>
+        <h2 class="card-title">Indicadores do Contrato</h2>
         <div class="indicadores-list">
           <div class="indicador-item">
             <div class="indicador-label">Encargos e Provisões</div>
@@ -127,12 +127,12 @@
 
       <!-- COL 3, ROWS 1-2: Breakdown Financeiro (valores absolutos) -->
       <div class="card card-col3-rows12">
-        <h2 class="card-title">💰 Breakdown Financeiro Mensal</h2>
+        <h2 class="card-title">Breakdown Financeiro Mensal</h2>
 
         <!-- FATURAMENTO -->
         <div class="bk-group">
           <div class="bk-group-header bk-receita">
-            <span class="bk-group-label">📈 Faturamento</span>
+            <span class="bk-group-label">Faturamento</span>
             <span class="bk-group-total">{{ contrato()!.valorTotalMensal | currency: 'BRL' }}</span>
           </div>
         </div>
@@ -140,7 +140,7 @@
         <!-- CUSTO -->
         <div class="bk-group">
           <div class="bk-group-header bk-custo">
-            <span class="bk-group-label">📉 Custo</span>
+            <span class="bk-group-label">Custo</span>
             <span class="bk-group-total">- {{ custoTotal() | currency: 'BRL' }}</span>
           </div>
           <div class="bk-items">
@@ -197,7 +197,7 @@
         <!-- LUCRO ESTIMADO -->
         <div class="bk-group">
           <div class="bk-group-header bk-lucro" [class.bk-prejuizo]="lucro() < 0">
-            <span class="bk-group-label">{{ lucro() >= 0 ? '📊' : '⚠️' }} Lucro Estimado</span>
+            <span class="bk-group-label">Lucro Estimado</span>
             <span class="bk-group-total">{{ lucro() | currency: 'BRL' }}</span>
           </div>
           <div class="bk-items">
@@ -225,11 +225,15 @@
 
       <!-- COL 1, ROW 2: Custo Estimado por Escala -->
       <div class="card card-col1-row2">
-        <h2 class="card-title">🧮 Custo por Escala / Mês</h2>
+        <h2 class="card-title">Custo por Escala / Mês</h2>
         <p class="card-hint">Diária {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</p>
         <div class="escala-cards">
           <div class="escala-card">
-            <div class="escala-icon">🌙</div>
+            <div class="escala-icon">
+              <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            </div>
             <div class="escala-info">
               <span class="escala-label">12×36</span>
               <span class="escala-desc">~15 dias/mês</span>
@@ -237,7 +241,15 @@
             </div>
           </div>
           <div class="escala-card">
-            <div class="escala-icon">📅</div>
+            <div class="escala-icon">
+              <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
             <div class="escala-info">
               <span class="escala-label">5×2</span>
               <span class="escala-desc">~22 dias/mês</span>
@@ -273,7 +285,9 @@
                     <td>{{ posto.quantidadeIdealFuncionarios }}</td>
                     <td>
                       <span
-                        [class]="'badge ' + (posto.permiteDobrarEscala ? 'success' : 'inactive')"
+                        [class]="
+                          'badge ' + (posto.permiteDobrarEscala ? 'badge-success' : 'badge-neutral')
+                        "
                       >
                         {{ posto.permiteDobrarEscala ? 'Sim' : 'Não' }}
                       </span>

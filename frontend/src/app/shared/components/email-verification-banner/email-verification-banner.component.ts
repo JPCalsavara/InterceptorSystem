@@ -9,7 +9,15 @@ import { AuthService } from '../../../services/auth.service';
   template: `
     @if (mostrar()) {
       <div class="verification-banner">
-        <span class="banner-icon">⚠️</span>
+        <span class="banner-icon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </span>
         <span class="banner-text">
           Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada.
         </span>
@@ -29,19 +37,22 @@ import { AuthService } from '../../../services/auth.service';
   styles: [
     `
       .verification-banner {
-        background: #fef3c7;
-        border-bottom: 1px solid #f59e0b;
-        padding: 0.6rem 1.5rem;
+        background: var(--kanban-warning-bg);
+        border-bottom: 1px solid var(--kanban-warning-border);
+        padding: var(--space-2) var(--space-6);
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        font-size: 0.875rem;
-        color: #92400e;
+        gap: var(--space-3);
+        font-size: var(--text-sm);
+        color: var(--text-primary);
         flex-wrap: wrap;
       }
 
       .banner-icon {
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        color: var(--kanban-warning-border);
       }
 
       .banner-text {
@@ -49,18 +60,18 @@ import { AuthService } from '../../../services/auth.service';
       }
 
       .banner-btn {
-        padding: 0.35rem 0.85rem;
-        background: #f59e0b;
+        padding: var(--space-1) var(--space-3);
+        background: var(--kanban-warning-border);
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: var(--radius-md);
         cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
         white-space: nowrap;
 
         &:hover:not(:disabled) {
-          background: #d97706;
+          opacity: 0.85;
         }
 
         &:disabled {
@@ -71,7 +82,7 @@ import { AuthService } from '../../../services/auth.service';
 
       .banner-msg {
         font-style: italic;
-        color: #78350f;
+        opacity: 0.75;
       }
     `,
   ],

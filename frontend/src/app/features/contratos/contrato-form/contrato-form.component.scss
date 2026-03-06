@@ -27,7 +27,7 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: transparent;
-  color: #135fb0;
+  color: var(--app-ref-135fb0);
   border: none;
   border-radius: 6px;
   font-weight: 500;
@@ -35,7 +35,7 @@
   transition: background 0.2s;
 
   &:hover {
-    background: #d9ecff;
+    background: var(--app-ref-d9ecff);
   }
 }
 
@@ -49,9 +49,9 @@
   animation: slideDown 0.3s ease-out;
 
   &-error {
-    background: #ffd6d6;
-    color: #991b1b;
-    border-left: 4px solid #ef4444;
+    background: var(--app-ref-ffd6d6);
+    color: var(--app-ref-991b1b);
+    border-left: 4px solid var(--app-ref-ef4444);
   }
 
   svg {
@@ -114,7 +114,7 @@
   margin-bottom: 0.5rem;
 
   .required {
-    color: #ef4444;
+    color: var(--app-ref-ef4444);
   }
 
   // Tooltip clicável e acessível
@@ -131,18 +131,18 @@
     background: none;
     border: none;
     padding: 0;
-    color: #135fb0;
+    color: var(--app-ref-135fb0);
     cursor: pointer;
     transition: all 0.2s;
 
     &:hover,
     &:focus {
-      color: #0d47a1;
+      color: var(--app-ref-0d47a1);
       transform: scale(1.1);
     }
 
     &:focus {
-      outline: 2px solid #135fb0;
+      outline: 2px solid var(--app-ref-135fb0);
       outline-offset: 2px;
       border-radius: 50%;
     }
@@ -158,7 +158,7 @@
     left: 50%;
     transform: translateX(-50%);
     bottom: calc(100% + 10px);
-    background: #1e293b;
+    background: var(--app-ref-1e293b);
     color: white;
     padding: 1rem;
     border-radius: 8px;
@@ -183,7 +183,7 @@
       left: 50%;
       transform: translateX(-50%);
       border: 8px solid transparent;
-      border-top-color: #1e293b;
+      border-top-color: var(--app-ref-1e293b);
 
       @media (max-width: 640px) {
         left: auto;
@@ -201,7 +201,7 @@
     }
 
     strong {
-      color: #60a5fa;
+      color: var(--app-ref-60a5fa);
     }
   }
 
@@ -256,12 +256,12 @@
 
   &:focus {
     outline: none;
-    border-color: #135fb0;
+    border-color: var(--app-ref-135fb0);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
   }
 
   &.error {
-    border-color: #ef4444;
+    border-color: var(--app-ref-ef4444);
 
     &:focus {
       box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
@@ -269,7 +269,7 @@
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--app-ref-9ca3af);
   }
 
   &:disabled {
@@ -291,7 +291,7 @@ select.form-input {
   display: block;
   margin-top: 0.5rem;
   font-size: 0.875rem;
-  color: #ef4444;
+  color: var(--app-ref-ef4444);
 }
 
 .field-hint {
@@ -307,7 +307,7 @@ select.form-input {
   display: inline-block;
   margin-left: 0.75rem;
   padding: 0.25rem 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--app-ref-667eea) 0%, var(--app-ref-764ba2) 100%);
   color: white;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -342,7 +342,7 @@ select.form-input {
   margin: 0;
 
   .required {
-    color: #ef4444;
+    color: var(--app-ref-ef4444);
   }
 
   @media (max-width: 640px) {
@@ -368,7 +368,7 @@ select.form-input {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #1976d2 0%, #135fb0 100%);
+  background: linear-gradient(135deg, var(--app-ref-1976d2) 0%, var(--app-ref-135fb0) 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -434,8 +434,8 @@ select.form-input {
 }
 
 .calculation-display {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  border: 2px solid #2196f3;
+  background: linear-gradient(135deg, var(--app-ref-e3f2fd) 0%, var(--app-ref-bbdefb) 100%);
+  border: 2px solid var(--app-ref-2196f3);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
@@ -446,7 +446,7 @@ select.form-input {
   .calc-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #1565c0;
+    color: var(--app-ref-1565c0);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -454,7 +454,7 @@ select.form-input {
   .calc-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #0d47a1;
+    color: var(--app-ref-0d47a1);
   }
 
   @media (max-width: 640px) {
@@ -465,8 +465,8 @@ select.form-input {
 }
 
 .result-card {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  border: 2px solid #2196f3;
+  background: linear-gradient(135deg, var(--app-ref-e3f2fd) 0%, var(--app-ref-bbdefb) 100%);
+  border: 2px solid var(--app-ref-2196f3);
   border-radius: 12px;
   padding: 2rem;
   display: flex;
@@ -478,7 +478,7 @@ select.form-input {
 .result-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  background: linear-gradient(135deg, var(--app-ref-2196f3) 0%, var(--app-ref-1976d2) 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -493,7 +493,7 @@ select.form-input {
   .result-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #1565c0;
+    color: var(--app-ref-1565c0);
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -502,13 +502,13 @@ select.form-input {
   .result-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #1e3a8a;
+    color: var(--app-ref-1e3a8a);
     margin: 0 0 0.5rem 0;
   }
 
   .result-info {
     font-size: 0.875rem;
-    color: #3b82f6;
+    color: var(--app-ref-3b82f6);
     margin: 0;
   }
 }
@@ -533,7 +533,7 @@ select.form-input {
       width: 20px;
       height: 20px;
       border: 3px solid var(--border-color);
-      border-top-color: #135fb0;
+      border-top-color: var(--app-ref-135fb0);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -565,7 +565,7 @@ select.form-input {
 
     &.total {
       grid-column: 1 / -1;
-      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+      background: linear-gradient(135deg, var(--app-ref-2196f3) 0%, var(--app-ref-1976d2) 100%);
       color: white;
       font-size: 1.125rem;
       font-weight: bold;
@@ -579,7 +579,7 @@ select.form-input {
     }
 
     &.highlight {
-      background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+      background: linear-gradient(135deg, var(--app-ref-42a5f5) 0%, var(--app-ref-2196f3) 100%);
       color: white;
       border: none;
 
@@ -628,7 +628,7 @@ select.form-input {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary, var(--app-ref-f8fafc));
   border-color: var(--border-subtle);
   color: var(--text-primary);
   font-weight: 700;
@@ -673,23 +673,23 @@ select.form-input {
 
   &.bk-receita {
     background: rgba(16, 185, 129, 0.08);
-    border-left-color: #10b981;
+    border-left-color: var(--app-ref-10b981);
     .bk-group-total {
-      color: #059669;
+      color: var(--app-ref-059669);
     }
   }
   &.bk-custo {
     background: rgba(239, 68, 68, 0.07);
-    border-left-color: #ef4444;
+    border-left-color: var(--app-ref-ef4444);
     .bk-group-total {
-      color: #dc2626;
+      color: var(--app-ref-dc2626);
     }
   }
   &.bk-lucro {
     background: rgba(33, 150, 243, 0.08);
-    border-left-color: #2196f3;
+    border-left-color: var(--app-ref-2196f3);
     .bk-group-total {
-      color: #1565c0;
+      color: var(--app-ref-1565c0);
     }
   }
 }
@@ -712,7 +712,7 @@ select.form-input {
   transition: background 0.12s;
 
   &:hover {
-    background: var(--bg-secondary, #f8fafc);
+    background: var(--bg-secondary, var(--app-ref-f8fafc));
   }
 
   .bk-item-label {
@@ -729,13 +729,13 @@ select.form-input {
     color: var(--text-primary);
     white-space: nowrap;
     &.deduction {
-      color: #dc2626;
+      color: var(--app-ref-dc2626);
     }
     &.positive {
-      color: #059669;
+      color: var(--app-ref-059669);
     }
     &.negative {
-      color: #dc2626;
+      color: var(--app-ref-dc2626);
     }
   }
 }

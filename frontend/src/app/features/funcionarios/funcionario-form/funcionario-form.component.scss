@@ -352,7 +352,7 @@ select.form-input {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #135fb0 0%, #1976d2 100%);
+  background: linear-gradient(135deg, var(--app-ref-135fb0) 0%, var(--app-ref-1976d2) 100%);
   color: white;
   border: none;
   border-radius: 8px;

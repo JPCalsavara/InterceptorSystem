@@ -15,11 +15,17 @@ import { NgxMaskDirective } from 'ngx-mask';
       <header class="landing-header">
         <div class="header-container">
           <img src="/logo-preta.png" alt="Interceptor System" class="header-logo" />
-          <a routerLink="/login" class="btn-login-header">Entrar</a>
+          <a routerLink="/login" class="btn-outline" style="padding: var(--space-2) var(--space-4); text-decoration: none; border-radius: var(--radius-md);">Entrar</a>
         </div>
       </header>
 
       <main class="landing-main">
+      <a routerLink="/" class="back-link">
+        <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+        Voltar ao início
+      </a>
         <section class="hero">
           <div class="hero-content">
             <div class="hero-badge">Gestão de Segurança Patrimonial</div>
@@ -34,32 +40,20 @@ import { NgxMaskDirective } from 'ngx-mask';
 
             <ul class="hero-features">
               <li>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clip-rule="evenodd"
-                  />
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Controle de escalas e alocações automáticas
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clip-rule="evenodd"
-                  />
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Cálculo automático de salários e adicionais noturnos
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clip-rule="evenodd"
-                  />
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Dashboard financeiro com visão mensal e anual
               </li>
@@ -119,9 +113,11 @@ import { NgxMaskDirective } from 'ngx-mask';
                     [type]="mostrarSenha() ? 'text' : 'password'"
                     name="senha"
                     [(ngModel)]="senha"
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder="8+ carac., 1 maiúscula, 1 num."
                     required
                     minlength="8"
+                    pattern="^(?=.*[A-Z])(?=.*\\d).{8,}$"
+                    title="A senha deve conter pelo menos 8 caracteres, 1 letra maiúscula e 1 número."
                     autocomplete="new-password"
                   />
                   <button
@@ -131,37 +127,13 @@ import { NgxMaskDirective } from 'ngx-mask';
                     [title]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
                   >
                     @if (mostrarSenha()) {
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path
-                          d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"
-                        />
-                        <path
-                          d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"
-                        />
-                        <line x1="1" y1="1" x2="23" y2="23" />
+                      <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                       </svg>
                     } @else {
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
+                      <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     }
                   </button>
@@ -172,7 +144,7 @@ import { NgxMaskDirective } from 'ngx-mask';
                 <div class="error-message">{{ erro() }}</div>
               }
 
-              <button type="submit" class="btn-submit" [disabled]="carregando()">
+              <button type="submit" class="btn-primary btn-lg" [disabled]="carregando()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-1);">
                 @if (carregando()) {
                   <span class="spinner"></span> Criando conta...
                 } @else {
@@ -201,10 +173,34 @@ import { NgxMaskDirective } from 'ngx-mask';
       .landing-header {
         border-bottom: 1px solid var(--border-subtle);
         background: var(--surface-card);
-        padding: 0 2rem;
+        padding: 0 var(--space-8);
         height: 64px;
         display: flex;
         align-items: center;
+      }
+
+      .back-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+        margin-bottom: var(--space-5);
+        align-self: flex-start;
+        max-width: 420px;
+        width: 100%;
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--primary-color);
+        }
+
+        svg {
+          flex-shrink: 0;
+          font-size: var(--text-xl);
+        }
       }
 
       .header-container {
@@ -217,62 +213,46 @@ import { NgxMaskDirective } from 'ngx-mask';
       }
 
       .header-logo {
-        height: 50px;
-      }
-
-      .btn-login-header {
-        padding: 0.5rem 1.25rem;
-        border: 2px solid var(--primary-color);
-        color: var(--primary-color);
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.875rem;
-        transition: all 0.2s;
-
-        &:hover {
-          background: var(--primary-color);
-          color: white;
-        }
+        height: 48px;
       }
 
       /* Main */
       .landing-main {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 4rem 2rem;
+        padding: var(--space-12) var(--space-8);
       }
 
       .hero {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 4rem;
+        gap: var(--space-12);
         align-items: center;
       }
 
       .hero-content {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: var(--space-6);
       }
 
       .hero-badge {
         display: inline-block;
-        background: rgba(33, 150, 243, 0.12);
+        background: var(--surface-muted);
         color: var(--primary-color);
-        border: 1px solid rgba(33, 150, 243, 0.3);
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+        border: 1px solid var(--border-subtle);
+        padding: var(--space-1) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
         width: fit-content;
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }
 
       .hero-title {
-        font-size: 2.75rem;
-        font-weight: 800;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: var(--fw-extrabold);
         line-height: 1.15;
         color: var(--text-primary);
       }
@@ -282,7 +262,7 @@ import { NgxMaskDirective } from 'ngx-mask';
       }
 
       .hero-description {
-        font-size: 1.05rem;
+        font-size: var(--text-base);
         color: var(--text-secondary);
         line-height: 1.7;
       }
@@ -291,18 +271,21 @@ import { NgxMaskDirective } from 'ngx-mask';
         list-style: none;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-3);
+        padding: 0;
+        margin: 0;
 
         li {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          font-size: 0.95rem;
+          gap: var(--space-3);
+          font-size: var(--text-sm);
           color: var(--text-primary);
 
           svg {
-            color: #10b981;
+            color: #10b981; /* Success icon */
             flex-shrink: 0;
+            font-size: var(--text-xl);
           }
         }
       }
@@ -311,64 +294,65 @@ import { NgxMaskDirective } from 'ngx-mask';
       .register-card {
         background: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 20px;
-        padding: 2.5rem;
+        border-radius: var(--radius-2xl);
+        padding: clamp(var(--space-6), 6vw, var(--space-10));
         box-shadow: var(--shadow-lg);
       }
 
       .register-header {
         text-align: center;
-        margin-bottom: 1.75rem;
+        margin-bottom: var(--space-6);
 
         h2 {
-          font-size: 1.4rem;
-          font-weight: 700;
+          font-size: var(--text-2xl);
+          font-weight: var(--fw-bold);
           color: var(--text-primary);
-          margin-bottom: 0.3rem;
+          margin-bottom: var(--space-1);
         }
 
         p {
           color: var(--text-secondary);
-          font-size: 0.875rem;
+          font-size: var(--text-sm);
         }
       }
 
       .register-form {
         display: flex;
         flex-direction: column;
-        gap: 1.1rem;
+        gap: var(--space-5);
       }
 
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: var(--space-1);
 
         label {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--text-primary);
+          font-size: var(--text-sm);
+          font-weight: var(--fw-medium);
+          color: var(--text-secondary);
         }
 
         .optional {
-          font-weight: 400;
-          color: var(--text-secondary);
-          font-size: 0.8rem;
+          font-weight: var(--fw-regular);
+          color: var(--text-tertiary);
+          font-size: var(--text-xs);
         }
 
         input {
-          padding: 0.7rem 0.9rem;
-          border: 1px solid var(--border-strong);
-          border-radius: 8px;
+          padding: var(--space-3) var(--space-4);
+          border: 1px solid var(--border-color, var(--border-strong));
+          border-radius: var(--radius-md);
           background: var(--input-bg);
           color: var(--text-primary);
-          font-size: 0.9rem;
-          transition: border-color 0.2s;
+          font-size: var(--text-base);
+          font-weight: var(--fw-regular);
+          transition: border-color 0.2s, box-shadow 0.2s;
 
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
           }
 
           &::placeholder {
@@ -391,7 +375,7 @@ import { NgxMaskDirective } from 'ngx-mask';
 
       .toggle-senha {
         position: absolute;
-        right: 0.75rem;
+        right: var(--space-3);
         background: none;
         border: none;
         cursor: pointer;
@@ -400,6 +384,7 @@ import { NgxMaskDirective } from 'ngx-mask';
         align-items: center;
         padding: 0;
         line-height: 1;
+        font-size: var(--text-lg);
 
         &:hover {
           color: var(--text-primary);
@@ -407,50 +392,23 @@ import { NgxMaskDirective } from 'ngx-mask';
       }
 
       .error-message {
-        background: #fee2e2;
-        color: #dc2626;
-        border: 1px solid #fecaca;
-        border-radius: 8px;
-        padding: 0.7rem 0.9rem;
-        font-size: 0.85rem;
-      }
-
-      .btn-submit {
-        width: 100%;
-        padding: 0.875rem;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.2s;
-        margin-top: 0.25rem;
-
-        &:hover:not(:disabled) {
-          background: var(--primary-dark);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(33, 150, 243, 0.35);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+        background: var(--surface-muted);
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        font-size: var(--text-xs);
+        font-weight: var(--fw-medium);
       }
 
       .spinner {
-        width: 16px;
-        height: 16px;
+        width: 1em;
+        height: 1em;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
+        border-top-color: currentColor;
+        border-radius: var(--radius-full);
         animation: spin 0.6s linear infinite;
+        display: inline-block;
       }
 
       @keyframes spin {
@@ -460,21 +418,21 @@ import { NgxMaskDirective } from 'ngx-mask';
       }
 
       .terms {
-        font-size: 0.75rem;
+        font-size: var(--text-xs);
         color: var(--text-tertiary);
         text-align: center;
       }
 
       .register-footer {
         text-align: center;
-        margin-top: 1.25rem;
-        font-size: 0.875rem;
+        margin-top: var(--space-5);
+        font-size: var(--text-sm);
         color: var(--text-secondary);
 
         a {
           color: var(--primary-color);
           text-decoration: none;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
 
           &:hover {
             text-decoration: underline;
@@ -485,15 +443,15 @@ import { NgxMaskDirective } from 'ngx-mask';
       @media (max-width: 900px) {
         .hero {
           grid-template-columns: 1fr;
-          gap: 2.5rem;
-        }
-
-        .hero-title {
-          font-size: 2rem;
+          gap: var(--space-10);
         }
 
         .landing-main {
-          padding: 2rem 1rem;
+          padding: var(--space-8) var(--space-4);
+        }
+
+        .landing-header {
+          padding: 0 var(--space-4);
         }
       }
     `,

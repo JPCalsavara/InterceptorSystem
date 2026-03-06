@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,8 +11,14 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="auth-page">
       <div class="auth-card">
+        <a routerLink="/login" class="back-link">
+          <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Voltar para o login
+        </a>
         <div class="auth-header">
-          <img src="/logo-preta.png" alt="Interceptor System" class="auth-logo" />
+          <img [src]="logoSrc()" alt="Interceptor System" class="auth-logo" />
           <h1 class="auth-title">Esqueci minha senha</h1>
           <p class="auth-subtitle">Informe seu e-mail para receber as instruções de recuperação</p>
         </div>
@@ -32,7 +38,7 @@ import { AuthService } from '../../services/auth.service';
               />
             </div>
 
-            <button type="submit" class="btn-submit" [disabled]="carregando()">
+            <button type="submit" class="btn-primary btn-lg submit-btn" [disabled]="carregando()">
               @if (carregando()) {
                 <span class="spinner"></span> Enviando...
               } @else {
@@ -45,10 +51,6 @@ import { AuthService } from '../../services/auth.service';
             <p>Se o e-mail estiver cadastrado, você receberá as instruções em breve.</p>
           </div>
         }
-
-        <div class="auth-footer">
-          <a routerLink="/login">Voltar para o login</a>
-        </div>
       </div>
     </div>
   `,
@@ -57,111 +59,126 @@ import { AuthService } from '../../services/auth.service';
       .auth-page {
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         background: var(--bg-primary);
-        padding: 1rem;
+        padding: var(--space-4);
+      }
+
+      .back-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+        margin-bottom: var(--space-5);
+        align-self: flex-start;
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--primary-color);
+        }
+
+        svg {
+          flex-shrink: 0;
+          font-size: var(--text-xl);
+        }
       }
 
       .auth-card {
         background: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 16px;
-        padding: 2.5rem;
+        border-radius: var(--radius-xl);
+        padding: clamp(var(--space-6), 8vw, var(--space-10));
         width: 100%;
         max-width: 420px;
         box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
       }
 
       .auth-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: var(--space-8);
       }
 
       .auth-logo {
-        height: 60px;
-        margin-bottom: 1rem;
+        height: 12rem;
+        margin-bottom: var(--space-4);
       }
 
       .auth-title {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: var(--text-2xl);
+        font-weight: var(--fw-bold);
         color: var(--text-primary);
-        margin-bottom: 0.5rem;
+        margin-bottom: var(--space-2);
       }
 
       .auth-subtitle {
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-sm);
+        font-weight: var(--fw-regular);
       }
 
       .auth-form {
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: var(--space-5);
       }
 
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: var(--space-1);
 
         label {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--text-primary);
+          font-size: var(--text-sm);
+          font-weight: var(--fw-medium);
+          color: var(--text-secondary);
         }
 
         input {
-          padding: 0.75rem 1rem;
-          border: 1px solid var(--border-strong);
-          border-radius: 8px;
+          padding: var(--space-3) var(--space-4);
+          border: 1px solid var(--border-color, var(--border-strong));
+          border-radius: var(--radius-md);
           background: var(--input-bg);
           color: var(--text-primary);
-          font-size: 0.95rem;
-          transition: border-color 0.2s;
+          font-size: var(--text-base);
+          font-weight: var(--fw-regular);
+          transition: border-color 0.2s, box-shadow 0.2s;
 
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+          }
+
+          &::placeholder {
+            color: var(--text-tertiary);
+            opacity: 0.7;
           }
         }
       }
 
-      .btn-submit {
+      .submit-btn {
         width: 100%;
-        padding: 0.875rem;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.2s;
-
-        &:hover:not(:disabled) {
-          background: var(--primary-dark);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+        gap: var(--space-2);
       }
 
       .spinner {
-        width: 16px;
-        height: 16px;
+        width: 1em;
+        height: 1em;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
+        border-top-color: currentColor;
+        border-radius: var(--radius-full);
         animation: spin 0.6s linear infinite;
+        display: inline-block;
       }
 
       @keyframes spin {
@@ -171,39 +188,31 @@ import { AuthService } from '../../services/auth.service';
       }
 
       .success-box {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #6ee7b7;
-        border-radius: 8px;
-        padding: 1rem;
+        background: var(--surface-muted);
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
         text-align: center;
-        font-size: 0.95rem;
-      }
-
-      .auth-footer {
-        text-align: center;
-        margin-top: 1.5rem;
-        font-size: 0.875rem;
-
-        a {
-          color: var(--primary-color);
-          text-decoration: none;
-          font-weight: 600;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
       }
     `,
   ],
 })
-export class EsqueciSenhaComponent {
+export class EsqueciSenhaComponent implements OnInit {
   email = '';
   enviado = signal(false);
   carregando = signal(false);
+  isDarkMode = signal(false);
+  logoSrc = computed(() => this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png');
 
   constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    const saved = localStorage.getItem('theme');
+    this.isDarkMode.set(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  }
 
   onSubmit(): void {
     if (!this.email) return;

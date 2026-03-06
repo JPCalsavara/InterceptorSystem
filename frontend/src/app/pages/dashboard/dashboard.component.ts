@@ -105,61 +105,7 @@ export class DashboardComponent implements OnInit {
     return { inicio, fim };
   }
 
-  // Cards com dados dinâmicos
-  cards = computed(() => [
-    {
-      title: 'Condomínios',
-      description: 'Gerenciar condomínios cadastrados',
-      icon: '🏢',
-      route: '/condominios',
-      color: '#2196F3',
-      stats: { label: 'Ativos', value: this.condominios().filter((c) => c.ativo).length },
-    },
-    {
-      title: 'Funcionários',
-      description: 'Gerenciar vigilantes e porteiros',
-      icon: '👥',
-      route: '/funcionarios',
-      color: '#4CAF50',
-      stats: {
-        label: 'Ativos',
-        value: this.funcionarios().filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
-          .length,
-      },
-    },
-    {
-      title: 'Postos de Trabalho',
-      description: 'Gerenciar postos e turnos',
-      icon: '📍',
-      route: '/postos',
-      color: '#FF9800',
-      stats: { label: 'Cadastrados', value: this.postos().length },
-    },
-    {
-      title: 'Alocações',
-      description: 'Escala semanal e mensal',
-      icon: '📅',
-      route: '/alocacoes',
-      color: '#9C27B0',
-      stats: {
-        label: 'Confirmadas',
-        value: this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
-          .length,
-      },
-    },
-    {
-      title: 'Contratos',
-      description: 'Gerenciar contratos ativos',
-      icon: '📄',
-      route: '/contratos',
-      color: '#F44336',
-      stats: {
-        label: 'Vigentes',
-        value: this.contratos().filter((c) => c.status === StatusContrato.ATIVO).length,
-      },
-    },
-  ]);
-
+  
   // Métricas financeiras
   metricasFinanceiras = computed(() => {
     const contratosVigentes = this.contratos().filter(
@@ -189,7 +135,7 @@ export class DashboardComponent implements OnInit {
         titulo: 'Faturamento Bruto',
         valor: faturamentoBruto,
         subtitulo: `${contratosVigentes.length} contrato${contratosVigentes.length !== 1 ? 's' : ''} vigente${contratosVigentes.length !== 1 ? 's' : ''}`,
-        icone: '💰',
+        icone: 'currency-dollar',
         cor: '#4CAF50',
         isCurrency: true,
         tendencia: 'up' as const,
@@ -198,7 +144,7 @@ export class DashboardComponent implements OnInit {
         titulo: 'Lucro Projetado',
         valor: lucroProjetado,
         subtitulo: 'Soma das margens de lucro',
-        icone: '📈',
+        icone: 'arrow-trending-up',
         cor: '#2196F3',
         isCurrency: true,
         tendencia: 'up' as const,
@@ -207,17 +153,10 @@ export class DashboardComponent implements OnInit {
         titulo: 'Custo Operacional',
         valor: custoOperacional,
         subtitulo: 'Folha + impostos + coberturas',
-        icone: '📉',
+        icone: 'arrow-trending-down',
         cor: '#FF5722',
         isCurrency: true,
-      },
-      {
-        titulo: 'Funcionários Ativos',
-        valor: totalFuncionarios,
-        subtitulo: 'Porteiros e vigilantes',
-        icone: '👥',
-        cor: '#FF9800',
-      },
+      }
     ];
   });
 

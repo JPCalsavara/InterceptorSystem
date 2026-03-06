@@ -11,7 +11,7 @@
         </svg>
         Voltar
       </button>
-      <h1>{{ isEdit() ? '✏️ Editar Contrato' : '➕ Novo Contrato' }}</h1>
+      <h1>{{ isEdit() ? 'Editar Contrato' : 'Novo Contrato' }}</h1>
       <p class="subtitle">
         {{
           isEdit()
@@ -76,7 +76,7 @@
         }
       </div>
 
-      <h3 class="section-title">💰 Valores Base</h3>
+      <h3 class="section-title">Valores Base</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -186,7 +186,7 @@
             <span class="error-message">{{ getErrorMessage('numeroDePostos') }}</span>
           }
           <small class="field-hint">
-            💡 2 postos = 12h cada (padrão) | 3 postos = 8h cada | 4 postos = 6h cada
+            2 postos = 12h cada (padrão) | 3 postos = 8h cada | 4 postos = 6h cada
           </small>
         </div>
         <div class="form-group">
@@ -220,7 +220,7 @@
             <span class="error-message">{{ getErrorMessage('numeroDePostosNoturnos') }}</span>
           }
           <small class="field-hint">
-            🌙 CLT Art. 73 — adicional noturno aplicado proporcionalmente aos postos noturnos
+            CLT Art. 73 — adicional noturno aplicado proporcionalmente aos postos noturnos
           </small>
         </div>
         <div class="form-group">
@@ -254,7 +254,7 @@
         </div>
       </div>
 
-      <h3 class="section-title">📊 Percentuais e Margens</h3>
+      <h3 class="section-title">Percentuais e Margens</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -390,7 +390,7 @@
         </div>
       </div>
 
-      <h3 class="section-title">📅 Período do Contrato</h3>
+      <h3 class="section-title">Período do Contrato</h3>
 
       <div class="form-row">
         <div class="form-group">
@@ -413,7 +413,7 @@
           <label for="dataFim" class="form-label">
             Data Fim <span class="required">*</span>
             @if (duracaoContrato()) {
-              <span class="duration-badge">📅 Duração: {{ duracaoContrato() }}</span>
+              <span class="duration-badge">Duração: {{ duracaoContrato() }}</span>
             }
           </label>
           <input
@@ -449,7 +449,7 @@
       <!-- Breakdown de Custos -->
       @if (temBreakdown || calculando()) {
         <div class="breakdown-section">
-          <h3 class="section-title">📊 Breakdown de Custos</h3>
+          <h3 class="section-title">Breakdown de Custos</h3>
 
           <!-- Loading -->
           @if (calculando()) {
@@ -477,7 +477,7 @@
           @if (breakdown() && !calculando()) {
             <div class="bk-group">
               <div class="bk-group-header bk-receita">
-                <span class="bk-group-label">📈 Faturamento</span>
+                <span class="bk-group-label">Faturamento</span>
                 <span class="bk-group-total">{{
                   breakdown()!.valorTotalMensal | currency: 'BRL'
                 }}</span>
@@ -486,7 +486,7 @@
 
             <div class="bk-group">
               <div class="bk-group-header bk-custo">
-                <span class="bk-group-label">📉 Custo Operacional</span>
+                <span class="bk-group-label">Custo Operacional</span>
                 <span class="bk-group-total">{{
                   breakdown()!.baseParaSalarios +
                     breakdown()!.valorEncargosTrabalhistas +
@@ -515,7 +515,7 @@
                 @if (breakdown()!.valorAdicionalNoturno > 0) {
                   <div class="bk-item bk-item-sub">
                     <span class="bk-item-label">
-                      🌙 Adicional Noturno
+                      Adicional Noturno
                       <span class="bk-formula">
                         {{ breakdown()!.numeroDePostosNoturnos }}/{{
                           breakdown()!.numeroDePostos
@@ -557,7 +557,7 @@
 
             <div class="bk-group">
               <div class="bk-group-header bk-lucro">
-                <span class="bk-group-label">📊 Lucro Esperado (Sobra)</span>
+                <span class="bk-group-label">Lucro Esperado (Sobra)</span>
                 <span class="bk-group-total">{{
                   breakdown()!.valorMargemLucro | currency: 'BRL'
                 }}</span>

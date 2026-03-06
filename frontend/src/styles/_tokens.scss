@@ -1,0 +1,288 @@
+:root {
+  /* ==========================================================================
+     Primitive Colors (Blue Baby Palette)
+     ========================================================================== */
+  --blue-50:  #e1f5fe;
+  --blue-100: #e3f2fd;
+  --blue-200: #bbdefb;
+  --blue-300: #90caf9;
+  --blue-400: #64b5f6;
+  --blue-500: #2196f3;
+  --blue-600: #1976d2;
+  --blue-700: #1565c0;
+  --blue-800: #0d47a1;
+  --blue-900: #0a3d91;
+
+  /* ==========================================================================
+     Semantic Colors - Light Mode
+     ========================================================================== */
+  --bg-primary: #e3f2fd;
+  --bg-secondary: #bbdefb;
+  --bg-tertiary: #90caf9;
+  --surface-card: #f5faff;
+  --surface-muted: #e1f5fe;
+  --text-primary: #0d47a1;
+  --text-secondary: #1565c0;
+  --text-tertiary: #1976d2;
+  --border-subtle: #bbdefb;
+  --border-strong: #90caf9;
+  
+  --primary-color: #2196f3;
+  --primary-dark: #1976d2;
+
+  --card-bg: #f5faff;
+  --input-bg: #ffffff;
+  --border-color: #bbdefb;
+  --hover-bg: #e1f5fe;
+  --bg-hover: #e1f5fe;
+  --border-hover: #90caf9;
+
+  /* Navbar */
+  --navbar-bg: #e3f2fd;
+  --navbar-border: #bbdefb;
+  --theme-toggle-bg: #bbdefb;
+  --theme-toggle-color: #1565c0;
+  --theme-toggle-hover-bg: #90caf9;
+  --profile-hover-bg: #bbdefb;
+  --dropdown-bg: #f5faff;
+  --dropdown-border: #bbdefb;
+  --dropdown-item-hover: #e1f5fe;
+  --dropdown-divider: #bbdefb;
+
+  /* Sidebar */
+  --sidebar-bg: #e3f2fd;
+  --sidebar-border: #bbdefb;
+  --sidebar-text: #1565c0;
+  --sidebar-text-hover: #0d47a1;
+  --sidebar-hover: #bbdefb;
+  --sidebar-active-bg: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.4);
+  --sidebar-scrollbar: #90caf9;
+  --sidebar-scrollbar-hover: #64b5f6;
+
+  /* Kanban Status */
+  --kanban-success-bg: linear-gradient(135deg, #c5f1d8 0%, #a7f3d0 100%);
+  --kanban-success-border: #10b981;
+  --kanban-warning-bg: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  --kanban-warning-border: #f59e0b;
+  --kanban-error-bg: linear-gradient(135deg, #ffd6d6 0%, #fecaca 100%);
+  --kanban-error-border: #ef4444;
+  --kanban-info-bg: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  --kanban-info-border: #3b82f6;
+  --kanban-neutral-bg: linear-gradient(135deg, var(--surface-muted) 0%, var(--border-subtle) 100%);
+  --kanban-neutral-border: #9ca3af;
+
+  /* App Legacy Color Tokens (auto-generated to remove hardcoded hex in component styles) */
+  --app-ref-0284c7: #0284c7;
+  --app-ref-034133: #034133;
+  --app-ref-0369a1: #0369a1;
+  --app-ref-059669: #059669;
+  --app-ref-064e3b: #064e3b;
+  --app-ref-065f46: #065f46;
+  --app-ref-075985: #075985;
+  --app-ref-0891b2: #0891b2;
+  --app-ref-0c3046: #0c3046;
+  --app-ref-0c4a6e: #0c4a6e;
+  --app-ref-0d47a1: #0d47a1;
+  --app-ref-0d8f73: #0d8f73;
+  --app-ref-0d9488: #0d9488;
+  --app-ref-0f766e: #0f766e;
+  --app-ref-10b981: #10b981;
+  --app-ref-111827: #111827;
+  --app-ref-134e4a: #134e4a;
+  --app-ref-135fb0: #135fb0;
+  --app-ref-14532d: #14532d;
+  --app-ref-1565c0: #1565c0;
+  --app-ref-15803d: #15803d;
+  --app-ref-16a34a: #16a34a;
+  --app-ref-1976d2: #1976d2;
+  --app-ref-1d4ed8: #1d4ed8;
+  --app-ref-1e1b4b: #1e1b4b;
+  --app-ref-1e293b: #1e293b;
+  --app-ref-1e3a5f: #1e3a5f;
+  --app-ref-1e3a8a: #1e3a8a;
+  --app-ref-1e40af: #1e40af;
+  --app-ref-2196f3: #2196f3;
+  --app-ref-2563eb: #2563eb;
+  --app-ref-2dd4bf: #2dd4bf;
+  --app-ref-2e1065: #2e1065;
+  --app-ref-2e7d32: #2e7d32;
+  --app-ref-333: #333;
+  --app-ref-34d399: #34d399;
+  --app-ref-3730a3: #3730a3;
+  --app-ref-388e3c: #388e3c;
+  --app-ref-38bdf8: #38bdf8;
+  --app-ref-3b0764: #3b0764;
+  --app-ref-3b82f6: #3b82f6;
+  --app-ref-3e2723: #3e2723;
+  --app-ref-42a5f5: #42a5f5;
+  --app-ref-43a047: #43a047;
+  --app-ref-4a044e: #4a044e;
+  --app-ref-4ade80: #4ade80;
+  --app-ref-4b5563: #4b5563;
+  --app-ref-4caf50: #4caf50;
+  --app-ref-4f46e5: #4f46e5;
+  --app-ref-5a4000: #5a4000;
+  --app-ref-5d4037: #5d4037;
+  --app-ref-5eead4: #5eead4;
+  --app-ref-60a5fa: #60a5fa;
+  --app-ref-667eea: #667eea;
+  --app-ref-6b7280: #6b7280;
+  --app-ref-6d28d9: #6d28d9;
+  --app-ref-6ee7b7: #6ee7b7;
+  --app-ref-713f12: #713f12;
+  --app-ref-764ba2: #764ba2;
+  --app-ref-7c3aed: #7c3aed;
+  --app-ref-7dd3fc: #7dd3fc;
+  --app-ref-818cf8: #818cf8;
+  --app-ref-854d0e: #854d0e;
+  --app-ref-8d6e63: #8d6e63;
+  --app-ref-92400e: #92400e;
+  --app-ref-9333ea: #9333ea;
+  --app-ref-93c5fd: #93c5fd;
+  --app-ref-991b1b: #991b1b;
+  --app-ref-9ca3af: #9ca3af;
+  --app-ref-a1887f: #a1887f;
+  --app-ref-a78bfa: #a78bfa;
+  --app-ref-a7f3d0: #a7f3d0;
+  --app-ref-b45309: #b45309;
+  --app-ref-b71c1c: #b71c1c;
+  --app-ref-b91c1c: #b91c1c;
+  --app-ref-bbdefb: #bbdefb;
+  --app-ref-bfdbfe: #bfdbfe;
+  --app-ref-c026d3: #c026d3;
+  --app-ref-c0c0c0: #c0c0c0;
+  --app-ref-c4b5fd: #c4b5fd;
+  --app-ref-c5f1d8: #c5f1d8;
+  --app-ref-c62828: #c62828;
+  --app-ref-c7d2fe: #c7d2fe;
+  --app-ref-ccc: #ccc;
+  --app-ref-cd7f32: #cd7f32;
+  --app-ref-d1d5db: #d1d5db;
+  --app-ref-d1fae5: #d1fae5;
+  --app-ref-d32f2f: #d32f2f;
+  --app-ref-d97706: #d97706;
+  --app-ref-d9ecff: #d9ecff;
+  --app-ref-dbeafe: #dbeafe;
+  --app-ref-dc2626: #dc2626;
+  --app-ref-e0e7ff: #e0e7ff;
+  --app-ref-e0f2fe: #e0f2fe;
+  --app-ref-e3f2fd: #e3f2fd;
+  --app-ref-e53935: #e53935;
+  --app-ref-e65100: #e65100;
+  --app-ref-e879f9: #e879f9;
+  --app-ref-eab308: #eab308;
+  --app-ref-ef4444: #ef4444;
+  --app-ref-ef5350: #ef5350;
+  --app-ref-f44336: #f44336;
+  --app-ref-f57c00: #f57c00;
+  --app-ref-f59e0b: #f59e0b;
+  --app-ref-f8fafc: #f8fafc;
+  --app-ref-fb8c00: #fb8c00;
+  --app-ref-fbbf24: #fbbf24;
+  --app-ref-fca5a5: #fca5a5;
+  --app-ref-fcd34d: #fcd34d;
+  --app-ref-fde68a: #fde68a;
+  --app-ref-fecaca: #fecaca;
+  --app-ref-fee2e2: #fee2e2;
+  --app-ref-fef08a: #fef08a;
+  --app-ref-fef3c7: #fef3c7;
+  --app-ref-ff9800: #ff9800;
+  --app-ref-ffd6d6: #ffd6d6;
+  --app-ref-ffd700: #ffd700;
+  --app-ref-ffe69c: #ffe69c;
+  --app-ref-fff: #fff;
+  --app-ref-fff3cd: #fff3cd;
+
+  /* ==========================================================================
+     Shadows, Spacing & Radii
+     ========================================================================== */
+  --shadow-sm: 0 1px 2px rgba(13, 71, 161, 0.08);
+  --shadow-md: 0 4px 10px rgba(13, 71, 161, 0.12);
+  --shadow-lg: 0 12px 30px rgba(13, 71, 161, 0.16);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+body.dark-mode {
+  /* ==========================================================================
+     Semantic Colors - Dark Mode
+     ========================================================================== */
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1f2e;
+  --bg-tertiary: #252d3d;
+  --surface-card: #1e2738;
+  --surface-muted: #151b26;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  --border-subtle: #30363d;
+  --border-strong: #424a53;
+
+  --primary-color: #58a6ff;
+  --primary-dark: #4a8fd8;
+
+  --card-bg: #1e2738;
+  --input-bg: #0d1117;
+  --border-color: #30363d;
+  --hover-bg: #252d3d;
+
+  /* Navbar */
+  --navbar-bg: #161b22;
+  --navbar-border: #30363d;
+  --theme-toggle-bg: #21262d;
+  --theme-toggle-color: #8b949e;
+  --theme-toggle-hover-bg: #30363d;
+  --profile-hover-bg: #21262d;
+  --dropdown-bg: #161b22;
+  --dropdown-border: #30363d;
+  --dropdown-item-hover: #21262d;
+  --dropdown-divider: #30363d;
+
+  /* Sidebar */
+  --sidebar-bg: #0d1117;
+  --sidebar-border: #21262d;
+  --sidebar-text: #8b949e;
+  --sidebar-text-hover: #c9d1d9;
+  --sidebar-hover: #161b22;
+  --sidebar-active-bg: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-shadow: 0 4px 6px -1px rgba(88, 166, 255, 0.4);
+  --sidebar-scrollbar: #30363d;
+  --sidebar-scrollbar-hover: #424a53;
+
+  /* Kanban Status (Dark mode variants) */
+  --kanban-success-bg: linear-gradient(135deg, #0d4d2f 0%, #065f46 100%);
+  --kanban-success-border: #059669;
+  --kanban-warning-bg: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  --kanban-warning-border: #d97706;
+  --kanban-error-bg: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  --kanban-error-border: #dc2626;
+  --kanban-info-bg: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  --kanban-info-border: #2563eb;
+  --kanban-neutral-bg: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  --kanban-neutral-border: #6b7280;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6);
+}

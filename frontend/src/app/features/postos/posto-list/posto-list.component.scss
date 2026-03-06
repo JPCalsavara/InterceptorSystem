@@ -35,13 +35,15 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #1976d2 0%, #135fb0 100%);
+  background: linear-gradient(135deg, var(--app-ref-1976d2) 0%, var(--app-ref-135fb0) 100%);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
 
   &:hover {
@@ -66,15 +68,15 @@
   animation: slideDown 0.3s ease-out;
 
   &-success {
-    background: #c5f1d8;
-    color: #034133;
-    border-left: 4px solid #0d8f73;
+    background: var(--app-ref-c5f1d8);
+    color: var(--app-ref-034133);
+    border-left: 4px solid var(--app-ref-0d8f73);
   }
 
   &-error {
-    background: #ffd6d6;
-    color: #b91c1c;
-    border-left: 4px solid #dc2626;
+    background: var(--app-ref-ffd6d6);
+    color: var(--app-ref-b91c1c);
+    border-left: 4px solid var(--app-ref-dc2626);
   }
 
   svg {
@@ -119,7 +121,7 @@
     width: 48px;
     height: 48px;
     border: 4px solid var(--border-subtle);
-    border-top-color: #1976d2;
+    border-top-color: var(--app-ref-1976d2);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -142,7 +144,7 @@
   padding: 4rem 2rem;
 
   svg {
-    color: #d1d5db;
+    color: var(--app-ref-d1d5db);
     margin-bottom: 1rem;
   }
 
@@ -178,10 +180,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid;
-  border-image: linear-gradient(90deg, #1976d2 0%, #135fb0 100%) 1;
+  border-image: linear-gradient(90deg, var(--app-ref-1976d2) 0%, var(--app-ref-135fb0) 100%) 1;
 
   h2 {
     font-size: 1.5rem;
@@ -191,11 +193,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-
-    &::before {
-      content: '🏢';
-      font-size: 1.3rem;
-    }
   }
 
   .postos-count {
@@ -203,12 +200,42 @@
     align-items: center;
     justify-content: center;
     padding: 0.375rem 0.875rem;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    color: #1e40af;
+    background: linear-gradient(135deg, var(--app-ref-dbeafe) 0%, var(--app-ref-bfdbfe) 100%);
+    color: var(--app-ref-1e40af);
     border-radius: 16px;
     font-size: 0.813rem;
     font-weight: 600;
   }
+}
+
+// Faixa de informações do condomínio (entre header e cards de postos)
+.condominio-info-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.cond-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.cond-info-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cond-info-value {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 // Grid de Postos
@@ -233,7 +260,7 @@
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(25, 118, 210, 0.15);
-    border-color: #1976d2;
+    border-color: var(--app-ref-1976d2);
   }
 }
 
@@ -255,7 +282,7 @@
     gap: 0.5rem;
 
     svg {
-      color: #1976d2;
+      color: var(--app-ref-1976d2);
       flex-shrink: 0;
     }
   }
@@ -264,12 +291,12 @@
     display: inline-flex;
     align-items: center;
     padding: 0.375rem 0.75rem;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    color: #1e40af;
+    background: linear-gradient(135deg, var(--app-ref-dbeafe) 0%, var(--app-ref-bfdbfe) 100%);
+    color: var(--app-ref-1e40af);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
-    border: 1px solid #1976d2;
+    border: 1px solid var(--app-ref-1976d2);
   }
 }
 
@@ -294,7 +321,7 @@
     font-weight: 500;
 
     svg {
-      color: #1976d2;
+      color: var(--app-ref-1976d2);
       flex-shrink: 0;
     }
   }
@@ -317,35 +344,13 @@
       min-width: 28px;
       height: 28px;
       padding: 0 8px;
-      background: linear-gradient(135deg, #ffd6d6 0%, #fecaca 100%);
-      color: #b91c1c;
+      background: linear-gradient(135deg, var(--app-ref-ffd6d6) 0%, var(--app-ref-fecaca) 100%);
+      color: var(--app-ref-b91c1c);
       border-radius: 14px;
       font-size: 0.813rem;
       font-weight: 700;
-      border: 1px solid #dc2626;
+      border: 1px solid var(--app-ref-dc2626);
     }
-  }
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-
-  &-success {
-    background: linear-gradient(135deg, #c5f1d8 0%, #a8e6c4 100%);
-    color: #034133;
-    border: 1px solid #0d8f73;
-  }
-
-  &-inactive {
-    background: var(--surface-muted);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-subtle);
   }
 }
 
@@ -375,9 +380,9 @@
   }
 
   &.btn-view {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    color: #1e40af;
-    border: 1px solid #2196f3;
+    background: linear-gradient(135deg, var(--app-ref-dbeafe) 0%, var(--app-ref-bfdbfe) 100%);
+    color: var(--app-ref-1e40af);
+    border: 1px solid var(--app-ref-2196f3);
 
     &:hover {
       transform: translateY(-2px);
@@ -386,20 +391,20 @@
   }
 
   &.btn-edit {
-    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
-    color: #92400e;
-    border: 1px solid #f59e0b;
+    background: linear-gradient(135deg, var(--app-ref-fff3cd) 0%, var(--app-ref-ffe69c) 100%);
+    color: var(--app-ref-92400e);
+    border: 1px solid var(--app-ref-f59e0b);
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 4px 8px rgba(245, 159, 11, 0.801);
     }
   }
 
   &.btn-delete {
-    background: linear-gradient(135deg, #ffd6d6 0%, #fecaca 100%);
-    color: #b91c1c;
-    border: 1px solid #dc2626;
+    background: linear-gradient(135deg, var(--app-ref-ffd6d6) 0%, var(--app-ref-fecaca) 100%);
+    color: var(--app-ref-b91c1c);
+    border: 1px solid var(--app-ref-dc2626);
 
     &:hover {
       transform: translateY(-2px);
@@ -411,5 +416,3 @@
     transform: translateY(0);
   }
 }
-
-

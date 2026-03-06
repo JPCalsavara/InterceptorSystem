@@ -2,7 +2,24 @@
   <!-- Header -->
   <div class="page-header">
     <div class="header-content">
-      <h1>📍 Postos de Trabalho</h1>
+      <h1>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+          />
+          <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Postos de Trabalho
+      </h1>
       <p class="subtitle">Gerencie todos os postos de trabalho por condomínio</p>
     </div>
     <button class="btn-primary" routerLink="/postos/novo">
@@ -82,6 +99,32 @@
             <span class="postos-count">{{ grupo.postos.length }} posto(s)</span>
           </div>
 
+          <!-- Informações do condomínio -->
+          <div class="condominio-info-strip">
+            <span class="cond-info-item">
+              <span class="cond-info-label">Pessoa(s) Ideal:</span>
+              <span class="badge badge-info">{{ grupo.condominio.quantidadeIdealPorTurno }}</span>
+            </span>
+            <span class="cond-info-item">
+              <span class="cond-info-label">Contrato:</span>
+              <span class="cond-info-value">{{
+                getContratoDoCondominio(grupo.condominio.id)
+              }}</span>
+            </span>
+            <span class="cond-info-item">
+              <span class="cond-info-label">Capacidade de Dobras:</span>
+              <span class="cond-info-value">{{ getCapacidadeMaxDobras(grupo.condominio.id) }}</span>
+            </span>
+            <span class="cond-info-item">
+              <span class="cond-info-label">Dobra Permitida:</span>
+              @if (getPermiteDobras(grupo.condominio.id)) {
+                <span class="badge badge-success">Sim</span>
+              } @else {
+                <span class="badge badge-inactive">Não</span>
+              }
+            </span>
+          </div>
+
           <div class="postos-grid">
             @for (posto of grupo.postos; track posto.id) {
               <div class="posto-card">
@@ -104,52 +147,10 @@
                     </svg>
                     {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
                   </h3>
-                  <span class="ideal-badge"
-                    >{{ posto.quantidadeIdealFuncionarios }} pessoa(s) ideal</span
-                  >
                 </div>
 
                 <!-- Informações do Posto -->
                 <div class="card-info">
-                  <div class="info-row">
-                    <span class="info-label">Contrato:</span>
-                    <span class="info-value">{{ getContratoDescricao(posto.contratoId) }}</span>
-                  </div>
-
-                  <div class="info-row">
-                    <span class="info-label">
-                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                          fill-rule="evenodd"
-                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                      Capacidade Dobras:
-                    </span>
-                    <span class="info-value">{{ posto.capacidadeMaximaPorDobras }}</span>
-                  </div>
-
-                  <div class="info-row">
-                    <span class="info-label">
-                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                          fill-rule="evenodd"
-                          d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                      Dobra Permitida:
-                    </span>
-                    <span class="info-value">
-                      @if (posto.permiteDobrarEscala) {
-                        <span class="badge badge-success">Sim</span>
-                      } @else {
-                        <span class="badge badge-inactive">Não</span>
-                      }
-                    </span>
-                  </div>
-
                   <div class="info-row faltas-row">
                     <span class="info-label">
                       <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">

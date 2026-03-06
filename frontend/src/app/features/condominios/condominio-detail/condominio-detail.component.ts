@@ -92,25 +92,25 @@ export class CondominioDetailComponent implements OnInit {
         titulo: 'Alocações',
         valor: this.alocacoesPeriodo().length,
         unidade: 'total',
-        icone: '📅',
+        icone: 'calendar-days',
       },
       {
         titulo: 'Taxa de Faltas',
         valor: this.taxaFaltasPeriodo(),
         unidade: '%',
-        icone: '⚠️',
+        icone: 'exclamation-triangle',
       },
       {
         titulo: 'Dobras Realizadas',
         valor: this.dobrasRealizadas(),
         unidade: 'total',
-        icone: '🔄',
+        icone: 'arrow-path',
       },
       {
         titulo: 'Custo por Funcionário',
         valor: this.custoMedioPorFuncionario(),
         unidade: 'BRL',
-        icone: '👤',
+        icone: 'user',
       },
     ];
   });
@@ -481,11 +481,15 @@ export class CondominioDetailComponent implements OnInit {
       }
 
       const total = totalAlocacoes + (contrato.valorBeneficiosExtrasMensal || 0);
-      console.log(`[salarios] ${func.nome}: ${alocacoesConfirmadas.length} alocs confirmadas → R$${total.toFixed(2)}`);
+      console.log(
+        `[salarios] ${func.nome}: ${alocacoesConfirmadas.length} alocs confirmadas → R$${total.toFixed(2)}`,
+      );
       map.set(func.id, total);
     }
 
-    console.log(`[salarios] contratos:${contratos.length} alocacoes:${alocacoes.length} postos:${postos.length}`);
+    console.log(
+      `[salarios] contratos:${contratos.length} alocacoes:${alocacoes.length} postos:${postos.length}`,
+    );
     return map;
   });
 
@@ -566,6 +570,11 @@ export class CondominioDetailComponent implements OnInit {
   }
 
   // Métodos auxiliares para template
+  getContratoDescricao(contratoId: string): string {
+    const contrato = this.contratos().find((c) => c.id === contratoId);
+    return contrato?.descricao || 'Sem contrato';
+  }
+
   abs(value: number): number {
     return Math.abs(value);
   }
