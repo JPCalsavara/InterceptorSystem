@@ -35,9 +35,9 @@
     }
 
     &.active {
-      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
       color: white;
-      box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+      box-shadow: var(--shadow-sm);
     }
   }
 }
@@ -104,7 +104,7 @@
 
     &:focus {
       outline: none;
-      border-color: #2196f3;
+      border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
     }
   }
@@ -171,7 +171,7 @@
       font-size: 0.9rem;
 
       svg {
-        color: #2196f3;
+        color: var(--primary-color);
         flex-shrink: 0;
       }
     }
@@ -236,7 +236,7 @@
   min-width: 200px;
 
   .column-header {
-    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
     padding: 0.75rem 1rem;
     text-align: center;
@@ -267,7 +267,7 @@
     background: var(--bg-secondary);
     border-radius: 0.5rem;
     padding: 0.75rem;
-    border-left: 3px solid #2196f3;
+    border-left: 3px solid var(--primary-color);
 
     .posto-header {
       display: flex;
@@ -308,14 +308,14 @@
       }
 
       &.status-confirmada {
-        border-left-color: #10b981;
+        border-left-color: var(--app-ref-10b981);
       }
       &.status-cancelada {
-        border-left-color: #6b7280;
+        border-left-color: var(--app-ref-6b7280);
         opacity: 0.6;
       }
       &.status-falta_registrada {
-        border-left-color: #f59e0b;
+        border-left-color: var(--app-ref-f59e0b);
       }
 
       .func-name {
@@ -352,7 +352,7 @@
   }
 }
 
-[data-theme='dark'] {
+:host-context(.dark-mode) {
   .funcionario-card {
     background: var(--bg-tertiary) !important;
   }
@@ -490,23 +490,23 @@
     }
 
     &.dia-sabado {
-      background: color-mix(in srgb, #3b82f6 10%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--app-ref-3b82f6) 10%, var(--bg-secondary));
       .cell-date {
-        color: #2563eb;
+        color: var(--app-ref-2563eb);
       }
     }
 
     &.dia-domingo {
-      background: color-mix(in srgb, #ef4444 10%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--app-ref-ef4444) 10%, var(--bg-secondary));
       .cell-date {
-        color: #dc2626;
+        color: var(--app-ref-dc2626);
       }
     }
 
     &.dia-feriado {
-      background: color-mix(in srgb, #f59e0b 12%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--app-ref-f59e0b) 12%, var(--bg-secondary));
       .cell-date {
-        color: #b45309;
+        color: var(--app-ref-b45309);
         text-decoration: underline dotted;
         cursor: help;
       }
@@ -514,7 +514,7 @@
 
     &.dia-feriado.dia-sabado,
     &.dia-feriado.dia-domingo {
-      background: color-mix(in srgb, #f59e0b 18%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--app-ref-f59e0b) 18%, var(--bg-secondary));
     }
 
     .cell-date {
@@ -550,217 +550,164 @@
   }
 }
 
-// ── Badges ──────────────────────────────────────────────────────────────────
-
-.badge {
+.mini-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.45rem;
-  border-radius: 9999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-
-  &-success {
-    background: #d1fae5;
-    color: #065f46;
-  }
-  &-warning {
-    background: #fef3c7;
-    color: #92400e;
-  }
-  &-inactive {
-    background: #e5e7eb;
-    color: #6b7280;
-  }
-  &-info {
-    background: #dbeafe;
-    color: #1e40af;
-  }
-  &-secondary {
-    background: #f3f4f6;
-    color: #374151;
-  }
-}
-
-.mini-badge {
-  @extend .badge;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  white-space: nowrap;
   padding: 0.1rem 0.3rem;
   font-size: 0.6rem;
-}
-
-[data-theme='dark'] {
-  .badge {
-    &-success {
-      background: rgba(16, 185, 129, 0.2);
-      color: #6ee7b7;
-    }
-    &-warning {
-      background: rgba(251, 191, 36, 0.2);
-      color: #fbbf24;
-    }
-    &-inactive {
-      background: rgba(107, 114, 128, 0.2);
-      color: #d1d5db;
-    }
-    &-info {
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
-    }
-    &-secondary {
-      background: rgba(156, 163, 175, 0.2);
-      color: #e5e7eb;
-    }
-  }
 }
 
 // ── Employee Color Palette ──────────────────────────────────────────────────
 
 .emp-falta {
-  background: #dc2626;
-  color: #fff;
+  background: var(--app-ref-dc2626);
+  color: var(--app-ref-fff);
 }
 .emp-substituicao {
-  background: #b45309;
-  color: #fff;
+  background: var(--app-ref-b45309);
+  color: var(--app-ref-fff);
 }
 .emp-cancelada {
-  background: #6b7280;
-  color: #fff;
+  background: var(--app-ref-6b7280);
+  color: var(--app-ref-fff);
 }
 
 .emp-color-0 {
-  background: #7c3aed;
-  color: #fff;
+  background: var(--app-ref-7c3aed);
+  color: var(--app-ref-fff);
 }
 .emp-color-1 {
-  background: #2563eb;
-  color: #fff;
+  background: var(--app-ref-2563eb);
+  color: var(--app-ref-fff);
 }
 .emp-color-2 {
-  background: #0891b2;
-  color: #fff;
+  background: var(--app-ref-0891b2);
+  color: var(--app-ref-fff);
 }
 .emp-color-3 {
-  background: #059669;
-  color: #fff;
+  background: var(--app-ref-059669);
+  color: var(--app-ref-fff);
 }
 .emp-color-4 {
-  background: #c026d3;
-  color: #fff;
+  background: var(--app-ref-c026d3);
+  color: var(--app-ref-fff);
 }
 .emp-color-5 {
-  background: #0d9488;
-  color: #fff;
+  background: var(--app-ref-0d9488);
+  color: var(--app-ref-fff);
 }
 .emp-color-6 {
-  background: #6d28d9;
-  color: #fff;
+  background: var(--app-ref-6d28d9);
+  color: var(--app-ref-fff);
 }
 .emp-color-7 {
-  background: #1d4ed8;
-  color: #fff;
+  background: var(--app-ref-1d4ed8);
+  color: var(--app-ref-fff);
 }
 .emp-color-8 {
-  background: #15803d;
-  color: #fff;
+  background: var(--app-ref-15803d);
+  color: var(--app-ref-fff);
 }
 .emp-color-9 {
-  background: #0369a1;
-  color: #fff;
+  background: var(--app-ref-0369a1);
+  color: var(--app-ref-fff);
 }
 .emp-color-10 {
-  background: #9333ea;
-  color: #fff;
+  background: var(--app-ref-9333ea);
+  color: var(--app-ref-fff);
 }
 .emp-color-11 {
-  background: #0f766e;
-  color: #fff;
+  background: var(--app-ref-0f766e);
+  color: var(--app-ref-fff);
 }
 
-[data-theme='dark'] {
+:host-context(.dark-mode) {
   .emp-falta {
-    background: #dc2626;
-    color: #fff;
+    background: var(--app-ref-dc2626);
+    color: var(--app-ref-fff);
   }
   .emp-substituicao {
-    background: #fde68a;
-    color: #713f12;
+    background: var(--app-ref-fde68a);
+    color: var(--app-ref-713f12);
   }
   .emp-cancelada {
-    background: #9ca3af;
-    color: #111827;
+    background: var(--app-ref-9ca3af);
+    color: var(--app-ref-111827);
   }
 
   .emp-color-0 {
-    background: #a78bfa;
-    color: #2e1065;
+    background: var(--app-ref-a78bfa);
+    color: var(--app-ref-2e1065);
   }
   .emp-color-1 {
-    background: #60a5fa;
-    color: #1e3a5f;
+    background: var(--app-ref-60a5fa);
+    color: var(--app-ref-1e3a5f);
   }
   .emp-color-2 {
-    background: #38bdf8;
-    color: #0c3046;
+    background: var(--app-ref-38bdf8);
+    color: var(--app-ref-0c3046);
   }
   .emp-color-3 {
-    background: #34d399;
-    color: #064e3b;
+    background: var(--app-ref-34d399);
+    color: var(--app-ref-064e3b);
   }
   .emp-color-4 {
-    background: #e879f9;
-    color: #4a044e;
+    background: var(--app-ref-e879f9);
+    color: var(--app-ref-4a044e);
   }
   .emp-color-5 {
-    background: #2dd4bf;
-    color: #134e4a;
+    background: var(--app-ref-2dd4bf);
+    color: var(--app-ref-134e4a);
   }
   .emp-color-6 {
-    background: #818cf8;
-    color: #1e1b4b;
+    background: var(--app-ref-818cf8);
+    color: var(--app-ref-1e1b4b);
   }
   .emp-color-7 {
-    background: #93c5fd;
-    color: #1e3a5f;
+    background: var(--app-ref-93c5fd);
+    color: var(--app-ref-1e3a5f);
   }
   .emp-color-8 {
-    background: #4ade80;
-    color: #14532d;
+    background: var(--app-ref-4ade80);
+    color: var(--app-ref-14532d);
   }
   .emp-color-9 {
-    background: #7dd3fc;
-    color: #0c4a6e;
+    background: var(--app-ref-7dd3fc);
+    color: var(--app-ref-0c4a6e);
   }
   .emp-color-10 {
-    background: #c4b5fd;
-    color: #3b0764;
+    background: var(--app-ref-c4b5fd);
+    color: var(--app-ref-3b0764);
   }
   .emp-color-11 {
-    background: #5eead4;
-    color: #134e4a;
+    background: var(--app-ref-5eead4);
+    color: var(--app-ref-134e4a);
   }
 }
 
-[data-theme='dark'] {
+:host-context(.dark-mode) {
   .calendar-cell {
     &.dia-sabado {
       background: rgba(59, 130, 246, 0.12);
       .cell-date {
-        color: #93c5fd;
+        color: var(--app-ref-93c5fd);
       }
     }
     &.dia-domingo {
       background: rgba(239, 68, 68, 0.12);
       .cell-date {
-        color: #fca5a5;
+        color: var(--app-ref-fca5a5);
       }
     }
     &.dia-feriado {
       background: rgba(245, 158, 11, 0.14);
       .cell-date {
-        color: #fcd34d;
+        color: var(--app-ref-fcd34d);
       }
     }
     &.dia-feriado.dia-sabado,

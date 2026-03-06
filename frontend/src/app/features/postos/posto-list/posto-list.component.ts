@@ -11,6 +11,7 @@ import {
   Contrato,
   Alocacao,
   StatusAlocacao,
+  StatusContrato,
 } from '../../../models/index';
 
 interface PostoPorCondominio {
@@ -127,6 +128,23 @@ export class PostoListComponent implements OnInit {
   getContratoDescricao(contratoId: string): string {
     const contrato = this.contratos().find((c) => c.id === contratoId);
     return contrato ? contrato.descricao : '—';
+  }
+
+  getContratoDoCondominio(condominioId: string): string {
+    const contrato = this.contratos().find(
+      (c) => c.condominioId === condominioId && c.status === StatusContrato.ATIVO,
+    );
+    return contrato?.descricao || '—';
+  }
+
+  getCapacidadeMaxDobras(condominioId: string): number {
+    const postos = this.postos().filter((p) => p.condominioId === condominioId);
+    if (postos.length === 0) return 0;
+    return Math.max(...postos.map((p) => p.capacidadeMaximaPorDobras || 0));
+  }
+
+  getPermiteDobras(condominioId: string): boolean {
+    return this.postos().some((p) => p.condominioId === condominioId && p.permiteDobrarEscala);
   }
 
   confirmDelete(id: string, inicio: string, fim: string): void {

@@ -145,10 +145,10 @@ export class FuncionarioListComponent implements OnInit {
 
   getStatusClass(status: StatusFuncionario): string {
     const classes = {
-      [StatusFuncionario.ATIVO]: 'success',
-      [StatusFuncionario.FERIAS]: 'warning',
-      [StatusFuncionario.AFASTADO]: 'inactive',
-      [StatusFuncionario.DEMITIDO]: 'error',
+      [StatusFuncionario.ATIVO]: 'badge-success',
+      [StatusFuncionario.FERIAS]: 'badge-warning',
+      [StatusFuncionario.AFASTADO]: 'badge-neutral',
+      [StatusFuncionario.DEMITIDO]: 'badge-error',
     };
     return classes[status] || '';
   }

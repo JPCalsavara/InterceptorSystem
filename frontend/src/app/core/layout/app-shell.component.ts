@@ -29,13 +29,13 @@ import { EmailVerificationBannerComponent } from '../../shared/components/email-
       .main-content {
         flex: 1;
         margin-left: 260px;
-        padding: 2rem;
+        padding: var(--space-8);
         min-height: calc(100vh - 64px);
         background: var(--bg-primary);
 
         @media (max-width: 768px) {
           margin-left: 80px;
-          padding: 1rem;
+          padding: var(--space-4);
         }
       }
     `,

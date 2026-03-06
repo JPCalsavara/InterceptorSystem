@@ -14,13 +14,16 @@ interface PlanFeature {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="plano-page">
+    <div class="page-container">
       <div class="page-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
         <h1>Plano de Assinatura</h1>
-        <p class="page-subtitle">
-          Veja os detalhes do seu plano e compare com as opções disponíveis
-        </p>
       </div>
+      <p class="page-subtitle">
+        Veja os detalhes do seu plano e compare com as opções disponíveis
+      </p>
 
       <!-- Plano atual -->
       <div class="current-plan-card">
@@ -28,7 +31,7 @@ interface PlanFeature {
           <span class="current-label">Plano Atual</span>
           <h2 class="current-plan-name">
             {{ planoAtual() }}
-            <span [class]="'badge badge-' + planoAtual().toLowerCase()">{{ planoAtual() }}</span>
+            <span class="badge badge-current">{{ planoAtual() }}</span>
           </h2>
           @if (planoAtual() === 'PRO') {
             <p class="plan-status success">Plano completo ativo</p>
@@ -70,9 +73,39 @@ interface PlanFeature {
               @for (feature of features; track feature.label) {
                 <tr>
                   <td class="feature-label">{{ feature.label }}</td>
-                  <td class="feature-value">{{ renderValue(feature.free) }}</td>
-                  <td class="feature-value">{{ renderValue(feature.basic) }}</td>
-                  <td class="feature-value">{{ renderValue(feature.pro) }}</td>
+                  <td>
+                    @if (feature.free === true) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-check">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    } @else if (feature.free === false) {
+                      —
+                    } @else {
+                      {{ feature.free }}
+                    }
+                  </td>
+                  <td>
+                    @if (feature.basic === true) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-check">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    } @else if (feature.basic === false) {
+                      —
+                    } @else {
+                      {{ feature.basic }}
+                    }
+                  </td>
+                  <td>
+                    @if (feature.pro === true) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-check">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    } @else if (feature.pro === false) {
+                      —
+                    } @else {
+                      {{ feature.pro }}
+                    }
+                  </td>
                 </tr>
               }
             </tbody>
@@ -91,96 +124,117 @@ interface PlanFeature {
   `,
   styles: [
     `
-      .plano-page {
+      .page-container {
         max-width: 860px;
+        margin: var(--space-4) auto;
+        padding: 0 var(--space-4);
+        display: flex;
+        flex-direction: column;
       }
 
       .page-header {
-        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-2);
+      }
+
+      .page-header svg {
+        width: 1.5em;
+        height: 1.5em;
+        color: var(--primary-color);
+        font-size: var(--text-3xl);
       }
 
       .page-header h1 {
-        font-size: 1.75rem;
-        font-weight: 700;
+        font-size: var(--text-3xl);
+        font-weight: var(--fw-extrabold);
         color: var(--text-primary);
-        margin-bottom: 0.25rem;
+        margin: 0;
       }
 
       .page-subtitle {
         color: var(--text-secondary);
-        font-size: 0.95rem;
-      }
-
-      .current-plan-card {
-        background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        color: white;
-      }
-
-      .current-label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        opacity: 0.8;
-      }
-
-      .current-plan-name {
-        font-size: 1.75rem;
-        font-weight: 800;
-        margin: 0.4rem 0 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .plan-status {
-        font-size: 0.9rem;
-        opacity: 0.85;
-
-        &.success {
-          opacity: 1;
-          font-weight: 600;
-        }
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 0.2rem 0.65rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-
-      .badge-free {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
-      }
-      .badge-basic {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
-      }
-      .badge-pro {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
+        font-size: var(--text-base);
+        margin-top: 0;
+        margin-bottom: var(--space-6);
+        font-weight: var(--fw-regular);
       }
 
       .card {
         background: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 16px;
-        padding: 2rem;
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
         box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+
+      .current-plan-card {
+        background: var(--primary-color);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        box-shadow: var(--shadow-md);
+        margin-bottom: var(--space-6);
+      }
+
+      .current-label {
+        font-size: var(--text-sm);
+        font-weight: var(--fw-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.9;
+        display: block;
+      }
+
+      .current-plan-name {
+        font-size: var(--text-4xl);
+        font-weight: var(--fw-extrabold);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .plan-status {
+        font-size: var(--text-base);
+        opacity: 0.9;
+        margin: 0;
+      }
+
+      .plan-status.success {
+        opacity: 1;
+        font-weight: var(--fw-semibold);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0 var(--space-2);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
+        text-transform: uppercase;
+        line-height: normal;
+      }
+
+      .badge-current {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: var(--text-sm);
+        padding: var(--space-1) var(--space-3);
       }
 
       .table-title {
-        font-size: 1.1rem;
-        font-weight: 700;
+        font-size: var(--text-2xl);
+        font-weight: var(--fw-bold);
         color: var(--text-primary);
-        margin-bottom: 1.5rem;
+        margin: 0;
       }
 
       .table-wrapper {
@@ -190,71 +244,103 @@ interface PlanFeature {
       .plans-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 0.9rem;
+        font-size: var(--text-sm);
+      }
 
-        th {
-          text-align: center;
-          font-weight: 700;
-          font-size: 0.875rem;
-          color: var(--text-primary);
-          padding: 0.75rem 1rem;
-          border-bottom: 2px solid var(--border-subtle);
-          background: var(--bg-primary);
+      .plans-table th {
+        text-align: center;
+        font-weight: var(--fw-bold);
+        font-size: var(--text-sm);
+        color: var(--text-primary);
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 2px solid var(--border-subtle);
+        background: var(--bg-primary);
+        white-space: nowrap;
+      }
 
-          &:first-child {
-            text-align: left;
-          }
-        }
+      .plans-table th:first-child {
+        text-align: left;
+      }
 
-        td {
-          padding: 0.875rem 1rem;
-          border-bottom: 1px solid var(--border-subtle);
-          vertical-align: middle;
-          text-align: center;
+      .plans-table td {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--border-subtle);
+        vertical-align: middle;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: var(--text-sm);
+      }
 
-          &:last-child td {
-            border-bottom: none;
-          }
-        }
+      .plans-table tr:last-child td {
+        border-bottom: none;
       }
 
       .feature-label {
         text-align: left !important;
-        color: var(--text-primary);
-        font-weight: 500;
+        color: var(--text-primary) !important;
+        font-weight: var(--fw-medium);
       }
 
-      .feature-value {
-        color: var(--text-secondary);
+      .icon-check {
+        width: 1.5em;
+        height: 1.5em;
+        color: var(--primary-color);
+        display: inline-block;
+        vertical-align: middle;
       }
 
       .current-badge {
         display: inline-block;
         background: var(--primary-color);
         color: white;
-        font-size: 0.65rem;
-        font-weight: 700;
-        padding: 0.15rem 0.5rem;
-        border-radius: 10px;
-        margin-left: 0.4rem;
+        font-size: var(--text-xs);
+        font-weight: var(--fw-bold);
+        padding: 2px var(--space-2);
+        border-radius: var(--radius-sm);
+        margin-left: var(--space-2);
         text-transform: uppercase;
         vertical-align: middle;
       }
 
       .upgrade-cta {
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
+        margin-top: var(--space-6);
+        padding-top: var(--space-6);
         border-top: 1px solid var(--border-subtle);
         text-align: center;
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-base);
       }
 
       .contact-info {
-        display: block;
-        margin-top: 0.4rem;
+        display: inline-block;
+        margin-top: var(--space-2);
         color: var(--primary-color);
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
+      }
+
+      /* Responsive rules */
+      @media (max-width: 768px) {
+        .page-container {
+          padding: 0 var(--space-2);
+        }
+        .page-header h1 {
+          font-size: var(--text-2xl);
+        }
+        .page-header svg {
+          font-size: var(--text-2xl);
+        }
+        .current-plan-card {
+          padding: var(--space-4);
+        }
+        .current-plan-name {
+          font-size: var(--text-3xl);
+        }
+        .card {
+          padding: var(--space-4);
+        }
+        .plans-table th, .plans-table td {
+          padding: var(--space-2);
+        }
       }
     `,
   ],
@@ -276,10 +362,5 @@ export class PlanoComponent {
     { label: 'Relatórios avançados', free: false, basic: false, pro: true },
     { label: 'Suporte prioritário', free: false, basic: false, pro: true },
   ];
-
-  renderValue(value: string | boolean): string {
-    if (value === true) return '✓';
-    if (value === false) return '—';
-    return value;
-  }
 }
+

@@ -158,14 +158,14 @@ export class CondominioFormComponent implements OnInit {
           errorMessage.toLowerCase().includes('cnpj') ||
           errorMessage.toLowerCase().includes('duplicate')
         ) {
-          this.error.set('⚠️ Este CNPJ já está cadastrado. Por favor, use um CNPJ diferente.');
+          this.error.set('Este CNPJ já está cadastrado. Por favor, use um CNPJ diferente.');
         } else if (err.status === 400) {
-          this.error.set('❌ Dados inválidos. Verifique os campos obrigatórios e tente novamente.');
+          this.error.set('Dados inválidos. Verifique os campos obrigatórios e tente novamente.');
         } else {
           this.error.set(
             this.isEdit()
-              ? '❌ Erro ao atualizar condomínio. Tente novamente.'
-              : '❌ Erro ao criar condomínio. Tente novamente.',
+              ? 'Erro ao atualizar condomínio. Tente novamente.'
+              : 'Erro ao criar condomínio. Tente novamente.',
           );
         }
         this.loading.set(false);

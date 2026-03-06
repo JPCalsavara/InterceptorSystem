@@ -12,8 +12,8 @@ import { AuthService } from '../../services/auth.service';
     <div class="auth-page">
     <div class="auth-card">
     <a routerLink="/" class="back-link">
-      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+      <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
       </svg>
       Voltar ao início
     </a>
@@ -56,35 +56,13 @@ import { AuthService } from '../../services/auth.service';
                 [title]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
               >
                 @if (mostrarSenha()) {
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"
-                    />
-                    <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
+                  <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                   </svg>
                 } @else {
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
+                  <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 }
               </button>
@@ -95,7 +73,7 @@ import { AuthService } from '../../services/auth.service';
             <div class="error-message">{{ erro() }}</div>
           }
 
-          <button type="submit" class="btn-submit" [disabled]="carregando()">
+          <button type="submit" class="btn-primary btn-lg" [disabled]="carregando()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2);">
             @if (carregando()) {
               <span class="spinner"></span> Entrando...
             } @else {
@@ -123,18 +101,18 @@ import { AuthService } from '../../services/auth.service';
         align-items: center;
         justify-content: center;
         background: var(--bg-primary);
-        padding: 1rem;
+        padding: var(--space-4);
       }
 
       .back-link {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-2);
         color: var(--text-secondary);
         text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-bottom: 1.25rem;
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+        margin-bottom: var(--space-5);
         align-self: flex-start;
         max-width: 420px;
         width: 100%;
@@ -142,6 +120,11 @@ import { AuthService } from '../../services/auth.service';
 
         &:hover {
           color: var(--primary-color);
+        }
+
+        .icon-container {
+          font-size: var(--text-xl);
+          display: flex;
         }
 
         svg {
@@ -152,8 +135,8 @@ import { AuthService } from '../../services/auth.service';
       .auth-card {
         background: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 16px;
-        padding: 2.5rem;
+        border-radius: var(--radius-xl);
+        padding: clamp(var(--space-6), 8vw, var(--space-10));
         width: 100%;
         max-width: 420px;
         box-shadow: var(--shadow-lg);
@@ -161,56 +144,58 @@ import { AuthService } from '../../services/auth.service';
 
       .auth-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: var(--space-8);
       }
 
       .auth-logo {
         height: 12rem;
-        margin-bottom: 1rem;
+        margin-bottom: var(--space-4);
       }
 
       .auth-title {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: var(--text-2xl);
+        font-weight: var(--fw-bold);
         color: var(--text-primary);
-        margin-bottom: 0.5rem;
+        margin-bottom: var(--space-2);
       }
 
       .auth-subtitle {
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-sm);
+        font-weight: var(--fw-regular);
       }
 
       .auth-form {
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: var(--space-5);
       }
 
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: var(--space-1);
 
         label {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--text-primary);
+          font-size: var(--text-sm);
+          font-weight: var(--fw-medium);
+          color: var(--text-secondary);
         }
 
         input {
-          padding: 0.75rem 1rem;
-          border: 1px solid var(--border-strong);
-          border-radius: 8px;
+          padding: var(--space-3) var(--space-4);
+          border: 1px solid var(--border-color, var(--border-strong));
+          border-radius: var(--radius-md);
           background: var(--input-bg);
           color: var(--text-primary);
-          font-size: 0.95rem;
-          transition: border-color 0.2s;
+          font-size: var(--text-base);
+          font-weight: var(--fw-regular);
+          transition: border-color 0.2s, box-shadow 0.2s;
 
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
           }
 
           &::placeholder {
@@ -233,7 +218,7 @@ import { AuthService } from '../../services/auth.service';
 
       .toggle-senha {
         position: absolute;
-        right: 0.75rem;
+        right: var(--space-3);
         background: none;
         border: none;
         cursor: pointer;
@@ -242,6 +227,7 @@ import { AuthService } from '../../services/auth.service';
         align-items: center;
         padding: 0;
         line-height: 1;
+        font-size: var(--text-lg);
 
         &:hover {
           color: var(--text-primary);
@@ -249,49 +235,22 @@ import { AuthService } from '../../services/auth.service';
       }
 
       .error-message {
-        background: #fee2e2;
-        color: #dc2626;
-        border: 1px solid #fecaca;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-      }
-
-      .btn-submit {
-        width: 100%;
-        padding: 0.875rem;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.2s;
-
-        &:hover:not(:disabled) {
-          background: var(--primary-dark);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(33, 150, 243, 0.35);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+        background: var(--surface-muted);
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        font-size: var(--text-xs);
       }
 
       .spinner {
-        width: 16px;
-        height: 16px;
+        width: 1em;
+        height: 1em;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
+        border-top-color: currentColor;
+        border-radius: var(--radius-full);
         animation: spin 0.6s linear infinite;
+        display: inline-block;
       }
 
       @keyframes spin {
@@ -302,14 +261,15 @@ import { AuthService } from '../../services/auth.service';
 
       .auth-footer {
         text-align: center;
-        margin-top: 1.5rem;
-        font-size: 0.875rem;
+        margin-top: var(--space-6);
+        font-size: var(--text-sm);
         color: var(--text-secondary);
+        font-weight: var(--fw-regular);
 
         a {
           color: var(--primary-color);
           text-decoration: none;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
 
           &:hover {
             text-decoration: underline;
@@ -319,12 +279,13 @@ import { AuthService } from '../../services/auth.service';
 
       .forgot-password {
         text-align: right;
-        font-size: 0.875rem;
-        margin-top: -0.5rem;
+        font-size: var(--text-sm);
+        margin-top: calc(-1 * var(--space-2));
 
         a {
           color: var(--primary-color);
           text-decoration: none;
+          font-weight: var(--fw-medium);
 
           &:hover {
             text-decoration: underline;

@@ -50,12 +50,12 @@
 }
 
 .alert-error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--app-ref-fee2e2);
+  color: var(--app-ref-991b1b);
   padding: 1rem;
   border-radius: 0.5rem;
   margin-bottom: 1.5rem;
-  border-left: 4px solid #dc2626;
+  border-left: 4px solid var(--app-ref-dc2626);
 }
 
 .form-container {
@@ -104,7 +104,7 @@
 }
 
 .required {
-  color: #dc2626;
+  color: var(--app-ref-dc2626);
   margin-left: 0.25rem;
 }
 
@@ -125,7 +125,7 @@
   }
 
   &.error {
-    border-color: #dc2626;
+    border-color: var(--app-ref-dc2626);
     &:focus {
       box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
     }
@@ -154,7 +154,7 @@ select.form-input {
   display: block;
   margin-top: 0.5rem;
   font-size: 0.875rem;
-  color: #dc2626;
+  color: var(--app-ref-dc2626);
 }
 
 .form-footer {
@@ -226,22 +226,22 @@ select.form-input {
 
 // Styles specific to batch form
 .summary-box {
-  background-color: #f0f7ff;
-  border: 1px solid #b3d4fc;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  color: #0a3d7e;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  background: var(--kanban-info-bg);
+  border: 1px solid var(--kanban-info-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--lh-relaxed);
 }
 
 .summary-title {
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 1.1em;
-  color: #0a3d7e;
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+  color: var(--text-primary);
 }
 
 .field-hint {
@@ -272,7 +272,7 @@ select.form-input {
   transition: all 0.2s;
   flex: 1;
 
-  input[type="radio"] {
+  input[type='radio'] {
     display: none;
   }
 

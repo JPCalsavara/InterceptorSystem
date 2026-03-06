@@ -2,7 +2,16 @@
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-content">
-      <h1>📊 Dashboard</h1>
+      <div class="page-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
+          />
+        </svg>
+        <h1>Dashboard</h1>
+      </div>
       <p class="subtitle">Visão geral do sistema - InterceptorSystem</p>
     </div>
     <div class="header-actions">
@@ -34,279 +43,456 @@
   }
 
   @if (!loading()) {
-    <!-- Métricas Financeiras -->
-    <section class="metricas-section">
-      <h2 class="section-title">💰 Métricas Financeiras</h2>
-      <div class="metricas-grid">
-        @for (metrica of metricasFinanceiras(); track metrica.titulo) {
-          <div class="metrica-card" [style.border-left-color]="metrica.cor">
-            <div class="metrica-header">
-              <span class="metrica-icone">{{ metrica.icone }}</span>
-              @if (metrica.tendencia) {
-                <span class="tendencia" [class]="'tendencia-' + metrica.tendencia">
-                  {{ getTendenciaIcon(metrica.tendencia) }}
-                </span>
-              }
-            </div>
-            <p class="metrica-titulo">{{ metrica.titulo }}</p>
-            <h3 class="metrica-valor">
-              @if (metrica.isCurrency) {
-                {{ formatCurrency(metrica.valor) }}
-              } @else {
-                {{ metrica.valor }}
-              }
-            </h3>
-            <p class="metrica-subtitulo">{{ metrica.subtitulo }}</p>
+    <div class="dashboard-main-grid">
+      <!-- Métricas Financeiras -->
+      <section class="metricas-section">
+        <div class="section-header">
+          <div class="page-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+            <h1>Métricas Financeiras</h1>
           </div>
-        }
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- CARDS DE CONDOMÍNIO                                          -->
-    <!-- ============================================================ -->
-    <section class="condominios-section">
-      <div class="section-header">
-        <h2 class="section-title">🏢 Condomínios</h2>
-        <a routerLink="/condominios" class="section-link">Ver todos →</a>
-      </div>
-
-      @if (condominioCards().length === 0) {
-        <div class="empty-state-inline">
-          <span>Nenhum condomínio cadastrado.</span>
-          <a routerLink="/condominios" class="btn-acao">Cadastrar →</a>
+          <a routerLink="/contratos" class="section-link">Ver todos →</a>
         </div>
-      } @else {
-        <div class="condominios-grid">
-          @for (cond of condominioCards(); track cond.id) {
-            <a
-              [routerLink]="['/condominios', cond.id]"
-              class="cond-card"
-              [class.inativo]="!cond.ativo"
-            >
-              <!-- Cabeçalho -->
-              <div class="cond-card-header">
-                <div class="cond-info">
-                  <h3 class="cond-nome">{{ cond.nome }}</h3>
-                  <span class="cond-cnpj">{{ cond.cnpj }}</span>
-                </div>
-                <div
-                  class="cond-status-badge"
-                  [class]="cond.ativo ? 'badge-ativo' : 'badge-inativo'"
-                >
-                  {{ cond.ativo ? 'Ativo' : 'Inativo' }}
-                </div>
-              </div>
-
-              <!-- Métricas financeiras -->
-              @if (cond.faturamentoMensal > 0) {
-                <div class="cond-financeiro">
-                  <div class="fin-item">
-                    <span class="fin-label">Faturamento</span>
-                    <span class="fin-valor faturamento">{{
-                      formatCurrency(cond.faturamentoMensal)
-                    }}</span>
-                  </div>
-                  <div class="fin-item">
-                    <span class="fin-label">Custo Est.</span>
-                    <span class="fin-valor custo">{{ formatCurrency(cond.custoEstimado) }}</span>
-                  </div>
-                  <div class="fin-item">
-                    <span class="fin-label">Lucro Est.</span>
-                    <span class="fin-valor" [class]="getLucroClass(cond.margemLucro)">
-                      {{ formatCurrency(cond.lucroEstimado) }}
-                    </span>
-                  </div>
-                  <div class="fin-item">
-                    <span class="fin-label">Margem</span>
-                    <span class="fin-valor margem" [class]="getLucroClass(cond.margemLucro)">
-                      {{ cond.margemLucro | number: '1.1-1' }}%
-                    </span>
-                  </div>
-                </div>
-              } @else {
-                <div class="cond-sem-contrato">
-                  <span>⚠️ Sem contrato ativo</span>
-                </div>
-              }
-
-              <!-- Rodapé: funcionários + postos + vencimento -->
-              <div class="cond-card-footer">
-                <div class="cond-funcionarios">
-                  <span class="footer-icon">👥</span>
-                  <span
-                    >{{ cond.quantidadeFuncionarios }} funcionário{{
-                      cond.quantidadeFuncionarios !== 1 ? 's' : ''
-                    }}</span
-                  >
-                  @if (cond.numeroDePostos) {
-                    <span class="footer-sep">·</span>
-                    <span
-                      >{{ cond.numeroDePostos }} posto{{
-                        cond.numeroDePostos !== 1 ? 's' : ''
-                      }}</span
-                    >
-                  }
-                </div>
-                @if (cond.dataFimContrato) {
-                  <div
-                    class="cond-vencimento"
-                    [class]="getVencimentoClass(cond.diasParaVencimento)"
-                  >
-                    @if (cond.diasParaVencimento !== null && cond.diasParaVencimento < 0) {
-                      <span class="footer-icon">🔴</span>
-                      <span>Vencido</span>
-                    } @else if (cond.diasParaVencimento !== null && cond.diasParaVencimento <= 30) {
-                      <span class="footer-icon">⚠️</span>
-                      <span>{{ cond.diasParaVencimento }}d restantes</span>
-                    } @else {
-                      <span class="footer-icon">📅</span>
-                      <span>{{ formatDate(cond.dataFimContrato) }}</span>
+        <div class="metricas-grid">
+          @for (metrica of metricasFinanceiras(); track metrica.titulo) {
+            <div class="card" [style.border-left-color]="metrica.cor">
+              <div class="card-header">
+                <span class="metrica-icone">
+                  @switch (metrica.icone) {
+                    @case ('currency-dollar') {
+                      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                      </svg>
                     }
-                  </div>
-                }
+                    @case ('arrow-trending-up') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"
+                        />
+                      </svg>
+                    }
+                    @case ('arrow-trending-down') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181"
+                        />
+                      </svg>
+                    }
+                    @case ('user-group') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+                        />
+                      </svg>
+                    }
+                  }
+                </span>
+                <h3 class="metrica-titulo">{{ metrica.titulo }}</h3>
               </div>
-            </a>
-          }
-        </div>
-      }
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- RANKING DE FUNCIONÁRIOS DO MÊS                               -->
-    <!-- ============================================================ -->
-    <section class="ranking-section">
-      <div class="section-header">
-        <h2 class="section-title">👤 Funcionários — {{ getMesAtualLabel() }}</h2>
-        <a routerLink="/funcionarios" class="section-link">Ver todos →</a>
-      </div>
-
-      <div class="ranking-grid">
-        <!-- Mais trabalharam -->
-        <div class="ranking-card">
-          <h3 class="ranking-titulo"><span class="ranking-icon">🏆</span> Mais Alocações no Mês</h3>
-          @if (topTrabalhadores().length === 0) {
-            <div class="ranking-empty">Sem alocações registradas neste mês.</div>
-          } @else {
-            <ol class="ranking-lista">
-              @for (func of topTrabalhadores(); track func.id; let pos = $index) {
-                <li class="ranking-item" [class.podio]="pos < 3">
-                  <span class="pos-badge" [class]="'pos-' + (pos + 1)">{{ pos + 1 }}</span>
-                  <div class="rank-info">
-                    <span class="rank-nome">{{ func.nome }}</span>
-                    <span class="rank-cond">{{ func.condominioNome }}</span>
-                  </div>
-                  <div class="rank-stats">
-                    <span class="rank-valor confirmado">{{ func.alocacoesNoMes }}</span>
-                    <span class="rank-sub">plantões</span>
-                  </div>
-                  <div class="rank-presenca">
-                    <div class="presenca-bar">
-                      <div
-                        class="presenca-fill"
-                        [class]="getPresencaClass(func.taxaPresenca)"
-                        [style.width.%]="func.taxaPresenca"
-                      ></div>
-                    </div>
-                    <span class="presenca-pct" [class]="getPresencaClass(func.taxaPresenca)"
-                      >{{ func.taxaPresenca }}%</span
-                    >
-                  </div>
-                </li>
-              }
-            </ol>
-          }
-        </div>
-
-        <!-- Mais faltas -->
-        <div class="ranking-card">
-          <h3 class="ranking-titulo"><span class="ranking-icon">⚠️</span> Mais Faltas no Mês</h3>
-          @if (topFaltas().length === 0) {
-            <div class="ranking-empty ranking-ok">
-              <span>✅ Nenhuma falta registrada</span>
-              <span class="ranking-ok-sub">Ótimo desempenho da equipe!</span>
-            </div>
-          } @else {
-            <ol class="ranking-lista">
-              @for (func of topFaltas(); track func.id; let pos = $index) {
-                <li class="ranking-item ranking-falta">
-                  <span class="pos-badge falta-badge">{{ pos + 1 }}</span>
-                  <div class="rank-info">
-                    <span class="rank-nome">{{ func.nome }}</span>
-                    <span class="rank-cond">{{ func.condominioNome }}</span>
-                  </div>
-                  <div class="rank-stats">
-                    <span class="rank-valor falta">{{ func.faltasNoMes }}</span>
-                    <span class="rank-sub">falta{{ func.faltasNoMes !== 1 ? 's' : '' }}</span>
-                  </div>
-                  <div class="rank-presenca">
-                    <div class="presenca-bar">
-                      <div
-                        class="presenca-fill"
-                        [class]="getPresencaClass(func.taxaPresenca)"
-                        [style.width.%]="func.taxaPresenca"
-                      ></div>
-                    </div>
-                    <span class="presenca-pct" [class]="getPresencaClass(func.taxaPresenca)"
-                      >{{ func.taxaPresenca }}%</span
-                    >
-                  </div>
-                </li>
-              }
-            </ol>
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- Navegação Rápida -->
-    <section class="navegacao-section">
-      <h2 class="section-title">🧭 Navegação Rápida</h2>
-      <div class="cards-grid">
-        @for (card of cards(); track card.route) {
-          <a [routerLink]="card.route" class="nav-card" [style.border-left-color]="card.color">
-            <div class="card-header">
-              <span class="card-icon">{{ card.icon }}</span>
-              <h3 class="card-title">{{ card.title }}</h3>
-            </div>
-            <p class="card-description">{{ card.description }}</p>
-            <div class="card-stats">
-              <span class="stats-label">{{ card.stats.label }}:</span>
-              <span class="stats-value">{{ card.stats.value }}</span>
-            </div>
-            <div class="card-footer">
-              <span class="card-link">Acessar →</span>
-            </div>
-          </a>
-        }
-      </div>
-    </section>
-
-    <!-- Alertas de Contratos Próximos ao Vencimento -->
-    @if (contratosProximosVencimento().length > 0) {
-      <section class="alertas-section">
-        <h2 class="section-title">⚠️ Contratos Próximos ao Vencimento</h2>
-        <div class="alertas-list">
-          @for (contrato of contratosProximosVencimento(); track contrato.id) {
-            <div class="alerta-card" [class]="getUrgenciaClass(contrato.diasRestantes)">
-              <div class="alerta-header">
-                <div class="alerta-info">
-                  <h4 class="alerta-titulo">{{ contrato.condominioNome }}</h4>
-                  <p class="alerta-valor">{{ formatCurrency(contrato.valorTotalMensal) }}/mês</p>
-                </div>
-                <div class="alerta-dias">
-                  <span class="dias-numero">{{ contrato.diasRestantes }}</span>
-                  <span class="dias-label">dias</span>
-                </div>
-              </div>
-              <div class="alerta-footer">
-                <span class="alerta-data">Vence em: {{ formatDate(contrato.dataFim) }}</span>
-                <a [routerLink]="['/contratos']" class="alerta-link">Ver contrato →</a>
+              <div class="card-body">
+                <h3 class="metrica-valor">
+                  @if (metrica.isCurrency) {
+                    {{ formatCurrency(metrica.valor) }}
+                  } @else {
+                    {{ metrica.valor }}
+                  }
+                </h3>
+                <p class="metrica-subtitulo">{{ metrica.subtitulo }}</p>
               </div>
             </div>
           }
         </div>
       </section>
-    }
+
+      <!-- ============================================================ -->
+      <!-- CARDS DE CONDOMÍNIO                                          -->
+      <!-- ============================================================ -->
+      <section class="condominios-section">
+        <div class="section-header">
+          <div class="page-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"
+              />
+            </svg>
+            <h1>Condomínios</h1>
+          </div>
+          <a routerLink="/condominios" class="section-link">Ver todos →</a>
+        </div>
+
+        @if (condominioCards().length === 0) {
+          <div class="empty-state-inline">
+            <span>Nenhum condomínio cadastrado.</span>
+            <a routerLink="/condominios" class="btn-acao">Cadastrar →</a>
+          </div>
+        } @else {
+          <div class="condominios-grid">
+            @for (cond of condominioCards(); track cond.id) {
+              <a
+                [routerLink]="['/condominios', cond.id]"
+                class="cond-card"
+                [class.inativo]="!cond.ativo"
+              >
+                <!-- Cabeçalho -->
+                <div class="cond-card-header">
+                  <div class="cond-info">
+                    <h3 class="cond-nome">{{ cond.nome }}</h3>
+                    <span class="cond-cnpj">{{ cond.cnpj }}</span>
+                  </div>
+                  <div
+                    class="cond-status-badge badge"
+                    [class.badge-success]="cond.ativo"
+                    [class.badge-inactive]="!cond.ativo"
+                  >
+                    {{ cond.ativo ? 'Ativo' : 'Inativo' }}
+                  </div>
+                </div>
+
+                <!-- Métricas financeiras -->
+                @if (cond.faturamentoMensal > 0) {
+                  <div class="cond-financeiro">
+                    <div class="fin-item">
+                      <span class="fin-label">Faturamento</span>
+                      <span class="fin-valor faturamento">{{
+                        formatCurrency(cond.faturamentoMensal)
+                      }}</span>
+                    </div>
+                    <div class="fin-item">
+                      <span class="fin-label">Custo Est.</span>
+                      <span class="fin-valor custo">{{ formatCurrency(cond.custoEstimado) }}</span>
+                    </div>
+                    <div class="fin-item">
+                      <span class="fin-label">Lucro Est.</span>
+                      <span class="fin-valor" [class]="getLucroClass(cond.margemLucro)">
+                        {{ formatCurrency(cond.lucroEstimado) }}
+                      </span>
+                    </div>
+                    <div class="fin-item">
+                      <span class="fin-label">Margem</span>
+                      <span class="fin-valor margem" [class]="getLucroClass(cond.margemLucro)">
+                        {{ cond.margemLucro | number: '1.1-1' }}%
+                      </span>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="cond-sem-contrato">
+                    <span class="warning-text"
+                      ><svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        class="icon"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                        />
+                      </svg>
+                      Sem contrato ativo</span
+                    >
+                  </div>
+                }
+
+                <!-- Rodapé: funcionários + postos + vencimento -->
+                <div class="cond-card-footer">
+                  <div class="cond-funcionarios">
+                    <span class="footer-icon"
+                      ><svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        class="icon"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+                        /></svg
+                    ></span>
+                    <span
+                      >{{ cond.quantidadeFuncionarios }} funcionário{{
+                        cond.quantidadeFuncionarios !== 1 ? 's' : ''
+                      }}</span
+                    >
+                    @if (cond.numeroDePostos) {
+                      <span class="footer-sep">·</span>
+                      <span
+                        >{{ cond.numeroDePostos }} posto{{
+                          cond.numeroDePostos !== 1 ? 's' : ''
+                        }}</span
+                      >
+                    }
+                  </div>
+                  @if (cond.dataFimContrato) {
+                    <div
+                      class="cond-vencimento"
+                      [class]="getVencimentoClass(cond.diasParaVencimento)"
+                    >
+                      @if (cond.diasParaVencimento !== null && cond.diasParaVencimento < 0) {
+                        <span class="footer-icon"
+                          ><svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            class="icon"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            /></svg
+                        ></span>
+                        <span>Vencido</span>
+                      } @else if (
+                        cond.diasParaVencimento !== null && cond.diasParaVencimento <= 30
+                      ) {
+                        <span class="footer-icon"
+                          ><svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            class="icon"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                            /></svg
+                        ></span>
+                        <span>{{ cond.diasParaVencimento }}d restantes</span>
+                      } @else {
+                        <span class="footer-icon"
+                          ><svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            class="icon"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                            /></svg
+                        ></span>
+                        <span>{{ formatDate(cond.dataFimContrato) }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </a>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- RANKING DE FUNCIONÁRIOS DO MÊS                               -->
+      <!-- ============================================================ -->
+      <section class="ranking-section">
+        <div class="section-header">
+          <div class="page-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+              />
+            </svg>
+            <h1>Funcionários — {{ getMesAtualLabel() }}</h1>
+          </div>
+          <a routerLink="/funcionarios" class="section-link">Ver todos →</a>
+        </div>
+
+        <div class="ranking-grid">
+          <!-- Mais trabalharam -->
+          <div class="ranking-card">
+            <h3 class="ranking-titulo">
+              <span class="ranking-icon"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  class="icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"
+                  /></svg
+              ></span>
+              Mais Alocações no Mês
+            </h3>
+            @if (topTrabalhadores().length === 0) {
+              <div class="ranking-empty">Sem alocações registradas neste mês.</div>
+            } @else {
+              <ol class="ranking-lista">
+                @for (func of topTrabalhadores(); track func.id; let pos = $index) {
+                  <li class="ranking-item" [class.podio]="pos < 3">
+                    <span class="pos-badge" [class]="'pos-' + (pos + 1)">{{ pos + 1 }}</span>
+                    <div class="rank-info">
+                      <span class="rank-nome">{{ func.nome }}</span>
+                      <span class="rank-cond">{{ func.condominioNome }}</span>
+                    </div>
+                    <div class="rank-stats">
+                      <span class="rank-valor confirmado">{{ func.alocacoesNoMes }}</span>
+                      <span class="rank-sub">plantões</span>
+                    </div>
+                    <div class="rank-presenca">
+                      <div class="presenca-bar">
+                        <div
+                          class="presenca-fill"
+                          [class]="getPresencaClass(func.taxaPresenca)"
+                          [style.width.%]="func.taxaPresenca"
+                        ></div>
+                      </div>
+                      <span class="presenca-pct" [class]="getPresencaClass(func.taxaPresenca)"
+                        >{{ func.taxaPresenca }}%</span
+                      >
+                    </div>
+                  </li>
+                }
+              </ol>
+            }
+          </div>
+
+          <!-- Mais faltas -->
+          <div class="ranking-card">
+            <h3 class="ranking-titulo">
+              <span class="ranking-icon"
+                ><svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  class="icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                  /></svg
+              ></span>
+              Mais Faltas no Mês
+            </h3>
+            @if (topFaltas().length === 0) {
+              <div class="ranking-empty ranking-ok">
+                <span class="success-text"
+                  ><svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    class="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                  Nenhuma falta registrada</span
+                >
+                <span class="ranking-ok-sub">Ótimo desempenho da equipe!</span>
+              </div>
+            } @else {
+              <ol class="ranking-lista">
+                @for (func of topFaltas(); track func.id; let pos = $index) {
+                  <li class="ranking-item ranking-falta">
+                    <span class="pos-badge falta-badge">{{ pos + 1 }}</span>
+                    <div class="rank-info">
+                      <span class="rank-nome">{{ func.nome }}</span>
+                      <span class="rank-cond">{{ func.condominioNome }}</span>
+                    </div>
+                    <div class="rank-stats">
+                      <span class="rank-valor falta">{{ func.faltasNoMes }}</span>
+                      <span class="rank-sub">falta{{ func.faltasNoMes !== 1 ? 's' : '' }}</span>
+                    </div>
+                    <div class="rank-presenca">
+                      <div class="presenca-bar">
+                        <div
+                          class="presenca-fill"
+                          [class]="getPresencaClass(func.taxaPresenca)"
+                          [style.width.%]="func.taxaPresenca"
+                        ></div>
+                      </div>
+                      <span class="presenca-pct" [class]="getPresencaClass(func.taxaPresenca)"
+                        >{{ func.taxaPresenca }}%</span
+                      >
+                    </div>
+                  </li>
+                }
+              </ol>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Alertas de Contratos Próximos ao Vencimento -->
+      @if (contratosProximosVencimento().length > 0) {
+        <section class="alertas-section">
+          <div class="page-header">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              class="icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+            <h1>Contratos Próximos ao Vencimento</h1>
+          </div>
+          <div class="alertas-list">
+            @for (contrato of contratosProximosVencimento(); track contrato.id) {
+              <div class="alerta-card" [class]="getUrgenciaClass(contrato.diasRestantes)">
+                <div class="alerta-header">
+                  <div class="alerta-info">
+                    <h4 class="alerta-titulo">{{ contrato.condominioNome }}</h4>
+                    <p class="alerta-valor">{{ formatCurrency(contrato.valorTotalMensal) }}/mês</p>
+                  </div>
+                  <div class="alerta-dias">
+                    <span class="dias-numero">{{ contrato.diasRestantes }}</span>
+                    <span class="dias-label">dias</span>
+                  </div>
+                </div>
+                <div class="alerta-footer">
+                  <span class="alerta-data">Vence em: {{ formatDate(contrato.dataFim) }}</span>
+                  <a [routerLink]="['/contratos']" class="alerta-link">Ver contrato →</a>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
   }
 </div>

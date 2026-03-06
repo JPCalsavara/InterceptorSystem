@@ -35,30 +35,28 @@ export class ContratoListComponent implements OnInit {
 
   // Computed signals para organização kanban
   contratosPendentes = computed(() =>
-    this.contratos().filter(
-      (c) => c.status === StatusContrato.PENDENTE
-    )
+    this.contratos().filter((c) => c.status === StatusContrato.PENDENTE),
   );
   contratosVerde = computed(() => this.getContratosByDias(90, Infinity));
   contratosAmarelo = computed(() => this.getContratosByDias(30, 90));
   contratosVermelho = computed(() => this.getContratosByDias(0, 30));
   contratosFinalizados = computed(() =>
-    this.contratos().filter((c) => c.status === StatusContrato.FINALIZADO)
+    this.contratos().filter((c) => c.status === StatusContrato.FINALIZADO),
   );
 
   // Métricas mensais
-  totalContratos = computed(() =>
-    this.contratos().filter((c) => c.status !== StatusContrato.FINALIZADO).length
+  totalContratos = computed(
+    () => this.contratos().filter((c) => c.status !== StatusContrato.FINALIZADO).length,
   );
   faturamentoMensal = computed(() =>
     this.contratos()
       .filter((c) => c.status === StatusContrato.ATIVO)
-      .reduce((sum, c) => sum + this.getValorMensal(c), 0)
+      .reduce((sum, c) => sum + this.getValorMensal(c), 0),
   );
   custoMensal = computed(() =>
     this.contratos()
       .filter((c) => c.status === StatusContrato.ATIVO)
-      .reduce((sum, c) => sum + this.getContratoCusto(c), 0)
+      .reduce((sum, c) => sum + this.getContratoCusto(c), 0),
   );
   lucroMensal = computed(() => this.faturamentoMensal() - this.custoMensal());
 
@@ -146,11 +144,11 @@ export class ContratoListComponent implements OnInit {
   getStatusClass(status: StatusContrato): string {
     switch (status) {
       case StatusContrato.ATIVO:
-        return 'success';
+        return 'badge-success';
       case StatusContrato.PENDENTE:
-        return 'warning';
+        return 'badge-warning';
       case StatusContrato.FINALIZADO:
-        return 'inactive';
+        return 'badge-neutral';
       default:
         return '';
     }
@@ -193,11 +191,13 @@ export class ContratoListComponent implements OnInit {
 
     // Funcionários ativos deste condomínio
     const ativos = this.funcionarios().filter(
-      (f) => f.condominioId === contrato.condominioId && f.statusFuncionario === StatusFuncionario.ATIVO
+      (f) =>
+        f.condominioId === contrato.condominioId && f.statusFuncionario === StatusFuncionario.ATIVO,
     );
 
     // Benefícios: se há ativos reais, usa qtd real; senao usa estimativa do contrato
-    const qtdBeneficios = ativos.length > 0 ? ativos.length : (contrato.quantidadeFuncionarios || 0) * 2;
+    const qtdBeneficios =
+      ativos.length > 0 ? ativos.length : (contrato.quantidadeFuncionarios || 0) * 2;
     const beneficios = qtdBeneficios * beneficioUnit;
 
     // Custo por funcionário (diaria × dias de escala)

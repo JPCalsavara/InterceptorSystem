@@ -9,7 +9,24 @@ import { RouterLink } from '@angular/router';
   template: `
     <div class="page-container">
       <div class="page-header">
-        <h1>👥 Funcionários</h1>
+        <h1>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="flex-shrink:0;vertical-align:middle"
+          >
+            <path
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+          Funcionários
+        </h1>
         <button class="btn-primary" routerLink="/funcionarios/novo">+ Novo Funcionário</button>
       </div>
       <p class="coming-soon">Em desenvolvimento - Gestão de vigilantes e porteiros</p>
@@ -31,11 +48,11 @@ import { RouterLink } from '@angular/router';
       }
       h1 {
         font-size: 2rem;
-        color: #333;
+        color: var(--text-primary);
         margin: 0;
       }
       .btn-primary {
-        background: #4caf50;
+        background: var(--primary-color);
         color: white;
         border: none;
         padding: 0.75rem 1.5rem;
@@ -48,16 +65,16 @@ import { RouterLink } from '@angular/router';
         opacity: 0.9;
       }
       .coming-soon {
-        background: #fff3cd;
-        border-left: 4px solid #ffc107;
+        background: var(--warning-bg, #fff3cd);
+        border-left: 4px solid var(--warning-border, #ffc107);
         padding: 1rem;
-        color: #856404;
+        color: var(--warning-text, #856404);
         border-radius: 4px;
       }
       .back-link {
         display: inline-block;
         margin-top: 1rem;
-        color: #4caf50;
+        color: var(--primary-color);
         text-decoration: none;
       }
     `,

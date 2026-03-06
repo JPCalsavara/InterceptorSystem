@@ -42,9 +42,9 @@ export class CondominioWizardComponent implements OnInit {
 
   // Labels dos steps
   steps = [
-    { number: 1, label: 'Condomínio', icon: '🏢' },
-    { number: 2, label: 'Contrato', icon: '📄' },
-    { number: 3, label: 'Funcionários', icon: '👥' },
+    { number: 1, label: 'Condomínio', icon: 'building-office' },
+    { number: 2, label: 'Contrato', icon: 'document-text' },
+    { number: 3, label: 'Funcionários', icon: 'user-group' },
   ];
 
   // Computed para controle de navegação
@@ -408,7 +408,7 @@ export class CondominioWizardComponent implements OnInit {
         // Validar STEP 1 (Condomínio)
         if (currentStepNum === 1 && !this.formCondominio.valid) {
           this.markFormGroupTouched(this.formCondominio);
-          this.error.set('⚠️ Preencha todos os campos obrigatórios do condomínio antes de avançar');
+          this.error.set('Preencha todos os campos obrigatórios do condomínio antes de avançar');
           return;
         }
 
@@ -417,7 +417,7 @@ export class CondominioWizardComponent implements OnInit {
           const criarContrato = this.formContrato?.get('criarContrato')?.value;
           if (criarContrato && !this.formContrato?.valid) {
             this.markFormGroupTouched(this.formContrato);
-            this.error.set('⚠️ Preencha todos os campos obrigatórios do contrato antes de avançar');
+            this.error.set('Preencha todos os campos obrigatórios do contrato antes de avançar');
             return;
           }
         }
@@ -448,13 +448,13 @@ export class CondominioWizardComponent implements OnInit {
       const payload = this.montarPayloadCompleto();
 
       console.log(
-        '📤 Payload enviado para /api/condominios-completos:',
+        'Payload enviado para /api/condominios-completos:',
         JSON.stringify(payload, null, 2),
       );
 
       this.condominioService.createCompleto(payload).subscribe({
         next: async (response: CriarCondominioCompletoOutput) => {
-          console.log('✅ Resposta recebida:', response);
+          console.log('Resposta recebida:', response);
 
           // Criar funcionários do Step 3, se houver
           const funcionariosParaCriar = this.funcionarios.controls;
@@ -478,7 +478,7 @@ export class CondominioWizardComponent implements OnInit {
                   }),
                 );
               } catch (funcErr: any) {
-                console.error('❌ Erro ao criar funcionário:', func.nome, funcErr);
+                console.error('Erro ao criar funcionário:', func.nome, funcErr);
               }
             }
           }
@@ -494,9 +494,9 @@ export class CondominioWizardComponent implements OnInit {
             err.message ||
             'Erro ao criar condomínio completo';
           this.error.set(errorMessage);
-          console.error('❌ Erro detalhado:', err);
-          console.error('❌ Status:', err.status);
-          console.error('❌ Error body:', err.error);
+          console.error('Erro detalhado:', err);
+          console.error('Status:', err.status);
+          console.error('Error body:', err.error);
         },
       });
     } catch (err: any) {

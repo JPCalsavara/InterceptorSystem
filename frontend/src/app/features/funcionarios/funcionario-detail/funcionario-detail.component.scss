@@ -197,11 +197,11 @@
       font-weight: 700;
 
       &.alert {
-        color: #ff9800;
+        color: var(--app-ref-ff9800);
       }
 
       &.danger {
-        color: #f44336;
+        color: var(--app-ref-f44336);
       }
     }
   }
@@ -223,7 +223,7 @@
   border-radius: 0.75rem;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #2196f3;
+  border-left: 4px solid var(--app-ref-2196f3);
 
   .posto-header {
     display: flex;
@@ -413,7 +413,7 @@
 }
 
 .valor-positivo {
-  color: #16a34a;
+  color: var(--app-ref-16a34a);
   font-weight: 600;
 }
 
@@ -424,30 +424,6 @@
 .valor-total {
   color: var(--primary-color);
   font-size: 1.1rem;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  &-success {
-    background: #d1fae5;
-    color: #065f46;
-  }
-
-  &-danger {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-
-  &-secondary {
-    background: #e5e7eb;
-    color: #374151;
-  }
 }
 
 // Faltas Section
@@ -471,7 +447,7 @@
     border-radius: 0.75rem;
     padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #f44336;
+    border-left: 4px solid var(--app-ref-f44336);
 
     h3 {
       font-size: 1.125rem;
@@ -514,7 +490,7 @@
           color: var(--text-primary);
 
           &.danger {
-            color: #f44336;
+            color: var(--app-ref-f44336);
             font-size: 1.25rem;
           }
         }
@@ -563,7 +539,7 @@
 
     .falta-valor {
       text-align: right;
-      color: #f44336;
+      color: var(--app-ref-f44336);
       font-weight: 600;
     }
 
@@ -585,7 +561,7 @@
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--app-ref-3b82f6);
 }
 
 .noturno-header {
@@ -606,7 +582,7 @@
   font-weight: 600;
   padding: 0.2rem 0.6rem;
   background: rgba(59, 130, 246, 0.12);
-  color: #2563eb;
+  color: var(--app-ref-2563eb);
   border-radius: 9999px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -650,10 +626,10 @@
   }
 
   &.diurno .noturno-stat-count {
-    color: #059669;
+    color: var(--app-ref-059669);
   }
   &.noturno .noturno-stat-count {
-    color: #4f46e5;
+    color: var(--app-ref-4f46e5);
   }
 }
 
@@ -707,7 +683,7 @@
   font-variant-numeric: tabular-nums;
 
   &.positive {
-    color: #4f46e5;
+    color: var(--app-ref-4f46e5);
   }
   &.total {
     font-size: 1rem;

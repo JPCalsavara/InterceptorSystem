@@ -9,112 +9,129 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="page-container">
-      <h1 class="page-title">Minha Conta</h1>
+      <div class="page-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+        </svg>
+        <h1>Minha Conta</h1>
+      </div>
 
       <!-- Status de verificação de e-mail -->
       <section class="card">
-        <h2 class="section-title">Status do E-mail</h2>
-        @if (authService.isEmailVerificado()) {
-          <div class="status-badge verified">E-mail verificado</div>
-        } @else {
-          <div class="status-badge unverified">E-mail não verificado</div>
-          <button
-            class="btn-secondary"
-            (click)="reenviarVerificacao()"
-            [disabled]="enviandoVerificacao()"
-          >
-            @if (enviandoVerificacao()) {
-              Enviando...
-            } @else {
-              Reenviar e-mail de verificação
+        <div class="card-header">
+          <h2>Status do E-mail</h2>
+        </div>
+        <div class="card-body">
+          @if (authService.isEmailVerificado()) {
+            <div class="badge badge-success">E-mail verificado</div>
+          } @else {
+            <div class="badge badge-warning">E-mail não verificado</div>
+            <button
+              class="btn-secondary"
+              (click)="reenviarVerificacao()"
+              [disabled]="enviandoVerificacao()"
+            >
+              @if (enviandoVerificacao()) {
+                Enviando...
+              } @else {
+                Reenviar e-mail de verificação
+              }
+            </button>
+            @if (msgVerificacao()) {
+              <p class="feedback-msg">{{ msgVerificacao() }}</p>
             }
-          </button>
-          @if (msgVerificacao()) {
-            <p class="feedback-msg">{{ msgVerificacao() }}</p>
           }
-        }
+        </div>
       </section>
 
       <!-- Alterar senha -->
       <section class="card">
-        <h2 class="section-title">Alterar Senha</h2>
-        <form class="form" (ngSubmit)="alterarSenha()">
-          <div class="form-group">
-            <label>Senha atual</label>
-            <input
-              type="password"
-              [(ngModel)]="senhaAtual"
-              name="senhaAtual"
-              placeholder="••••••••"
-            />
-          </div>
-          <div class="form-group">
-            <label>Nova senha</label>
-            <input
-              type="password"
-              [(ngModel)]="novaSenha"
-              name="novaSenha"
-              placeholder="••••••••"
-            />
-          </div>
-          <div class="form-group">
-            <label>Confirmar nova senha</label>
-            <input
-              type="password"
-              [(ngModel)]="confirmarSenha"
-              name="confirmarSenha"
-              placeholder="••••••••"
-            />
-          </div>
-          @if (erroSenha()) {
-            <div class="error-msg">{{ erroSenha() }}</div>
-          }
-          @if (sucesso('senha')) {
-            <div class="success-msg">Senha alterada com sucesso!</div>
-          }
-          <button type="submit" class="btn-primary" [disabled]="salvandoSenha()">
-            @if (salvandoSenha()) {
-              Salvando...
-            } @else {
-              Salvar senha
+        <div class="card-header">
+          <h2>Alterar Senha</h2>
+        </div>
+        <div class="card-body">
+          <form class="form" (ngSubmit)="alterarSenha()">
+            <div class="form-group">
+              <label>Senha atual</label>
+              <input
+                type="password"
+                [(ngModel)]="senhaAtual"
+                name="senhaAtual"
+                placeholder="••••••••"
+              />
+            </div>
+            <div class="form-group">
+              <label>Nova senha</label>
+              <input
+                type="password"
+                [(ngModel)]="novaSenha"
+                name="novaSenha"
+                placeholder="••••••••"
+              />
+            </div>
+            <div class="form-group">
+              <label>Confirmar nova senha</label>
+              <input
+                type="password"
+                [(ngModel)]="confirmarSenha"
+                name="confirmarSenha"
+                placeholder="••••••••"
+              />
+            </div>
+            @if (erroSenha()) {
+              <div class="error-msg">{{ erroSenha() }}</div>
             }
-          </button>
-        </form>
+            @if (sucesso('senha')) {
+              <div class="success-msg">Senha alterada com sucesso!</div>
+            }
+            <button type="submit" class="btn-primary" [disabled]="salvandoSenha()">
+              @if (salvandoSenha()) {
+                Salvando...
+              } @else {
+                Salvar senha
+              }
+            </button>
+          </form>
+        </div>
       </section>
 
       <!-- Alterar e-mail -->
       <section class="card">
-        <h2 class="section-title">Alterar E-mail</h2>
-        <p class="section-desc">
-          E-mail atual: <strong>{{ authService.currentUser()?.email }}</strong>
-        </p>
-        <form class="form" (ngSubmit)="solicitarAlteracaoEmail()">
-          <div class="form-group">
-            <label>Novo e-mail</label>
-            <input
-              type="email"
-              [(ngModel)]="novoEmail"
-              name="novoEmail"
-              placeholder="novo@empresa.com"
-            />
-          </div>
-          @if (erroEmail()) {
-            <div class="error-msg">{{ erroEmail() }}</div>
-          }
-          @if (sucesso('email')) {
-            <div class="success-msg">
-              Um e-mail de confirmação foi enviado para {{ novoEmail }}. Acesse o link para
-              confirmar a troca.
+        <div class="card-header">
+          <h2>Alterar E-mail</h2>
+        </div>
+        <div class="card-body">
+          <p class="section-desc">
+            E-mail atual: <strong>{{ authService.currentUser()?.email }}</strong>
+          </p>
+          <form class="form" (ngSubmit)="solicitarAlteracaoEmail()">
+            <div class="form-group">
+              <label>Novo e-mail</label>
+              <input
+                type="email"
+                [(ngModel)]="novoEmail"
+                name="novoEmail"
+                placeholder="novo@empresa.com"
+              />
             </div>
-          }
-          <button type="submit" class="btn-primary" [disabled]="salvandoEmail()">
-            @if (salvandoEmail()) {
-              Enviando...
-            } @else {
-              Solicitar alteração de e-mail
+            @if (erroEmail()) {
+              <div class="error-msg">{{ erroEmail() }}</div>
             }
-          </button>
-        </form>
+            @if (sucesso('email')) {
+              <div class="success-msg">
+                Um e-mail de confirmação foi enviado para {{ novoEmail }}. Acesse o link para
+                confirmar a troca.
+              </div>
+            }
+            <button type="submit" class="btn-primary" [disabled]="salvandoEmail()">
+              @if (salvandoEmail()) {
+                Enviando...
+              } @else {
+                Solicitar alteração de e-mail
+              }
+            </button>
+          </form>
+        </div>
       </section>
     </div>
   `,
@@ -122,16 +139,29 @@ import { AuthService } from '../../services/auth.service';
     `
       .page-container {
         max-width: 700px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+        margin: var(--space-4) auto;
+        padding: 0 var(--space-4);
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: var(--space-6);
       }
 
-      .page-title {
-        font-size: 1.75rem;
-        font-weight: 700;
+      .page-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .page-header svg {
+        width: 1.5em;
+        height: 1.5em;
+        color: var(--primary-color);
+        font-size: var(--text-3xl);
+      }
+
+      .page-header h1 {
+        font-size: var(--text-3xl);
+        font-weight: var(--fw-extrabold);
         color: var(--text-primary);
         margin: 0;
       }
@@ -139,143 +169,183 @@ import { AuthService } from '../../services/auth.service';
       .card {
         background: var(--surface-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 12px;
-        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        box-shadow: var(--shadow-sm);
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: var(--space-4);
       }
 
-      .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
+      .card-header h2 {
+        font-size: var(--text-2xl);
+        font-weight: var(--fw-bold);
         color: var(--text-primary);
         margin: 0;
       }
 
+      .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        align-items: flex-start;
+      }
+
       .section-desc {
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--text-base);
         margin: 0;
       }
 
-      .status-badge {
+      .badge {
         display: inline-block;
-        padding: 0.35rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 600;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        font-weight: var(--fw-semibold);
+      }
 
-        &.verified {
-          background: #d1fae5;
-          color: #065f46;
-        }
+      .badge-success {
+        background: rgba(16, 185, 129, 0.15);
+        color: #059669;
+      }
 
-        &.unverified {
-          background: #fef3c7;
-          color: #92400e;
-        }
+      .badge-warning {
+        background: rgba(245, 158, 11, 0.15);
+        color: #d97706;
       }
 
       .form {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: var(--space-4);
+        width: 100%;
       }
 
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.35rem;
+        gap: var(--space-2);
+      }
 
-        label {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--text-primary);
-        }
+      .form-group label {
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+        color: var(--text-secondary);
+      }
 
-        input {
-          padding: 0.7rem 1rem;
-          border: 1px solid var(--border-strong);
-          border-radius: 8px;
-          background: var(--input-bg);
-          color: var(--text-primary);
-          font-size: 0.95rem;
+      .form-group input {
+        padding: var(--space-3) var(--space-4);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-size: var(--text-base);
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
 
-          &:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
-          }
-        }
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
       }
 
       .btn-primary {
-        padding: 0.75rem 1.25rem;
         background: var(--primary-color);
         color: white;
         border: none;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        font-weight: 600;
+        padding: var(--space-3) var(--space-6);
+        border-radius: var(--radius-md);
+        font-size: var(--text-base);
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         align-self: flex-start;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+      }
 
-        &:hover:not(:disabled) {
-          background: var(--primary-dark);
-        }
+      .btn-primary:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
 
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
 
       .btn-secondary {
-        padding: 0.6rem 1rem;
-        background: transparent;
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 600;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         align-self: flex-start;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+      }
 
-        &:hover:not(:disabled) {
-          background: rgba(33, 150, 243, 0.08);
-        }
+      .btn-secondary:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
 
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+      .btn-secondary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
 
       .error-msg {
-        background: #fee2e2;
-        color: #dc2626;
-        border: 1px solid #fecaca;
-        border-radius: 6px;
-        padding: 0.6rem 0.85rem;
-        font-size: 0.875rem;
+        background: rgba(220, 38, 38, 0.1);
+        color: var(--kanban-error-border, #dc2626);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        font-size: var(--text-sm);
       }
 
       .success-msg {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #6ee7b7;
-        border-radius: 6px;
-        padding: 0.6rem 0.85rem;
-        font-size: 0.875rem;
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        font-size: var(--text-sm);
       }
 
       .feedback-msg {
-        font-size: 0.875rem;
+        font-size: var(--text-sm);
         color: var(--text-secondary);
         margin: 0;
+      }
+
+      /* Responsive rules */
+      @media (max-width: 768px) {
+        .page-container {
+          padding: 0 var(--space-2);
+        }
+        .page-header h1 {
+          font-size: var(--text-2xl);
+        }
+        .page-header svg {
+          font-size: var(--text-2xl);
+        }
+        .card {
+          padding: var(--space-4);
+        }
+        .card-header h2 {
+          font-size: var(--text-xl);
+        }
+        .btn-primary, .btn-secondary {
+          width: 100%;
+        }
       }
     `,
   ],

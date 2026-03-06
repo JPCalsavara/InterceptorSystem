@@ -32,17 +32,13 @@ import { AuthService } from '../../services/auth.service';
         >
           @if (isDarkMode()) {
             <!-- Sun Icon -->
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                clip-rule="evenodd"
-              />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
             </svg>
           } @else {
             <!-- Moon Icon -->
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
             </svg>
           }
         </button>
@@ -57,58 +53,38 @@ import { AuthService } from '../../services/auth.service';
             <svg
               class="dropdown-icon"
               [class.rotated]="isDropdownOpen()"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5"
             >
-              <path
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
           </div>
 
           @if (isDropdownOpen()) {
             <div class="dropdown-menu">
               <a routerLink="/perfil" class="dropdown-item" (click)="isDropdownOpen.set(false)">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clip-rule="evenodd"
-                  />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zm-7.5 7.5A6.75 6.75 0 001.5 20.25h15A6.75 6.75 0 009.75 13.5zm0 0v-1.5a1.5 1.5 0 113 0v1.5zm0 0H12m0 0v1.5" />
                 </svg>
                 Perfil
               </a>
               <a routerLink="/conta" class="dropdown-item" (click)="isDropdownOpen.set(false)">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                    clip-rule="evenodd"
-                  />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 Minha Conta
               </a>
               <a routerLink="/plano" class="dropdown-item" (click)="isDropdownOpen.set(false)">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path
-                    fill-rule="evenodd"
-                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                    clip-rule="evenodd"
-                  />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Plano
               </a>
               <div class="dropdown-divider"></div>
               <button class="dropdown-item danger" (click)="logout()">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                    clip-rule="evenodd"
-                  />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                 </svg>
                 Sair
               </button>
@@ -122,12 +98,12 @@ import { AuthService } from '../../services/auth.service';
     `
       .navbar {
         height: 64px;
-        background: var(--navbar-bg);
-        border-bottom: 1px solid var(--navbar-border);
+        background: var(--surface-card);
+        border-bottom: 1px solid var(--border-subtle);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 2rem;
+        padding: 0 var(--space-8);
         position: fixed;
         top: 0;
         left: 0;
@@ -151,16 +127,16 @@ import { AuthService } from '../../services/auth.service';
       .navbar-actions {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: var(--space-4);
       }
 
       .theme-toggle {
         width: 40px;
         height: 40px;
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         border: none;
-        background: var(--theme-toggle-bg);
-        color: var(--theme-toggle-color);
+        background: transparent;
+        color: var(--text-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -168,7 +144,7 @@ import { AuthService } from '../../services/auth.service';
         transition: all 0.2s ease;
 
         &:hover {
-          background: var(--theme-toggle-hover-bg);
+          background: var(--surface-muted);
           transform: scale(1.05);
         }
 
@@ -189,20 +165,21 @@ import { AuthService } from '../../services/auth.service';
       .profile-trigger {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: var(--space-3);
         cursor: pointer;
-        padding: 0.5rem;
-        border-radius: 8px;
+        padding: var(--space-2);
+        border-radius: var(--radius-md);
         transition: background 0.2s;
 
         &:hover {
-          background: var(--profile-hover-bg);
+          background: var(--surface-muted);
         }
       }
 
       .avatar {
         width: 40px;
         height: 40px;
+        flex-shrink: 0;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
@@ -229,14 +206,14 @@ import { AuthService } from '../../services/auth.service';
 
       .dropdown-menu {
         position: absolute;
-        top: calc(100% + 0.5rem);
+        top: calc(100% + var(--space-2));
         right: 0;
-        background: var(--dropdown-bg);
-        border: 1px solid var(--dropdown-border);
-        border-radius: 8px;
+        background: var(--surface-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
         box-shadow: var(--shadow-lg);
         min-width: 200px;
-        padding: 0.5rem;
+        padding: var(--space-2);
         animation: slideDown 0.2s ease-out;
       }
 
@@ -255,19 +232,19 @@ import { AuthService } from '../../services/auth.service';
         width: 100%;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem;
+        gap: var(--space-3);
+        padding: var(--space-3);
         border: none;
         background: transparent;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        font-size: 0.875rem;
+        font-size: var(--text-sm);
         color: var(--text-primary);
         transition: background 0.2s;
         text-decoration: none;
 
         &:hover {
-          background: var(--dropdown-item-hover);
+          background: var(--bg-tertiary);
         }
 
         &.danger {
@@ -287,13 +264,13 @@ import { AuthService } from '../../services/auth.service';
 
       .dropdown-divider {
         height: 1px;
-        background: var(--dropdown-divider);
-        margin: 0.5rem 0;
+        background: var(--border-subtle);
+        margin: var(--space-2) 0;
       }
 
       @media (max-width: 768px) {
         .navbar {
-          padding: 0 1rem;
+          padding: 0 var(--space-4);
         }
 
         .company-name {
