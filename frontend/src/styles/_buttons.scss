@@ -16,7 +16,7 @@
   text-decoration: none;
   line-height: var(--lh-tight);
   color: var(--text-primary);
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -30,7 +30,7 @@
   @extend .btn-base;
   background-color: var(--primary-color);
   color: white;
-  
+
   &:hover:not(:disabled) {
     background-color: var(--primary-dark);
     transform: translateY(-1px);
@@ -43,7 +43,7 @@
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   border: 1px solid var(--border-strong);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--bg-tertiary);
     transform: translateY(-1px);
@@ -56,7 +56,7 @@
   background-color: transparent;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--primary-color);
     color: white;
@@ -67,7 +67,7 @@
   @extend .btn-base;
   background-color: transparent;
   color: var(--text-secondary);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--hover-bg);
     color: var(--text-primary);
@@ -82,9 +82,9 @@
   padding: var(--space-4) var(--space-8);
   border-radius: var(--radius-lg);
   font-weight: var(--fw-bold);
-  
+
   &:hover:not(:disabled) {
-    background-color: rgba(255,255,255,0.9);
+    background-color: rgba(255, 255, 255, 0.9);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
   }
