@@ -2,6 +2,10 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+  }
 }
 
 // Loading & Error States
@@ -54,6 +58,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-4);
+    }
   }
 
   .header-content {
@@ -335,7 +345,7 @@
 .table-container {
   background: var(--card-bg);
   border-radius: 0.75rem;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -590,6 +600,7 @@
 
 .noturno-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1rem;
 }

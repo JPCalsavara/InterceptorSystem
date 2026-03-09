@@ -75,6 +75,14 @@ interface FuncionarioRanking {
   salarioTotal?: number;
 }
 
+interface DadosMensais {
+  mes: string;
+  mesAbrev: string;
+  custoOperacional: number;
+  faturamento: number;
+  lucro: number;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -105,7 +113,6 @@ export class DashboardComponent implements OnInit {
     return { inicio, fim };
   }
 
-  
   // Métricas financeiras
   metricasFinanceiras = computed(() => {
     const contratosVigentes = this.contratos().filter(
@@ -156,7 +163,7 @@ export class DashboardComponent implements OnInit {
         icone: 'arrow-trending-down',
         cor: '#FF5722',
         isCurrency: true,
-      }
+      },
     ];
   });
 
@@ -288,6 +295,57 @@ export class DashboardComponent implements OnInit {
       .sort((a, b) => a.diasRestantes - b.diasRestantes);
   });
 
+  // Dados dos últimos 6 meses
+  dadosUltimos6Meses = computed<DadosMensais[]>(() => {
+    const resultado: DadosMensais[] = [];
+    const hoje = new Date();
+
+    // Gera os últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      const mesNome = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(data);
+      const mesAbrev = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(data);
+
+      // Para simplificar, vamos usar os valores atuais dos contratos ativos
+      // Em um sistema real, você precisaria de dados históricos
+      const contratosVigentes = this.contratos().filter(
+        (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+      );
+
+      const faturamento = contratosVigentes.reduce((sum, c) => sum + c.valorTotalMensal, 0);
+      const custoOperacional = contratosVigentes.reduce(
+        (sum, c) =>
+          sum +
+          c.valorTotalMensal * (1 - c.margemLucroPercentual - c.margemCoberturaFaltasPercentual),
+        0,
+      );
+      const lucro = contratosVigentes.reduce(
+        (sum, c) => sum + c.valorTotalMensal * c.margemLucroPercentual,
+        0,
+      );
+
+      resultado.push({
+        mes: mesNome.charAt(0).toUpperCase() + mesNome.slice(1),
+        mesAbrev: mesAbrev.charAt(0).toUpperCase() + mesAbrev.slice(1),
+        custoOperacional,
+        faturamento,
+        lucro,
+      });
+    }
+
+    return resultado;
+  });
+
+  // Valor máximo para normalizar o gráfico
+  valorMaximoGrafico = computed(() => {
+    const valores = this.dadosUltimos6Meses().flatMap((d) => [
+      d.custoOperacional,
+      d.faturamento,
+      d.lucro,
+    ]);
+    return Math.max(...valores, 1);
+  });
+
   ngOnInit(): void {
     this.loadAllData();
   }
@@ -406,5 +464,10 @@ export class DashboardComponent implements OnInit {
     if (margem >= 10) return 'lucro-medio';
     if (margem >= 0) return 'lucro-baixo';
     return 'lucro-negativo';
+  }
+
+  getAlturaBarraGrafico(valor: number): number {
+    const max = this.valorMaximoGrafico();
+    return max > 0 ? (valor / max) * 100 : 0;
   }
 }

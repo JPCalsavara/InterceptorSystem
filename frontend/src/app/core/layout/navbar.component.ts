@@ -11,6 +11,7 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LayoutStateService } from '../services/layout-state.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +19,29 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, RouterLink],
   template: `
     <nav class="navbar">
+      <!-- Hamburger: mobile only, opens left sidebar drawer -->
+      <button
+        class="menu-toggle"
+        (click)="toggleLeftDrawer()"
+        [attr.aria-label]="layoutState.leftDrawerOpen() ? 'Fechar menu' : 'Abrir menu'"
+      >
+        @if (layoutState.leftDrawerOpen()) {
+          <!-- x-mark -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        } @else {
+          <!-- bars-3 -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        }
+      </button>
+
       <div class="navbar-brand">
         <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img" />
       </div>
@@ -33,19 +57,28 @@ import { AuthService } from '../../services/auth.service';
           @if (isDarkMode()) {
             <!-- Sun Icon -->
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+              />
             </svg>
           } @else {
             <!-- Moon Icon -->
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
+              />
             </svg>
           }
         </button>
 
         <!-- Profile -->
         <div class="navbar-profile">
-          <div class="profile-trigger" (click)="toggleDropdown()">
+          <!-- Desktop trigger: opens dropdown -->
+          <div class="profile-trigger desktop-trigger" (click)="toggleDropdown()">
             <div class="avatar">
               <span>{{ getInitials() }}</span>
             </div>
@@ -54,37 +87,71 @@ import { AuthService } from '../../services/auth.service';
               class="dropdown-icon"
               [class.rotated]="isDropdownOpen()"
               viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="1.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
             </svg>
           </div>
 
+          <!-- Mobile trigger: opens right drawer -->
+          <div class="profile-trigger mobile-trigger" (click)="toggleRightDrawer()">
+            <div class="avatar">
+              <span>{{ getInitials() }}</span>
+            </div>
+          </div>
+
+          <!-- Desktop dropdown -->
           @if (isDropdownOpen()) {
             <div class="dropdown-menu">
               <a routerLink="/perfil" class="dropdown-item" (click)="isDropdownOpen.set(false)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zm-7.5 7.5A6.75 6.75 0 001.5 20.25h15A6.75 6.75 0 009.75 13.5zm0 0v-1.5a1.5 1.5 0 113 0v1.5zm0 0H12m0 0v1.5" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  />
                 </svg>
                 Perfil
               </a>
               <a routerLink="/conta" class="dropdown-item" (click)="isDropdownOpen.set(false)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
                 Minha Conta
               </a>
               <a routerLink="/plano" class="dropdown-item" (click)="isDropdownOpen.set(false)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 Plano
               </a>
               <div class="dropdown-divider"></div>
               <button class="dropdown-item danger" (click)="logout()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+                  />
                 </svg>
                 Sair
               </button>
@@ -93,6 +160,80 @@ import { AuthService } from '../../services/auth.service';
         </div>
       </div>
     </nav>
+
+    <!-- Right profile drawer: mobile only -->
+    <div class="profile-drawer" [class.open]="layoutState.rightDrawerOpen()">
+      <div class="profile-drawer-header">
+        <div class="profile-drawer-user">
+          <div class="avatar avatar-lg">
+            <span>{{ getInitials() }}</span>
+          </div>
+          <span class="company-name-drawer">{{ companyName() }}</span>
+        </div>
+        <button
+          class="drawer-close"
+          (click)="layoutState.rightDrawerOpen.set(false)"
+          aria-label="Fechar perfil"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="profile-drawer-nav">
+        <a
+          routerLink="/perfil"
+          class="drawer-item"
+          (click)="layoutState.rightDrawerOpen.set(false)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+            />
+          </svg>
+          Perfil
+        </a>
+        <a routerLink="/conta" class="drawer-item" (click)="layoutState.rightDrawerOpen.set(false)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          Minha Conta
+        </a>
+        <a routerLink="/plano" class="drawer-item" (click)="layoutState.rightDrawerOpen.set(false)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Plano
+        </a>
+        <div class="drawer-divider"></div>
+        <button class="drawer-item danger" (click)="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+            />
+          </svg>
+          Sair
+        </button>
+      </nav>
+    </div>
   `,
   styles: [
     `
@@ -112,6 +253,30 @@ import { AuthService } from '../../services/auth.service';
         transition:
           background-color 0.3s ease,
           border-color 0.3s ease;
+      }
+
+      .menu-toggle {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+          background: var(--surface-muted);
+        }
+
+        svg {
+          width: 22px;
+          height: 22px;
+        }
       }
 
       .navbar-brand {
@@ -176,6 +341,10 @@ import { AuthService } from '../../services/auth.service';
         }
       }
 
+      .mobile-trigger {
+        display: none;
+      }
+
       .avatar {
         width: 40px;
         height: 40px;
@@ -186,18 +355,20 @@ import { AuthService } from '../../services/auth.service';
         align-items: center;
         justify-content: center;
         color: white;
-        font-weight: 600;
-        font-size: 0.875rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--text-sm);
       }
 
       .company-name {
-        font-weight: 500;
+        font-weight: var(--fw-medium);
         color: var(--text-primary);
       }
 
       .dropdown-icon {
         transition: transform 0.2s;
         color: var(--text-secondary);
+        width: 18px;
+        height: 18px;
 
         &.rotated {
           transform: rotate(180deg);
@@ -215,6 +386,7 @@ import { AuthService } from '../../services/auth.service';
         min-width: 200px;
         padding: var(--space-2);
         animation: slideDown 0.2s ease-out;
+        z-index: 110;
       }
 
       @keyframes slideDown {
@@ -268,13 +440,149 @@ import { AuthService } from '../../services/auth.service';
         margin: var(--space-2) 0;
       }
 
+      /* ── Right Profile Drawer ── */
+      .profile-drawer {
+        display: none;
+        position: fixed;
+        top: 64px;
+        right: 0;
+        width: 280px;
+        height: calc(100vh - 64px);
+        background: var(--surface-card);
+        border-left: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-lg);
+        z-index: 200;
+        transform: translateX(100%);
+        transition:
+          transform 0.3s ease,
+          background-color 0.3s ease,
+          border-color 0.3s ease;
+        overflow-y: auto;
+        flex-direction: column;
+      }
+
+      .profile-drawer.open {
+        transform: translateX(0);
+      }
+
+      .profile-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-6) var(--space-4) var(--space-4);
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .profile-drawer-user {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .avatar-lg {
+        width: 48px;
+        height: 48px;
+        font-size: var(--text-base);
+      }
+
+      .company-name-drawer {
+        font-weight: var(--fw-semibold);
+        color: var(--text-primary);
+        font-size: var(--text-sm);
+      }
+
+      .drawer-close {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-full);
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background: var(--surface-muted);
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .profile-drawer-nav {
+        padding: var(--space-4);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+      }
+
+      .drawer-item {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        border: none;
+        background: transparent;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+        color: var(--text-primary);
+        transition: background 0.2s;
+        text-decoration: none;
+
+        &:hover {
+          background: var(--bg-tertiary);
+          color: var(--primary-color);
+        }
+
+        &.danger {
+          color: #dc2626;
+
+          &:hover {
+            background: #fee2e2;
+          }
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
+
+      .drawer-divider {
+        height: 1px;
+        background: var(--border-subtle);
+        margin: var(--space-2) 0;
+      }
+
+      /* ── Mobile overrides ── */
       @media (max-width: 768px) {
         .navbar {
           padding: 0 var(--space-4);
         }
 
-        .company-name {
+        .menu-toggle {
+          display: flex;
+        }
+
+        .desktop-trigger {
           display: none;
+        }
+
+        .mobile-trigger {
+          display: flex;
+        }
+
+        .profile-drawer {
+          display: flex;
         }
       }
     `,
@@ -282,6 +590,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class NavbarComponent implements OnInit {
   private authService = inject(AuthService);
+  layoutState = inject(LayoutStateService);
 
   companyName = computed(() => this.authService.currentUser()?.nomeEmpresa ?? 'Minha Empresa');
   isDropdownOpen = signal(false);
@@ -290,7 +599,6 @@ export class NavbarComponent implements OnInit {
   logoSrc = computed(() => (this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png'));
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    // Effect to apply theme changes
     effect(() => {
       this.applyTheme(this.isDarkMode());
     });
@@ -346,7 +654,16 @@ export class NavbarComponent implements OnInit {
     this.isDropdownOpen.update((v) => !v);
   }
 
+  toggleLeftDrawer(): void {
+    this.layoutState.leftDrawerOpen.update((v) => !v);
+  }
+
+  toggleRightDrawer(): void {
+    this.layoutState.rightDrawerOpen.update((v) => !v);
+  }
+
   logout(): void {
+    this.layoutState.closeAll();
     this.authService.logout();
   }
 

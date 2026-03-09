@@ -1,6 +1,7 @@
 .page-container {
-  padding: 2rem;
-  max-width: 1400px;
+  padding: 1rem;
+  padding-top: 1.5rem;
+  max-width: 1450px;
   margin: 0 auto;
 }
 
@@ -22,6 +23,14 @@
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    svg {
+      color: white;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    }
   }
 
   .subtitle {
@@ -196,23 +205,23 @@
   flex-shrink: 0;
 
   &-primary {
-    background: linear-gradient(135deg, var(--app-ref-dbeafe) 0%, var(--app-ref-bfdbfe) 100%);
-    color: var(--app-ref-1e40af);
+    background: linear-gradient(135deg, var(--app-ref-3b82f6) 0%, var(--app-ref-1e40af) 100%);
+    color: white;
   }
 
   &-success {
-    background: linear-gradient(135deg, var(--app-ref-c5f1d8) 0%, var(--app-ref-a7f3d0) 100%);
-    color: var(--app-ref-065f46);
+    background: linear-gradient(135deg, var(--app-ref-10b981) 0%, var(--app-ref-059669) 100%);
+    color: white;
   }
 
   &-warning {
-    background: linear-gradient(135deg, var(--app-ref-fef3c7) 0%, var(--app-ref-fde68a) 100%);
-    color: var(--app-ref-92400e);
+    background: linear-gradient(135deg, var(--app-ref-f59e0b) 0%, var(--app-ref-d97706) 100%);
+    color: white;
   }
 
   &-error {
-    background: linear-gradient(135deg, var(--app-ref-ffd6d6) 0%, var(--app-ref-fecaca) 100%);
-    color: var(--app-ref-991b1b);
+    background: linear-gradient(135deg, var(--app-ref-ef4444) 0%, var(--app-ref-dc2626) 100%);
+    color: white;
   }
 }
 
@@ -431,29 +440,29 @@
   }
 
   &.btn-view {
-    background: var(--app-ref-e0e7ff);
-    color: var(--app-ref-3730a3);
+    background: var(--app-ref-6366f1);
+    color: white;
 
     &:hover {
-      background: var(--app-ref-c7d2fe);
+      background: var(--app-ref-4f46e5);
     }
   }
 
   &.btn-edit {
-    background: var(--app-ref-dbeafe);
-    color: var(--app-ref-1e40af);
+    background: var(--app-ref-3b82f6);
+    color: white;
 
     &:hover {
-      background: var(--app-ref-bfdbfe);
+      background: var(--app-ref-2563eb);
     }
   }
 
   &.btn-delete {
-    background: var(--app-ref-ffd6d6);
-    color: var(--app-ref-991b1b);
+    background: var(--app-ref-ef4444);
+    color: white;
 
     &:hover {
-      background: var(--app-ref-fecaca);
+      background: var(--app-ref-dc2626);
     }
   }
 }
