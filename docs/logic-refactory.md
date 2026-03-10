@@ -16,7 +16,6 @@ Our entities already inherit from a base `Entity` class that contains a `_domain
 
 ## 4. Acceptance Criteria
 - [ ] The `MediatR` library is installed and configured in the `Application` and `Infrastructure` layers.
-- [ ] A `DomainEventDispatcher` is hooked into the Entity Framework `SaveChanges`/`CommitAsync` process to publish all pending `DomainEvents`.
 - [ ] Domain events (e.g., `ClienteCreatedEvent`, `ClienteUpdatedEvent`) exist in the `Domain` layer and are added to the entity before saving.
 - [ ] Event listeners (Handlers) are implemented in the `Infrastructure` or `Application` layer to remove specific `IMemoryCache` keys upon receiving the events.
 - [ ] Read methods (e.g., `GetAllAsync`) in `AppServices` first attempt to retrieve data from `IMemoryCache` before querying the database.

@@ -19,7 +19,7 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="landing-page">
       <!-- Header -->
-      <header class="landing-header">
+      <header class="landing-header" [class.header-hidden]="!isHeaderVisible()">
         <div class="header-container">
           <img [src]="logoSrc()" alt="Interceptor Assessoria Inteligente" class="header-logo" />
           <nav class="header-nav">
@@ -65,8 +65,8 @@ import { AuthService } from '../../services/auth.service';
               }
             </button>
 
-            <a routerLink="/login" class="btn-outline">Entrar</a>
-            <a routerLink="/cadastro" class="btn-primary">Criar conta</a>
+            <a routerLink="/login" class="btn-outline hide-on-mobile btn-login-mobile">Entrar</a>
+            <a routerLink="/cadastro" class="btn-primary hide-on-mobile">Criar conta</a>
           </nav>
         </div>
       </header>
@@ -99,7 +99,7 @@ import { AuthService } from '../../services/auth.service';
           <div class="hero-text">
             <div class="hero-eyebrow">
               <span class="eyebrow-dot"></span>
-              Segurança Patrimonial · Porto Feliz · Tietê · Tatuí · Boituva · Salto
+              Porto Feliz · Tietê · Tatuí · Boituva · Salto
             </div>
             <h1 class="hero-title">
               Assessoria<br />
@@ -123,6 +123,15 @@ import { AuthService } from '../../services/auth.service';
                 Conheça nossos serviços
               </a>
               <a href="#sobre" class="btn-hero-ghost">Sobre a empresa</a>
+            </div>
+            <div class="hero-scroll-hint hero-scroll-hint-mobile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"
+                />
+              </svg>
             </div>
           </div>
 
@@ -171,7 +180,7 @@ import { AuthService } from '../../services/auth.service';
           </div>
         </div>
 
-        <div class="hero-scroll-hint">
+        <div class="hero-scroll-hint hero-scroll-hint-desktop">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path
               stroke-linecap="round"
@@ -779,10 +788,22 @@ import { AuthService } from '../../services/auth.service';
         height: var(--header-height);
         display: flex;
         align-items: center;
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 50;
         backdrop-filter: blur(16px);
+        transition: transform 0.3s ease-in-out;
+        transform: translateY(0);
+      }
+
+      .landing-header.header-hidden {
+        transform: translateY(-100%);
+      }
+
+      .landing-page {
+        padding-top: var(--header-height);
       }
 
       .header-container {
@@ -841,6 +862,28 @@ import { AuthService } from '../../services/auth.service';
         flex-direction: column;
         padding: var(--space-8);
         animation: slideDown 0.25s ease-out forwards;
+        overflow-y: auto;
+      }
+
+      .landing-header {
+        border-bottom: 1px solid var(--border-subtle);
+        background: var(--surface-card);
+        padding: 0 2rem;
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        backdrop-filter: blur(16px);
+        transition: transform 0.3s ease-in-out;
+        transform: translateY(0);
+      }
+
+      body.menu-open .landing-header {
+        transform: translateY(0) !important;
       }
 
       @keyframes slideDown {
@@ -1195,6 +1238,14 @@ import { AuthService } from '../../services/auth.service';
         color: var(--text-tertiary);
         font-size: 1.5rem;
         animation: bounce 2s ease-in-out infinite;
+      }
+
+      .hero-scroll-hint-mobile {
+        display: none;
+      }
+
+      .hero-scroll-hint-desktop {
+        display: block;
       }
 
       @keyframes bounce {
@@ -2073,25 +2124,85 @@ import { AuthService } from '../../services/auth.service';
           align-items: center;
           justify-content: center;
         }
-        .header-nav .btn-outline,
-        .header-nav .btn-primary {
+        .header-nav .hide-on-mobile {
           display: none;
+        }
+        .header-nav .btn-login-mobile {
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
         }
       }
 
       @media (max-width: 600px) {
         :host {
-          --header-height: 64px;
+          --header-height: 72px;
         }
 
         .hero {
-          padding: var(--space-12) 1.5rem;
+          min-height: 100vh;
+          height: 100vh;
+          padding: 2rem 1.5rem 1rem;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
         }
         .hero-visual {
           display: none;
         }
+        .hero-text {
+          gap: var(--space-3);
+          text-align: center;
+          align-items: center;
+        }
+        .hero-eyebrow {
+          display: none;
+        }
+        .hero-title {
+          font-size: clamp(2.25rem, 9vw, 3rem);
+          margin-bottom: 0;
+          line-height: 1.15;
+        }
+        .hero-description {
+          font-size: 1.063rem;
+          line-height: 1.5;
+          margin-bottom: 0;
+        }
+        .hero-actions {
+          margin-top: var(--space-2);
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+        .hero-actions a {
+          width: 100%;
+          justify-content: center;
+        }
+        .hero-scroll-hint-mobile {
+          display: block;
+          position: static;
+          transform: none;
+          margin-top: var(--space-1);
+          animation: bounceVertical 2s ease-in-out infinite;
+        }
+        .hero-scroll-hint-desktop {
+          display: none;
+        }
+
         .hero-inner {
           grid-template-columns: 1fr;
+          width: 100%;
+        }
+
+        @keyframes bounceVertical {
+          0%,
+          100% {
+            transform: translateY(0);
+            opacity: 0.5;
+          }
+          50% {
+            transform: translateY(6px);
+            opacity: 1;
+          }
         }
 
         .stats {
@@ -2150,11 +2261,13 @@ import { AuthService } from '../../services/auth.service';
           text-align: center;
         }
 
-        .btn-outline {
-          display: none;
-        }
         .nav-link {
           display: none;
+        }
+
+        .header-nav .btn-login-mobile {
+          padding: 0.4rem 0.75rem;
+          font-size: 0.813rem;
         }
 
         .product-actions {
@@ -2184,9 +2297,19 @@ export class LandingComponent implements OnInit {
 
   isDarkMode = signal(false);
   isMobileMenuOpen = signal(false);
+  isHeaderVisible = signal(true);
+  private lastScrollY = 0;
+  private scrollThreshold = 100;
 
   toggleMobileMenu(): void {
-    this.isMobileMenuOpen.update((v) => !v);
+    this.isMobileMenuOpen.update((v) => {
+      const newValue = !v;
+      if (isPlatformBrowser(this.platformId)) {
+        document.body.style.overflow = newValue ? 'hidden' : '';
+        document.body.classList.toggle('menu-open', newValue);
+      }
+      return newValue;
+    });
   }
 
   logoSrc = computed(() => (this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png'));
@@ -2203,6 +2326,30 @@ export class LandingComponent implements OnInit {
       return;
     }
     this.initializeTheme();
+    this.setupScrollListener();
+  }
+
+  private setupScrollListener(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    window.addEventListener('scroll', () => {
+      // Don't hide header when mobile menu is open
+      if (this.isMobileMenuOpen()) return;
+
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < this.scrollThreshold) {
+        this.isHeaderVisible.set(true);
+      } else if (currentScrollY > this.lastScrollY) {
+        // Scrolling down
+        this.isHeaderVisible.set(false);
+      } else if (currentScrollY < this.lastScrollY) {
+        // Scrolling up
+        this.isHeaderVisible.set(true);
+      }
+
+      this.lastScrollY = currentScrollY;
+    });
   }
 
   private initializeTheme(): void {

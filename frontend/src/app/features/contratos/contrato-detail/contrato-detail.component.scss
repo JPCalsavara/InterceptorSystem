@@ -200,6 +200,14 @@
   background: var(--bg-secondary, var(--app-ref-f8fafc));
   transition: box-shadow 0.15s;
 
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr auto;
+
+    .indicador-valor {
+      display: none;
+    }
+  }
+
   &:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
   }
@@ -486,6 +494,14 @@
   border-radius: 6px;
   font-size: 0.85rem;
   transition: background 0.15s;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr auto;
+
+    .func-dias {
+      display: none;
+    }
+  }
 
   &:hover {
     background: var(--bg-secondary, var(--app-ref-f8fafc));
