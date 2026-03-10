@@ -4,7 +4,7 @@ using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
 public record CreateContratoDtoInput(
-    Guid CondominioId,
+    Guid ClienteId,
     string Descricao,
     decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
@@ -16,7 +16,8 @@ public record CreateContratoDtoInput(
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
     DateOnly DataFim,
-    StatusContrato Status);
+    StatusContrato Status,
+    decimal? ValorDiariaVigilante = null);
 
 public record UpdateContratoDtoInput(
     string Descricao,
@@ -30,11 +31,12 @@ public record UpdateContratoDtoInput(
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
     DateOnly DataFim,
-    StatusContrato Status);
+    StatusContrato Status,
+    decimal? ValorDiariaVigilante = null);
 
 public record ContratoDtoOutput(
     Guid Id,
-    Guid CondominioId,
+    Guid ClienteId,
     string Descricao,
     decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
@@ -47,14 +49,15 @@ public record ContratoDtoOutput(
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,
     DateOnly DataFim,
-    StatusContrato Status)
+    StatusContrato Status,
+    decimal? ValorDiariaVigilante = null)
 {
     public static ContratoDtoOutput? FromEntity(Contrato? entity)
     {
         if (entity == null) return null;
         return new ContratoDtoOutput(
             entity.Id,
-            entity.CondominioId,
+            entity.ClienteId,
             entity.Descricao,
             entity.ValorTotalMensal,
             entity.ValorDiariaCobrada,
@@ -67,6 +70,7 @@ public record ContratoDtoOutput(
             entity.MargemCoberturaFaltasPercentual,
             entity.DataInicio,
             entity.DataFim,
-            entity.Status);
+            entity.Status,
+            entity.ValorDiariaVigilante);
     }
 }

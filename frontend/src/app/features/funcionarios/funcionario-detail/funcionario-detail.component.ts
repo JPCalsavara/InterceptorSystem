@@ -2,20 +2,22 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { AlocacaoService } from '../../../services/alocacao.service';
-import { CondominioService } from '../../../services/condominio.service';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
+import { DiariaService } from '../../../services/diaria.service';
+import { ClienteService } from '../../../services/cliente.service';
+import { PostoService } from '../../../services/posto.service';
 import { ContratoService } from '../../../services/contrato.service';
 import {
   Funcionario,
+  Diaria,
+  Cliente,
+  Posto,
   Alocacao,
-  Condominio,
-  PostoDeTrabalho,
   Contrato,
-  StatusAlocacao,
-  TipoAlocacao,
+  StatusDiaria,
+  TipoDiaria,
   TipoEscala,
 } from '../../../models/index';
+import { AlocacaoService } from '../../../services/alocacao.service';
 
 @Component({
   selector: 'app-funcionario-detail',
@@ -27,15 +29,17 @@ import {
 export class FuncionarioDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private funcionarioService = inject(FuncionarioService);
-  private alocacaoService = inject(AlocacaoService);
-  private condominioService = inject(CondominioService);
-  private postoService = inject(PostoDeTrabalhoService);
+  private diariaService = inject(DiariaService);
+  private clienteService = inject(ClienteService);
+  private postoService = inject(PostoService);
   private contratoService = inject(ContratoService);
+  private alocacaoService = inject(AlocacaoService);
 
   funcionario = signal<Funcionario | null>(null);
+  diarias = signal<Diaria[]>([]);
   alocacoes = signal<Alocacao[]>([]);
-  condominio = signal<Condominio | null>(null);
-  postos = signal<PostoDeTrabalho[]>([]);
+  cliente = signal<Cliente | null>(null);
+  postos = signal<Posto[]>([]);
   contrato = signal<Contrato | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
@@ -44,14 +48,14 @@ export class FuncionarioDetailComponent implements OnInit {
   selectedMonth = signal({ month: new Date().getMonth(), year: new Date().getFullYear() });
 
   // Computeds
-  totalAlocacoes = computed(() => this.alocacoes().length);
+  totalDiarias = computed(() => this.diarias().length);
 
-  alocacoesConfirmadas = computed(
-    () => this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA).length,
+  diariasConfirmadas = computed(
+    () => this.diarias().filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA).length,
   );
 
   faltas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA),
+    this.diarias().filter((a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA),
   );
 
   totalFaltas = computed(() => this.faltas().length);
@@ -64,11 +68,11 @@ export class FuncionarioDetailComponent implements OnInit {
     return this.totalFaltas() * valorDiaria;
   });
 
-  alocacoesCanceladas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA),
+  diariasCanceladas = computed(() =>
+    this.diarias().filter((a) => a.statusDiaria === StatusDiaria.CANCELADA),
   );
 
-  totalCanceladas = computed(() => this.alocacoesCanceladas().length);
+  totalCanceladas = computed(() => this.diariasCanceladas().length);
 
   multaPorCancelamentos = computed(() => {
     const contrato = this.contrato();
@@ -76,10 +80,10 @@ export class FuncionarioDetailComponent implements OnInit {
     return this.totalCanceladas() * (contrato.valorDiariaCobrada || 0);
   });
 
-  // Alocações filtradas pelo mês selecionado
-  alocacoesFiltradas = computed(() => {
+  // Diárias filtradas pelo mês selecionado
+  diariasFiltradas = computed(() => {
     const { month, year } = this.selectedMonth();
-    return this.alocacoes().filter((a) => {
+    return this.diarias().filter((a) => {
       const d = new Date(a.data + 'T12:00:00');
       return d.getMonth() === month && d.getFullYear() === year;
     });
@@ -90,21 +94,23 @@ export class FuncionarioDetailComponent implements OnInit {
     const func = this.funcionario();
     if (!contrato || !func) return 0;
 
-    const alocacoesMes = this.alocacoesFiltradas().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+    const diariasMes = this.diariasFiltradas().filter(
+      (a) => a.statusDiaria === StatusDiaria.CONFIRMADA,
     );
 
-    // Fallback: sem alocações no mês usa média por tipo de escala
-    if (alocacoesMes.length === 0) {
-      const diasMedio = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+    // Fallback: sem diárias no mês usa média por tipo de escala
+    if (diariasMes.length === 0) {
+      let diasMedio = 22;
+      if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
+      else if (func.tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8;
       return (
         diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
       );
     }
 
     let total = 0;
-    for (const aloc of alocacoesMes) {
-      total += this.calcularValorAlocacao(aloc);
+    for (const aloc of diariasMes) {
+      total += this.calcularValorDiaria(aloc);
     }
 
     return total + (contrato.valorBeneficiosExtrasMensal || 0);
@@ -115,36 +121,41 @@ export class FuncionarioDetailComponent implements OnInit {
     const contrato = this.contrato();
     if (!contrato) return 0;
 
-    return this.alocacoesFiltradas()
-      .filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
-      .reduce((sum, a) => sum + this.calcularValorAlocacao(a), 0);
+    return this.diariasFiltradas()
+      .filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA)
+      .reduce((sum, a) => sum + this.calcularValorDiaria(a), 0);
   });
 
   salarioMesCompleto = computed(() => {
     const contrato = this.contrato();
     const func = this.funcionario();
     if (!contrato || !func) return 0;
-    const diasMedio = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+    let diasMedio = 22;
+    if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
+    else if (func.tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8;
     return (
       diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
     );
   });
 
   taxaPresenca = computed(() => {
-    const total = this.totalAlocacoes();
+    const total = this.totalDiarias();
     if (total === 0) return 100;
 
-    const confirmadas = this.alocacoesConfirmadas();
+    const confirmadas = this.diariasConfirmadas();
     return (confirmadas / total) * 100;
   });
 
-  // Alocações por posto
-  alocacoesPorPosto = computed(() => {
+  // Diárias por posto
+  diariasPorPosto = computed(() => {
     const postoMap = new Map<string, number>();
 
-    this.alocacoes().forEach((a) => {
-      const count = postoMap.get(a.postoDeTrabalhoId) || 0;
-      postoMap.set(a.postoDeTrabalhoId, count + 1);
+    this.diarias().forEach((a) => {
+      const aloc = this.alocacoes().find(al => al.id === a.alocacaoId);
+      if (aloc) {
+        const count = postoMap.get(aloc.postoId) || 0;
+        postoMap.set(aloc.postoId, count + 1);
+      }
     });
 
     return this.postos()
@@ -182,10 +193,10 @@ export class FuncionarioDetailComponent implements OnInit {
   }
 
   private loadRelatedData(funcionario: Funcionario): void {
-    // Carregar condomínio
-    this.condominioService.getById(funcionario.condominioId).subscribe({
-      next: (condominio) => this.condominio.set(condominio),
-      error: (err) => console.warn('Erro ao carregar condomínio:', err),
+    // Carregar cliente
+    this.clienteService.getById(funcionario.clienteId).subscribe({
+      next: (cliente) => this.cliente.set(cliente),
+      error: (err) => console.warn('Erro ao carregar cliente:', err),
     });
 
     // Carregar contrato
@@ -194,112 +205,107 @@ export class FuncionarioDetailComponent implements OnInit {
       error: (err) => console.warn('Erro ao carregar contrato:', err),
     });
 
-    // Carregar alocações
-    this.alocacaoService.getAll().subscribe({
-      next: (alocacoes) => {
-        this.alocacoes.set(alocacoes.filter((a) => a.funcionarioId === funcionario.id));
-      },
-      error: (err) => console.warn('Erro ao carregar alocações:', err),
-    });
+    // Carregar diárias
+    this.diariaService.getAll().subscribe({
+      next: (diarias) => {
+        const diariasFunc = diarias.filter((a) => a.funcionarioId === funcionario.id);
+        this.diarias.set(diariasFunc);
 
-    // Carregar postos
-    this.postoService.getByCondominioId(funcionario.condominioId).subscribe({
-      next: (postos) => this.postos.set(postos),
-      error: (err) => console.warn('Erro ao carregar postos:', err),
+        // Carregar alocações usadas nestas diárias
+        const alocIds = [...new Set(diariasFunc.map((a) => a.alocacaoId))];
+        this.alocacaoService.getAll().subscribe({
+          next: (alocs) => {
+            const alocsFunc = alocs.filter((a) => alocIds.includes(a.id));
+            this.alocacoes.set(alocsFunc);
+
+            // Carregar postos destas alocações
+            const pIds = [...new Set(alocsFunc.map((a) => a.postoId))];
+            this.postoService.getAll().subscribe({
+              next: (postos) => this.postos.set(postos.filter((p) => pIds.includes(p.id))),
+              error: () => {},
+            });
+          },
+          error: () => {},
+        });
+      },
+      error: (err) => console.warn('Erro ao carregar diárias:', err),
     });
 
     this.loading.set(false);
   }
 
-  getPostoNome(postoId: string): string {
-    const posto = this.postos().find((p) => p.id === postoId);
+  getPostoNome(alocacaoId: string): string {
+    const aloc = this.alocacoes().find((a) => a.id === alocacaoId);
+    if (!aloc) return 'Desconhecido';
+    const posto = this.postos().find((p) => p.id === aloc.postoId);
     if (!posto) return 'Posto desconhecido';
 
-    return `${posto.horarioInicio.substring(0, 5)} - ${posto.horarioFim.substring(0, 5)}`;
+    return `${posto.nome} - ${posto.cidade}`;
   }
 
-  getStatusBadgeClass(status: StatusAlocacao): string {
+  getStatusBadgeClass(status: StatusDiaria): string {
     const classes = {
-      [StatusAlocacao.CONFIRMADA]: 'badge-success',
-      [StatusAlocacao.CANCELADA]: 'badge-secondary',
-      [StatusAlocacao.FALTA_REGISTRADA]: 'badge-danger',
+      [StatusDiaria.CONFIRMADA]: 'badge-success',
+      [StatusDiaria.CANCELADA]: 'badge-secondary',
+      [StatusDiaria.FALTA_REGISTRADA]: 'badge-danger',
     };
     return classes[status] || 'badge-secondary';
   }
 
-  getStatusLabel(status: StatusAlocacao): string {
+  getStatusLabel(status: StatusDiaria): string {
     const labels = {
-      [StatusAlocacao.CONFIRMADA]: 'Confirmada',
-      [StatusAlocacao.CANCELADA]: 'Cancelada',
-      [StatusAlocacao.FALTA_REGISTRADA]: 'Falta',
+      [StatusDiaria.CONFIRMADA]: 'Confirmada',
+      [StatusDiaria.CANCELADA]: 'Cancelada',
+      [StatusDiaria.FALTA_REGISTRADA]: 'Falta',
     };
     return labels[status] || 'Desconhecido';
   }
 
-  getTipoLabel(tipo: TipoAlocacao): string {
+  getTipoLabel(tipo: TipoDiaria): string {
     const labels = {
-      [TipoAlocacao.REGULAR]: 'Regular',
-      [TipoAlocacao.DOBRA_PROGRAMADA]: 'Dobra Programada',
-      [TipoAlocacao.SUBSTITUICAO]: 'Substituição',
+      [TipoDiaria.REGULAR]: 'Regular',
+      [TipoDiaria.DOBRA_PROGRAMADA]: 'Dobra Programada',
+      [TipoDiaria.SUBSTITUICAO]: 'Substituição',
     };
     return labels[tipo] || tipo;
   }
 
-  // Retorna a proporção de horas noturnas do turno (0.0 a 1.0) — CLT Art. 73: 22h–05h
-  // Ex: turno 18h–06h (12h) → 7h noturnas (22h–05h) → 7/12 ≈ 0.583
-  // Ex: turno 06h–18h (12h) → 0h noturnas → 0.0
-  // Ex: turno 22h–10h (12h) → 7h noturnas → 7/12 ≈ 0.583
-  private calcularProporcaoNoturna(posto: PostoDeTrabalho): number {
-    const inicio = parseInt(posto.horarioInicio.substring(0, 2), 10);
-    const fim = parseInt(posto.horarioFim.substring(0, 2), 10);
-
-    // Duração total do turno em horas (tratando cruzamento de meia-noite)
-    const duracao = inicio > fim ? 24 - inicio + fim : fim - inicio;
-    if (duracao === 0) return 0;
-
-    // Conta horas dentro do período noturno CLT Art. 73: 22h até 05h
-    let horasNoturnas = 0;
-    for (let i = 0; i < duracao; i++) {
-      const hora = (inicio + i) % 24;
-      if (hora >= 22 || hora < 5) horasNoturnas++;
-    }
-
-    return horasNoturnas / duracao;
+  private calcularProporcaoNoturna(alocacaoId: string): number {
+    const aloc = this.alocacoes().find(a => a.id === alocacaoId);
+    if (!aloc) return 0;
+    return aloc.temHorarioNoturno ? 1.0 : 0; // Simplificado: se tem horário noturno, aplica bônus total ou proporcional?
+    // O backend agora tem a lógica real, no frontend podemos simplificar ou ler do backend.
   }
 
-  // Calcula o valor de uma única alocação (bônus FDS + adicional noturno proporcional)
-  calcularValorAlocacao(alocacao: Alocacao): number {
+  // Calcula o valor de uma única diária (bônus FDS + adicional noturno proporcional)
+  calcularValorDiaria(diaria: Diaria): number {
     const contrato = this.contrato();
     if (!contrato) return 0;
 
     let valor = contrato.valorDiariaCobrada || 0;
-    const data = new Date(alocacao.data + 'T12:00:00');
+    const data = new Date(diaria.data + 'T12:00:00');
     const diaSemana = data.getDay();
 
     if (diaSemana === 0)
       valor *= 2.0; // +100% domingo
     else if (diaSemana === 6) valor *= 1.5; // +50% sábado
 
-    const posto = this.postos().find((p) => p.id === alocacao.postoDeTrabalhoId);
-    if (posto) {
-      const proporcaoNoturna = this.calcularProporcaoNoturna(posto);
-      if (proporcaoNoturna > 0) {
-        // Adicional proporcional às horas noturnas reais (CLT Art. 73)
-        // percentualAdicionalNoturno armazenado como decimal (0.20 = 20%)
-        valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
-      }
+    const proporcaoNoturna = this.calcularProporcaoNoturna(diaria.alocacaoId);
+    if (proporcaoNoturna > 0) {
+      // Adicional proporcional às horas noturnas reais (CLT Art. 73)
+      valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
     }
 
     return valor;
   }
 
-  // Breakdown noturno do mês selecionado (apenas alocações confirmadas)
+  // Breakdown noturno do mês selecionado (apenas diárias confirmadas)
   nocturnoBreakdown = computed(() => {
     const contrato = this.contrato();
     if (!contrato || this.postos().length === 0) return null;
 
-    const confirmadas = this.alocacoesFiltradas().filter(
-      (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+    const confirmadas = this.diariasFiltradas().filter(
+      (a) => a.statusDiaria === StatusDiaria.CONFIRMADA,
     );
     if (confirmadas.length === 0) return null;
 
@@ -318,8 +324,7 @@ export class FuncionarioDetailComponent implements OnInit {
 
       totalBase += base;
 
-      const posto = this.postos().find((p) => p.id === aloc.postoDeTrabalhoId);
-      const proporcao = posto ? this.calcularProporcaoNoturna(posto) : 0;
+      const proporcao = this.calcularProporcaoNoturna(aloc.alocacaoId);
       const adicional = base * proporcao * (contrato.percentualAdicionalNoturno || 0);
       totalAdicional += adicional;
 

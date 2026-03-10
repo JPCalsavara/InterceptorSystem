@@ -20,10 +20,10 @@ public class SessaoWhatsapp
     public EstadoConversa Estado { get; private set; }
 
     // Seleções acumuladas durante o fluxo
-    public Guid? CondominioIdSelecionado { get; private set; }
+    public Guid? ClienteIdSelecionado { get; private set; }
     public Guid? PostoIdSelecionado { get; private set; }
     public DateOnly? DataSelecionada { get; private set; }
-    public Guid? AlocacaoIdParaSubstituir { get; private set; }
+    public Guid? DiariaIdParaSubstituir { get; private set; }
     public Guid? FuncionarioSubstitutoId { get; private set; }
 
     /// <summary>
@@ -44,7 +44,7 @@ public class SessaoWhatsapp
         Id = Guid.NewGuid();
         Telefone = telefone;
         ContaId = contaId;
-        Estado = EstadoConversa.AguardandoCondominio;
+        Estado = EstadoConversa.AguardandoCliente;
         CriadoEm = DateTime.UtcNow;
         UltimaAtividade = DateTime.UtcNow;
     }
@@ -56,9 +56,9 @@ public class SessaoWhatsapp
         UltimaAtividade = DateTime.UtcNow;
     }
 
-    public void SelecionarCondominio(Guid id)
+    public void SelecionarCliente(Guid id)
     {
-        CondominioIdSelecionado = id;
+        ClienteIdSelecionado = id;
         UltimaAtividade = DateTime.UtcNow;
     }
 
@@ -74,9 +74,9 @@ public class SessaoWhatsapp
         UltimaAtividade = DateTime.UtcNow;
     }
 
-    public void SelecionarAlocacaoParaSubstituir(Guid id)
+    public void SelecionarDiariaParaSubstituir(Guid id)
     {
-        AlocacaoIdParaSubstituir = id;
+        DiariaIdParaSubstituir = id;
         UltimaAtividade = DateTime.UtcNow;
     }
 

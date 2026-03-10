@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ContratoService } from '../../../services/contrato.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { StatusContrato, CalculoValorTotalOutput } from '../../../models/index';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -20,7 +20,7 @@ export class ContratoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(ContratoService);
   private calculoService = inject(ContratoCalculoService);
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -30,7 +30,7 @@ export class ContratoFormComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
-  condominios = signal<any[]>([]);
+  clientes = signal<any[]>([]);
   duracaoContrato = signal<string>(''); // Duração calculada do contrato
   activeTooltip = signal<string | null>(null); // Controla qual tooltip está aberto
 
@@ -47,7 +47,7 @@ export class ContratoFormComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadCondominios();
+    this.loadClientes();
     this.buildForm();
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -61,10 +61,10 @@ export class ContratoFormComponent implements OnInit {
     this.setupAutoCalculo();
   }
 
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => console.error('Erro ao carregar clientes:', err),
     });
   }
 
@@ -75,7 +75,7 @@ export class ContratoFormComponent implements OnInit {
     seisMesesDepois.setMonth(hoje.getMonth() + 6);
 
     this.form = this.fb.group({
-      condominioId: ['', Validators.required],
+      clienteId: ['', Validators.required],
       descricao: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]],
       // Valores padrão baseados no mercado de segurança patrimonial brasileiro
       valorDiariaCobrada: [100, [Validators.required, Validators.min(0)]], // R$ 100/dia é valor médio para portaria
@@ -110,10 +110,9 @@ export class ContratoFormComponent implements OnInit {
     });
   }
 
-  // Calcula o total de funcionários a partir do condomínio selecionado × número de postos
-  getQuantidadeFuncionariosTotal(condominioId: string, numeroDePostos: number): number {
-    const cond = this.condominios().find((c) => c.id === condominioId);
-    return (cond?.quantidadeIdealPorTurno || 0) * (numeroDePostos || 0);
+  // Calcula o total de funcionários a partir do número de postos (slots)
+  getQuantidadeFuncionariosTotal(numeroDePostos: number): number {
+    return numeroDePostos || 0;
   }
 
   setupAutoCalculo(): void {
@@ -122,9 +121,8 @@ export class ContratoFormComponent implements OnInit {
         debounceTime(500), // Aguarda 500ms após última mudança
         distinctUntilChanged(),
         switchMap((valores) => {
-          // Deriva total de funcionários do condomínio selecionado × postos
+          // Deriva total de funcionários diretamente do número de postos (slots)
           const quantidadeFuncionarios = this.getQuantidadeFuncionariosTotal(
-            valores.condominioId,
             valores.numeroDePostos,
           );
 
@@ -186,7 +184,7 @@ export class ContratoFormComponent implements OnInit {
     this.service.getById(id).subscribe({
       next: (data) => {
         this.form.patchValue({
-          condominioId: data.condominioId,
+          clienteId: data.clienteId,
           descricao: data.descricao,
           valorDiariaCobrada: data.valorDiariaCobrada,
           percentualAdicionalNoturno: data.percentualAdicionalNoturno * 100,

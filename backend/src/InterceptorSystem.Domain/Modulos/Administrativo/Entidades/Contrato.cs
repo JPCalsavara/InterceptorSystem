@@ -6,14 +6,14 @@ using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
 /// <summary>
-/// Representa um contrato de prestação de serviços de segurança patrimonial entre a empresa e um condomínio.
+/// Representa um contrato de prestação de serviços de segurança patrimonial entre a empresa e um cliente.
 /// </summary>
 public class Contrato : Entity, IAggregateRoot
 {
     /// <summary>
-    /// Identificador do condomínio associado a este contrato.
+    /// Identificador do cliente associado a este contrato.
     /// </summary>
-    public Guid CondominioId { get; private set; }
+    public Guid ClienteId { get; private set; }
     
     /// <summary>
     /// Descrição do contrato (ex: "Contrato de Portaria 12x36", "Vigilância Diurna").
@@ -21,7 +21,7 @@ public class Contrato : Entity, IAggregateRoot
     public string Descricao { get; private set; } = null!;
     
     /// <summary>
-    /// Valor total mensal que o condomínio pagará (faturamento bruto).
+    /// Valor total mensal que o cliente pagará (faturamento bruto).
     /// Inclui: salários, benefícios, impostos, margens de lucro e cobertura de faltas.
     /// </summary>
     public decimal ValorTotalMensal { get; private set; }
@@ -31,6 +31,12 @@ public class Contrato : Entity, IAggregateRoot
     /// Usado para cálculo do custo mensal: ValorDiaria × Funcionários × 30 dias.
     /// </summary>
     public decimal ValorDiariaCobrada { get; private set; }
+    
+    /// <summary>
+    /// Valor padrão da diária pago ao vigilante neste contrato.
+    /// Usado como fallback quando não há tags específicas (FASE 3).
+    /// </summary>
+    public decimal? ValorDiariaVigilante { get; private set; }
     
     /// <summary>
     /// Percentual de adicional noturno (conforme CLT Art. 73 - mínimo 20%).
@@ -52,7 +58,7 @@ public class Contrato : Entity, IAggregateRoot
     public decimal PercentualImpostos { get; private set; }
     
     /// <summary>
-    /// Número de turnos/postos de trabalho no condomínio.
+    /// Número de turnos/postos de trabalho no cliente.
     /// - 2 postos = Escala 12x36 (diurno 6h-18h + noturno 18h-6h)
     /// - 3 postos = Escala 8h (manhã, tarde, noite)
     /// - 4 postos = Escala 6h (4 turnos por dia)
@@ -88,50 +94,35 @@ public class Contrato : Entity, IAggregateRoot
     
     /// <summary>
     /// Quantidade total de funcionários vinculados a este contrato.
-    /// Calculado automaticamente a partir do Condomínio.
-    /// IMPORTANTE: Esta é uma propriedade SOMENTE LEITURA que reflete a configuração do condomínio.
-    /// Fórmula: QuantidadeIdealPorTurno × NumeroDePostos
-    /// Exemplo: 6 funcionários/turno × 2 postos = 12 funcionários totais
+    /// Agora baseado na coleção de Funcionários.
     /// </summary>
     [NotMapped]
-    public int QuantidadeFuncionarios
-    {
-        get
-        {
-            if (Condominio == null)
-                throw new InvalidOperationException(
-                    "Navegação 'Condominio' não carregada. Use .Include(c => c.Condominio) na query.");
-            
-            return Condominio.QuantidadeIdealPorTurno * NumeroDePostos;
-        }
-    }
+    public int QuantidadeFuncionarios => Math.Max(1, Funcionarios.Count);
     
     /// <summary>
     /// Quantidade ideal de funcionários por turno/posto.
-    /// Calculado automaticamente: Funcionários do Condomínio ÷ Número de postos.
-    /// Exemplo: 12 funcionários ÷ 2 postos = 6 funcionários por turno.
     /// </summary>
     [NotMapped]
     public int QuantidadeIdealFuncionariosPorTurno
     {
         get
         {
-            if (NumeroDePostos == 0 || QuantidadeFuncionarios == 0)
+            if (NumeroDePostos == 0)
                 return 0;
             
             return QuantidadeFuncionarios / NumeroDePostos;
         }
     }
 
-    public Condominio? Condominio { get; private set; }
+    public Cliente? Cliente { get; private set; }
     public ICollection<Funcionario> Funcionarios { get; private set; } = new List<Funcionario>(); // FASE 2: Navegação para funcionários
-    public ICollection<PostoDeTrabalho> PostosDeTrabalho { get; private set; } = new List<PostoDeTrabalho>();
+    public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
 
     protected Contrato() { }
 
     public Contrato(
         Guid empresaId,
-        Guid condominioId,
+        Guid clienteId,
         string descricao,
         decimal valorTotalMensal,
         decimal valorDiariaCobrada,
@@ -143,10 +134,11 @@ public class Contrato : Entity, IAggregateRoot
         decimal margemCoberturaFaltasPercentual,
         DateOnly dataInicio,
         DateOnly dataFim,
-        StatusContrato status)
+        StatusContrato status,
+        decimal? valorDiariaVigilante = null)
     {
         CheckRule(empresaId == Guid.Empty, "O contrato deve estar associado a uma empresa.");
-        CheckRule(condominioId == Guid.Empty, "O contrato deve pertencer a um condomínio.");
+        CheckRule(clienteId == Guid.Empty, "O contrato deve pertencer a um cliente.");
         CheckRule(string.IsNullOrWhiteSpace(descricao), "A descrição do contrato é obrigatória.");
         CheckRule(valorTotalMensal <= 0, "O valor total mensal deve ser maior que zero.");
         CheckRule(valorDiariaCobrada <= 0, "O valor da diária deve ser maior que zero.");
@@ -163,10 +155,11 @@ public class Contrato : Entity, IAggregateRoot
         CheckRule(!Enum.IsDefined(status), "Status do contrato é obrigatório.");
 
         EmpresaId = empresaId;
-        CondominioId = condominioId;
+        ClienteId = clienteId;
         Descricao = descricao;
         ValorTotalMensal = valorTotalMensal;
         ValorDiariaCobrada = valorDiariaCobrada;
+        ValorDiariaVigilante = valorDiariaVigilante;
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
         PercentualImpostos = percentualImpostos;
@@ -176,6 +169,7 @@ public class Contrato : Entity, IAggregateRoot
         DataInicio = dataInicio;
         DataFim = dataFim;
         Status = status;
+        ValorDiariaVigilante = valorDiariaVigilante;
     }
 
     public void AtualizarDados(
@@ -189,7 +183,8 @@ public class Contrato : Entity, IAggregateRoot
         decimal margemLucroPercentual,
         decimal margemCoberturaFaltasPercentual,
         DateOnly dataInicio,
-        DateOnly dataFim)
+        DateOnly dataFim,
+        decimal? valorDiariaVigilante = null)
     {
         CheckRule(string.IsNullOrWhiteSpace(descricao), "A descrição do contrato é obrigatória.");
         CheckRule(valorTotalMensal <= 0, "O valor total mensal deve ser maior que zero.");
@@ -216,6 +211,7 @@ public class Contrato : Entity, IAggregateRoot
         MargemCoberturaFaltasPercentual = margemCoberturaFaltasPercentual;
         DataInicio = dataInicio;
         DataFim = dataFim;
+        ValorDiariaVigilante = valorDiariaVigilante;
     }
 
     public void AtualizarStatus(StatusContrato status)

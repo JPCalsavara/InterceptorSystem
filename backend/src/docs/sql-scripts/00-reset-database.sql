@@ -9,11 +9,11 @@
 SET session_replication_role = 'replica';
 
 -- Limpar todas as tabelas na ordem correta (das dependências para as principais)
-TRUNCATE TABLE "Alocacoes" CASCADE;
+TRUNCATE TABLE "Diarias" CASCADE;
 TRUNCATE TABLE "Funcionarios" CASCADE;
-TRUNCATE TABLE "PostosDeTrabalho" CASCADE;
+TRUNCATE TABLE "Postos" CASCADE;
 TRUNCATE TABLE "Contratos" CASCADE;
-TRUNCATE TABLE "Condominios" CASCADE;
+TRUNCATE TABLE "Clientes" CASCADE;
 
 -- Reabilitar constraints
 SET session_replication_role = 'origin';

@@ -37,10 +37,10 @@ public class SessaoWhatsappConfiguration : IEntityTypeConfiguration<SessaoWhatsa
             .IsRequired();
 
         // Campos nullable de seleção durante o fluxo
-        builder.Property(s => s.CondominioIdSelecionado);
+        builder.Property(s => s.ClienteIdSelecionado);
         builder.Property(s => s.PostoIdSelecionado);
         builder.Property(s => s.DataSelecionada);
-        builder.Property(s => s.AlocacaoIdParaSubstituir);
+        builder.Property(s => s.DiariaIdParaSubstituir);
         builder.Property(s => s.FuncionarioSubstitutoId);
     }
 }

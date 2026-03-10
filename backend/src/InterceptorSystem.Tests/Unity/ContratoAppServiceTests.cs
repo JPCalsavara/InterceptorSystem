@@ -12,7 +12,7 @@ namespace InterceptorSystem.Tests.Unity;
 public class ContratoAppServiceTests
 {
     private readonly Mock<IContratoRepository> _contratoRepo = new();
-    private readonly Mock<ICondominioRepository> _condominioRepo = new();
+    private readonly Mock<IClienteRepository> _clienteRepo = new();
     private readonly Mock<ICurrentTenantService> _tenantService = new();
     private readonly Mock<IUnitOfWork> _uow = new();
     private readonly ContratoAppService _service;
@@ -20,16 +20,16 @@ public class ContratoAppServiceTests
     public ContratoAppServiceTests()
     {
         _contratoRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        _service = new ContratoAppService(_contratoRepo.Object, _condominioRepo.Object, _tenantService.Object);
+        _service = new ContratoAppService(_contratoRepo.Object, _clienteRepo.Object, _tenantService.Object);
     }
 
     [Fact]
     public async Task Create_DeveCriarContrato()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         var input = new CreateContratoDtoInput(
-            condominioId,
+            clienteId,
             "Contrato Segurança",
             10000,
             500,
@@ -44,13 +44,13 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId))
+            .ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
         
         Contrato? savedContrato = null;
         _contratoRepo.Setup(r => r.Add(It.IsAny<Contrato>())).Callback<Contrato>(c => 
         {
-            typeof(Contrato).GetProperty("Condominio")!.SetValue(c, new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+            typeof(Contrato).GetProperty("Cliente")!.SetValue(c, new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
             savedContrato = c;
         });
         _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Guid id) => savedContrato?.Id == id ? savedContrato : null);
@@ -86,7 +86,7 @@ public class ContratoAppServiceTests
     }
 
     [Fact]
-    public async Task Create_DeveFalhar_QuandoCondominioNaoExiste()
+    public async Task Create_DeveFalhar_QuandoClienteNaoExiste()
     {
         var empresaId = Guid.NewGuid();
         var input = new CreateContratoDtoInput(
@@ -105,7 +105,7 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Condominio?)null);
+        _clienteRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Cliente?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
@@ -115,9 +115,9 @@ public class ContratoAppServiceTests
     public async Task Create_DeveFalhar_QuandoValoresInvalidos()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         var input = new CreateContratoDtoInput(
-            condominioId,
+            clienteId,
             "",
             -10,
             0,
@@ -132,8 +132,8 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId))
-            .ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId))
+            .ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
@@ -158,7 +158,7 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.PENDENTE);
 
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, new Condominio(Guid.NewGuid(), "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, new Cliente(Guid.NewGuid(), "Cond", "00000000000000", "São Paulo", "SP"));
 
         var input = new UpdateContratoDtoInput(
             "Novo",
@@ -269,11 +269,11 @@ public class ContratoAppServiceTests
     public async Task CreateAsync_DeveFalharQuandoJaExisteContratoVigente()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        var condominio = new Condominio(empresaId, "Teste", "12345678000100", "Rua A, 123, Centro, São Paulo-SP", 10, TimeSpan.FromHours(6));
+        var clienteId = Guid.NewGuid();
+        var cliente = new Cliente(empresaId, "Teste", "00000000000000", "São Paulo", "SP");
         
         var input = new CreateContratoDtoInput(
-            condominioId,
+            clienteId,
             "Contrato novo",
             2000,
             150,
@@ -288,21 +288,21 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(condominio);
-        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, null)).ReturnsAsync(true);
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(cliente);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, null)).ReturnsAsync(true);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
-        Assert.Contains("Já existe um contrato vigente para este condomínio", exception.Message);
+        Assert.Contains("Já existe um contrato vigente para este cliente", exception.Message);
     }
 
     [Fact(DisplayName = "UpdateAsync - Deve falhar quando tentar ativar contrato com outro vigente")]
     public async Task UpdateAsync_DeveFalharQuandoTentarAtivarContratoComOutroVigente()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         var contrato = new Contrato(
             empresaId,
-            condominioId,
+            clienteId,
             "Contrato inativo",
             1000,
             100,
@@ -331,20 +331,20 @@ public class ContratoAppServiceTests
             StatusContrato.ATIVO);
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
-        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(true);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, contrato.Id)).ReturnsAsync(true);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(contrato.Id, input));
-        Assert.Contains("Já existe um contrato vigente para este condomínio", exception.Message);
+        Assert.Contains("Já existe um contrato vigente para este cliente", exception.Message);
     }
 
     [Fact(DisplayName = "UpdateAsync - Deve permitir ativar contrato quando não há outro vigente")]
     public async Task UpdateAsync_DevePermitirAtivarContratoQuandoNaoHaOutroVigente()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         var contrato = new Contrato(
             empresaId,
-            condominioId,
+            clienteId,
             "Contrato inativo",
             1000,
             100,
@@ -358,7 +358,7 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.FINALIZADO);
 
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
 
         var input = new UpdateContratoDtoInput(
             "Contrato ativado",
@@ -375,7 +375,7 @@ public class ContratoAppServiceTests
             StatusContrato.ATIVO);
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
-        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(condominioId, contrato.Id)).ReturnsAsync(false);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, contrato.Id)).ReturnsAsync(false);
         _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 
         var result = await _service.UpdateAsync(contrato.Id, input);

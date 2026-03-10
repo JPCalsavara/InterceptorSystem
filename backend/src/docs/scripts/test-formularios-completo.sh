@@ -34,9 +34,9 @@ generate_unique_cpf() {
 echo -e "${BLUE}📋 ETAPA 1: Listar dados existentes${NC}"
 echo "─────────────────────────────────────────────"
 
-# Listar condomínios existentes
-echo -n "Condomínios cadastrados: "
-COND_COUNT=$(curl -s "$BASE_URL/condominios" | grep -o '"id"' | wc -l)
+# Listar clientes existentes
+echo -n "Clientes cadastrados: "
+COND_COUNT=$(curl -s "$BASE_URL/clientes" | grep -o '"id"' | wc -l)
 echo "$COND_COUNT"
 
 echo ""
@@ -52,7 +52,7 @@ echo "   Timestamp: $TIMESTAMP"
 echo ""
 
 # Payload com dados únicos
-cat > /tmp/test_condominio_unique.json << EOF
+cat > /tmp/test_cliente_unique.json << EOF
 {
   "nome": "Teste Automático $TIMESTAMP",
   "cnpj": "$UNIQUE_CNPJ",
@@ -64,34 +64,34 @@ cat > /tmp/test_condominio_unique.json << EOF
 }
 EOF
 
-echo -e "${YELLOW}🔍 Testando criação de condomínio...${NC}"
+echo -e "${YELLOW}🔍 Testando criação de cliente...${NC}"
 
 RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
     -H "Content-Type: application/json" \
-    -d @/tmp/test_condominio_unique.json \
-    "$BASE_URL/condominios")
+    -d @/tmp/test_cliente_unique.json \
+    "$BASE_URL/clientes")
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 BODY=$(echo "$RESPONSE" | sed '$d')
 
 if [ "$HTTP_CODE" = "201" ]; then
-    echo -e "${GREEN}✅ SUCESSO!${NC} Condomínio criado (HTTP $HTTP_CODE)"
+    echo -e "${GREEN}✅ SUCESSO!${NC} Cliente criado (HTTP $HTTP_CODE)"
     echo ""
     echo "Dados retornados:"
     echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
     
-    # Extrair ID do condomínio criado
+    # Extrair ID do cliente criado
     COND_ID=$(echo "$BODY" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
     
     if [ -n "$COND_ID" ]; then
         echo ""
         echo -e "${BLUE}🧪 ETAPA 3: Testar criação de Posto de Trabalho${NC}"
         echo "─────────────────────────────────────────────"
-        echo "   Usando condomínio ID: $COND_ID"
+        echo "   Usando cliente ID: $COND_ID"
         
         cat > /tmp/test_posto.json << EOFPOSTO
 {
-  "condominioId": "$COND_ID",
+  "clienteId": "$COND_ID",
   "horarioInicio": "06:00:00",
   "horarioFim": "18:00:00",
   "permiteDobrarEscala": true,
@@ -105,7 +105,7 @@ EOFPOSTO
         POSTO_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             -H "Content-Type: application/json" \
             -d @/tmp/test_posto.json \
-            "$BASE_URL/postos-de-trabalho")
+            "$BASE_URL/postos")
         
         POSTO_HTTP_CODE=$(echo "$POSTO_RESPONSE" | tail -n1)
         POSTO_BODY=$(echo "$POSTO_RESPONSE" | sed '$d')
@@ -144,15 +144,15 @@ echo "CNPJ usado: $UNIQUE_CNPJ"
 echo "Timestamp: $TIMESTAMP"
 echo ""
 
-# Verificar novamente quantos condomínios existem
-NEW_COND_COUNT=$(curl -s "$BASE_URL/condominios" | grep -o '"id"' | wc -l)
-echo "Condomínios antes: $COND_COUNT"
-echo "Condomínios depois: $NEW_COND_COUNT"
+# Verificar novamente quantos clientes existem
+NEW_COND_COUNT=$(curl -s "$BASE_URL/clientes" | grep -o '"id"' | wc -l)
+echo "Clientes antes: $COND_COUNT"
+echo "Clientes depois: $NEW_COND_COUNT"
 
 if [ $NEW_COND_COUNT -gt $COND_COUNT ]; then
-    echo -e "${GREEN}✅ Novo condomínio foi criado com sucesso!${NC}"
+    echo -e "${GREEN}✅ Novo cliente foi criado com sucesso!${NC}"
 else
-    echo -e "${YELLOW}⚠️  Nenhum novo condomínio foi adicionado${NC}"
+    echo -e "${YELLOW}⚠️  Nenhum novo cliente foi adicionado${NC}"
 fi
 
 echo ""

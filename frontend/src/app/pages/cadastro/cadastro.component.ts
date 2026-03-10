@@ -34,7 +34,7 @@ import { NgxMaskDirective } from 'ngx-mask';
               <span class="hero-highlight">operação de segurança</span>
             </h1>
             <p class="hero-description">
-              Gerencie funcionários, contratos, turnos e alocações em um só lugar. Simples,
+              Gerencie funcionários, contratos, turnos e diárias em um só lugar. Simples,
               eficiente e pensado para empresas de segurança.
             </p>
 
@@ -43,7 +43,7 @@ import { NgxMaskDirective } from 'ngx-mask';
                 <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Controle de escalas e alocações automáticas
+                Controle de escalas e diárias automáticas
               </li>
               <li>
                 <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

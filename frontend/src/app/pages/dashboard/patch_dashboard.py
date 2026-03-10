@@ -32,7 +32,7 @@ main_grid = """// DASHBOARD MAIN GRID
     grid-row: 1;
   }
 
-  > .condominios-section {
+  > .clientes-section {
     grid-column: 1 / 3;
     grid-row: 2;
   }
@@ -55,7 +55,7 @@ main_grid = """// DASHBOARD MAIN GRID
   gap: var(--space-4) !important;
 }
 
-.condominios-grid, .ranking-grid {
+.clientes-grid, .ranking-grid {
   display: flex !important;
   flex-direction: column !important;
   gap: var(--space-4) !important;
@@ -66,7 +66,7 @@ main_grid = """// DASHBOARD MAIN GRID
     grid-template-columns: 1fr;
   }
   .dashboard-main-grid > .metricas-section,
-  .dashboard-main-grid > .condominios-section,
+  .dashboard-main-grid > .clientes-section,
   .dashboard-main-grid > .ranking-section,
   .dashboard-main-grid > .alertas-section {
     grid-column: 1 / -1;

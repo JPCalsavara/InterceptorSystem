@@ -1,19 +1,20 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { CondominioService } from '../../services/condominio.service';
+import { ClienteService } from '../../services/cliente.service';
 import { FuncionarioService } from '../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../services/posto-de-trabalho.service';
-import { AlocacaoService } from '../../services/alocacao.service';
+import { PostoService } from '../../services/posto.service';
+import { DiariaService } from '../../services/diaria.service';
 import { ContratoService } from '../../services/contrato.service';
-import { StatusContrato, StatusAlocacao, StatusFuncionario } from '../../models/index';
+import { StatusContrato, StatusDiaria, StatusFuncionario } from '../../models/index';
 
+import { AlocacaoService } from '../../services/alocacao.service';
 
 interface NavItem {
   label: string;
   route: string;
   icon: string;
-  countKey?: 'condominios' | 'funcionarios' | 'postos' | 'alocacoes' | 'contratos';
+  countKey?: 'clientes' | 'funcionarios' | 'postos' | 'alocacoes' | 'diarias' | 'contratos';
 }
 
 @Component({
@@ -61,6 +62,11 @@ interface NavItem {
                 @case ('calendar-days') {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                  </svg>
+                }
+                @case ('clock') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                   </svg>
                 }
               }
@@ -191,32 +197,35 @@ interface NavItem {
   ],
 })
 export class SidebarComponent implements OnInit {
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private diariaService = inject(DiariaService);
   private contratoService = inject(ContratoService);
+  private alocacaoService = inject(AlocacaoService);
 
   counts = signal<Record<string, number | null>>({
-    condominios: null,
+    clientes: null,
     funcionarios: null,
     postos: null,
     alocacoes: null,
+    diarias: null,
     contratos: null
   });
 
   navItems: NavItem[] = [
     { label: 'Resumo', route: '/dashboard', icon: 'chart-bar' },
-    { label: 'Condomínios', route: '/condominios', icon: 'building-office', countKey: 'condominios' },
+    { label: 'Clientes', route: '/clientes', icon: 'building-office', countKey: 'clientes' },
     { label: 'Contratos', route: '/contratos', icon: 'document-text', countKey: 'contratos' },
     { label: 'Funcionários', route: '/funcionarios', icon: 'user-group', countKey: 'funcionarios' },
-    { label: 'Postos de Trabalho', route: '/postos', icon: 'map-pin', countKey: 'postos' },
-    { label: 'Alocações', route: '/alocacoes', icon: 'calendar-days', countKey: 'alocacoes' },
+    { label: 'Postos', route: '/postos', icon: 'map-pin', countKey: 'postos' },
+    { label: 'Alocações', route: '/alocacoes', icon: 'clock', countKey: 'alocacoes' },
+    { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' },
   ];
 
   ngOnInit() {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.counts.update(c => ({ ...c, condominios: data.filter((x: any) => x.ativo).length }))
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, clientes: data.filter((x: any) => x.ativo).length }))
     });
     this.funcionarioService.getAll().subscribe({
       next: (data) => this.counts.update(c => ({ ...c, funcionarios: data.filter((x: any) => x.statusFuncionario === StatusFuncionario.ATIVO).length }))
@@ -225,7 +234,10 @@ export class SidebarComponent implements OnInit {
       next: (data) => this.counts.update(c => ({ ...c, postos: data.length }))
     });
     this.alocacaoService.getAll().subscribe({
-      next: (data) => this.counts.update(c => ({ ...c, alocacoes: data.filter((x: any) => x.statusAlocacao === StatusAlocacao.CONFIRMADA).length }))
+      next: (data) => this.counts.update(c => ({ ...c, alocacoes: data.length }))
+    });
+    this.diariaService.getAll().subscribe({
+      next: (data) => this.counts.update(c => ({ ...c, diarias: data.filter((x: any) => x.statusDiaria === StatusDiaria.CONFIRMADA).length }))
     });
     this.contratoService.getAll().subscribe({
       next: (data) => this.counts.update(c => ({ ...c, contratos: data.filter((x: any) => x.status === StatusContrato.ATIVO).length }))

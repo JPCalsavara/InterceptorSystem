@@ -128,7 +128,7 @@ public void CalcularSalario_DeveConsiderarMargemLucroEFaltas()
     // Arrange
     var contrato = new Contrato(
         empresaId: Guid.NewGuid(),
-        condominioId: Guid.NewGuid(),
+        clienteId: Guid.NewGuid(),
         descricao: "Teste",
         valorTotalMensal: 36000m,
         percentualImpostos: 0.15m,

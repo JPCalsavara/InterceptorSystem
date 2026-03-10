@@ -18,7 +18,7 @@ public class ContratoConfiguration : IEntityTypeConfiguration<Contrato>
         builder.Property(c => c.PercentualAdicionalNoturno).HasColumnType("decimal(5,4)").IsRequired();
         builder.Property(c => c.ValorBeneficiosExtrasMensal).HasColumnType("decimal(12,2)").IsRequired();
         builder.Property(c => c.PercentualImpostos).HasColumnType("decimal(5,4)").IsRequired();
-        // QuantidadeFuncionarios agora é calculado: Condominio.QuantidadeIdealPorTurno × NumeroDePostos
+        // QuantidadeFuncionarios agora é calculado: Cliente.QuantidadeIdealPorTurno × NumeroDePostos
         builder.Property(c => c.NumeroDePostos).IsRequired();
         builder.Property(c => c.MargemLucroPercentual).HasColumnType("decimal(5,4)").IsRequired();
         builder.Property(c => c.MargemCoberturaFaltasPercentual).HasColumnType("decimal(5,4)").IsRequired();
@@ -32,14 +32,14 @@ public class ContratoConfiguration : IEntityTypeConfiguration<Contrato>
             .HasMaxLength(50);
 
         builder.Property(c => c.EmpresaId).IsRequired();
-        builder.Property(c => c.CondominioId).IsRequired();
+        builder.Property(c => c.ClienteId).IsRequired();
 
-        builder.HasOne(c => c.Condominio)
+        builder.HasOne(c => c.Cliente)
             .WithMany(c => c.Contratos)
-            .HasForeignKey(c => c.CondominioId)
+            .HasForeignKey(c => c.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(c => c.EmpresaId);
-        builder.HasIndex(c => new { c.CondominioId, c.Status });
+        builder.HasIndex(c => new { c.ClienteId, c.Status });
     }
 }

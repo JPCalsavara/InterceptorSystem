@@ -2,14 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Alocacao, CreateAlocacaoDto, UpdateAlocacaoDto } from '../models/index';
+import { Alocacao, CreateAlocacaoDto, UpdateAlocacaoDto } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlocacaoService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/alocacoes`;
+  private apiUrl = `${environment.apiUrl}/api/alocacao`;
 
   getAll(): Observable<Alocacao[]> {
     return this.http.get<Alocacao[]>(this.apiUrl);
@@ -19,16 +19,16 @@ export class AlocacaoService {
     return this.http.get<Alocacao>(`${this.apiUrl}/${id}`);
   }
 
-  create(dto: CreateAlocacaoDto): Observable<Alocacao> {
-    return this.http.post<Alocacao>(this.apiUrl, dto);
+  getByPostoId(postoId: string): Observable<Alocacao[]> {
+    return this.http.get<Alocacao[]>(`${this.apiUrl}/posto/${postoId}`);
   }
 
-  /**
-   * Cria múltiplas alocações em lote (batch)
-   * Usado ao cadastrar funcionário para criar todas as alocações de uma vez
-   */
-  createBatch(alocacoes: CreateAlocacaoDto[]): Observable<Alocacao[]> {
-    return this.http.post<Alocacao[]>(`${this.apiUrl}/batch`, { alocacoes });
+  getByContratoId(contratoId: string): Observable<Alocacao[]> {
+    return this.http.get<Alocacao[]>(`${this.apiUrl}/contrato/${contratoId}`);
+  }
+
+  create(dto: CreateAlocacaoDto): Observable<Alocacao> {
+    return this.http.post<Alocacao>(this.apiUrl, dto);
   }
 
   update(id: string, dto: UpdateAlocacaoDto): Observable<Alocacao> {

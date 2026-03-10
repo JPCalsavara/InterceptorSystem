@@ -5,6 +5,7 @@ using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Auth.Entidades;
 using InterceptorSystem.Domain.Modulos.Whatsapp.Entidades;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterceptorSystem.Infrastructure.Persistence.Contexts;
@@ -12,20 +13,24 @@ namespace InterceptorSystem.Infrastructure.Persistence.Contexts;
 public class ApplicationDbContext : DbContext, IUnitOfWork
 {
     private readonly ICurrentTenantService _tenantService;
+    private readonly IMediator _mediator;
 
     // Construtor com Injeção de Dependência
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
-        ICurrentTenantService tenantService) : base(options)
+        ICurrentTenantService tenantService,
+        IMediator mediator) : base(options)
     {
         _tenantService = tenantService;
+        _mediator = mediator;
     }
 
     // --- DbSets (Tabelas) ---
-    public DbSet<Condominio> Condominios { get; set; }
-    public DbSet<PostoDeTrabalho> PostosDeTrabalho { get; set; }
-    public DbSet<Funcionario> Funcionarios { get; set; }
+    public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Alocacao> Alocacoes { get; set; }
+    public DbSet<Posto> Postos { get; set; }
+    public DbSet<Funcionario> Funcionarios { get; set; }
+    public DbSet<Diaria> Diarias { get; set; }
     public DbSet<Contrato> Contratos => Set<Contrato>();
     public DbSet<Conta> Contas { get; set; }
     public DbSet<TokenVerificacao> TokensVerificacao { get; set; }
@@ -86,8 +91,31 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
             }
         }
 
+        // Recupera as entidades com eventos antes de salvar
+        var entitiesWithEvents = ChangeTracker.Entries<Entity>()
+            .Select(e => e.Entity)
+            .Where(e => e.DomainEvents.Any())
+            .ToList();
+
         // Persiste no banco
         var result = await base.SaveChangesAsync();
+        
+        // Dispara os eventos de domínio via MediatR
+        if (entitiesWithEvents.Any())
+        {
+            var events = entitiesWithEvents.SelectMany(e => e.DomainEvents).ToList();
+
+            foreach (var entity in entitiesWithEvents)
+            {
+                entity.ClearDomainEvents();
+            }
+
+            foreach (var domainEvent in events)
+            {
+                await _mediator.Publish(domainEvent);
+            }
+        }
+
         return result > 0;
     }
 

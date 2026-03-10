@@ -3,45 +3,47 @@ using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
-public record CreateAlocacaoDtoInput(
-    Guid FuncionarioId,
-    Guid PostoDeTrabalhoId,
-    DateOnly Data,
-    StatusAlocacao StatusAlocacao,
-    TipoAlocacao TipoAlocacao);
-
-public record UpdateAlocacaoDtoInput(
-    StatusAlocacao StatusAlocacao,
-    TipoAlocacao TipoAlocacao);
-
-public record AlocacaoDtoOutput(
-    Guid Id,
-    Guid FuncionarioId,
-    Guid PostoDeTrabalhoId,
-    DateOnly Data,
-    StatusAlocacao StatusAlocacao,
-    TipoAlocacao TipoAlocacao)
+public class AlocacaoDto
 {
-    public static AlocacaoDtoOutput? FromEntity(Alocacao? entity)
+    public Guid Id { get; set; }
+    public Guid PostoId { get; set; }
+    public Guid ContratoId { get; set; }
+    public TimeSpan HorarioInicio { get; set; }
+    public TimeSpan HorarioFim { get; set; }
+    public TipoEscala TipoEscala { get; set; }
+    public bool PermiteDobrarEscala { get; set; }
+    public bool TemHorarioNoturno { get; set; }
+
+    public static AlocacaoDto FromEntity(Alocacao entity)
     {
-        if (entity == null) return null;
-        return new AlocacaoDtoOutput(
-            entity.Id,
-            entity.FuncionarioId,
-            entity.PostoDeTrabalhoId,
-            entity.Data,
-            entity.StatusAlocacao,
-            entity.TipoAlocacao);
+        return new AlocacaoDto
+        {
+            Id = entity.Id,
+            PostoId = entity.PostoId,
+            ContratoId = entity.ContratoId,
+            HorarioInicio = entity.HorarioInicio,
+            HorarioFim = entity.HorarioFim,
+            TipoEscala = entity.TipoEscala,
+            PermiteDobrarEscala = entity.PermiteDobrarEscala,
+            TemHorarioNoturno = entity.TemHorarioNoturno
+        };
     }
 }
 
-/// <summary>
-/// DTO enriquecido com nome do funcionário, usado pelo bot do WhatsApp para
-/// exibir as alocações de um posto em uma data específica.
-/// </summary>
-public record AlocacaoComFuncionarioDto(
-    Guid Id,
-    Guid FuncionarioId,
-    string NomeFuncionario,
-    TipoAlocacao TipoAlocacao,
-    StatusAlocacao StatusAlocacao);
+public class CreateAlocacaoInput
+{
+    public Guid PostoId { get; set; }
+    public Guid ContratoId { get; set; }
+    public TimeSpan HorarioInicio { get; set; }
+    public TimeSpan HorarioFim { get; set; }
+    public TipoEscala TipoEscala { get; set; }
+    public bool PermiteDobrarEscala { get; set; }
+}
+
+public class UpdateAlocacaoInput
+{
+    public TimeSpan HorarioInicio { get; set; }
+    public TimeSpan HorarioFim { get; set; }
+    public TipoEscala TipoEscala { get; set; }
+    public bool PermiteDobrarEscala { get; set; }
+}

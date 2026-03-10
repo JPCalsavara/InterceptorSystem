@@ -20,7 +20,7 @@
         </svg>
         Postos de Trabalho
       </h1>
-      <p class="subtitle">Gerencie todos os postos de trabalho por condomínio</p>
+      <p class="subtitle">Gerencie todos os postos de trabalho por cliente</p>
     </div>
     <button class="btn-primary" routerLink="/postos/novo">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -89,41 +89,18 @@
     </div>
   }
 
-  <!-- Cards por Condomínio -->
-  @if (!loading() && postosPorCondominio().length > 0) {
-    <div class="condominios-grid">
-      @for (grupo of postosPorCondominio(); track grupo.condominio.id) {
-        <div class="condominio-section">
-          <div class="condominio-header">
-            <h2>{{ grupo.condominio.nome }}</h2>
+  <!-- Cards por Cliente -->
+  @if (!loading() && postosPorCliente().length > 0) {
+    <div class="clientes-grid">
+      @for (grupo of postosPorCliente(); track grupo.cliente.id) {
+        <div class="cliente-section">
+          <div class="cliente-header">
+            <h2>{{ grupo.cliente.nome }}</h2>
             <span class="postos-count">{{ grupo.postos.length }} posto(s)</span>
           </div>
 
-          <!-- Informações do condomínio -->
-          <div class="condominio-info-strip">
-            <span class="cond-info-item">
-              <span class="cond-info-label">Pessoa(s) Ideal:</span>
-              <span class="badge badge-info">{{ grupo.condominio.quantidadeIdealPorTurno }}</span>
-            </span>
-            <span class="cond-info-item">
-              <span class="cond-info-label">Contrato:</span>
-              <span class="cond-info-value">{{
-                getContratoDoCondominio(grupo.condominio.id)
-              }}</span>
-            </span>
-            <span class="cond-info-item">
-              <span class="cond-info-label">Capacidade de Dobras:</span>
-              <span class="cond-info-value">{{ getCapacidadeMaxDobras(grupo.condominio.id) }}</span>
-            </span>
-            <span class="cond-info-item">
-              <span class="cond-info-label">Dobra Permitida:</span>
-              @if (getPermiteDobras(grupo.condominio.id)) {
-                <span class="badge badge-success">Sim</span>
-              } @else {
-                <span class="badge badge-inactive">Não</span>
-              }
-            </span>
-          </div>
+          <!-- Informações do cliente -->
+
 
           <div class="postos-grid">
             @for (posto of grupo.postos; track posto.id) {
@@ -145,7 +122,7 @@
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
+                    {{ formatNome(posto.nome, posto.cidade) }}
                   </h3>
                 </div>
 
@@ -197,7 +174,7 @@
                   </button>
                   <button
                     class="btn-action btn-delete"
-                    (click)="confirmDelete(posto.id, posto.horarioInicio, posto.horarioFim)"
+                    (click)="confirmDelete(posto.id, posto.nome, posto.cidade)"
                     title="Excluir"
                   >
                     <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">

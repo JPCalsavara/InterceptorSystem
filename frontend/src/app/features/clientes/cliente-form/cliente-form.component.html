@@ -1,0 +1,170 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/clientes">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>
+        @if (isEdit()) {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1em;height:1em">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+          </svg>
+          Editar Cliente
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1em;height:1em">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+          </svg>
+          Novo Cliente
+        }
+      </h1>
+      <p class="subtitle">
+        {{
+          isEdit()
+            ? 'Atualize as informações do cliente'
+            : 'Preencha os dados para cadastrar um novo cliente'
+        }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-card">
+      <!-- Nome -->
+      <div class="form-group">
+        <label for="nome" class="form-label">
+          Nome do Cliente <span class="required">*</span>
+        </label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          class="form-input"
+          [class.error]="hasError('nome')"
+          placeholder="Ex: Cliente Horizonte Verde"
+        />
+        @if (hasError('nome')) {
+          <span class="error-message">{{ getErrorMessage('nome') }}</span>
+        }
+      </div>
+
+      <div class="form-row">
+        <!-- Cidade -->
+        <div class="form-group">
+          <label for="cidade" class="form-label"> Cidade <span class="required">*</span> </label>
+          <input
+            id="cidade"
+            type="text"
+            formControlName="cidade"
+            class="form-input"
+            [class.error]="hasError('cidade')"
+            placeholder="Ex: São Paulo"
+          />
+          @if (hasError('cidade')) {
+            <span class="error-message">{{ getErrorMessage('cidade') }}</span>
+          }
+        </div>
+
+        <!-- Estado -->
+        <div class="form-group" style="flex: 0 0 120px">
+          <label for="estado" class="form-label"> UF <span class="required">*</span> </label>
+          <input
+            id="estado"
+            type="text"
+            formControlName="estado"
+            class="form-input"
+            [class.error]="hasError('estado')"
+            placeholder="SP"
+            maxlength="2"
+            style="text-transform: uppercase"
+          />
+          @if (hasError('estado')) {
+            <span class="error-message">{{ getErrorMessage('estado') }}</span>
+          }
+        </div>
+      </div>
+
+      <h3 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+        </svg>
+        Contatos Adicionais
+      </h3>
+
+      <!-- Email Gestor e Telefone Emergência -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
+          <input
+            id="emailGestor"
+            type="email"
+            formControlName="emailGestor"
+            class="form-input"
+            [class.error]="hasError('emailGestor')"
+            placeholder="gestor@cliente.com.br"
+          />
+          @if (hasError('emailGestor')) {
+            <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
+          <input
+            id="telefoneEmergencia"
+            type="tel"
+            formControlName="telefoneEmergencia"
+            class="form-input"
+            [class.error]="hasError('telefoneEmergencia')"
+            placeholder="(11) 98765-4321"
+            mask="(00) 0000-0000||(00) 00000-0000"
+            maxlength="15"
+          />
+          @if (hasError('telefoneEmergencia')) {
+            <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
+        <div class="button-group">
+          <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner-small"></span>
+              Salvando...
+            } @else {
+              {{ isEdit() ? 'Atualizar' : 'Cadastrar' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

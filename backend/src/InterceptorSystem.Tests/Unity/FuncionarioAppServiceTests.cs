@@ -16,7 +16,7 @@ namespace InterceptorSystem.Tests.Unity;
 public class FuncionarioAppServiceTests
 {
     private readonly Mock<IFuncionarioRepository> _funcionarioRepo = new();
-    private readonly Mock<ICondominioRepository> _condominioRepo = new();
+    private readonly Mock<IClienteRepository> _clienteRepo = new();
     private readonly Mock<IContratoRepository> _contratoRepo = new(); // FASE 2: Adicionar mock
     private readonly Mock<ICurrentTenantService> _tenantService = new();
     private readonly Mock<IUnitOfWork> _uow = new();
@@ -25,8 +25,8 @@ public class FuncionarioAppServiceTests
     private const string CpfValido = "12345678901";
 
     // FASE 3: Sem parâmetros de salário (calculados automaticamente)
-    private static CreateFuncionarioDtoInput CriarInputValido(Guid condominioId, Guid contratoId) => new(
-        condominioId,
+    private static CreateFuncionarioDtoInput CriarInputValido(Guid clienteId, Guid contratoId) => new(
+        clienteId,
         contratoId,
         "João",
         CpfValido,
@@ -35,26 +35,26 @@ public class FuncionarioAppServiceTests
         TipoEscala.DOZE_POR_TRINTA_SEIS,
         TipoFuncionario.CLT);
 
-    private static Condominio CriarCondominio(Guid empresaId) => new(empresaId, "Cond", "123", "Rua", 10, TimeSpan.FromHours(6));
+    private static Cliente CriarCliente(Guid empresaId) => new(empresaId, "Cond", "00000000000000", "São Paulo", "SP");
 
     // FASE 3: Sem parâmetros de salário (calculados automaticamente)
-    private static Funcionario CriarFuncionario(Guid empresaId, Guid condominioId, Guid contratoId) =>
-        new(empresaId, condominioId, contratoId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+    private static Funcionario CriarFuncionario(Guid empresaId, Guid clienteId, Guid contratoId) =>
+        new(empresaId, clienteId, contratoId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
     public FuncionarioAppServiceTests()
     {
         _funcionarioRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        _service = new FuncionarioAppService(_funcionarioRepo.Object, _condominioRepo.Object, _contratoRepo.Object, _tenantService.Object); // FASE 2: Adicionar contratoRepo
+        _service = new FuncionarioAppService(_funcionarioRepo.Object, _clienteRepo.Object, _contratoRepo.Object, _tenantService.Object); // FASE 2: Adicionar contratoRepo
     }
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
     public async Task CreateAsync_DeveCriarFuncionario()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         var contratoId = Guid.NewGuid();
         // FASE 3: Sem parâmetros de salário
-        var input = new CreateFuncionarioDtoInput(condominioId,
+        var input = new CreateFuncionarioDtoInput(clienteId,
             contratoId,
             "João",
             "11111111111",
@@ -64,11 +64,11 @@ public class FuncionarioAppServiceTests
             TipoFuncionario.CLT);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(input.CondominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        _clienteRepo.Setup(r => r.GetByIdAsync(input.ClienteId.Value)).ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
-            condominioId,
+            clienteId,
             "Contrato Teste",
             10000m,
             100m,
@@ -92,14 +92,14 @@ public class FuncionarioAppServiceTests
         _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Once);
     }
 
-    [Fact(DisplayName = "CreateAsync - Falha quando Condomínio não existe")]
-    public async Task CreateAsync_DeveFalhar_QuandoCondominioInvalido()
+    [Fact(DisplayName = "CreateAsync - Falha quando Cliente não existe")]
+    public async Task CreateAsync_DeveFalhar_QuandoClienteInvalido()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        var input = CriarInputValido(condominioId, Guid.NewGuid());
+        var clienteId = Guid.NewGuid();
+        var input = CriarInputValido(clienteId, Guid.NewGuid());
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync((Condominio?)null);
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync((Cliente?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
     }
@@ -108,16 +108,16 @@ public class FuncionarioAppServiceTests
     public async Task CreateAsync_DeveFalhar_QuandoCpfDuplicado()
     {
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         var contratoId = Guid.NewGuid();
-        var input = CriarInputValido(condominioId, contratoId);
+        var input = CriarInputValido(clienteId, contratoId);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _condominioRepo.Setup(r => r.GetByIdAsync(condominioId)).ReturnsAsync(new Condominio(empresaId, "Cond", "11111111111111", "Rua", 10, TimeSpan.FromHours(6)));
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
-            condominioId,
+            clienteId,
             "Contrato Teste",
             10000m,
             100m,
@@ -133,7 +133,7 @@ public class FuncionarioAppServiceTests
         _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
         
         // FASE 3: Sem parâmetros de salário
-        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, condominioId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT));
+        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, clienteId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
     }

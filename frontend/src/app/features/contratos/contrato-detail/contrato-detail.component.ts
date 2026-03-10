@@ -2,17 +2,19 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ContratoService } from '../../../services/contrato.service';
-import { CondominioService } from '../../../services/condominio.service';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
+import { ClienteService } from '../../../services/cliente.service';
+import { PostoService } from '../../../services/posto.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import {
   Contrato,
   Funcionario,
-  PostoDeTrabalho,
+  Posto,
+  Alocacao,
   StatusContrato,
   TipoEscala,
   StatusFuncionario,
 } from '../../../models/index';
+import { AlocacaoService } from '../../../services/alocacao.service';
 
 @Component({
   selector: 'app-contrato-detail',
@@ -25,14 +27,16 @@ export class ContratoDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private contratoService = inject(ContratoService);
-  private condominioService = inject(CondominioService);
-  private postoService = inject(PostoDeTrabalhoService);
+  private clienteService = inject(ClienteService);
+  private postoService = inject(PostoService);
   private funcionarioService = inject(FuncionarioService);
+  private alocacaoService = inject(AlocacaoService);
 
   contrato = signal<Contrato | null>(null);
-  postos = signal<PostoDeTrabalho[]>([]);
+  alocacoes = signal<Alocacao[]>([]);
+  postos = signal<Posto[]>([]);
   funcionarios = signal<Funcionario[]>([]);
-  condominioNome = signal<string>('');
+  clienteNome = signal<string>('');
   loading = signal(true);
   erro = signal<string | null>(null);
 
@@ -57,11 +61,7 @@ export class ContratoDetailComponent implements OnInit {
   beneficiosTotais = computed(() => {
     const c = this.contrato();
     if (!c) return 0;
-    const ativos = this.custoFuncionariosDetalhado().length;
-    if (ativos > 0) {
-      return ativos * (c.valorBeneficiosExtrasMensal || 0);
-    }
-    return (c.quantidadeFuncionarios || 0) * 2 * (c.valorBeneficiosExtrasMensal || 0);
+    return (c.numeroDePostos || 0) * (c.valorBeneficiosExtrasMensal || 0);
   });
 
   // Custo mensal estimado por funcionário (diária × dias trabalhados + benefícios)
@@ -77,7 +77,7 @@ export class ContratoDetailComponent implements OnInit {
     return 22 * (c.valorDiariaCobrada || 0) + (c.valorBeneficiosExtrasMensal || 0);
   });
 
-  // Custo individual de cada funcionário atual do condomínio
+  // Custo individual de cada funcionário atual do cliente
   custoFuncionariosDetalhado = computed(() => {
     const c = this.contrato();
     if (!c) return [];
@@ -86,8 +86,8 @@ export class ContratoDetailComponent implements OnInit {
       .map((f) => ({
         funcionario: f,
         custo: this.calcularCustoFuncionario(f, c),
-        diasMes: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22,
-        escala: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? '12×36' : '5×2',
+        diasMes: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : f.tipoEscala === TipoEscala.FOLGUISTA ? 8 : 22,
+        escala: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? '12×36' : f.tipoEscala === TipoEscala.ALCALA_8H ? 'Alcalá 8h' : f.tipoEscala === TipoEscala.FOLGUISTA ? 'Folguista' : '5×2',
       }));
   });
 
@@ -96,7 +96,9 @@ export class ContratoDetailComponent implements OnInit {
   );
 
   calcularCustoFuncionario(func: Funcionario, contrato: Contrato): number {
-    const dias = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+    let dias = 22;
+    if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) dias = 15;
+    else if (func.tipoEscala === TipoEscala.FOLGUISTA) dias = 8;
     return dias * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0);
   }
 
@@ -132,9 +134,9 @@ export class ContratoDetailComponent implements OnInit {
       next: (contrato) => {
         this.contrato.set(contrato);
         this.loading.set(false);
-        this.carregarCondominio(contrato.condominioId);
-        this.carregarPostos(id);
-        this.carregarFuncionarios(contrato.condominioId);
+        this.carregarCliente(contrato.clienteId);
+        this.carregarAlocacoes(id);
+        this.carregarFuncionarios(contrato.clienteId);
       },
       error: () => {
         this.erro.set('Contrato não encontrado.');
@@ -143,23 +145,23 @@ export class ContratoDetailComponent implements OnInit {
     });
   }
 
-  private carregarCondominio(condominioId: string): void {
-    this.condominioService.getById(condominioId).subscribe({
-      next: (cond) => this.condominioNome.set(cond.nome),
+  private carregarCliente(clienteId: string): void {
+    this.clienteService.getById(clienteId).subscribe({
+      next: (cond) => this.clienteNome.set(cond.nome),
       error: () => {},
     });
   }
 
-  private carregarFuncionarios(condominioId: string): void {
+  private carregarFuncionarios(clienteId: string): void {
     this.funcionarioService.getAll().subscribe({
-      next: (todos) => this.funcionarios.set(todos.filter((f) => f.condominioId === condominioId)),
+      next: (todos) => this.funcionarios.set(todos.filter((f) => f.clienteId === clienteId)),
       error: () => {},
     });
   }
 
-  private carregarPostos(contratoId: string): void {
-    this.postoService.getByContratoId(contratoId).subscribe({
-      next: (postos) => this.postos.set(postos),
+  private carregarAlocacoes(contratoId: string): void {
+    this.alocacaoService.getByContratoId(contratoId).subscribe({
+      next: (alocs) => this.alocacoes.set(alocs),
       error: () => {},
     });
   }

@@ -124,11 +124,11 @@
 |------|---------|
 | `shield-check` | Security, protection |
 | `chart-bar` | Dashboard, analytics |
-| `building-office` | Condomínios |
+| `building-office` | Clientes |
 | `document-text` | Contratos |
 | `user-group` | Funcionários |
 | `map-pin` | Postos, location |
-| `calendar-days` | Alocações, schedules |
+| `calendar-days` | Diárias, schedules |
 | `currency-dollar` | Financial |
 | `bolt` | System product |
 | `trophy` | Achievement |

@@ -109,7 +109,7 @@ import { AuthService } from '../../services/auth.service';
             <p class="hero-description">
               A <strong>Interceptor Assessoria Inteligente</strong> oferece segurança terceirizada,
               consultoria especializada e gerenciamento completo — segurança e administrativo — para
-              condomínios nas cidades de Porto Feliz, Tietê, Tatuí, Boituva e Salto.
+              clientes nas cidades de Porto Feliz, Tietê, Tatuí, Boituva e Salto.
             </p>
             <div class="hero-actions">
               <a href="#servicos" class="btn-hero-primary">
@@ -156,7 +156,7 @@ import { AuthService } from '../../services/auth.service';
                   d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"
                 />
               </svg>
-              <span>15+ condomínios</span>
+              <span>15+ clientes</span>
             </div>
             <div class="hv-float hv-float-3">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -189,7 +189,7 @@ import { AuthService } from '../../services/auth.service';
           <div class="stats-row">
             <div class="stat-item">
               <span class="stat-n">15+</span>
-              <span class="stat-l">Condomínios Atendidos</span>
+              <span class="stat-l">Clientes Atendidos</span>
               <span class="stat-d">Região metropolitana de Sorocaba</span>
             </div>
             <div class="stat-div"></div>
@@ -223,13 +223,13 @@ import { AuthService } from '../../services/auth.service';
             <p class="about-text">
               Somos uma empresa especializada em
               <strong>segurança patrimonial terceirizada</strong>, <strong>consultoria</strong> e
-              <strong>gerenciamento operacional e administrativo</strong> para condomínios.
-              Atualmente atendemos <strong>7 condomínios</strong> nas cidades de
+              <strong>gerenciamento operacional e administrativo</strong> para clientes.
+              Atualmente atendemos <strong>7 clientes</strong> nas cidades de
               <strong>Porto Feliz, Tietê, Tatuí, Boituva e Salto</strong>.
             </p>
             <p class="about-text">
               Com mais de uma década de experiência no setor, desenvolvemos soluções sob medida para
-              cada condomínio — desde a alocação de profissionais de segurança até a gestão completa
+              cada cliente — desde a diária de profissionais de segurança até a gestão completa
               da operação administrativa. Nossa metodologia garante proteção eficiente,
               transparência total e tranquilidade para síndicos e moradores.
             </p>
@@ -295,7 +295,7 @@ import { AuthService } from '../../services/auth.service';
             <div class="section-eyebrow center">Nossos Serviços</div>
             <h2 class="features-title">Soluções completas<br />para sua operação</h2>
             <p class="features-subtitle">
-              Da vigilância terceirizada à gestão financeira — tudo que seu condomínio precisa
+              Da vigilância terceirizada à gestão financeira — tudo que seu cliente precisa
             </p>
           </div>
 
@@ -313,7 +313,7 @@ import { AuthService } from '../../services/auth.service';
               </div>
               <h3>Vigilância Terceirizada</h3>
               <p>
-                Profissionais qualificados e treinados para segurança patrimonial de condomínios.
+                Profissionais qualificados e treinados para segurança patrimonial de clientes.
                 Escalas 12x36 e comercial com cobertura completa.
               </p>
             </div>
@@ -404,7 +404,7 @@ import { AuthService } from '../../services/auth.service';
               <h3>Controle Financeiro</h3>
               <p>
                 Gestão de custos operacionais, apuração de encargos, margens contratuais e
-                relatórios financeiros detalhados por condomínio.
+                relatórios financeiros detalhados por cliente.
               </p>
             </div>
           </div>
@@ -424,7 +424,7 @@ import { AuthService } from '../../services/auth.service';
             <p class="product-text">
               O <strong>InterceptorSystem</strong> centraliza toda a operação: escalas de trabalho,
               contratos com cálculo automático de custos, folha de pagamento com adicionais CLT,
-              controle de alocações e um dashboard financeiro em tempo real.
+              controle de diárias e um dashboard financeiro em tempo real.
             </p>
 
             <div class="product-highlights">
@@ -440,7 +440,7 @@ import { AuthService } from '../../services/auth.service';
                 </span>
                 <div>
                   <strong>Gestão de Escalas</strong>
-                  <span>Alocações diárias com calendário, kanban e substituições automáticas</span>
+                  <span>Diárias diárias com calendário, kanban e substituições automáticas</span>
                 </div>
               </div>
               <div class="product-highlight-item">
@@ -618,7 +618,7 @@ import { AuthService } from '../../services/auth.service';
             <div class="big-quote-mark">"</div>
             <blockquote class="leader-quote">
               Nosso objetivo é oferecer segurança com a mesma eficiência e transparência que
-              esperamos de qualquer serviço de excelência. Cada condomínio que atendemos recebe
+              esperamos de qualquer serviço de excelência. Cada cliente que atendemos recebe
               atenção personalizada porque entendemos que segurança não é commodity — é confiança.
             </blockquote>
             <div class="quote-author-info">
@@ -635,10 +635,10 @@ import { AuthService } from '../../services/auth.service';
             <p class="leader-bio">
               Com mais de <strong>10 anos de experiência</strong> na gestão de segurança
               patrimonial, Luciano fundou a Interceptor com foco em excelência operacional e
-              inovação no atendimento a condomínios.
+              inovação no atendimento a clientes.
             </p>
             <p class="leader-bio">
-              Sua vivência direta no campo — desde a alocação de vigilantes até a negociação de
+              Sua vivência direta no campo — desde a diária de vigilantes até a negociação de
               contratos — trouxe a visão de transformar a gestão manual em processos digitais
               eficientes, capazes de escalar sem perder a qualidade e o atendimento personalizado.
             </p>
@@ -661,7 +661,7 @@ import { AuthService } from '../../services/auth.service';
                     d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"
                   />
                 </svg>
-                <span>7 condomínios atendidos ativamente</span>
+                <span>7 clientes atendidos ativamente</span>
               </div>
               <div class="lh-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -706,10 +706,10 @@ import { AuthService } from '../../services/auth.service';
               />
             </svg>
           </div>
-          <h2>Seu condomínio merece<br />a melhor assessoria</h2>
+          <h2>Seu cliente merece<br />a melhor assessoria</h2>
           <p>
             Entre em contato e descubra como a Interceptor Assessoria Inteligente pode transformar a
-            segurança e a gestão do seu condomínio.
+            segurança e a gestão do seu cliente.
           </p>
           <a routerLink="/cadastro" class="btn-cta">
             Criar conta no InterceptorSystem

@@ -13,7 +13,7 @@ O InterceptorSystem passou por uma refatoração completa em 5 fases, implementa
 
 | Indicador | Antes (v1.0) | Depois (v2.0) | Melhoria |
 |-----------|--------------|---------------|----------|
-| Requests para criar condomínio completo | 4 | 1 | **75% ↓** |
+| Requests para criar cliente completo | 4 | 1 | **75% ↓** |
 | Salários calculados manualmente | 100% | 0% | **Automático** |
 | Funcionários sem contrato | Possível | Impossível | **Validado** |
 | Postos criados manualmente | 100% | 0% | **Automático** |
@@ -25,10 +25,10 @@ O InterceptorSystem passou por uma refatoração completa em 5 fases, implementa
 ## 🚀 As 5 Fases Implementadas
 
 ### **FASE 1: Configurações Operacionais** ✅
-**Objetivo:** Centralizar configurações no Condomínio
+**Objetivo:** Centralizar configurações no Cliente
 
 **Implementações:**
-- ✅ `QuantidadeFuncionariosIdeal` no Condomínio
+- ✅ `QuantidadeFuncionariosIdeal` no Cliente
 - ✅ `HorarioTrocaTurno` para criação automática de postos
 - ✅ `EmailGestor` e `TelefoneEmergencia` para notificações
 
@@ -91,7 +91,7 @@ public decimal SalarioTotal => SalarioBase + AdicionalNoturno + Beneficios;
 
 ---
 
-### **FASE 4: Simplificação de PostoDeTrabalho** ✅
+### **FASE 4: Simplificação de Posto** ✅
 **Objetivo:** Remover duplicação de `QuantidadeIdealFuncionarios`
 
 **Implementações:**
@@ -104,9 +104,9 @@ public int QuantidadeIdealFuncionarios
 {
     get
     {
-        if (Condominio == null) return 0;
-        var totalPostos = Condominio.PostosDeTrabalho?.Count ?? 1;
-        return Condominio.QuantidadeFuncionariosIdeal / totalPostos;
+        if (Cliente == null) return 0;
+        var totalPostos = Cliente.Postos?.Count ?? 1;
+        return Cliente.QuantidadeFuncionariosIdeal / totalPostos;
     }
 }
 ```
@@ -115,35 +115,35 @@ public int QuantidadeIdealFuncionarios
 
 **Exemplo:**
 ```
-Condomínio: 12 funcionários ideais
+Cliente: 12 funcionários ideais
 Postos: 2 (diurno e noturno)
 Cálculo automático: 12 / 2 = 6 funcionários por posto
 ```
 
 **Benefícios:**
 - Consistência automática
-- Mudança no condomínio reflete em todos os postos
+- Mudança no cliente reflete em todos os postos
 - Menos campos para manter
 
 ---
 
 ### **FASE 5: Criação em Cascata** ✅
-**Objetivo:** Criar Condomínio + Contrato + Postos em uma única operação
+**Objetivo:** Criar Cliente + Contrato + Postos em uma única operação
 
 **Implementações:**
-- ✅ Novo endpoint: `POST /api/condominios-completos`
-- ✅ Serviço orquestrador: `CondominioOrquestradorService`
+- ✅ Novo endpoint: `POST /api/clientes-completos`
+- ✅ Serviço orquestrador: `ClienteOrquestradorService`
 - ✅ Validações automáticas:
   - Consistência de quantidade de funcionários
   - Divisibilidade por número de postos
   - Datas válidas
 - ✅ Cálculo automático de horários de turnos
-- ✅ Endpoint de validação (dry-run): `POST /api/condominios-completos/validar`
+- ✅ Endpoint de validação (dry-run): `POST /api/clientes-completos/validar`
 
 **Exemplo de Request:**
 ```json
 {
-  "condominio": {
+  "cliente": {
     "nome": "Residencial Estrela",
     "quantidadeFuncionariosIdeal": 12,
     "horarioTrocaTurno": "06:00:00"
@@ -160,7 +160,7 @@ Cálculo automático: 12 / 2 = 6 funcionários por posto
 **Response (201 Created):**
 ```json
 {
-  "condominio": { "id": "...", "nome": "Residencial Estrela" },
+  "cliente": { "id": "...", "nome": "Residencial Estrela" },
   "contrato": { "id": "...", "valorTotalMensal": 36000.00 },
   "postos": [
     { "id": "...", "horario": "06:00 - 18:00", "quantidadeIdealFuncionarios": 6 },
@@ -190,13 +190,13 @@ Posto 2: 06:00 + (1 × 12h) = 18:00 até 06:00
 
 ## 📋 Regras de Negócio Implementadas
 
-### **Condomínio**
+### **Cliente**
 - ✅ CNPJ único por empresa
 - ✅ Configurações operacionais obrigatórias
 - ✅ Multi-tenant rigoroso
 
 ### **Contrato**
-- ✅ Um contrato vigente por condomínio
+- ✅ Um contrato vigente por cliente
 - ✅ Auto-finalização quando vencido
 - ✅ Validação de datas e valores
 
@@ -205,13 +205,13 @@ Posto 2: 06:00 + (1 × 12h) = 18:00 até 06:00
 - ✅ Vinculação obrigatória a contrato vigente
 - ✅ Salários calculados automaticamente
 
-### **PostoDeTrabalho**
+### **Posto**
 - ✅ Turnos de 12 horas obrigatórios
 - ✅ Quantidade de funcionários calculada
 - ✅ Criação automática via cascata
 
-### **Alocação**
-- ✅ Não permite 2 alocações no mesmo dia
+### **Diária**
+- ✅ Não permite 2 diárias no mesmo dia
 - ✅ Não permite dias consecutivos (exceto dobra programada)
 - ✅ Obriga descanso após dobra programada
 - ✅ Validação de capacidade do posto
@@ -226,20 +226,20 @@ Posto 2: 06:00 + (1 × 12h) = 18:00 até 06:00
 ## 🧪 Cobertura de Testes
 
 ### **Testes Unitários**
-- ✅ CondominioAppServiceTests (6 casos)
+- ✅ ClienteAppServiceTests (6 casos)
 - ✅ ContratoAppServiceTests (8 casos)
 - ✅ FuncionarioAppServiceTests (6 casos)
-- ✅ PostoDeTrabalhoAppServiceTests (12 casos)
-- ✅ AlocacaoAppServiceTests (8 casos)
-- ✅ **CondominioOrquestradorServiceTests (4 casos)** ← NOVO
+- ✅ PostoAppServiceTests (12 casos)
+- ✅ DiariaAppServiceTests (8 casos)
+- ✅ **ClienteOrquestradorServiceTests (4 casos)** ← NOVO
 
 ### **Testes de Integração**
-- ✅ CondominiosControllerIntegrationTests (5 casos)
+- ✅ ClientesControllerIntegrationTests (5 casos)
 - ✅ ContratosControllerIntegrationTests (5 casos)
 - ✅ FuncionariosControllerIntegrationTests (5 casos)
-- ✅ PostosDeTrabalhoControllerIntegrationTests (8 casos)
-- ✅ AlocacoesControllerIntegrationTests (6 casos)
-- ✅ **CondominiosCompletosControllerIntegrationTests (4 casos)** ← NOVO
+- ✅ PostosControllerIntegrationTests (8 casos)
+- ✅ DiariasControllerIntegrationTests (6 casos)
+- ✅ **ClientesCompletosControllerIntegrationTests (4 casos)** ← NOVO
 
 **Total:** 73 testes automatizados
 
@@ -253,37 +253,37 @@ InterceptorSystem/
 │   ├── InterceptorSystem.Domain/          # Entidades, VOs, Enums
 │   │   └── Modulos/Administrativo/
 │   │       ├── Entities/
-│   │       │   ├── Condominio.cs          ✅ FASE 1 (configs)
+│   │       │   ├── Cliente.cs          ✅ FASE 1 (configs)
 │   │       │   ├── Contrato.cs            ✅ FASE 2 (vínculo)
 │   │       │   ├── Funcionario.cs         ✅ FASE 3 (salários calc.)
-│   │       │   ├── PostoDeTrabalho.cs     ✅ FASE 4 (qtd calc.)
-│   │       │   └── Alocacao.cs
+│   │       │   ├── Posto.cs     ✅ FASE 4 (qtd calc.)
+│   │       │   └── Diaria.cs
 │   │       └── Enums/
 │   ├── InterceptorSystem.Application/     # Services, DTOs
 │   │   └── Modulos/Administrativo/
 │   │       ├── Services/
-│   │       │   ├── CondominioAppService.cs
+│   │       │   ├── ClienteAppService.cs
 │   │       │   ├── ContratoAppService.cs
 │   │       │   ├── FuncionarioAppService.cs
-│   │       │   ├── PostoDeTrabalhoAppService.cs
-│   │       │   ├── AlocacaoAppService.cs
-│   │       │   └── CondominioOrquestradorService.cs  ✅ FASE 5
+│   │       │   ├── PostoAppService.cs
+│   │       │   ├── DiariaAppService.cs
+│   │       │   └── ClienteOrquestradorService.cs  ✅ FASE 5
 │   │       ├── Interfaces/
-│   │       │   └── ICondominioOrquestradorService.cs ✅ FASE 5
+│   │       │   └── IClienteOrquestradorService.cs ✅ FASE 5
 │   │       └── DTOs/
-│   │           └── CondominioCompletoDto.cs          ✅ FASE 5
+│   │           └── ClienteCompletoDto.cs          ✅ FASE 5
 │   ├── InterceptorSystem.Infrastructure/  # Repositories, EF Config
 │   ├── InterceptorSystem.Api/             # Controllers
 │   │   └── Controllers/
-│   │       └── CondominiosCompletosController.cs     ✅ FASE 5
+│   │       └── ClientesCompletosController.cs     ✅ FASE 5
 │   └── InterceptorSystem.Tests/           # Testes
 │       ├── Unity/
-│       │   └── CondominioOrquestradorServiceTests.cs ✅ FASE 5
+│       │   └── ClienteOrquestradorServiceTests.cs ✅ FASE 5
 │       └── Integration/
-│           └── CondominiosCompletosControllerIntegrationTests.cs ✅ FASE 5
+│           └── ClientesCompletosControllerIntegrationTests.cs ✅ FASE 5
 └── docs/
     ├── test-payloads/
-    │   ├── condominio-completo.json       ✅ FASE 5
+    │   ├── cliente-completo.json       ✅ FASE 5
     │   └── CURLS_FASE5.md                 ✅ FASE 5
     └── sql-scripts/
         └── 01-popular-dados-teste.sql     ✅ Atualizado FASE 4
@@ -294,35 +294,35 @@ InterceptorSystem/
 ## 🎯 Endpoints da API
 
 ### **Criação em Cascata (NOVO)**
-- `POST /api/condominios-completos` - Criar tudo em 1 request
-- `POST /api/condominios-completos/validar` - Validar dry-run
+- `POST /api/clientes-completos` - Criar tudo em 1 request
+- `POST /api/clientes-completos/validar` - Validar dry-run
 
-### **Condomínios**
-- `GET /api/condominios`
-- `POST /api/condominios`
-- `GET /api/condominios/{id}`
-- `PUT /api/condominios/{id}`
-- `DELETE /api/condominios/{id}`
+### **Clientes**
+- `GET /api/clientes`
+- `POST /api/clientes`
+- `GET /api/clientes/{id}`
+- `PUT /api/clientes/{id}`
+- `DELETE /api/clientes/{id}`
 
 ### **Contratos**
 - `GET /api/contratos`
 - `POST /api/contratos`
-- `GET /api/contratos/condominio/{condominioId}`
+- `GET /api/contratos/cliente/{clienteId}`
 
 ### **Postos de Trabalho**
-- `GET /api/postos-de-trabalho`
-- `POST /api/postos-de-trabalho`
-- `GET /api/postos-de-trabalho/condominio/{condominioId}`
+- `GET /api/postos`
+- `POST /api/postos`
+- `GET /api/postos/cliente/{clienteId}`
 
 ### **Funcionários**
 - `GET /api/funcionarios`
 - `POST /api/funcionarios`
-- `GET /api/funcionarios/condominio/{condominioId}`
+- `GET /api/funcionarios/cliente/{clienteId}`
 
-### **Alocações**
-- `GET /api/alocacoes`
-- `POST /api/alocacoes`
-- `GET /api/alocacoes/funcionario/{funcionarioId}`
+### **Diárias**
+- `GET /api/diarias`
+- `POST /api/diarias`
+- `GET /api/diarias/funcionario/{funcionarioId}`
 
 ---
 
@@ -330,14 +330,14 @@ InterceptorSystem/
 
 ### **1. Teste via cURL (Criação Completa)**
 ```bash
-curl -X POST http://localhost/api/condominios-completos \
+curl -X POST http://localhost/api/clientes-completos \
   -H "Content-Type: application/json" \
-  -d @src/docs/test-payloads/condominio-completo.json
+  -d @src/docs/test-payloads/cliente-completo.json
 ```
 
 ### **2. Teste via Swagger**
 1. Acesse: http://localhost/swagger
-2. Localize: `POST /api/condominios-completos`
+2. Localize: `POST /api/clientes-completos`
 3. Click "Try it out"
 4. Execute
 
@@ -351,29 +351,29 @@ cd src/docs/sql-scripts
 
 ## 📊 Comparativo Antes vs Depois
 
-### **Criar Condomínio Completo**
+### **Criar Cliente Completo**
 
 **ANTES (v1.0) - 4 Requests:**
 ```javascript
-// 1. Criar condomínio
-const condo = await fetch('/api/condominios', { method: 'POST', body: {...} });
+// 1. Criar cliente
+const condo = await fetch('/api/clientes', { method: 'POST', body: {...} });
 
 // 2. Criar contrato
 const contrato = await fetch('/api/contratos', { 
   method: 'POST', 
-  body: { condominioId: condo.id, ... } 
+  body: { clienteId: condo.id, ... } 
 });
 
 // 3. Criar posto diurno
-await fetch('/api/postos-de-trabalho', { 
+await fetch('/api/postos', { 
   method: 'POST', 
-  body: { condominioId: condo.id, inicio: '06:00', fim: '18:00' } 
+  body: { clienteId: condo.id, inicio: '06:00', fim: '18:00' } 
 });
 
 // 4. Criar posto noturno
-await fetch('/api/postos-de-trabalho', { 
+await fetch('/api/postos', { 
   method: 'POST', 
-  body: { condominioId: condo.id, inicio: '18:00', fim: '06:00' } 
+  body: { clienteId: condo.id, inicio: '18:00', fim: '06:00' } 
 });
 
 // Total: ~80 linhas de código + cálculo manual de horários
@@ -381,10 +381,10 @@ await fetch('/api/postos-de-trabalho', {
 
 **DEPOIS (v2.0) - 1 Request:**
 ```javascript
-const resultado = await fetch('/api/condominios-completos', { 
+const resultado = await fetch('/api/clientes-completos', { 
   method: 'POST', 
   body: JSON.stringify({
-    condominio: {...},
+    cliente: {...},
     contrato: {...},
     criarPostosAutomaticamente: true,
     numeroDePostos: 2
@@ -399,7 +399,7 @@ const resultado = await fetch('/api/condominios-completos', {
 ## ✅ Checklist de Conclusão
 
 ### **FASE 1** ✅
-- [x] Adicionar configs operacionais no Condomínio
+- [x] Adicionar configs operacionais no Cliente
 - [x] Testes unitários
 - [x] Testes de integração
 - [x] Documentação
@@ -421,7 +421,7 @@ const resultado = await fetch('/api/condominios-completos', {
 ### **FASE 4** ✅
 - [x] Remover QuantidadeIdealFuncionarios
 - [x] Implementar cálculo automático
-- [x] Atualizar testes (mocks com Condomínio)
+- [x] Atualizar testes (mocks com Cliente)
 - [x] Migration
 - [x] Atualizar scripts SQL
 

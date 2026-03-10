@@ -1,3 +1,4 @@
+using System.Reflection;
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
@@ -25,10 +26,11 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         // 2. Registro dos Repositórios
-        services.AddScoped<ICondominioRepository, CondominioRepository>();
-        services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
-        services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+        services.AddScoped<IClienteRepository, ClienteRepository>();
+        services.AddScoped<IPostoRepository, PostoRepository>();
         services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
+        services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+        services.AddScoped<IDiariaRepository, DiariaRepository>();
         services.AddScoped<IContratoRepository, ContratoRepository>();
         services.AddScoped<IContaRepository, ContaRepository>();
         services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
@@ -45,6 +47,10 @@ public static class DependencyInjection
         services.AddScoped<IWhatsappMessageSender, MetaWhatsappMessageSender>();
         services.AddHttpClient<MetaWhatsappMessageSender>();
         services.AddHostedService<SessaoExpiradaCleanupService>();
+
+        // 6. Caching & MediatR Handlers
+        services.AddMemoryCache();
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         return services;
     }

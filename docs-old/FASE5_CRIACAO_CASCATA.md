@@ -7,33 +7,33 @@
 
 ## 🎯 Objetivo
 
-Criar um serviço orquestrador que permite criar **Condomínio + Contrato + Postos de Trabalho** em uma única operação, eliminando a necessidade de 3 chamadas de API separadas.
+Criar um serviço orquestrador que permite criar **Cliente + Contrato + Postos de Trabalho** em uma única operação, eliminando a necessidade de 3 chamadas de API separadas.
 
 ---
 
 ## 📋 Arquivos Criados
 
 ### 1. **DTOs** (`Application/DTOs/`)
-- ✅ `CondominioCompletoDto.cs`
-  - `CreateCondominioCompletoDtoInput`
+- ✅ `ClienteCompletoDto.cs`
+  - `CreateClienteCompletoDtoInput`
   - `CreateContratoCompletoDtoInput`
-  - `CondominioCompletoDtoOutput`
+  - `ClienteCompletoDtoOutput`
 
 ### 2. **Interface** (`Application/Interfaces/`)
-- ✅ `ICondominioOrquestradorService.cs`
+- ✅ `IClienteOrquestradorService.cs`
 
 ### 3. **Serviço** (`Application/Services/`)
-- ✅ `CondominioOrquestradorService.cs`
+- ✅ `ClienteOrquestradorService.cs`
 
 ### 4. **Controller** (`Api/Controllers/`)
-- ✅ `CondominiosCompletosController.cs`
+- ✅ `ClientesCompletosController.cs`
 
 ### 5. **Testes**
-- ✅ `CondominioOrquestradorServiceTests.cs` (Unitários)
-- ✅ `CondominiosCompletosControllerIntegrationTests.cs` (Integração)
+- ✅ `ClienteOrquestradorServiceTests.cs` (Unitários)
+- ✅ `ClientesCompletosControllerIntegrationTests.cs` (Integração)
 
 ### 6. **Documentação**
-- ✅ `condominio-completo.json` (Payload de teste)
+- ✅ `cliente-completo.json` (Payload de teste)
 - ✅ Este arquivo de resumo
 
 ---
@@ -43,11 +43,11 @@ Criar um serviço orquestrador que permite criar **Condomínio + Contrato + Post
 ### **Endpoint Principal**
 
 ```http
-POST /api/condominios-completos
+POST /api/clientes-completos
 Content-Type: application/json
 
 {
-  "condominio": {
+  "cliente": {
     "nome": "Residencial Estrela",
     "cnpj": "12.345.678/0001-90",
     "endereco": "Rua das Flores, 123",
@@ -79,7 +79,7 @@ Content-Type: application/json
 
 ```json
 {
-  "condominio": {
+  "cliente": {
     "id": "guid...",
     "nome": "Residencial Estrela",
     "cnpj": "12.345.678/0001-90",
@@ -88,7 +88,7 @@ Content-Type: application/json
   },
   "contrato": {
     "id": "guid...",
-    "condominioId": "guid...",
+    "clienteId": "guid...",
     "descricao": "Contrato de Portaria 2026",
     "valorTotalMensal": 36000.00,
     "quantidadeFuncionarios": 12
@@ -96,14 +96,14 @@ Content-Type: application/json
   "postos": [
     {
       "id": "guid...",
-      "condominioId": "guid...",
+      "clienteId": "guid...",
       "horario": "06:00 - 18:00",
       "quantidadeIdealFuncionarios": 6,
       "permiteDobrarEscala": true
     },
     {
       "id": "guid...",
-      "condominioId": "guid...",
+      "clienteId": "guid...",
       "horario": "18:00 - 06:00",
       "quantidadeIdealFuncionarios": 6,
       "permiteDobrarEscala": true
@@ -119,7 +119,7 @@ Content-Type: application/json
 ### **1. Criação Automática de Postos**
 
 O serviço calcula automaticamente os horários dos postos baseado em:
-- **Horário de Troca de Turno** do condomínio
+- **Horário de Troca de Turno** do cliente
 - **Número de Postos** solicitado
 
 **Exemplo com 2 postos:**
@@ -137,7 +137,7 @@ O serviço calcula automaticamente os horários dos postos baseado em:
 
 ✅ **Consistência de Funcionários:**
 ```
-condominio.quantidadeFuncionariosIdeal == contrato.quantidadeFuncionarios
+cliente.quantidadeFuncionariosIdeal == contrato.quantidadeFuncionarios
 ```
 
 ✅ **Divisibilidade:**
@@ -154,7 +154,7 @@ dataFim > dataInicio
 ### **3. Endpoint de Validação (Dry-Run)**
 
 ```http
-POST /api/condominios-completos/validar
+POST /api/clientes-completos/validar
 ```
 
 **Uso:** Validar dados ANTES de salvar (melhor UX)
@@ -171,7 +171,7 @@ POST /api/condominios-completos/validar
 ```json
 {
   "valido": false,
-  "erro": "Quantidade de funcionários do contrato (10) deve ser igual à quantidade ideal do condomínio (12)."
+  "erro": "Quantidade de funcionários do contrato (10) deve ser igual à quantidade ideal do cliente (12)."
 }
 ```
 
@@ -181,8 +181,8 @@ POST /api/condominios-completos/validar
 
 ### **Testes Unitários (4 casos)**
 
-1. ✅ `CriarCondominioCompleto_DeveCriarTodasEntidades`
-   - Verifica criação de condomínio, contrato e 2 postos
+1. ✅ `CriarClienteCompleto_DeveCriarTodasEntidades`
+   - Verifica criação de cliente, contrato e 2 postos
    - Valida que todos os services foram chamados
 
 2. ✅ `ValidarCriacaoCompleta_DeveFalhar_QuandoQuantidadeFuncionariosDifere`
@@ -196,7 +196,7 @@ POST /api/condominios-completos/validar
 
 ### **Testes de Integração (4 casos)**
 
-1. ✅ `Post_DeveCriarCondominioCompleto`
+1. ✅ `Post_DeveCriarClienteCompleto`
    - Teste end-to-end completo
    - Valida criação no banco de dados
 
@@ -216,29 +216,29 @@ POST /api/condominios-completos/validar
 ### **Antes da FASE 5 (3 requests)**
 
 ```javascript
-// 1. Criar condomínio
-const condResp = await fetch('/api/condominios', { 
+// 1. Criar cliente
+const condResp = await fetch('/api/clientes', { 
   method: 'POST', 
-  body: condominioData 
+  body: clienteData 
 });
 const cond = await condResp.json();
 
 // 2. Criar contrato
 const contrResp = await fetch('/api/contratos', { 
   method: 'POST', 
-  body: { ...contratoData, condominioId: cond.id } 
+  body: { ...contratoData, clienteId: cond.id } 
 });
 
 // 3. Criar posto 1
-await fetch('/api/postos-de-trabalho', { 
+await fetch('/api/postos', { 
   method: 'POST', 
-  body: { condominioId: cond.id, inicio: '06:00', fim: '18:00' } 
+  body: { clienteId: cond.id, inicio: '06:00', fim: '18:00' } 
 });
 
 // 4. Criar posto 2
-await fetch('/api/postos-de-trabalho', { 
+await fetch('/api/postos', { 
   method: 'POST', 
-  body: { condominioId: cond.id, inicio: '18:00', fim: '06:00' } 
+  body: { clienteId: cond.id, inicio: '18:00', fim: '06:00' } 
 });
 
 // Total: 4 requests + lógica de horários no frontend
@@ -247,10 +247,10 @@ await fetch('/api/postos-de-trabalho', {
 ### **Depois da FASE 5 (1 request)**
 
 ```javascript
-const resp = await fetch('/api/condominios-completos', { 
+const resp = await fetch('/api/clientes-completos', { 
   method: 'POST', 
   body: JSON.stringify({
-    condominio: {...},
+    cliente: {...},
     contrato: {...},
     criarPostosAutomaticamente: true,
     numeroDePostos: 2
@@ -272,7 +272,7 @@ const resp = await fetch('/api/condominios-completos', {
 
 ### **RN1: Consistência de Funcionários**
 ```
-❌ Condomínio: 12 funcionários
+❌ Cliente: 12 funcionários
 ❌ Contrato: 10 funcionários
 ✅ Erro: "Quantidade deve ser igual"
 ```
@@ -311,7 +311,7 @@ Posto 2: 06:00 + (1 * 12h) = 18:00 até 18:00 + 12h = 06:00
 using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 try
 {
-    var cond = await _condominioService.CreateAsync(...);
+    var cond = await _clienteService.CreateAsync(...);
     var contr = await _contratoService.CreateAsync(...);
     var postos = await CriarPostosAsync(...);
     scope.Complete(); // Commit
@@ -325,9 +325,9 @@ catch
 
 ### **P2: Domain Events**
 ```csharp
-public class CondominioCompletocriadoEvent : IDomainEvent
+public class ClienteCompletocriadoEvent : IDomainEvent
 {
-    public Guid CondominioId { get; init; }
+    public Guid ClienteId { get; init; }
     public string EmailGestor { get; init; }
 }
 
@@ -336,7 +336,7 @@ public class CondominioCompletocriadoEvent : IDomainEvent
 
 ### **P3: Criação de Funcionários em Lote**
 ```
-POST /api/condominios-completos-com-funcionarios
+POST /api/clientes-completos-com-funcionarios
 ```
 
 ---
@@ -360,7 +360,7 @@ POST /api/condominios-completos-com-funcionarios
 
 | Métrica | Antes | Depois | Melhoria |
 |---------|-------|--------|----------|
-| Requests para criar condomínio completo | 4 | 1 | **75% ↓** |
+| Requests para criar cliente completo | 4 | 1 | **75% ↓** |
 | Linhas de código no frontend | ~80 | ~20 | **75% ↓** |
 | Pontos de falha | 4 | 1 | **75% ↓** |
 | Validações duplicadas | Sim | Não | **✅** |

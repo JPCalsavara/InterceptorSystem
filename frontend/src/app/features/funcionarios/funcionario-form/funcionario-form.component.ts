@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
 import {
   StatusFuncionario,
@@ -24,7 +24,7 @@ import {
 export class FuncionarioFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(FuncionarioService);
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -35,7 +35,7 @@ export class FuncionarioFormComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
-  condominios = signal<any[]>([]);
+  clientes = signal<any[]>([]);
   contratos = signal<Contrato[]>([]);
 
   StatusFuncionario = StatusFuncionario;
@@ -61,12 +61,14 @@ export class FuncionarioFormComponent implements OnInit {
       label: '12x36 (12 horas trabalhadas, 36 de descanso)',
     },
     { value: TipoEscala.SEMANAL_COMERCIAL, label: 'Semanal Comercial (44h semanais)' },
+    { value: TipoEscala.ALCALA_8H, label: 'Alcalá 8h (Segunda a Sábado)' },
+    { value: TipoEscala.FOLGUISTA, label: 'Folguista' },
   ];
 
   ngOnInit(): void {
-    this.loadCondominios();
+    this.loadClientes();
     this.buildForm();
-    this.setupCondominioChange();
+    this.setupClienteChange();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -76,30 +78,30 @@ export class FuncionarioFormComponent implements OnInit {
     }
   }
 
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => console.error('Erro ao carregar clientes:', err),
     });
   }
 
-  setupCondominioChange(): void {
-    this.form.get('condominioId')?.valueChanges.subscribe((condominioId) => {
-      if (condominioId) {
-        this.loadContratos(condominioId);
+  setupClienteChange(): void {
+    this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
+      if (clienteId) {
+        this.loadContratos(clienteId);
       } else {
         this.contratos.set([]);
       }
     });
   }
 
-  loadContratos(condominioId: string): void {
+  loadContratos(clienteId: string): void {
     this.contratoService.getAll().subscribe({
       next: (data) => {
-        const contratosDoCondominio = data.filter(
-          (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO,
+        const contratosDoCliente = data.filter(
+          (c) => c.clienteId === clienteId && c.status !== StatusContrato.FINALIZADO,
         );
-        this.contratos.set(contratosDoCondominio);
+        this.contratos.set(contratosDoCliente);
       },
       error: (err) => console.error('Erro ao carregar contratos:', err),
     });
@@ -107,7 +109,8 @@ export class FuncionarioFormComponent implements OnInit {
 
   buildForm(): void {
     this.form = this.fb.group({
-      condominioId: ['', Validators.required],
+      clienteId: ['', Validators.required],
+      contratoId: ['', Validators.required],
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       cpf: ['', [Validators.required, this.cpfValidator]],
       celular: ['', [Validators.required, this.celularValidator]],
@@ -158,7 +161,7 @@ export class FuncionarioFormComponent implements OnInit {
 
     if (this.contratos().length === 0 && !this.isEdit()) {
       this.error.set(
-        'Não há contratos ativos para o condomínio selecionado. Cadastre um contrato primeiro.',
+        'Não há contratos ativos para o cliente selecionado. Cadastre um contrato primeiro.',
       );
       return;
     }
@@ -166,10 +169,7 @@ export class FuncionarioFormComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    const formValue = {
-      ...this.form.value,
-      contratoId: this.isEdit() ? this.form.value.contratoId : this.contratos()[0].id,
-    };
+    const formValue = this.form.value;
 
     const request = this.isEdit()
       ? this.service.update(this.funcionarioId()!, formValue)

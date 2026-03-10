@@ -34,8 +34,8 @@
         <h2 class="card-title">Informações Gerais</h2>
         <div class="info-list">
           <div class="info-item">
-            <span class="info-label">Condomínio</span>
-            <span class="info-value">{{ condominioNome() || contrato()!.condominioId }}</span>
+            <span class="info-label">Cliente</span>
+            <span class="info-value">{{ clienteNome() || contrato()!.clienteId }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Início</span>
@@ -270,9 +270,7 @@
               <thead>
                 <tr>
                   <th>Horário</th>
-                  <th>Capacidade Ideal</th>
-                  <th>Permite Dobra</th>
-                  <th>Cap. Máx. Dobras</th>
+                  <th>Capacidade Ideal Cliente</th>
                   <th></th>
                 </tr>
               </thead>
@@ -280,19 +278,9 @@
                 @for (posto of postos(); track posto.id) {
                   <tr>
                     <td class="horario">
-                      {{ formatHorario(posto.horarioInicio, posto.horarioFim) }}
+                      {{ posto.nome }} - {{ posto.cidade }}
                     </td>
-                    <td>{{ posto.quantidadeIdealFuncionarios }}</td>
-                    <td>
-                      <span
-                        [class]="
-                          'badge ' + (posto.permiteDobrarEscala ? 'badge-success' : 'badge-neutral')
-                        "
-                      >
-                        {{ posto.permiteDobrarEscala ? 'Sim' : 'Não' }}
-                      </span>
-                    </td>
-                    <td>{{ posto.capacidadeMaximaPorDobras }}</td>
+                    <td>{{ contrato()!.quantidadeFuncionarios }}</td>
                     <td>
                       <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>
                     </td>

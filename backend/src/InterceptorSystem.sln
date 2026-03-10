@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterceptorSystem.Applicati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterceptorSystem.Infrastructure", "InterceptorSystem.Infrastructure\InterceptorSystem.Infrastructure.csproj", "{B05A036E-1B3E-427F-9196-0897E03CE656}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterceptorSystem.Tests", "InterceptorSystem.Tests\InterceptorSystem.Tests.csproj", "{52485991-4F41-4196-9CB6-E227536B4E5D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterceptorSystem.Api", "InterceptorSystem.Api\InterceptorSystem.Api.csproj", "{7F4582AF-80FF-455F-A84D-032E8739DCA5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEF8AFAE-047C-45FD-8AFC-DF8B40419B85}"
@@ -43,10 +41,6 @@ Global
 		{B05A036E-1B3E-427F-9196-0897E03CE656}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B05A036E-1B3E-427F-9196-0897E03CE656}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B05A036E-1B3E-427F-9196-0897E03CE656}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52485991-4F41-4196-9CB6-E227536B4E5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52485991-4F41-4196-9CB6-E227536B4E5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52485991-4F41-4196-9CB6-E227536B4E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52485991-4F41-4196-9CB6-E227536B4E5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F4582AF-80FF-455F-A84D-032E8739DCA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F4582AF-80FF-455F-A84D-032E8739DCA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F4582AF-80FF-455F-A84D-032E8739DCA5}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -21,21 +21,21 @@ public class ContratoRepository : IContratoRepository
     public async Task<Contrato?> GetByIdAsync(Guid id)
     {
         return await _context.Contratos
-            .Include(c => c.Condominio) // FASE 3: Necessário para calcular QuantidadeFuncionarios
+            .Include(c => c.Cliente) // FASE 3: Necessário para calcular QuantidadeFuncionarios
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<IEnumerable<Contrato>> GetAllAsync()
     {
         return await _context.Contratos
-            .Include(c => c.Condominio) // FASE 3: Necessário para calcular QuantidadeFuncionarios
+            .Include(c => c.Cliente) // FASE 3: Necessário para calcular QuantidadeFuncionarios
             .ToListAsync();
     }
 
-    public async Task<bool> ExisteContratoVigenteAsync(Guid condominioId, Guid? contratoIdIgnorado = null)
+    public async Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null)
     {
         return await _context.Contratos
-            .Where(c => c.CondominioId == condominioId && 
+            .Where(c => c.ClienteId == clienteId && 
                        (c.Status == StatusContrato.ATIVO || c.Status == StatusContrato.PENDENTE) &&
                        (contratoIdIgnorado == null || c.Id != contratoIdIgnorado))
             .AnyAsync();

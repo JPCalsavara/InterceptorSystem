@@ -31,7 +31,7 @@
 
 **WhatsApp Bot (Meta API):**
 - Webhook para receber mensagens (`GET/POST /api/whatsapp/webhook`)
-- Máquina de estados conversacional (`EstadoConversa`) para substituição de alocações
+- Máquina de estados conversacional (`EstadoConversa`) para substituição de diárias
 - Sessão persistida por telefone (`SessaoWhatsapp`) com expiração de 15 minutos
 - Processamento assíncrono (fire-and-forget)
 
@@ -64,21 +64,21 @@
 
 #### ✨ Mudanças
 
-- `QuantidadeFuncionariosIdeal` renomeado para `QuantidadeIdealPorTurno` em `Condominio`
+- `QuantidadeFuncionariosIdeal` renomeado para `QuantidadeIdealPorTurno` em `Cliente`
 - `QuantidadeFuncionarios` removido da persistência de `Contrato` — agora propriedade `[NotMapped]` calculada: `QuantidadeIdealPorTurno × NumeroDePostos`
-- Eager loading do `PostoDeTrabalhoRepository` simplificado (não carrega mais lista de postos desnecessariamente)
-- Configuração EF Core atualizada em `CondominioConfiguration`
+- Eager loading do `PostoRepository` simplificado (não carrega mais lista de postos desnecessariamente)
+- Configuração EF Core atualizada em `ClienteConfiguration`
 
 #### ⚠️ Breaking Changes (API)
 
-- `POST /api/condominios` e `GET /api/condominios`: campo `quantidadeFuncionariosIdeal` → `quantidadeIdealPorTurno`
-- `POST /api/contratos` e `POST /api/condominios-completos`: campo `quantidadeFuncionarios` **removido** do input (calculado automaticamente)
+- `POST /api/clientes` e `GET /api/clientes`: campo `quantidadeFuncionariosIdeal` → `quantidadeIdealPorTurno`
+- `POST /api/contratos` e `POST /api/clientes-completos`: campo `quantidadeFuncionarios` **removido** do input (calculado automaticamente)
 - `GET /api/contratos/{id}`: campo `quantidadeFuncionarios` mantido no output (retornado calculado)
 
 #### 🔧 Fórmula
 
 ```
-QuantidadeFuncionarios = Condominio.QuantidadeIdealPorTurno × Contrato.NumeroDePostos
+QuantidadeFuncionarios = Cliente.QuantidadeIdealPorTurno × Contrato.NumeroDePostos
 ```
 
 #### 🐛 Benefícios
@@ -89,9 +89,9 @@ QuantidadeFuncionarios = Condominio.QuantidadeIdealPorTurno × Contrato.NumeroDe
 
 #### 📦 Arquivos Modificados
 
-- Domain: `Condominio.cs`, `Contrato.cs`, `PostoDeTrabalho.cs`
-- Application: `CondominioDto.cs`, `ContratoDto.cs`, `CondominioCompletoDto.cs`, `CondominioAppService.cs`, `ContratoAppService.cs`, `CondominioOrquestradorService.cs`
-- Infrastructure: migration `RenameQuantidadeFuncionariosIdealToQuantidadeIdealPorTurno`, `CondominioConfiguration.cs`, `PostoDeTrabalhoRepository.cs`
+- Domain: `Cliente.cs`, `Contrato.cs`, `Posto.cs`
+- Application: `ClienteDto.cs`, `ContratoDto.cs`, `ClienteCompletoDto.cs`, `ClienteAppService.cs`, `ContratoAppService.cs`, `ClienteOrquestradorService.cs`
+- Infrastructure: migration `RenameQuantidadeFuncionariosIdealToQuantidadeIdealPorTurno`, `ClienteConfiguration.cs`, `PostoRepository.cs`
 
 ---
 
@@ -107,8 +107,8 @@ Adicional noturno era calculado com base na **escala do funcionário** (ex: 12x3
 
 #### ✨ Mudanças
 
-- Nova propriedade calculada `TemHorarioNoturno` em `PostoDeTrabalho`: retorna `true` se o turno passa pelo período 22h–5h
-- `Funcionario.AdicionalNoturno` agora depende de `PostoDeTrabalho.TemHorarioNoturno`
+- Nova propriedade calculada `TemHorarioNoturno` em `Posto`: retorna `true` se o turno passa pelo período 22h–5h
+- `Funcionario.AdicionalNoturno` agora depende de `Posto.TemHorarioNoturno`
 - 7 novos testes unitários em `AdicionalNoturnoTests.cs` cobrindo todos os cenários de horário
 
 #### 📊 Exemplos
@@ -138,14 +138,14 @@ Adicional noturno era calculado com base na **escala do funcionário** (ex: 12x3
 
 #### **FASE 5: Criação em Cascata**
 
-- ✅ Endpoint `POST /api/condominios-completos` (1 request ao invés de 4)
-- ✅ Validação dry-run: `POST /api/condominios-completos/validar`
+- ✅ Endpoint `POST /api/clientes-completos` (1 request ao invés de 4)
+- ✅ Validação dry-run: `POST /api/clientes-completos/validar`
 - ✅ Cálculo automático de horários de turnos
 - ✅ 75% redução em código frontend
 
-#### **FASE 4: PostoDeTrabalho Simplificado**
+#### **FASE 4: Posto Simplificado**
 
-- ✅ `QuantidadeIdealFuncionarios` agora é calculado do Condomínio
+- ✅ `QuantidadeIdealFuncionarios` agora é calculado do Cliente
 - ❌ Removidos campos duplicados
 
 #### **FASE 3: Salários Automáticos**
@@ -161,7 +161,7 @@ Adicional noturno era calculado com base na **escala do funcionário** (ex: 12x3
 
 #### **FASE 1: Configs Operacionais**
 
-- ✅ Condomínio centraliza configs (qtd funcionários, horário troca)
+- ✅ Cliente centraliza configs (qtd funcionários, horário troca)
 
 ### 🐛 Bugs Críticos Corrigidos
 
@@ -182,7 +182,7 @@ Adicional noturno era calculado com base na **escala do funcionário** (ex: 12x3
 
 ### Versão Inicial
 
-- CRUD completo: Condomínios, Postos, Funcionários, Alocações, Contratos
+- CRUD completo: Clientes, Postos, Funcionários, Diárias, Contratos
 - Multi-tenant por `EmpresaId`
 - Validações básicas
 - Docker + PostgreSQL

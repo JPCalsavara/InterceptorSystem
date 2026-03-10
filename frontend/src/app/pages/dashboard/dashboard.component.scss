@@ -88,7 +88,7 @@
     grid-row: 1;
   }
 
-  > .condominios-section {
+  > .clientes-section {
     grid-column: 1;
     grid-row: 2;
   }
@@ -111,7 +111,7 @@
   gap: var(--space-4) !important;
 }
 
-.condominios-grid {
+.clientes-grid {
   display: flex !important;
   flex-direction: column !important;
   gap: var(--space-4) !important;
@@ -128,7 +128,7 @@
     grid-template-columns: 1fr;
   }
   .dashboard-main-grid > .metricas-section,
-  .dashboard-main-grid > .condominios-section,
+  .dashboard-main-grid > .clientes-section,
   .dashboard-main-grid > .ranking-section,
   .dashboard-main-grid > .alertas-section {
     grid-column: 1 / -1;
@@ -551,13 +551,13 @@
 }
 
 // ============================================================
-// Cards de Condomínio
+// Cards de Cliente
 // ============================================================
-.condominios-section {
+.clientes-section {
   margin-bottom: 3rem;
 }
 
-.condominios-grid {
+.clientes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.25rem;
@@ -964,7 +964,7 @@
     grid-template-columns: 1fr;
   }
 
-  .condominios-grid {
+  .clientes-grid {
     grid-template-columns: 1fr;
   }
 

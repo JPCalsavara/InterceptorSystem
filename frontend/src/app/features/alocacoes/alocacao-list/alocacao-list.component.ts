@@ -1,558 +1,101 @@
-import { Component, OnInit, inject, signal, computed, input } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AlocacaoService } from '../../../services/alocacao.service';
-import { FuncionarioService } from '../../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { CondominioService } from '../../../services/condominio.service';
-import { AlocacaoFormComponent } from '../alocacao-form/alocacao-form.component';
-import { FeriadosService } from '../../../services/feriados.service';
-import {
-  Alocacao,
-  Funcionario,
-  PostoDeTrabalho,
-  Condominio,
-  StatusAlocacao,
-  TipoAlocacao,
-} from '../../../models/index';
+import { PostoService } from '../../../services/posto.service';
+import { ClienteService } from '../../../services/cliente.service';
+import { ContratoService } from '../../../services/contrato.service';
+import { Alocacao, Posto, Cliente, Contrato, TipoEscala } from '../../../models/index';
+import { forkJoin } from 'rxjs';
 
-type ViewMode = 'daily' | 'weekly' | 'monthly';
-
-interface DayCell {
-  date: Date;
-  dateStr: string;
-  isCurrentMonth: boolean;
-  alocacoes: Alocacao[];
-}
-
-interface WeekColumn {
-  date: Date;
-  dateStr: string;
-  dayName: string;
-  postos: {
-    posto: PostoDeTrabalho;
-    condominio: Condominio;
-    alocacoes: Alocacao[];
-  }[];
+interface AlocacaoView extends Alocacao {
+  postoNome: string;
+  clienteNome: string;
+  contratoDesc: string;
 }
 
 @Component({
   selector: 'app-alocacao-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, AlocacaoFormComponent],
+  imports: [CommonModule],
   templateUrl: './alocacao-list.component.html',
   styleUrl: './alocacao-list.component.scss',
 })
 export class AlocacaoListComponent implements OnInit {
-  private service = inject(AlocacaoService);
-  private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private condominioService = inject(CondominioService);
-  private feriadosService = inject(FeriadosService);
-
-  condominioIdFixed = input<string>('');
+  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private clienteService = inject(ClienteService);
+  private contratoService = inject(ContratoService);
 
   alocacoes = signal<Alocacao[]>([]);
-  funcionarios = signal<Funcionario[]>([]);
-  postos = signal<PostoDeTrabalho[]>([]);
-  condominios = signal<Condominio[]>([]);
-  loading = signal(false);
+  postos = signal<Posto[]>([]);
+  clientes = signal<Cliente[]>([]);
+  contratos = signal<Contrato[]>([]);
+  loading = signal(true);
   error = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
-  editingAlocacaoId = signal<string | null>(null);
 
-  // View mode
-  viewMode = signal<ViewMode>('daily');
+  alocacoesView = computed(() => {
+    return this.alocacoes().map((aloc) => {
+      const posto = this.postos().find((p) => p.id === aloc.postoId);
+      const cliente = this.clientes().find((c) => c.id === posto?.clienteId);
+      const contrato = this.contratos().find((c) => c.id === aloc.contratoId);
 
-  // Filtros
-  filtroCondominioId = signal<string>('');
-  filtroFuncionarioId = signal<string>('');
-  filtroStatus = signal<string>('');
-  filtroTipo = signal<string>('');
-  filtroDataInicio = signal<string>(this.getToday());
-  filtroDataFim = signal<string>(this.getToday());
-
-  // Controle de período para visualização semanal e mensal
-  currentDate = signal<Date>(new Date());
-
-  // Alocações filtradas
-  alocacoesFiltradas = computed(() => {
-    let resultado = this.alocacoes();
-
-    const condominioId = this.filtroCondominioId();
-    if (condominioId) {
-      const postosDoCondominio = this.postos()
-        .filter((p) => p.condominioId === condominioId)
-        .map((p) => p.id);
-      resultado = resultado.filter((a) => postosDoCondominio.includes(a.postoDeTrabalhoId));
-    }
-
-    const funcionarioId = this.filtroFuncionarioId();
-    if (funcionarioId) {
-      resultado = resultado.filter((a) => a.funcionarioId === funcionarioId);
-    }
-
-    const status = this.filtroStatus();
-    if (status) {
-      resultado = resultado.filter((a) => a.statusAlocacao === status);
-    }
-
-    const tipo = this.filtroTipo();
-    if (tipo) {
-      resultado = resultado.filter((a) => a.tipoAlocacao === tipo);
-    }
-
-    // Filtro de data
-    const dataInicio = this.filtroDataInicio();
-    const dataFim = this.filtroDataFim();
-
-    if (this.viewMode() === 'daily' && dataInicio && dataFim) {
-      resultado = resultado.filter((a) => a.data >= dataInicio && a.data <= dataFim);
-    }
-
-    return resultado;
-  });
-
-  // Dados para visualização semanal
-  weekData = computed(() => {
-    const date = this.currentDate();
-    const weekStart = this.getWeekStart(date);
-    const columns: WeekColumn[] = [];
-
-    for (let i = 0; i < 7; i++) {
-      const currentDay = new Date(weekStart);
-      currentDay.setDate(weekStart.getDate() + i);
-      const dateStr = this.formatDateToISO(currentDay);
-
-      const dayPostos = this.postos()
-        .map((posto) => {
-          const condominio = this.condominios().find((c) => c.id === posto.condominioId);
-          const alocacoes = this.alocacoesFiltradas().filter(
-            (a) => a.postoDeTrabalhoId === posto.id && a.data === dateStr,
-          );
-
-          return {
-            posto,
-            condominio: condominio!,
-            alocacoes,
-          };
-        })
-        .filter((item) => item.condominio && item.alocacoes.length > 0);
-
-      columns.push({
-        date: currentDay,
-        dateStr,
-        dayName: this.getDayName(currentDay),
-        postos: dayPostos,
-      });
-    }
-
-    return columns;
-  });
-
-  // Dados para visualização mensal
-  monthData = computed(() => {
-    const date = this.currentDate();
-    const year = date.getFullYear();
-    const month = date.getMonth();
-
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-
-    const firstDayOfWeek = firstDay.getDay();
-    const daysInMonth = lastDay.getDate();
-
-    const cells: DayCell[] = [];
-
-    // Dias do mês anterior
-    const prevMonthLastDay = new Date(year, month, 0).getDate();
-    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
-      const day = prevMonthLastDay - i;
-      const cellDate = new Date(year, month - 1, day);
-      cells.push({
-        date: cellDate,
-        dateStr: this.formatDateToISO(cellDate),
-        isCurrentMonth: false,
-        alocacoes: [],
-      });
-    }
-
-    // Dias do mês atual
-    for (let day = 1; day <= daysInMonth; day++) {
-      const cellDate = new Date(year, month, day);
-      const dateStr = this.formatDateToISO(cellDate);
-      const alocacoes = this.alocacoesFiltradas().filter((a) => a.data === dateStr);
-
-      cells.push({
-        date: cellDate,
-        dateStr,
-        isCurrentMonth: true,
-        alocacoes,
-      });
-    }
-
-    // Dias do próximo mês
-    const remainingCells = 42 - cells.length; // 6 semanas * 7 dias
-    for (let day = 1; day <= remainingCells; day++) {
-      const cellDate = new Date(year, month + 1, day);
-      cells.push({
-        date: cellDate,
-        dateStr: this.formatDateToISO(cellDate),
-        isCurrentMonth: false,
-        alocacoes: [],
-      });
-    }
-
-    return cells;
-  });
-
-  // Legenda de funcionários para visualização mensal
-  funcionariosLegenda = computed(() => {
-    const funcionariosUsados = new Map<string, { funcionario: Funcionario; number: number }>();
-    let counter = 1;
-
-    this.alocacoesFiltradas().forEach((alocacao) => {
-      if (!funcionariosUsados.has(alocacao.funcionarioId)) {
-        const funcionario = this.funcionarios().find((f) => f.id === alocacao.funcionarioId);
-        if (funcionario) {
-          funcionariosUsados.set(alocacao.funcionarioId, { funcionario, number: counter++ });
-        }
-      }
+      return {
+        ...aloc,
+        postoNome: posto?.nome || '—',
+        clienteNome: cliente?.nome || '—',
+        contratoDesc: contrato?.descricao || '—',
+      } as AlocacaoView;
     });
-
-    return Array.from(funcionariosUsados.values());
   });
 
   ngOnInit(): void {
-    const fixedId = this.condominioIdFixed();
-    if (fixedId) {
-      this.filtroCondominioId.set(fixedId);
-    }
-    this.loadAll();
+    this.loadData();
   }
 
-  // ...existing code...
-
-  loadAll(): void {
+  loadData(): void {
     this.loading.set(true);
-    Promise.all([
-      this.loadAlocacoes(),
-      this.loadFuncionarios(),
-      this.loadPostos(),
-      this.loadCondominios(),
-    ]).finally(() => this.loading.set(false));
-  }
-
-  loadAlocacoes(): Promise<void> {
-    return new Promise((resolve) => {
-      this.service.getAll().subscribe({
-        next: (data) => {
-          this.alocacoes.set(data);
-          resolve();
-        },
-        error: (err) => {
-          this.error.set('Erro ao carregar alocações.');
-          console.error(err);
-          resolve();
-        },
-      });
+    forkJoin({
+      alocacoes: this.alocacaoService.getAll(),
+      postos: this.postoService.getAll(),
+      clientes: this.clienteService.getAll(),
+      contratos: this.contratoService.getAll(),
+    }).subscribe({
+      next: (res) => {
+        this.alocacoes.set(res.alocacoes);
+        this.postos.set(res.postos);
+        this.clientes.set(res.clientes);
+        this.contratos.set(res.contratos);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set('Erro ao carregar alocações');
+        this.loading.set(false);
+        console.error(err);
+      },
     });
   }
 
-  loadFuncionarios(): Promise<void> {
-    return new Promise((resolve) => {
-      this.funcionarioService.getAll().subscribe({
-        next: (data) => {
-          this.funcionarios.set(data);
-          resolve();
-        },
-        error: (err) => {
-          console.error('Erro ao carregar funcionários:', err);
-          resolve();
-        },
-      });
-    });
-  }
-
-  loadPostos(): Promise<void> {
-    return new Promise((resolve) => {
-      this.postoService.getAll().subscribe({
-        next: (data) => {
-          this.postos.set(data);
-          resolve();
-        },
-        error: (err) => {
-          console.error('Erro ao carregar postos:', err);
-          resolve();
-        },
-      });
-    });
-  }
-
-  loadCondominios(): Promise<void> {
-    return new Promise((resolve) => {
-      this.condominioService.getAll().subscribe({
-        next: (data) => {
-          this.condominios.set(data);
-          resolve();
-        },
-        error: (err) => {
-          console.error('Erro ao carregar condomínios:', err);
-          resolve();
-        },
-      });
-    });
-  }
-
-  aplicarFiltros(): void {
-    // Os filtros são reativos via computed
-  }
-
-  setViewMode(mode: ViewMode): void {
-    this.viewMode.set(mode);
-
-    // Ajustar filtros de data baseado no modo
-    if (mode === 'daily') {
-      // Manter filtros de data
-    } else if (mode === 'weekly') {
-      const weekStart = this.getWeekStart(this.currentDate());
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
-      this.filtroDataInicio.set(this.formatDateToISO(weekStart));
-      this.filtroDataFim.set(this.formatDateToISO(weekEnd));
-    } else if (mode === 'monthly') {
-      const date = this.currentDate();
-      const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-      const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-      this.filtroDataInicio.set(this.formatDateToISO(firstDay));
-      this.filtroDataFim.set(this.formatDateToISO(lastDay));
-    }
-  }
-
-  previousPeriod(): void {
-    const date = this.currentDate();
-    const mode = this.viewMode();
-
-    if (mode === 'weekly') {
-      date.setDate(date.getDate() - 7);
-    } else if (mode === 'monthly') {
-      date.setMonth(date.getMonth() - 1);
-    }
-
-    this.currentDate.set(new Date(date));
-    this.setViewMode(mode);
-  }
-
-  nextPeriod(): void {
-    const date = this.currentDate();
-    const mode = this.viewMode();
-
-    if (mode === 'weekly') {
-      date.setDate(date.getDate() + 7);
-    } else if (mode === 'monthly') {
-      date.setMonth(date.getMonth() + 1);
-    }
-
-    this.currentDate.set(new Date(date));
-    this.setViewMode(mode);
-  }
-
-  today(): void {
-    this.currentDate.set(new Date());
-    this.setViewMode(this.viewMode());
-  }
-
-  getToday(): string {
-    return this.formatDateToISO(new Date());
-  }
-
-  formatDateToISO(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  getWeekStart(date: Date): Date {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Ajustar para segunda-feira
-    return new Date(d.setDate(diff));
-  }
-
-  getDayName(date: Date): string {
-    const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    return days[date.getDay()];
-  }
-
-  getMonthName(date: Date): string {
-    const months = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
-    ];
-    return months[date.getMonth()];
-  }
-
-  getCurrentPeriodLabel(): string {
-    const date = this.currentDate();
-    const mode = this.viewMode();
-
-    if (mode === 'weekly') {
-      const weekStart = this.getWeekStart(date);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
-      return `${weekStart.getDate()}/${weekStart.getMonth() + 1} - ${weekEnd.getDate()}/${weekEnd.getMonth() + 1}/${weekEnd.getFullYear()}`;
-    } else if (mode === 'monthly') {
-      return `${this.getMonthName(date)} ${date.getFullYear()}`;
-    }
-
-    return '';
-  }
-
-  getFuncionarioNumber(funcionarioId: string): number {
-    const item = this.funcionariosLegenda().find((f) => f.funcionario.id === funcionarioId);
-    return item?.number || 0;
-  }
-
-  getFuncionarioLegendaIndex(funcionarioId: string): number {
-    return this.funcionariosLegenda().findIndex((item) => item.funcionario.id === funcionarioId);
-  }
-
-  getAlocacaoMonthlyClass(alocacao: Alocacao): string {
-    if (alocacao.statusAlocacao === 'FALTA_REGISTRADA') return 'emp-falta';
-    if (alocacao.statusAlocacao === 'CANCELADA') return 'emp-cancelada';
-    if (alocacao.tipoAlocacao === 'SUBSTITUICAO') return 'emp-substituicao';
-    if (alocacao.tipoAlocacao === 'DOBRA_PROGRAMADA') return 'emp-dobra';
-    const index = this.getFuncionarioLegendaIndex(alocacao.funcionarioId);
-    return `emp-color-${index % 12}`;
-  }
-
-  getLegendColorClass(funcionarioId: string): string {
-    const index = this.getFuncionarioLegendaIndex(funcionarioId);
-    return `emp-color-${index % 12}`;
-  }
-
-  getFuncionarioNome(funcionarioId: string): string {
-    return this.funcionarios().find((f) => f.id === funcionarioId)?.nome || 'N/A';
-  }
-
-  getPostoHorario(postoId: string): string {
-    const posto = this.postos().find((p) => p.id === postoId);
-    if (!posto) return 'N/A';
-    const inicio = posto.horarioInicio.substring(0, 5);
-    const fim = posto.horarioFim.substring(0, 5);
-    return `${inicio} - ${fim}`;
-  }
-
-  getCondominioNome(postoId: string): string {
-    const posto = this.postos().find((p) => p.id === postoId);
-    if (!posto) return 'N/A';
-    return this.condominios().find((c) => c.id === posto.condominioId)?.nome || 'N/A';
-  }
-
-  formatDate(dateStr: string): string {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
-  }
-
-  getStatusLabel(status: StatusAlocacao): string {
-    const labels: Record<StatusAlocacao, string> = {
-      CONFIRMADA: 'Confirmada',
-      CANCELADA: 'Cancelamento',
-      FALTA_REGISTRADA: 'Falta',
-    };
-    return labels[status] || status;
-  }
-
-  getStatusClass(status: StatusAlocacao): string {
-    const classes: Record<StatusAlocacao, string> = {
-      CONFIRMADA: 'badge-success',
-      CANCELADA: 'badge-inactive',
-      FALTA_REGISTRADA: 'badge-warning',
-    };
-    return classes[status] || '';
-  }
-
-  getTipoLabel(tipo: TipoAlocacao): string {
-    const labels: Record<TipoAlocacao, string> = {
-      REGULAR: 'Regular',
-      DOBRA_PROGRAMADA: 'Alocação Extra',
-      SUBSTITUICAO: 'Substituição',
+  getEscalaLabel(tipo: TipoEscala): string {
+    const labels = {
+      [TipoEscala.DOZE_POR_TRINTA_SEIS]: '12x36',
+      [TipoEscala.SEMANAL_COMERCIAL]: 'Comercial',
+      [TipoEscala.ALCALA_8H]: '8 Horas',
+      [TipoEscala.FOLGUISTA]: 'Folguista',
     };
     return labels[tipo] || tipo;
   }
 
-  getTipoClass(tipo: TipoAlocacao): string {
-    const classes: Record<TipoAlocacao, string> = {
-      REGULAR: 'badge-info',
-      DOBRA_PROGRAMADA: 'badge-warning',
-      SUBSTITUICAO: 'badge-secondary',
-    };
-    return classes[tipo] || '';
+  formatHorario(horario: string): string {
+    return horario.substring(0, 5);
   }
 
-  confirmDelete(id: string, data: string): void {
-    if (confirm(`Deseja excluir a alocação do dia ${this.formatDate(data)}?`)) {
-      this.service.delete(id).subscribe({
-        next: () => {
-          this.successMessage.set('Alocação excluída!');
-          this.loadAll();
-          setTimeout(() => this.dismissSuccess(), 5000);
-        },
-        error: (err) => {
-          this.error.set('Erro ao excluir alocação.');
-          console.error(err);
-        },
+  deleteAlocacao(id: string): void {
+    if (confirm('Tem certeza que deseja excluir esta alocação?')) {
+      this.alocacaoService.delete(id).subscribe({
+        next: () => this.loadData(),
+        error: (err) => console.error('Erro ao excluir:', err),
       });
     }
-  }
-
-  dismissError(): void {
-    this.error.set(null);
-  }
-
-  dismissSuccess(): void {
-    this.successMessage.set(null);
-  }
-
-  navigateToEdit(id: string): void {
-    this.openEditModal(id);
-  }
-
-  openEditModal(id: string): void {
-    this.editingAlocacaoId.set(id);
-  }
-
-  closeEditModal(): void {
-    this.editingAlocacaoId.set(null);
-  }
-
-  onAlocacaoSaved(): void {
-    this.closeEditModal();
-    this.successMessage.set('Alocação atualizada com sucesso!');
-    this.loadAll();
-    setTimeout(() => this.dismissSuccess(), 5000);
-  }
-
-  getDayCellClasses(cell: DayCell): Record<string, boolean> {
-    return {
-      'other-month': !cell.isCurrentMonth,
-      ...this.feriadosService.getDayCellClasses(cell.date, cell.dateStr),
-    };
-  }
-
-  getFeriadoNome(dateStr: string): string | null {
-    return this.feriadosService.getFeriadoNome(dateStr);
   }
 }

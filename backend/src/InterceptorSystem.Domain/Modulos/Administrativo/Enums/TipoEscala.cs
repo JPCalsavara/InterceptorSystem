@@ -3,5 +3,7 @@ namespace InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 public enum TipoEscala
 {
     DOZE_POR_TRINTA_SEIS = 0,
-    SEMANAL_COMERCIAL = 1
+    SEMANAL_COMERCIAL = 1,
+    ALCALA_8H = 2,
+    FOLGUISTA = 3
 }

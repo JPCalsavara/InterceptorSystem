@@ -119,11 +119,15 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     .Build();
             });
 
+            // Adicionar serviços faltantes que a factory não injeta adequadamente
+            services.AddMemoryCache();
+
             // Repositórios do domínio administrativo
-            services.AddScoped<ICondominioRepository, CondominioRepository>();
-            services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
-            services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
+            services.AddScoped<IPostoRepository, PostoRepository>();
             services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
+            services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            services.AddScoped<IDiariaRepository, DiariaRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
 
             // Repositório e serviços de autenticação

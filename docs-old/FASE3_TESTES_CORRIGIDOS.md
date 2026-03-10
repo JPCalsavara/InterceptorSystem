@@ -25,7 +25,7 @@
 **Antes (FASE 2):**
 ```csharp
 new CreateFuncionarioDtoInput(
-    condominioId, contratoId, "João", cpf, celular,
+    clienteId, contratoId, "João", cpf, celular,
     StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT,
     2000,  // ❌ Removido
     300,   // ❌ Removido
@@ -35,19 +35,19 @@ new CreateFuncionarioDtoInput(
 **Depois (FASE 3):**
 ```csharp
 new CreateFuncionarioDtoInput(
-    condominioId, contratoId, "João", cpf, celular,
+    clienteId, contratoId, "João", cpf, celular,
     StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 // ✅ Salários calculados automaticamente!
 ```
 
 ---
 
-#### 2. **AlocacaoAppServiceTests.cs** (Testes Unitários)
+#### 2. **DiariaAppServiceTests.cs** (Testes Unitários)
 **Localização:** `/src/InterceptorSystem.Tests/Unity/`
 
 **Mudanças:**
 - ✅ Helper `CriarFuncionario()` - Removidos 3 parâmetros
-- ✅ `CreateAsync_DeveCriarAlocacao()` - Atualizado construtor de Funcionario
+- ✅ `CreateAsync_DeveCriarDiaria()` - Atualizado construtor de Funcionario
 - ✅ `CreateAsync_DeveFalhar_QuandoPostoNaoExiste()` - Atualizado construtor de Funcionario
 
 ---
@@ -59,13 +59,13 @@ new CreateFuncionarioDtoInput(
 - ✅ Helper `CriarFuncionarioAsync()` - Removidos 3 parâmetros
 - ✅ `Post_DeveCriarFuncionario()` - Removidos parâmetros
 - ✅ `Post_DeveFalhar_QuandoCpfDuplicado()` - Removidos parâmetros
-- ✅ `Post_DeveFalhar_QuandoCondominioNaoExiste()` - Removidos parâmetros
+- ✅ `Post_DeveFalhar_QuandoClienteNaoExiste()` - Removidos parâmetros
 - ✅ `Put_DeveAtualizarFuncionario()` - Removidos parâmetros do UpdateDto
 - ✅ `Put_DeveRetornar404_QuandoFuncionarioNaoExiste()` - Removidos parâmetros do UpdateDto
 
 ---
 
-#### 4. **AlocacoesControllerIntegrationTests.cs** (Testes de Integração)
+#### 4. **DiariasControllerIntegrationTests.cs** (Testes de Integração)
 **Localização:** `/src/InterceptorSystem.Tests/Integration/Administrativo/`
 
 **Mudanças:**
@@ -78,9 +78,9 @@ new CreateFuncionarioDtoInput(
 | Arquivo | Linhas Modificadas | Testes Corrigidos |
 |---------|-------------------|-------------------|
 | FuncionarioAppServiceTests.cs | ~15 | 8 testes |
-| AlocacaoAppServiceTests.cs | ~3 | 2 testes |
+| DiariaAppServiceTests.cs | ~3 | 2 testes |
 | FuncionariosControllerIntegrationTests.cs | ~8 | 5 testes |
-| AlocacoesControllerIntegrationTests.cs | ~1 | 1 helper |
+| DiariasControllerIntegrationTests.cs | ~1 | 1 helper |
 | **TOTAL** | **~27 linhas** | **15+ testes** |
 
 ---
@@ -91,7 +91,7 @@ new CreateFuncionarioDtoInput(
 ```csharp
 // ❌ ANTES (11 parâmetros):
 new CreateFuncionarioDtoInput(
-    condominioId, contratoId, nome, cpf, celular,
+    clienteId, contratoId, nome, cpf, celular,
     status, escala, tipo,
     salarioMensal,              // ❌
     valorBeneficiosMensal,      // ❌
@@ -99,7 +99,7 @@ new CreateFuncionarioDtoInput(
 
 // ✅ DEPOIS (8 parâmetros):
 new CreateFuncionarioDtoInput(
-    condominioId, contratoId, nome, cpf, celular,
+    clienteId, contratoId, nome, cpf, celular,
     status, escala, tipo);
 ```
 
@@ -121,7 +121,7 @@ new UpdateFuncionarioDtoInput(
 ```csharp
 // ❌ ANTES (12 parâmetros):
 new Funcionario(
-    empresaId, condominioId, contratoId,
+    empresaId, clienteId, contratoId,
     nome, cpf, celular, status, escala, tipo,
     salarioMensal,              // ❌
     valorBeneficiosMensal,      // ❌
@@ -129,7 +129,7 @@ new Funcionario(
 
 // ✅ DEPOIS (9 parâmetros):
 new Funcionario(
-    empresaId, condominioId, contratoId,
+    empresaId, clienteId, contratoId,
     nome, cpf, celular, status, escala, tipo);
 ```
 
@@ -157,8 +157,8 @@ new Funcionario(
    ```
 
 2. **Verificar Coverage:**
-   - Testes Unitários: FuncionarioAppService, AlocacaoAppService
-   - Testes de Integração: FuncionariosController, AlocacoesController
+   - Testes Unitários: FuncionarioAppService, DiariaAppService
+   - Testes de Integração: FuncionariosController, DiariasController
 
 3. **Testar API Manualmente:**
    ```bash
@@ -166,7 +166,7 @@ new Funcionario(
    curl -X POST http://localhost/api/funcionarios \
      -H "Content-Type: application/json" \
      -d '{
-       "condominioId": "...",
+       "clienteId": "...",
        "contratoId": "...",
        "nome": "João Silva",
        "cpf": "12345678901",

@@ -1,0 +1,13 @@
+{
+  "create": {
+    "funcionarioId": "00000000-0000-0000-0000-000000000000",
+    "postoId": "00000000-0000-0000-0000-000000000000",
+    "data": "2025-01-01",
+    "statusDiaria": "CONFIRMADA",
+    "tipoDiaria": "REGULAR"
+  },
+  "update": {
+    "statusDiaria": "CANCELADA",
+    "tipoDiaria": "SUBSTITUICAO"
+  }
+}

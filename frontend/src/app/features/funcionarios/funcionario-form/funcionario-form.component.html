@@ -40,23 +40,49 @@
       <h3 class="section-title">Dados Pessoais</h3>
 
       <div class="form-row">
+        <!-- Cliente -->
         <div class="form-group">
-          <label for="condominioId" class="form-label">
-            Condomínio <span class="required">*</span>
+          <label for="clienteId" class="form-label">
+            Cliente <span class="required">*</span>
           </label>
           <select
-            id="condominioId"
-            formControlName="condominioId"
+            id="clienteId"
+            formControlName="clienteId"
             class="form-input"
-            [class.error]="hasError('condominioId')"
+            [class.error]="hasError('clienteId')"
           >
-            <option value="">Selecione um condomínio</option>
-            @for (cond of condominios(); track cond.id) {
+            <option value="">Selecione um cliente</option>
+            @for (cond of clientes(); track cond.id) {
               <option [value]="cond.id">{{ cond.nome }}</option>
             }
           </select>
-          @if (hasError('condominioId')) {
-            <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+          @if (hasError('clienteId')) {
+            <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
+          }
+        </div>
+
+        <!-- Contrato -->
+        <div class="form-group">
+          <label for="contratoId" class="form-label">
+            Contrato <span class="required">*</span>
+          </label>
+          <select
+            id="contratoId"
+            formControlName="contratoId"
+            class="form-input"
+            [class.error]="hasError('contratoId')"
+            [disabled]="!form.get('clienteId')?.value"
+          >
+            <option value="">Selecione um contrato</option>
+            @for (cont of contratos(); track cont.id) {
+              <option [value]="cont.id">{{ cont.descricao }}</option>
+            }
+          </select>
+          @if (hasError('contratoId')) {
+            <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
+          }
+          @if (form.get('clienteId')?.value && contratos().length === 0) {
+            <span class="help-text warning">Nenhum contrato ativo para este cliente.</span>
           }
         </div>
       </div>

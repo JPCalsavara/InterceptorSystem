@@ -11,18 +11,18 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 public class FuncionarioAppService : IFuncionarioAppService
 {
     private readonly IFuncionarioRepository _repository;
-    private readonly ICondominioRepository _condominioRepository;
+    private readonly IClienteRepository _clienteRepository;
     private readonly IContratoRepository _contratoRepository; // FASE 2: Novo repositório
     private readonly ICurrentTenantService _tenantService;
 
     public FuncionarioAppService(
         IFuncionarioRepository repository,
-        ICondominioRepository condominioRepository,
+        IClienteRepository clienteRepository,
         IContratoRepository contratoRepository, // FASE 2: Injetar repositório de contrato
         ICurrentTenantService tenantService)
     {
         _repository = repository;
-        _condominioRepository = condominioRepository;
+        _clienteRepository = clienteRepository;
         _contratoRepository = contratoRepository; // FASE 2: Atribuir repositório
         _tenantService = tenantService;
     }
@@ -31,22 +31,24 @@ public class FuncionarioAppService : IFuncionarioAppService
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
-        var condominio = await _condominioRepository.GetByIdAsync(input.CondominioId);
-        if (condominio == null)
-        {
-            throw new KeyNotFoundException("Condomínio não encontrado para o funcionário.");
-        }
-
-        // FASE 2: Validar se o contrato existe e está ativo
         var contrato = await _contratoRepository.GetByIdAsync(input.ContratoId);
         if (contrato == null)
         {
             throw new KeyNotFoundException("Contrato não encontrado.");
         }
 
-        if (contrato.CondominioId != input.CondominioId)
+        if (input.ClienteId.HasValue)
         {
-            throw new InvalidOperationException("O contrato não pertence ao condomínio informado.");
+            var cliente = await _clienteRepository.GetByIdAsync(input.ClienteId.Value);
+            if (cliente == null)
+            {
+                throw new KeyNotFoundException("Cliente não encontrado para o funcionário.");
+            }
+
+            if (contrato.ClienteId != input.ClienteId.Value)
+            {
+                throw new InvalidOperationException("O contrato não pertence ao cliente informado.");
+            }
         }
 
         // Apenas verificar se o contrato está ATIVO ou PENDENTE (sem validação rigorosa de datas)
@@ -65,7 +67,7 @@ public class FuncionarioAppService : IFuncionarioAppService
         // FASE 3: Funcionário sem parâmetros de salário (calculados automaticamente)
         var funcionario = new Funcionario(
             empresaId,
-            input.CondominioId,
+            input.ClienteId,
             input.ContratoId,
             input.Nome,
             input.Cpf,
@@ -132,9 +134,9 @@ public class FuncionarioAppService : IFuncionarioAppService
         return existente != null;
     }
 
-    public async Task<bool> CondominioExisteAsync(Guid condominioId)
+    public async Task<bool> ClienteExisteAsync(Guid clienteId)
     {
-        var condominio = await _condominioRepository.GetByIdAsync(condominioId);
-        return condominio != null;
+        var cliente = await _clienteRepository.GetByIdAsync(clienteId);
+        return cliente != null;
     }
 }

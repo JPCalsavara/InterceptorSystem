@@ -17,36 +17,36 @@ public class FuncionarioRepository : IFuncionarioRepository
 
     public IUnitOfWork UnitOfWork => _context;
 
-    // FASE 3: Sempre carregar Contrato e Condominio (via Contrato) para cálculo de salário
+    // FASE 3: Sempre carregar Contrato e Cliente (via Contrato) para cálculo de salário
     public async Task<Funcionario?> GetByIdAsync(Guid id)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Condominio)
-            .Include(f => f.Alocacoes)
-                .ThenInclude(a => a.PostoDeTrabalho)
+                .ThenInclude(c => c.Cliente)
+            .Include(f => f.Diarias)
+                .ThenInclude(a => a.Alocacao)
             .FirstOrDefaultAsync(f => f.Id == id);
 
     public async Task<IEnumerable<Funcionario>> GetAllAsync()
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Condominio)
-            .Include(f => f.Alocacoes)
-                .ThenInclude(a => a.PostoDeTrabalho)
+                .ThenInclude(c => c.Cliente)
+            .Include(f => f.Diarias)
+                .ThenInclude(a => a.Alocacao)
             .ToListAsync();
 
     public async Task<Funcionario?> GetByCpfAsync(string cpf)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Condominio)
+                .ThenInclude(c => c.Cliente)
             .FirstOrDefaultAsync(f => f.Cpf == cpf);
 
-    public async Task<IEnumerable<Funcionario>> GetByCondominioAsync(Guid condominioId)
+    public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Condominio)
-            .Include(f => f.Alocacoes)
-                .ThenInclude(a => a.PostoDeTrabalho)
-            .Where(f => f.CondominioId == condominioId)
+                .ThenInclude(c => c.Cliente)
+            .Include(f => f.Diarias)
+                .ThenInclude(a => a.Alocacao)
+            .Where(f => f.ClienteId == clienteId)
             .ToListAsync();
 
     public void Add(Funcionario entity) => _context.Funcionarios.Add(entity);

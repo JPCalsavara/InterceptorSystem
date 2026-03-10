@@ -5,7 +5,7 @@
 ### **Estatísticas Levantadas**
 
 ```
-Total de Entidades: 5 (Condominio, Contrato, Funcionario, PostoDeTrabalho, Alocacao)
+Total de Entidades: 5 (Cliente, Contrato, Funcionario, Posto, Diaria)
 Total de Serviços: 5 (AppServices)
 Total de Controllers: 5
 Total de Testes: ~124 (estimado)
@@ -16,16 +16,16 @@ Cobertura de Domain Events: 0% (infraestrutura existe, não está sendo usada)
 
 ## 🎯 Análise de Cada Proposta
 
-### **PROPOSTA 1: Configurações Operacionais no Condomínio**
+### **PROPOSTA 1: Configurações Operacionais no Cliente**
 
 #### **O que já existe:**
 ```csharp
-public class Condominio
+public class Cliente
 {
     public string Nome { get; private set; }
     public string Cnpj { get; private set; }
     public string Endereco { get; private set; }
-    public ICollection<PostoDeTrabalho> PostosDeTrabalho { get; private set; }
+    public ICollection<Posto> Postos { get; private set; }
     public ICollection<Funcionario> Funcionarios { get; private set; }
 }
 ```
@@ -40,7 +40,7 @@ public class Condominio
 
 | Métrica | Antes | Depois | Delta |
 |---------|-------|--------|-------|
-| Campos em Condominio | 3 | 7 | +4 |
+| Campos em Cliente | 3 | 7 | +4 |
 | Validações no construtor | 3 | 5 | +2 |
 | DTOs afetados | 2 | 2 | 0 (apenas atualizar) |
 | Testes afetados | ~15 | ~25 | +10 novos casos |
@@ -78,8 +78,8 @@ public class Condominio
 ```csharp
 public class Funcionario
 {
-    public Guid CondominioId { get; private set; } ✅
-    public Condominio? Condominio { get; private set; } ✅
+    public Guid ClienteId { get; private set; } ✅
+    public Cliente? Cliente { get; private set; } ✅
 }
 ```
 
@@ -101,7 +101,7 @@ var funcionario = new Funcionario(...); // Criado em 2025
 
 | Métrica | Antes | Depois | Delta |
 |---------|-------|--------|-------|
-| Relacionamentos em Funcionario | 1 (Condominio) | 2 (Condominio + Contrato) | +1 |
+| Relacionamentos em Funcionario | 1 (Cliente) | 2 (Cliente + Contrato) | +1 |
 | Validações na criação | 9 | 12 | +3 |
 | Queries com Include | 1 | 2 | +1 |
 | Testes unitários | ~20 | ~35 | +15 |
@@ -222,16 +222,16 @@ Contrato com 10 funcionários, R$ 30.000/mês
 
 ---
 
-### **PROPOSTA 4: Remover QuantidadeIdeal de PostoDeTrabalho**
+### **PROPOSTA 4: Remover QuantidadeIdeal de Posto**
 
 #### **O que já existe:**
 ```csharp
-public class PostoDeTrabalho
+public class Posto
 {
     public int QuantidadeIdealFuncionarios { get; private set; } // ❌ DUPLICADO
 }
 
-public class Condominio
+public class Cliente
 {
     // ❌ NÃO TEM quantidade total
 }
@@ -239,9 +239,9 @@ public class Condominio
 
 #### **Problema Atual:**
 ```csharp
-// Condomínio precisa de 10 funcionários (2 turnos = 5 cada)
-var posto1 = new PostoDeTrabalho(qtdIdeal: 5); // ❌ MANUAL
-var posto2 = new PostoDeTrabalho(qtdIdeal: 5); // ❌ MANUAL
+// Cliente precisa de 10 funcionários (2 turnos = 5 cada)
+var posto1 = new Posto(qtdIdeal: 5); // ❌ MANUAL
+var posto2 = new Posto(qtdIdeal: 5); // ❌ MANUAL
 
 // Mudou para 12 funcionários?
 posto1.AtualizarHorario(qtdIdeal: 6); // ❌ TEM QUE ATUALIZAR OS 2
@@ -250,20 +250,20 @@ posto2.AtualizarHorario(qtdIdeal: 6);
 
 #### **Proposta:**
 ```csharp
-public class Condominio
+public class Cliente
 {
     public int QuantidadeFuncionariosIdeal { get; private set; } = 10; ✅
 }
 
-public class PostoDeTrabalho
+public class Posto
 {
     [NotMapped]
     public int QuantidadeIdealFuncionarios
     {
         get
         {
-            var totalPostos = Condominio.PostosDeTrabalho.Count;
-            return Condominio.QuantidadeFuncionariosIdeal / totalPostos;
+            var totalPostos = Cliente.Postos.Count;
+            return Cliente.QuantidadeFuncionariosIdeal / totalPostos;
         }
     }
 }
@@ -276,13 +276,13 @@ public class PostoDeTrabalho
 | Campos persistidos | 1 | 0 | -1 |
 | Propriedades calculadas | 0 | 1 | +1 |
 | Duplicação de dados | ❌ Sim | ✅ Não | Eliminada |
-| Queries com Include | 0 | 1 | +1 (precisa de Condominio) |
+| Queries com Include | 0 | 1 | +1 (precisa de Cliente) |
 | Manutenção de quantidade | Manual (N postos) | Automática (1 lugar) | -N+1 |
 
 #### **Complexidade:** 🟡 **MÉDIA**
 - Remover campo persistido
 - Criar propriedade calculada
-- Garantir Eager Loading de Condominio
+- Garantir Eager Loading de Cliente
 - Migration para remover coluna
 
 #### **Necessidade:** 🟡 **MÉDIA**
@@ -294,7 +294,7 @@ public class PostoDeTrabalho
 - ✅ Elimina duplicação de dados
 - ✅ Mudança em 1 lugar atualiza todos postos
 - ✅ Menos propenso a erros
-- ⚠️ Aumenta acoplamento (posto precisa de condomínio)
+- ⚠️ Aumenta acoplamento (posto precisa de cliente)
 
 #### **Esforço:** ⏱️ **8-10 horas**
 - Implementação: 2h
@@ -311,31 +311,31 @@ public class PostoDeTrabalho
 #### **O que já existe:**
 ```csharp
 // AppServices separados ✅
-ICondominioAppService
+IClienteAppService
 IContratoAppService
-IPostoDeTrabalhoAppService
+IPostoAppService
 ```
 
 #### **O que falta:**
 ```csharp
-❌ ICondominioOrquestradorService // Orquestra criação completa
+❌ IClienteOrquestradorService // Orquestra criação completa
 ```
 
 #### **Problema Atual:**
 ```csharp
 // Frontend/API tem que fazer 4 chamadas:
-POST /api/condominios        // 1
+POST /api/clientes        // 1
 POST /api/contratos          // 2
-POST /api/postos-de-trabalho // 3
-POST /api/postos-de-trabalho // 4 (segundo posto)
+POST /api/postos // 3
+POST /api/postos // 4 (segundo posto)
 ```
 
 #### **Proposta:**
 ```csharp
 // Uma chamada faz tudo:
-POST /api/condominios/completo
+POST /api/clientes/completo
 {
-  "condominio": { ... },
+  "cliente": { ... },
   "contrato": { ... }
   // Postos criados automaticamente baseado em HorarioTrocaTurno
 }
@@ -345,7 +345,7 @@ POST /api/condominios/completo
 
 | Métrica | Antes | Depois | Delta |
 |---------|-------|--------|-------|
-| Chamadas API para criar condomínio | 4 | 1 | -3 |
+| Chamadas API para criar cliente | 4 | 1 | -3 |
 | Código no frontend | ~100 linhas | ~25 linhas | -75% |
 | Risco de estado inconsistente | Alto | Baixo | ✅ |
 | Transações no banco | 4 | 1 | -3 |
@@ -404,7 +404,7 @@ Baixa   │                 │  P5 (Cascata) │  P4 (PostoQtd)
 3. ✅ **P3: Cálculo Automático de Salário** - Alto valor, mas complexo
 
 #### **Could Have (Backlog)**
-4. 🟡 **P4: Remover QuantidadeIdeal de PostoDeTrabalho** - Refatoração interna
+4. 🟡 **P4: Remover QuantidadeIdeal de Posto** - Refatoração interna
 5. 🟡 **P5: Criação em Cascata** - UX melhor, não crítico
 
 #### **Won't Have (Futuro)**
@@ -434,7 +434,7 @@ Baixa   │                 │  P5 (Cascata) │  P4 (PostoQtd)
 - **Economia:** ~75% menos código no frontend
 
 #### **Melhoria de Performance**
-- ❌ Antes: 4 transações no banco (criação de condomínio)
+- ❌ Antes: 4 transações no banco (criação de cliente)
 - ✅ Depois: 1 transação atômica
 - **Economia:** ~70% menos latência
 
@@ -458,7 +458,7 @@ ROI: 1,5 meses (break-even)
 ### **Risco 1: Dados Existentes em Produção**
 
 #### **Cenário:**
-Se já existem condominios/funcionários cadastrados, as migrations vão falhar.
+Se já existem clientes/funcionários cadastrados, as migrations vão falhar.
 
 #### **Probabilidade:** 🔴 Alta
 #### **Impacto:** 🔴 Alto
@@ -466,19 +466,19 @@ Se já existem condominios/funcionários cadastrados, as migrations vão falhar.
 #### **Mitigação:**
 ```sql
 -- Migration com valores padrão
-ALTER TABLE Condominios 
+ALTER TABLE Clientes 
 ADD QuantidadeFuncionariosIdeal INT NULL;
 
 -- Script de migração de dados
-UPDATE Condominios
+UPDATE Clientes
 SET QuantidadeFuncionariosIdeal = (
     SELECT COUNT(*) 
     FROM Funcionarios 
-    WHERE CondominioId = Condominios.Id
+    WHERE ClienteId = Clientes.Id
 );
 
 -- Depois torna NOT NULL
-ALTER TABLE Condominios 
+ALTER TABLE Clientes 
 ALTER COLUMN QuantidadeFuncionariosIdeal INT NOT NULL;
 ```
 
@@ -514,7 +514,7 @@ var dto = await _context.Funcionarios
 ### **Risco 3: Complexidade de Testes**
 
 #### **Cenário:**
-Testes precisam criar Contrato + Condominio + Funcionario.
+Testes precisam criar Contrato + Cliente + Funcionario.
 
 #### **Probabilidade:** 🟡 Média
 #### **Impacto:** 🟢 Baixo
@@ -526,8 +526,8 @@ public static class FuncionarioBuilder
 {
     public static Funcionario ComContratoVigente()
     {
-        var condominio = CondominioBuilder.Padrao();
-        var contrato = ContratoBuilder.Vigente(condominio.Id);
+        var cliente = ClienteBuilder.Padrao();
+        var contrato = ContratoBuilder.Vigente(cliente.Id);
         return new Funcionario(..., contratoId: contrato.Id);
     }
 }
@@ -543,7 +543,7 @@ public static class FuncionarioBuilder
 3. **FASE 3: Cálculo Automático de Salário** - Valor financeiro alto
 
 ### **🟡 AVALIAR POSTERIORMENTE:**
-4. FASE 4: Remover QuantidadeIdeal de PostoDeTrabalho
+4. FASE 4: Remover QuantidadeIdeal de Posto
 5. FASE 5: Criação em Cascata
 
 ### **⚪ MANTER NO BACKLOG:**

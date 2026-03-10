@@ -68,8 +68,8 @@ docker compose ps
 
 ### Testar API
 ```bash
-# Listar condominios (vazio inicialmente)
-curl http://localhost/api/condominios
+# Listar clientes (vazio inicialmente)
+curl http://localhost/api/clientes
 
 # Acessar Swagger no navegador
 xdg-open http://localhost/swagger

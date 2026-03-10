@@ -161,14 +161,14 @@
   }
 }
 
-// Grid de Condomínios
-.condominios-grid {
+// Grid de Clientes
+.clientes-grid {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-.condominio-section {
+.cliente-section {
   background: var(--surface-card);
   border-radius: 12px;
   padding: 1.5rem;
@@ -176,7 +176,7 @@
   border: 1px solid var(--border-color);
 }
 
-.condominio-header {
+.cliente-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -208,8 +208,8 @@
   }
 }
 
-// Faixa de informações do condomínio (entre header e cards de postos)
-.condominio-info-strip {
+// Faixa de informações do cliente (entre header e cards de postos)
+.cliente-info-strip {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.5rem;

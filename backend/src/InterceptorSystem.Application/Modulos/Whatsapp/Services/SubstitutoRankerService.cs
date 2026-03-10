@@ -7,41 +7,41 @@ namespace InterceptorSystem.Application.Modulos.Whatsapp.Services;
 /// Ranqueia funcionários disponíveis para substituição em uma data específica.
 /// Critérios (por ordem de importância):
 /// 1. StatusFuncionario == ATIVO (obrigatório)
-/// 2. Não possui alocação já confirmada na data alvo (obrigatório)
-/// 3. Score = quantidade de alocações nos últimos 30 dias (menor = melhor)
+/// 2. Não possui diária já confirmada na data alvo (obrigatório)
+/// 3. Score = quantidade de diárias nos últimos 30 dias (menor = melhor)
 /// </summary>
 public class SubstitutoRankerService
 {
     private readonly IFuncionarioRepository _funcionarios;
-    private readonly IAlocacaoRepository _alocacoes;
+    private readonly IDiariaRepository _diarias;
 
     public SubstitutoRankerService(
         IFuncionarioRepository funcionarios,
-        IAlocacaoRepository alocacoes)
+        IDiariaRepository diarias)
     {
         _funcionarios = funcionarios;
-        _alocacoes = alocacoes;
+        _diarias = diarias;
     }
 
     public async Task<IEnumerable<SubstitutoDto>> ObterSubstitutosRankeadosAsync(
-        Guid condominioId,
+        Guid clienteId,
         DateOnly data)
     {
-        var todos = await _funcionarios.GetByCondominioAsync(condominioId);
+        var todos = await _funcionarios.GetByClienteAsync(clienteId);
         var ativos = todos.Where(f => f.StatusFuncionario == StatusFuncionario.ATIVO).ToList();
 
         var resultado = new List<SubstitutoDto>();
 
         foreach (var funcionario in ativos)
         {
-            var jaAlocado = await _alocacoes.ExisteAlocacaoNaDataAsync(funcionario.Id, data);
+            var jaAlocado = await _diarias.ExisteDiariaNaDataAsync(funcionario.Id, data);
             if (jaAlocado) continue;
 
-            var alocacoesRecentes = await _alocacoes.GetByFuncionarioAsync(funcionario.Id);
-            var score = alocacoesRecentes.Count(a =>
+            var diariasRecentes = await _diarias.GetByFuncionarioAsync(funcionario.Id);
+            var score = diariasRecentes.Count(a =>
                 a.Data >= data.AddDays(-30) &&
                 a.Data <= data &&
-                a.StatusAlocacao != StatusAlocacao.CANCELADA);
+                a.StatusDiaria != StatusDiaria.CANCELADA);
 
             var indicador = score <= 10 ? "Alta" :
                             score <= 18 ? "Média" : "Baixa";

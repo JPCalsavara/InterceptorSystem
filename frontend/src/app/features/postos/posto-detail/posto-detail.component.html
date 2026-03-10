@@ -44,10 +44,10 @@
                 clip-rule="evenodd"
               />
             </svg>
-            {{ formatHorario(posto()!.horarioInicio, posto()!.horarioFim) }}
+            {{ formatNome(posto()!.nome, posto()!.cidade) }}
           </div>
           <div class="header-meta">
-            @if (condominio()) {
+            @if (cliente()) {
               <span class="meta-item">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -56,7 +56,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {{ condominio()!.nome }}
+                {{ cliente()!.nome }}
               </span>
             }
             <span class="meta-item">
@@ -78,24 +78,13 @@
       <div class="metrics-grid">
         <div class="metric-card highlight">
           <div class="metric-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
           </div>
           <div class="metric-content">
-            <span class="metric-label">Quantidade Ideal de Funcionários</span>
-            <span class="metric-value primary">{{
-              posto()?.quantidadeIdealFuncionarios || 0
-            }}</span>
+            <span class="metric-label">Alocações (Turnos)</span>
+            <span class="metric-value primary">{{ alocacoes().length }}</span>
           </div>
         </div>
 
@@ -110,8 +99,8 @@
             </svg>
           </div>
           <div class="metric-content">
-            <span class="metric-label">Total de Alocações</span>
-            <span class="metric-value">{{ totalAlocacoes() }}</span>
+            <span class="metric-label">Total de Diárias</span>
+            <span class="metric-value">{{ totalDiarias() }}</span>
           </div>
         </div>
 
@@ -127,7 +116,7 @@
           </div>
           <div class="metric-content">
             <span class="metric-label">Confirmadas</span>
-            <span class="metric-value success">{{ alocacoesConfirmadas() }}</span>
+            <span class="metric-value success">{{ diariasConfirmadas() }}</span>
           </div>
         </div>
 
@@ -159,7 +148,7 @@
           </div>
           <div class="metric-content">
             <span class="metric-label">Canceladas</span>
-            <span class="metric-value">{{ alocacoesCanceladas() }}</span>
+            <span class="metric-value">{{ diariasCanceladas() }}</span>
           </div>
         </div>
 
@@ -181,11 +170,43 @@
       </div>
     </section>
 
-    <!-- Alocações por Tipo -->
+    <!-- Lista de Alocações -->
+    <section class="alocacoes-section">
+      <div class="section-header">
+        <h2 class="section-title">Turnos (Alocações)</h2>
+      </div>
+      <div class="alocacoes-grid">
+        @for (aloc of alocacoes(); track aloc.id) {
+          <div class="alocacao-card">
+            <div class="alocacao-header">
+              <span class="horario">{{ aloc.horarioInicio.substring(0, 5) }} - {{ aloc.horarioFim.substring(0, 5) }}</span>
+              <span class="escala-badge">{{ aloc.tipoEscala }}</span>
+            </div>
+            <div class="alocacao-body">
+              <div class="info-item">
+                <span class="label">Noturno:</span>
+                <span class="value">{{ aloc.temHorarioNoturno ? 'Sim' : 'Não' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Permite Dobra:</span>
+                <span class="value">{{ aloc.permiteDobrarEscala ? 'Sim' : 'Não' }}</span>
+              </div>
+            </div>
+          </div>
+        }
+        @if (alocacoes().length === 0) {
+          <div class="empty-state">
+            <p>Nenhuma alocação (turno) cadastrada para este posto.</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Diárias por Tipo -->
     <section class="tipos-section">
       <h2 class="section-title">Distribuição por Tipo</h2>
       <div class="tipos-grid">
-        @for (item of alocacoesPorTipo(); track item.tipo) {
+        @for (item of diariasPorTipo(); track item.tipo) {
           <div class="tipo-card">
             <div class="tipo-icon">{{ item.icon }}</div>
             <div class="tipo-content">
@@ -221,7 +242,7 @@
               </div>
               <div class="ranking-count">
                 <span class="count-value">{{ item.total }}</span>
-                <span class="count-label">alocações</span>
+                <span class="count-label">diárias</span>
               </div>
             </div>
           }
@@ -229,10 +250,10 @@
       </section>
     }
 
-    <!-- Histórico de Alocações -->
-    <section class="alocacoes-section">
+    <!-- Histórico de Diárias -->
+    <section class="diarias-section">
       <div class="section-header-with-nav">
-        <h2 class="section-title">Histórico de Alocações</h2>
+        <h2 class="section-title">Histórico de Diárias</h2>
         <div class="month-nav">
           <button class="btn-nav" (click)="previousMonth()" title="Mês anterior">←</button>
           <span class="month-label">{{ getSelectedMonthLabel() }}</span>
@@ -273,7 +294,7 @@
         </div>
       }
 
-      @if (alocacoesFiltradas().length === 0) {
+      @if (diariasFiltradas().length === 0) {
         <div class="empty-state">
           <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -282,11 +303,11 @@
               clip-rule="evenodd"
             />
           </svg>
-          <p>Nenhuma alocação encontrada em {{ getSelectedMonthLabel() }}</p>
+          <p>Nenhuma diária encontrada em {{ getSelectedMonthLabel() }}</p>
         </div>
       } @else {
         <div class="table-container">
-          <table class="alocacoes-table">
+          <table class="diarias-table">
             <thead>
               <tr>
                 <th>Data</th>
@@ -301,21 +322,21 @@
               </tr>
             </thead>
             <tbody>
-              @for (alocacao of alocacoesFiltradas(); track alocacao.id) {
+              @for (diaria of diariasFiltradas(); track diaria.id) {
                 <tr
-                  [class.row-falta]="alocacao.statusAlocacao === 'FALTA_REGISTRADA'"
-                  [class.row-cancelada]="alocacao.statusAlocacao === 'CANCELADA'"
+                  [class.row-falta]="diaria.statusDiaria === 'FALTA_REGISTRADA'"
+                  [class.row-cancelada]="diaria.statusDiaria === 'CANCELADA'"
                 >
-                  <td>{{ formatDate(alocacao.data) }}</td>
-                  <td>{{ getFuncionarioNome(alocacao.funcionarioId) }}</td>
+                  <td>{{ formatDate(diaria.data) }}</td>
+                  <td>{{ getFuncionarioNome(diaria.funcionarioId) }}</td>
                   <td>
-                    <span [class]="'badge ' + getStatusBadgeClass(alocacao.statusAlocacao)">
-                      {{ getStatusLabel(alocacao.statusAlocacao) }}
+                    <span [class]="'badge ' + getStatusBadgeClass(diaria.statusDiaria)">
+                      {{ getStatusLabel(diaria.statusDiaria) }}
                     </span>
                   </td>
-                  <td>{{ getTipoLabel(alocacao.tipoAlocacao) }}</td>
+                  <td>{{ getTipoLabel(diaria.tipoDiaria) }}</td>
                   @if (contrato()) {
-                    @if (alocacao.statusAlocacao === 'CONFIRMADA') {
+                    @if (diaria.statusDiaria === 'CONFIRMADA') {
                       <td class="col-valor">
                         <span class="valor-positivo">{{
                           formatCurrency(contrato()!.valorDiariaCobrada)
@@ -330,7 +351,7 @@
                       </td>
                       <td class="col-valor">
                         <span class="valor-positivo">{{
-                          formatCurrency(calcularValorAlocacao(alocacao))
+                          formatCurrency(calcularValorDiaria(diaria))
                         }}</span>
                       </td>
                     } @else {
@@ -371,9 +392,9 @@
                   <span class="summary-value danger">{{ totalFaltas() }}</span>
                 </div>
                 <div class="summary-item">
-                  <span class="summary-label">% do Total de Alocações:</span>
+                  <span class="summary-label">% do Total de Diárias:</span>
                   <span class="summary-value"
-                    >{{ (totalFaltas() / totalAlocacoes()) * 100 | number: '1.1-1' }}%</span
+                    >{{ (totalFaltas() / totalDiarias()) * 100 | number: '1.1-1' }}%</span
                   >
                 </div>
               </div>
@@ -386,7 +407,7 @@
               <div class="falta-item">
                 <div class="falta-date">{{ formatDate(falta.data) }}</div>
                 <div class="falta-funcionario">{{ getFuncionarioNome(falta.funcionarioId) }}</div>
-                <div class="falta-tipo">{{ getTipoLabel(falta.tipoAlocacao) }}</div>
+                <div class="falta-tipo">{{ getTipoLabel(falta.tipoDiaria) }}</div>
               </div>
             }
           </div>

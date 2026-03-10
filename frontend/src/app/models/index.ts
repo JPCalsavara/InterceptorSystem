@@ -21,51 +21,47 @@ export enum TipoFuncionario {
 export enum TipoEscala {
   DOZE_POR_TRINTA_SEIS = 'DOZE_POR_TRINTA_SEIS',
   SEMANAL_COMERCIAL = 'SEMANAL_COMERCIAL',
+  ALCALA_8H = 'ALCALA_8H',
+  FOLGUISTA = 'FOLGUISTA',
 }
 
-export enum StatusAlocacao {
+export enum StatusDiaria {
   CONFIRMADA = 'CONFIRMADA',
   CANCELADA = 'CANCELADA',
   FALTA_REGISTRADA = 'FALTA_REGISTRADA',
 }
 
-export enum TipoAlocacao {
+export enum TipoDiaria {
   REGULAR = 'REGULAR',
   DOBRA_PROGRAMADA = 'DOBRA_PROGRAMADA',
   SUBSTITUICAO = 'SUBSTITUICAO',
 }
 
-// Condominio
-export interface Condominio {
+// Cliente
+export interface Cliente {
   id: string;
   nome: string;
-  cnpj: string;
-  endereco: string;
-  quantidadeIdealPorTurno: number; // Funcionários ideais por turno
-  horarioTrocaTurno: string; // formato "HH:mm:ss"
+  cidade: string;
+  estado: string; // UF, e.g. "SP"
+  ativo: boolean;
   emailGestor?: string;
   telefoneEmergencia?: string;
-  ativo: boolean;
   empresaId?: string;
   dataCriacao?: Date;
 }
 
-export interface CreateCondominioDto {
+export interface CreateClienteDto {
   nome: string;
-  cnpj: string;
-  endereco: string;
-  quantidadeIdealPorTurno: number; // Funcionários ideais por turno
-  horarioTrocaTurno: string; // formato "HH:mm:ss"
+  cidade: string;
+  estado: string;
   emailGestor?: string;
   telefoneEmergencia?: string;
 }
 
-export interface UpdateCondominioDto {
+export interface UpdateClienteDto {
   nome: string;
-  cnpj: string;
-  endereco: string;
-  quantidadeIdealPorTurno: number; // Funcionários ideais por turno
-  horarioTrocaTurno: string; // formato "HH:mm:ss"
+  cidade: string;
+  estado: string;
   emailGestor?: string;
   telefoneEmergencia?: string;
 }
@@ -73,7 +69,7 @@ export interface UpdateCondominioDto {
 // Contrato
 export interface Contrato {
   id: string;
-  condominioId: string;
+  clienteId: string;
   descricao: string;
   valorTotalMensal: number;
   valorDiariaCobrada: number;
@@ -90,7 +86,7 @@ export interface Contrato {
 }
 
 export interface CreateContratoDto {
-  condominioId: string;
+  clienteId: string;
   descricao: string;
   valorTotalMensal: number;
   valorDiariaCobrada: number;
@@ -123,7 +119,7 @@ export interface UpdateContratoDto {
 // Funcionario
 export interface Funcionario {
   id: string;
-  condominioId: string;
+  clienteId: string;
   contratoId: string; // FASE 2 backend - obrigatório
   nome: string;
   cpf: string;
@@ -141,7 +137,7 @@ export interface Funcionario {
 }
 
 export interface CreateFuncionarioDto {
-  condominioId: string;
+  clienteId: string;
   contratoId: string; // FASE 2 backend - obrigatório
   nome: string;
   cpf: string;
@@ -158,58 +154,85 @@ export interface UpdateFuncionarioDto {
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
 }
-
-// PostoDeTrabalho - FASE 3
-export interface PostoDeTrabalho {
-  id: string;
-  condominioId: string;
-  contratoId: string;
-  horarioInicio: string; // FASE 5 - formato "HH:mm:ss"
-  horarioFim: string; // FASE 5 - formato "HH:mm:ss"
-  horario: string; // FASE 5 - formato "HH:mm - HH:mm" (display)
-  quantidadeIdealFuncionarios: number; // FASE 5 - calculado do condomínio
-  permiteDobrarEscala: boolean; // FASE 5
-  capacidadeMaximaPorDobras: number; // FASE 5
-  condominio?: Condominio; // Pode vir populado em alguns endpoints
-}
-
-export interface CreatePostoDeTrabalhoDto {
-  condominioId: string;
-  contratoId: string;
-  horarioInicio: string; // formato "HH:mm:ss"
-  horarioFim: string; // formato "HH:mm:ss"
-  permiteDobrarEscala: boolean;
-}
-
-export interface UpdatePostoDeTrabalhoDto {
-  horarioInicio: string;
-  horarioFim: string;
-  permiteDobrarEscala: boolean;
-}
-
-// Alocacao - FASE 3
+// Alocacao (Shift Slot)
 export interface Alocacao {
   id: string;
-  funcionarioId: string;
-  postoDeTrabalhoId: string;
-  data: string; // formato "yyyy-MM-dd"
-  statusAlocacao: StatusAlocacao;
-  tipoAlocacao: TipoAlocacao;
-  funcionario?: Funcionario; // Pode vir populado
-  postoDeTrabalho?: PostoDeTrabalho; // Pode vir populado
+  postoId: string;
+  contratoId: string;
+  horarioInicio: string; // format "HH:mm:ss"
+  horarioFim: string; // format "HH:mm:ss"
+  tipoEscala: TipoEscala;
+  permiteDobrarEscala: boolean;
+  temHorarioNoturno: boolean;
 }
 
 export interface CreateAlocacaoDto {
-  funcionarioId: string;
-  postoDeTrabalhoId: string;
-  data: string; // formato "yyyy-MM-dd"
-  statusAlocacao: StatusAlocacao;
-  tipoAlocacao: TipoAlocacao;
+  postoId: string;
+  contratoId: string;
+  horarioInicio: string;
+  horarioFim: string;
+  tipoEscala: TipoEscala;
+  permiteDobrarEscala: boolean;
 }
 
 export interface UpdateAlocacaoDto {
-  statusAlocacao: StatusAlocacao;
-  tipoAlocacao: TipoAlocacao;
+  horarioInicio: string;
+  horarioFim: string;
+  tipoEscala: TipoEscala;
+  permiteDobrarEscala: boolean;
+}
+
+// Posto - FASE 2B
+export interface Posto {
+  id: string;
+  clienteId: string;
+  nome: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
+  ativo: boolean;
+  cliente?: Cliente;
+}
+
+export interface CreatePostoDto {
+  clienteId: string;
+  nome: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
+}
+
+export interface UpdatePostoDto {
+  nome: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
+}
+
+// Diaria (Assignment)
+export interface Diaria {
+  id: string;
+  funcionarioId: string;
+  alocacaoId: string;
+  data: string; // formato "yyyy-MM-dd"
+  valorDiaria: number;
+  statusDiaria: StatusDiaria;
+  tipoDiaria: TipoDiaria;
+  funcionario?: Funcionario;
+  alocacao?: Alocacao;
+}
+
+export interface CreateDiariaDto {
+  funcionarioId: string;
+  alocacaoId: string;
+  data: string; // formato "yyyy-MM-dd"
+  statusDiaria: StatusDiaria;
+  tipoDiaria: TipoDiaria;
+}
+
+export interface UpdateDiariaDto {
+  statusDiaria: StatusDiaria;
+  tipoDiaria: TipoDiaria;
   data?: string;
 }
 

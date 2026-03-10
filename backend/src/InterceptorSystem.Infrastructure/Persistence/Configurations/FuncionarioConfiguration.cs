@@ -44,12 +44,12 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         // estão marcadas como [NotMapped] e são calculadas em tempo real do Contrato
 
         builder.Property(f => f.EmpresaId).IsRequired();
-        builder.Property(f => f.CondominioId).IsRequired();
+        builder.Property(f => f.ClienteId).IsRequired(false); // Nullable: TERCEIRIZADO employees may not be assigned to a specific client
         builder.Property(f => f.ContratoId).IsRequired();
 
-        builder.HasOne(f => f.Condominio)
+        builder.HasOne(f => f.Cliente)
             .WithMany(c => c.Funcionarios)
-            .HasForeignKey(f => f.CondominioId)
+            .HasForeignKey(f => f.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
         
         // FASE 2: Relacionamento com Contrato
@@ -59,7 +59,7 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(f => f.EmpresaId);
-        builder.HasIndex(f => f.CondominioId);
+        builder.HasIndex(f => f.ClienteId);
         builder.HasIndex(f => f.ContratoId); // FASE 2: Índice para performance
     }
 

@@ -11,25 +11,24 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     {
     }
 
-    private async Task<Guid> CriarCondominioAsync()
+    private async Task<Guid> CriarClienteAsync()
     {
-        var input = new CreateCondominioDtoInput(
-            $"Condomínio Contrato {DateTime.Now.Ticks}",
-            $"{DateTime.Now.Ticks % 100000000:00000000}/0001-55",
-            "Rua Contrato, 1",
-            10,
-            TimeSpan.FromHours(6)
+        var input = new CreateClienteDtoInput(
+            $"Cliente Contrato {DateTime.Now.Ticks}",
+            "00000000000000",
+            "São Paulo",
+            "SP"
         );
-        var response = await Client.PostAsJsonAsync("/api/condominios", input);
+        var response = await Client.PostAsJsonAsync("/api/clientes", input);
         response.EnsureSuccessStatusCode();
-        var dto = await ReadAsAsync<CondominioDtoOutput>(response);
+        var dto = await ReadAsAsync<ClienteDtoOutput>(response);
         return dto!.Id;
     }
 
-    private async Task<ContratoDtoOutput> CriarContratoAsync(Guid condominioId)
+    private async Task<ContratoDtoOutput> CriarContratoAsync(Guid clienteId)
     {
         var input = new CreateContratoDtoInput(
-            condominioId,
+            clienteId,
             "Contrato Teste",
             10000,
             500,
@@ -51,9 +50,9 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     [Fact]
     public async Task Post_DeveCriarContrato()
     {
-        var condominioId = await CriarCondominioAsync();
+        var clienteId = await CriarClienteAsync();
         var input = new CreateContratoDtoInput(
-            condominioId,
+            clienteId,
             "Contrato Segurança",
             20000,
             800,
@@ -78,8 +77,8 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     [Fact]
     public async Task Put_DeveAtualizarContrato()
     {
-        var condominioId = await CriarCondominioAsync();
-        var contrato = await CriarContratoAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        var contrato = await CriarContratoAsync(clienteId);
         var input = new UpdateContratoDtoInput(
             "Contrato Atualizado",
             25000,
@@ -106,8 +105,8 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     [Fact]
     public async Task Delete_DeveRemoverContrato()
     {
-        var condominioId = await CriarCondominioAsync();
-        var contrato = await CriarContratoAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        var contrato = await CriarContratoAsync(clienteId);
 
         var response = await Client.DeleteAsync($"/api/contratos/{contrato.Id}");
 
@@ -117,8 +116,8 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     [Fact]
     public async Task GetAll_DeveRetornarLista()
     {
-        var condominioId = await CriarCondominioAsync();
-        await CriarContratoAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        await CriarContratoAsync(clienteId);
 
         var response = await Client.GetAsync("/api/contratos");
 
@@ -131,8 +130,8 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     [Fact]
     public async Task Get_DeveRetornarContrato()
     {
-        var condominioId = await CriarCondominioAsync();
-        var contrato = await CriarContratoAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        var contrato = await CriarContratoAsync(clienteId);
 
         var response = await Client.GetAsync($"/api/contratos/{contrato.Id}");
 

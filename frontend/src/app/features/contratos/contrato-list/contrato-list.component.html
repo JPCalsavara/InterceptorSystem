@@ -174,7 +174,7 @@
         <div class="column-content">
           @for (contrato of contratosPendentes(); track contrato.id) {
             <div class="contract-card">
-              <h4 class="card-title">{{ getCondominioNome(contrato.condominioId) }}</h4>
+              <h4 class="card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
@@ -257,7 +257,7 @@
         <div class="column-content">
           @for (contrato of contratosVerde(); track contrato.id) {
             <div class="contract-card">
-              <h4 class="card-title">{{ getCondominioNome(contrato.condominioId) }}</h4>
+              <h4 class="card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
@@ -340,7 +340,7 @@
         <div class="column-content">
           @for (contrato of contratosAmarelo(); track contrato.id) {
             <div class="contract-card">
-              <h4 class="card-title">{{ getCondominioNome(contrato.condominioId) }}</h4>
+              <h4 class="card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
@@ -423,7 +423,7 @@
         <div class="column-content">
           @for (contrato of contratosVermelho(); track contrato.id) {
             <div class="contract-card">
-              <h4 class="card-title">{{ getCondominioNome(contrato.condominioId) }}</h4>
+              <h4 class="card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
@@ -506,7 +506,7 @@
         <div class="column-content">
           @for (contrato of contratosFinalizados(); track contrato.id) {
             <div class="contract-card">
-              <h4 class="card-title">{{ getCondominioNome(contrato.condominioId) }}</h4>
+              <h4 class="card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">

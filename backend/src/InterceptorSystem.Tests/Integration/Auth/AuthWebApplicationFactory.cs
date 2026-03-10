@@ -69,11 +69,12 @@ public class AuthWebApplicationFactory : WebApplicationFactory<Program>
                 options.EnableSensitiveDataLogging();
             });
 
+            services.AddMemoryCache();
             // Repositórios do domínio administrativo
-            services.AddScoped<ICondominioRepository, CondominioRepository>();
-            services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
+            services.AddScoped<IPostoRepository, PostoRepository>();
             services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
-            services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
+            services.AddScoped<IDiariaRepository, DiariaRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
 
             // Repositório e serviços de autenticação

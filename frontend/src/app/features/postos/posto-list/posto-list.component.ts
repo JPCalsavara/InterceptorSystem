@@ -1,22 +1,24 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { PostoService } from '../../../services/posto.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
-import { AlocacaoService } from '../../../services/alocacao.service';
+import { DiariaService } from '../../../services/diaria.service';
 import {
-  PostoDeTrabalho,
-  Condominio,
-  Contrato,
+  Posto,
   Alocacao,
-  StatusAlocacao,
+  Cliente,
+  Contrato,
+  Diaria,
+  StatusDiaria,
   StatusContrato,
 } from '../../../models/index';
+import { AlocacaoService } from '../../../services/alocacao.service';
 
-interface PostoPorCondominio {
-  condominio: Condominio;
-  postos: PostoDeTrabalho[];
+interface PostoPorCliente {
+  cliente: Cliente;
+  postos: Posto[];
 }
 
 @Component({
@@ -27,37 +29,39 @@ interface PostoPorCondominio {
   styleUrl: './posto-list.component.scss',
 })
 export class PostoListComponent implements OnInit {
-  private service = inject(PostoDeTrabalhoService);
-  private condominioService = inject(CondominioService);
+  private service = inject(PostoService);
+  private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
+  private diariaService = inject(DiariaService);
   private alocacaoService = inject(AlocacaoService);
 
-  postos = signal<PostoDeTrabalho[]>([]);
-  condominios = signal<Condominio[]>([]);
+  postos = signal<Posto[]>([]);
+  clientes = signal<Cliente[]>([]);
   contratos = signal<Contrato[]>([]);
+  diarias = signal<Diaria[]>([]);
   alocacoes = signal<Alocacao[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
-  // Agrupa postos por condomínio
-  postosPorCondominio = computed<PostoPorCondominio[]>(() => {
-    const condominiosMap = new Map<string, Condominio>();
-    this.condominios().forEach((c) => condominiosMap.set(c.id, c));
+  // Agrupa postos por cliente
+  postosPorCliente = computed<PostoPorCliente[]>(() => {
+    const clientesMap = new Map<string, Cliente>();
+    this.clientes().forEach((c) => clientesMap.set(c.id, c));
 
-    const grupos = new Map<string, PostoDeTrabalho[]>();
+    const grupos = new Map<string, Posto[]>();
     this.postos().forEach((posto) => {
-      if (!grupos.has(posto.condominioId)) {
-        grupos.set(posto.condominioId, []);
+      if (!grupos.has(posto.clienteId)) {
+        grupos.set(posto.clienteId, []);
       }
-      grupos.get(posto.condominioId)!.push(posto);
+      grupos.get(posto.clienteId)!.push(posto);
     });
 
-    const resultado: PostoPorCondominio[] = [];
-    grupos.forEach((postos, condominioId) => {
-      const condominio = condominiosMap.get(condominioId);
-      if (condominio) {
-        resultado.push({ condominio, postos });
+    const resultado: PostoPorCliente[] = [];
+    grupos.forEach((postos, clienteId) => {
+      const cliente = clientesMap.get(clienteId);
+      if (cliente) {
+        resultado.push({ cliente, postos });
       }
     });
 
@@ -70,16 +74,17 @@ export class PostoListComponent implements OnInit {
 
   loadAll(): void {
     this.loading.set(true);
-    this.loadCondominios();
+    this.loadClientes();
     this.loadContratos();
     this.loadPostos();
     this.loadAlocacoes();
+    this.loadDiarias();
   }
 
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => console.error('Erro ao carregar clientes:', err),
     });
   }
 
@@ -87,6 +92,13 @@ export class PostoListComponent implements OnInit {
     this.contratoService.getAll().subscribe({
       next: (data) => this.contratos.set(data),
       error: (err) => console.error('Erro ao carregar contratos:', err),
+    });
+  }
+
+  loadDiarias(): void {
+    this.diariaService.getAll().subscribe({
+      next: (data) => this.diarias.set(data),
+      error: (err) => console.error('Erro ao carregar diárias:', err),
     });
   }
 
@@ -112,17 +124,15 @@ export class PostoListComponent implements OnInit {
   }
 
   getNumeroFaltas(postoId: string): number {
-    // Calcula o número de faltas a partir das alocações
-    return this.alocacoes().filter(
+    const alocIds = this.alocacoes().filter(al => al.postoId === postoId).map(al => al.id);
+    return this.diarias().filter(
       (a) =>
-        a.postoDeTrabalhoId === postoId && a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
+        alocIds.includes(a.alocacaoId) && a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
     ).length;
   }
 
-  formatHorario(inicio: string, fim: string): string {
-    const inicioFormatado = inicio.substring(0, 5);
-    const fimFormatado = fim.substring(0, 5);
-    return `${inicioFormatado} às ${fimFormatado}`;
+  formatNome(nome: string, cidade: string): string {
+    return `${nome} - ${cidade}`;
   }
 
   getContratoDescricao(contratoId: string): string {
@@ -130,26 +140,24 @@ export class PostoListComponent implements OnInit {
     return contrato ? contrato.descricao : '—';
   }
 
-  getContratoDoCondominio(condominioId: string): string {
+  getContratoDoCliente(clienteId: string): string {
     const contrato = this.contratos().find(
-      (c) => c.condominioId === condominioId && c.status === StatusContrato.ATIVO,
+      (c) => c.clienteId === clienteId && c.status === StatusContrato.ATIVO,
     );
     return contrato?.descricao || '—';
   }
 
-  getCapacidadeMaxDobras(condominioId: string): number {
-    const postos = this.postos().filter((p) => p.condominioId === condominioId);
-    if (postos.length === 0) return 0;
-    return Math.max(...postos.map((p) => p.capacidadeMaximaPorDobras || 0));
+  getCapacidadeMaxDobras(clienteId: string): number {
+    return 0;
   }
 
-  getPermiteDobras(condominioId: string): boolean {
-    return this.postos().some((p) => p.condominioId === condominioId && p.permiteDobrarEscala);
+  getPermiteDobras(clienteId: string): boolean {
+    return false;
   }
 
-  confirmDelete(id: string, inicio: string, fim: string): void {
-    const horario = this.formatHorario(inicio, fim);
-    if (confirm(`Deseja excluir o posto "${horario}"?`)) {
+  confirmDelete(id: string, nome: string, cidade: string): void {
+    const postoNome = this.formatNome(nome, cidade);
+    if (confirm(`Deseja excluir o posto "${postoNome}"?`)) {
       this.service.delete(id).subscribe({
         next: () => {
           this.successMessage.set('Posto excluído!');

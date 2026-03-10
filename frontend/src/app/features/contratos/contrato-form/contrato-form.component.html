@@ -38,23 +38,23 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
     <div class="form-card">
       <div class="form-group">
-        <label for="condominioId" class="form-label">
-          Condomínio <span class="required">*</span>
+        <label for="clienteId" class="form-label">
+          Cliente <span class="required">*</span>
         </label>
         <select
-          id="condominioId"
-          formControlName="condominioId"
+          id="clienteId"
+          formControlName="clienteId"
           class="form-input"
-          [class.error]="hasError('condominioId')"
+          [class.error]="hasError('clienteId')"
           [disabled]="isEdit()"
         >
-          <option value="">Selecione um condomínio</option>
-          @for (cond of condominios(); track cond.id) {
+          <option value="">Selecione um cliente</option>
+          @for (cond of clientes(); track cond.id) {
             <option [value]="cond.id">{{ cond.nome }}</option>
           }
         </select>
-        @if (hasError('condominioId')) {
-          <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+        @if (hasError('clienteId')) {
+          <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
         }
       </div>
 
@@ -135,7 +135,7 @@
             >Funcionários Estimados
             <span
               class="info-tooltip"
-              title="Calculado automaticamente: Quantidade Ideal por Turno do condomínio × Número de Postos"
+              title="Calculado automaticamente: Quantidade Ideal por Turno do cliente × Número de Postos"
             >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                 <path
@@ -148,7 +148,7 @@
           </label>
           <div class="form-input computed-field">
             {{
-              getQuantidadeFuncionariosTotal(form.value.condominioId, form.value.numeroDePostos) ||
+              getQuantidadeFuncionariosTotal(form.value.numeroDePostos) ||
                 '—'
             }}
             <span class="computed-hint">func. necessários</span>
@@ -501,7 +501,6 @@
                     <span class="bk-formula"
                       >{{
                         getQuantidadeFuncionariosTotal(
-                          form.value.condominioId,
                           form.value.numeroDePostos
                         )
                       }}

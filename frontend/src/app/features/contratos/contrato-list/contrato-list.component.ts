@@ -2,12 +2,12 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ContratoService } from '../../../services/contrato.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import {
   Contrato,
   StatusContrato,
-  Condominio,
+  Cliente,
   Funcionario,
   StatusFuncionario,
 } from '../../../models/index';
@@ -21,11 +21,11 @@ import {
 })
 export class ContratoListComponent implements OnInit {
   private service = inject(ContratoService);
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
 
   contratos = signal<Contrato[]>([]);
-  condominios = signal<Condominio[]>([]);
+  clientes = signal<Cliente[]>([]);
   funcionarios = signal<Funcionario[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
@@ -62,14 +62,14 @@ export class ContratoListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadContratos();
-    this.loadCondominios();
+    this.loadClientes();
     this.loadFuncionarios();
   }
 
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => console.error('Erro ao carregar clientes:', err),
     });
   }
 
@@ -172,8 +172,8 @@ export class ContratoListComponent implements OnInit {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
-  getCondominioNome(condominioId: string): string {
-    const cond = this.condominios().find((c) => c.id === condominioId);
+  getClienteNome(clienteId: string): string {
+    const cond = this.clientes().find((c) => c.id === clienteId);
     return cond?.nome || 'Desconhecido';
   }
 
@@ -189,10 +189,10 @@ export class ContratoListComponent implements OnInit {
     // Impostos: percentualImpostos já é decimal (0.15 = 15%)
     const impostos = valorTotal * (contrato.percentualImpostos || 0);
 
-    // Funcionários ativos deste condomínio
+    // Funcionários ativos deste cliente
     const ativos = this.funcionarios().filter(
       (f) =>
-        f.condominioId === contrato.condominioId && f.statusFuncionario === StatusFuncionario.ATIVO,
+        f.clienteId === contrato.clienteId && f.statusFuncionario === StatusFuncionario.ATIVO,
     );
 
     // Benefícios: se há ativos reais, usa qtd real; senao usa estimativa do contrato

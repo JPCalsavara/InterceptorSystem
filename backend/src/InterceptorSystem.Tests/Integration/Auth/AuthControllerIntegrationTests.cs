@@ -196,7 +196,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
             nomeEmpresa: "Empresa E2E Registro");
 
         // Act - acessa rota protegida com o JWT
-        var response = await client.GetAsync("/api/condominios");
+        var response = await client.GetAsync("/api/clientes");
 
         // Assert - deve retornar 200 (não 401)
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -223,7 +223,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", auth!.Token);
 
         // Act - acessa rota protegida
-        var response = await client.GetAsync("/api/condominios");
+        var response = await client.GetAsync("/api/clientes");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -236,7 +236,7 @@ public class AuthControllerIntegrationTests : IClassFixture<AuthWebApplicationFa
         var client = _factory.CreateUnauthenticatedClient();
 
         // Act - acessa rota protegida sem JWT
-        var response = await client.GetAsync("/api/condominios");
+        var response = await client.GetAsync("/api/clientes");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);

@@ -3,7 +3,7 @@ using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 namespace InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 
 public record CreateFuncionarioDtoInput(
-    Guid CondominioId,
+    Guid? ClienteId,
     Guid ContratoId,
     string Nome,
     string Cpf,
@@ -21,7 +21,7 @@ public record UpdateFuncionarioDtoInput(
 
 public record FuncionarioDtoOutput(
     Guid Id,
-    Guid CondominioId,
+    Guid? ClienteId,
     Guid ContratoId,
     string Nome,
     string Cpf,
@@ -41,7 +41,7 @@ public record FuncionarioDtoOutput(
         if (entity == null) return null;
         return new FuncionarioDtoOutput(
             entity.Id,
-            entity.CondominioId,
+            entity.ClienteId,
             entity.ContratoId,
             entity.Nome,
             entity.Cpf,

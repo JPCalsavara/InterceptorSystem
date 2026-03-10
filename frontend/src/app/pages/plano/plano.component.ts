@@ -351,11 +351,11 @@ export class PlanoComponent {
   planoAtual = computed(() => (this.authService.currentUser()?.plano ?? 'FREE').toUpperCase());
 
   features: PlanFeature[] = [
-    { label: 'Condomínios', free: 'Até 3', basic: 'Até 10', pro: 'Ilimitado' },
+    { label: 'Clientes', free: 'Até 3', basic: 'Até 10', pro: 'Ilimitado' },
     { label: 'Funcionários', free: 'Até 20', basic: 'Até 100', pro: 'Ilimitado' },
     { label: 'Contratos ativos', free: 'Até 3', basic: 'Até 10', pro: 'Ilimitado' },
     { label: 'Postos de trabalho', free: 'Até 10', basic: 'Até 50', pro: 'Ilimitado' },
-    { label: 'Gestão de alocações', free: true, basic: true, pro: true },
+    { label: 'Gestão de diárias', free: true, basic: true, pro: true },
     { label: 'Dashboard financeiro', free: false, basic: true, pro: true },
     { label: 'Wizard de criação rápida', free: false, basic: true, pro: true },
     { label: 'Cálculo automático de salários', free: false, basic: false, pro: true },

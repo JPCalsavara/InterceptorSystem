@@ -6,37 +6,37 @@ Durante esta sessão, implementamos **todas as regras críticas de negócio** id
 
 ---
 
-## ✅ Validações de Alocação (Críticas para Operação)
+## ✅ Validações de Diária (Críticas para Operação)
 
-### 1. **Alocação Simultânea Bloqueada**
-- **Regra**: Um funcionário não pode ter duas alocações na mesma data
-- **Implementação**: `ExisteAlocacaoNaDataAsync()` no repositório
-- **Exceção**: `"Funcionário já possui alocação neste período"`
-- **Local**: `AlocacaoAppService.CreateAsync()` e `UpdateAsync()`
+### 1. **Diária Simultânea Bloqueada**
+- **Regra**: Um funcionário não pode ter duas diárias na mesma data
+- **Implementação**: `ExisteDiariaNaDataAsync()` no repositório
+- **Exceção**: `"Funcionário já possui diária neste período"`
+- **Local**: `DiariaAppService.CreateAsync()` e `UpdateAsync()`
 
 ### 2. **Dias Consecutivos Controlados** 
 - **Regra**: Funcionários não podem trabalhar dias seguidos, **EXCETO** em `DOBRA_PROGRAMADA`
 - **Implementação**: `ValidarRegrasDeConsecutividade()`
-- **Exceção**: `"Não é permitido duas alocações em dias consecutivos, exceto em dobra programada"`
+- **Exceção**: `"Não é permitido duas diárias em dias consecutivos, exceto em dobra programada"`
 
 ### 3. **Descanso Obrigatório Pós-Dobra**
 - **Regra**: Após `DOBRA_PROGRAMADA`, funcionário **deve** descansar no dia seguinte
 - **Implementação**: Validação específica para dobras no dia anterior
 - **Exceção**: `"Funcionário deve descansar após dobra programada"`
 
-### 4. **Mesmo Condomínio (Já existia)**
-- **Regra**: Funcionário e Posto devem pertencer ao mesmo condomínio
-- **Implementação**: Validação de `CondominioId` consistente
-- **Exceção**: `"Funcionário e Posto devem pertencer ao mesmo condomínio"`
+### 4. **Mesmo Cliente (Já existia)**
+- **Regra**: Funcionário e Posto devem pertencer ao mesmo cliente
+- **Implementação**: Validação de `ClienteId` consistente
+- **Exceção**: `"Funcionário e Posto devem pertencer ao mesmo cliente"`
 
 ---
 
 ## ✅ Validações de Contrato (Negócio)
 
 ### 1. **Contrato Vigente Único**
-- **Regra**: Apenas **um** contrato com status `PAGO` ou `PENDENTE` por condomínio
+- **Regra**: Apenas **um** contrato com status `PAGO` ou `PENDENTE` por cliente
 - **Implementação**: `ExisteContratoVigenteAsync()` no repositório
-- **Exceção**: `"Já existe um contrato vigente para este condomínio"`
+- **Exceção**: `"Já existe um contrato vigente para este cliente"`
 - **Local**: `ContratoAppService.CreateAsync()` e `UpdateAsync()`
 
 ### 2. **Transições de Status Controladas**
@@ -48,12 +48,12 @@ Durante esta sessão, implementamos **todas as regras críticas de negócio** id
 
 ## 📋 Testes Implementados
 
-### **Alocação - 6 Novos Testes**
+### **Diária - 6 Novos Testes**
 ```
-✅ CreateAsync - Deve falhar quando funcionário já tem alocação na mesma data
-✅ CreateAsync - Deve permitir DOBRA_PROGRAMADA após alocação regular  
+✅ CreateAsync - Deve falhar quando funcionário já tem diária na mesma data
+✅ CreateAsync - Deve permitir DOBRA_PROGRAMADA após diária regular  
 ✅ CreateAsync - Deve falhar quando funcionário tenta trabalhar após DOBRA_PROGRAMADA
-✅ UpdateAsync - Validação de alocação simultânea na atualização
+✅ UpdateAsync - Validação de diária simultânea na atualização
 ✅ [Testes existentes continuam funcionando]
 ```
 
@@ -70,49 +70,49 @@ Durante esta sessão, implementamos **todas as regras críticas de negócio** id
 ## 🔧 Arquivos Modificados
 
 ### **Repositórios**
-- `AlocacaoRepository.cs`: Adicionado `ExisteAlocacaoNaDataAsync()`
+- `DiariaRepository.cs`: Adicionado `ExisteDiariaNaDataAsync()`
 - `ContratoRepository.cs`: Adicionado `ExisteContratoVigenteAsync()`
 
 ### **Interfaces**  
-- `IAlocacaoRepository.cs`: Nova assinatura do método
+- `IDiariaRepository.cs`: Nova assinatura do método
 - `IContratoRepository.cs`: Nova assinatura do método
 
 ### **Services**
-- `AlocacaoAppService.cs`: Validações melhoradas em `CreateAsync()` e `UpdateAsync()`
+- `DiariaAppService.cs`: Validações melhoradas em `CreateAsync()` e `UpdateAsync()`
 - `ContratoAppService.cs`: Validações de contrato vigente
 
 ### **Testes**
-- `AlocacaoAppServiceTests.cs`: 6 novos cenários de teste
+- `DiariaAppServiceTests.cs`: 6 novos cenários de teste
 - `ContratoAppServiceTests.cs`: 3 novos cenários de teste
 
 ---
 
 ## 🎯 Cenários Cobertos (Validação Real)
 
-### **Alocação**
+### **Diária**
 ```bash
-# ❌ FALHA: Alocação dupla na mesma data
-POST /alocacoes {"funcionarioId": "X", "data": "2026-01-10"} 
-POST /alocacoes {"funcionarioId": "X", "data": "2026-01-10"} → 400 Bad Request
+# ❌ FALHA: Diária dupla na mesma data
+POST /diarias {"funcionarioId": "X", "data": "2026-01-10"} 
+POST /diarias {"funcionarioId": "X", "data": "2026-01-10"} → 400 Bad Request
 
 # ❌ FALHA: Trabalho após dobra
-POST /alocacoes {"funcionarioId": "X", "data": "2026-01-10", "tipo": "DOBRA_PROGRAMADA"}
-POST /alocacoes {"funcionarioId": "X", "data": "2026-01-11", "tipo": "REGULAR"} → 400 Bad Request
+POST /diarias {"funcionarioId": "X", "data": "2026-01-10", "tipo": "DOBRA_PROGRAMADA"}
+POST /diarias {"funcionarioId": "X", "data": "2026-01-11", "tipo": "REGULAR"} → 400 Bad Request
 
 # ✅ SUCESSO: Dobra permitida  
-POST /alocacoes {"funcionarioId": "X", "data": "2026-01-10", "tipo": "REGULAR"}
-POST /alocacoes {"funcionarioId": "X", "data": "2026-01-11", "tipo": "DOBRA_PROGRAMADA"} → 201 Created
+POST /diarias {"funcionarioId": "X", "data": "2026-01-10", "tipo": "REGULAR"}
+POST /diarias {"funcionarioId": "X", "data": "2026-01-11", "tipo": "DOBRA_PROGRAMADA"} → 201 Created
 ```
 
 ### **Contrato**
 ```bash
 # ❌ FALHA: Segundo contrato vigente
-POST /contratos {"condominioId": "Y", "status": "PAGO"}
-POST /contratos {"condominioId": "Y", "status": "PENDENTE"} → 400 Bad Request
+POST /contratos {"clienteId": "Y", "status": "PAGO"}
+POST /contratos {"clienteId": "Y", "status": "PENDENTE"} → 400 Bad Request
 
 # ✅ SUCESSO: Reativação de contrato inativo
 PUT /contratos/1 {"status": "INATIVO"} → 200 OK  
-POST /contratos {"condominioId": "Y", "status": "PAGO"} → 201 Created
+POST /contratos {"clienteId": "Y", "status": "PAGO"} → 201 Created
 ```
 
 ---
@@ -126,7 +126,7 @@ POST /contratos {"condominioId": "Y", "status": "PAGO"} → 201 Created
 
 ### **Depois (Soluções)**
 - ✅ **Operacional**: Turnos respeitam legislação trabalhista (descanso obrigatório)
-- ✅ **Financeiro**: Um contrato vigente por condomínio elimina ambiguidades
+- ✅ **Financeiro**: Um contrato vigente por cliente elimina ambiguidades
 - ✅ **Técnico**: Validações em múltiplas camadas (Aplicação + Testes + README)
 - ✅ **Manutenibilidade**: Regras documentadas e testadas facilitam evolução
 
@@ -136,7 +136,7 @@ POST /contratos {"condominioId": "Y", "status": "PAGO"} → 201 Created
 
 1. **Automação**: Incluir essas validações em testes de integração E2E
 2. **Monitoramento**: Adicionar logs estruturados para rastrear violações de regras
-3. **Performance**: Indexar campos `FuncionarioId + Data` para consultas de alocação
+3. **Performance**: Indexar campos `FuncionarioId + Data` para consultas de diária
 4. **UX**: Melhorar mensagens de erro na API para facilitar troubleshooting
 
 ---

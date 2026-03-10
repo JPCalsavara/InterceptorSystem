@@ -10,16 +10,16 @@ namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 public class ContratoAppService : IContratoAppService
 {
     private readonly IContratoRepository _repository;
-    private readonly ICondominioRepository _condominioRepository;
+    private readonly IClienteRepository _clienteRepository;
     private readonly ICurrentTenantService _tenantService;
 
     public ContratoAppService(
         IContratoRepository repository,
-        ICondominioRepository condominioRepository,
+        IClienteRepository clienteRepository,
         ICurrentTenantService tenantService)
     {
         _repository = repository;
-        _condominioRepository = condominioRepository;
+        _clienteRepository = clienteRepository;
         _tenantService = tenantService;
     }
 
@@ -27,19 +27,19 @@ public class ContratoAppService : IContratoAppService
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
-        var condominio = await _condominioRepository.GetByIdAsync(input.CondominioId)
-            ?? throw new KeyNotFoundException("Condomínio não encontrado para o contrato.");
+        var cliente = await _clienteRepository.GetByIdAsync(input.ClienteId)
+            ?? throw new KeyNotFoundException("Cliente não encontrado para o contrato.");
 
-        // Validar se já existe um contrato vigente para este condomínio
-        var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(input.CondominioId);
+        // Validar se já existe um contrato vigente para este cliente
+        var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(input.ClienteId);
         if (existeContratoVigente)
         {
-            throw new InvalidOperationException("Já existe um contrato vigente para este condomínio.");
+            throw new InvalidOperationException("Já existe um contrato vigente para este cliente.");
         }
 
         var contrato = new Contrato(
             empresaId,
-            input.CondominioId,
+            input.ClienteId,
             input.Descricao,
             input.ValorTotalMensal,
             input.ValorDiariaCobrada,
@@ -51,7 +51,8 @@ public class ContratoAppService : IContratoAppService
             input.MargemCoberturaFaltasPercentual,
             input.DataInicio,
             input.DataFim,
-            input.Status);
+            input.Status,
+            input.ValorDiariaVigilante);
 
         _repository.Add(contrato);
         await _repository.UnitOfWork.CommitAsync();
@@ -71,10 +72,10 @@ public class ContratoAppService : IContratoAppService
         if ((input.Status == StatusContrato.ATIVO || input.Status == StatusContrato.PENDENTE) && 
             contrato.Status == StatusContrato.FINALIZADO)
         {
-            var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(contrato.CondominioId, id);
+            var existeContratoVigente = await _repository.ExisteContratoVigenteAsync(contrato.ClienteId, id);
             if (existeContratoVigente)
             {
-                throw new InvalidOperationException("Já existe um contrato vigente para este condomínio.");
+                throw new InvalidOperationException("Já existe um contrato vigente para este cliente.");
             }
         }
 
@@ -89,7 +90,8 @@ public class ContratoAppService : IContratoAppService
             input.MargemLucroPercentual,
             input.MargemCoberturaFaltasPercentual,
             input.DataInicio,
-            input.DataFim);
+            input.DataFim,
+            input.ValorDiariaVigilante);
 
         contrato.AtualizarStatus(input.Status);
 

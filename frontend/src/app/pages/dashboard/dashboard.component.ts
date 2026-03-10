@@ -1,19 +1,19 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CondominioService } from '../../services/condominio.service';
+import { ClienteService } from '../../services/cliente.service';
 import { FuncionarioService } from '../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../services/posto-de-trabalho.service';
-import { AlocacaoService } from '../../services/alocacao.service';
+import { PostoService } from '../../services/posto.service';
+import { DiariaService } from '../../services/diaria.service';
 import { ContratoService } from '../../services/contrato.service';
 import {
-  Condominio,
+  Cliente,
   Funcionario,
-  PostoDeTrabalho,
-  Alocacao,
+  Posto,
+  Diaria,
   Contrato,
   StatusContrato,
-  StatusAlocacao,
+  StatusDiaria,
   StatusFuncionario,
 } from '../../models/index';
 
@@ -42,16 +42,17 @@ interface MetricaFinanceira {
 
 interface ContratoProximoVencimento {
   id: string;
-  condominioNome: string;
+  clienteNome: string;
   dataFim: string;
   diasRestantes: number;
   valorTotalMensal: number;
 }
 
-interface CondominioCard {
+interface ClienteCard {
   id: string;
   nome: string;
-  cnpj: string;
+  cidade: string;
+  estado: string;
   ativo: boolean;
   faturamentoMensal: number;
   custoEstimado: number;
@@ -67,9 +68,9 @@ interface CondominioCard {
 interface FuncionarioRanking {
   id: string;
   nome: string;
-  condominioNome: string;
+  clienteNome: string;
   tipoFuncionario: string;
-  alocacoesNoMes: number;
+  diariasNoMes: number;
   faltasNoMes: number;
   taxaPresenca: number; // 0-100
   salarioTotal?: number;
@@ -83,21 +84,21 @@ interface FuncionarioRanking {
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private diariaService = inject(DiariaService);
   private contratoService = inject(ContratoService);
 
-  condominios = signal<Condominio[]>([]);
+  clientes = signal<Cliente[]>([]);
   funcionarios = signal<Funcionario[]>([]);
-  postos = signal<PostoDeTrabalho[]>([]);
-  alocacoes = signal<Alocacao[]>([]);
+  postos = signal<Posto[]>([]);
+  diarias = signal<Diaria[]>([]);
   contratos = signal<Contrato[]>([]);
 
   loading = signal(true);
 
-  // Mês atual para filtrar alocações
+  // Mês atual para filtrar diárias
   private get mesAtual(): { inicio: Date; fim: Date } {
     const hoje = new Date();
     const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -160,17 +161,17 @@ export class DashboardComponent implements OnInit {
     ];
   });
 
-  // Cards de condomínio com dados financeiros do contrato
-  condominioCards = computed<CondominioCard[]>(() => {
-    return this.condominios()
+  // Cards de cliente com dados financeiros do contrato
+  clienteCards = computed<ClienteCard[]>(() => {
+    return this.clientes()
       .map((cond) => {
         const contrato = this.contratos().find(
           (c) =>
-            c.condominioId === cond.id &&
+            c.clienteId === cond.id &&
             (c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE),
         );
         const funcionariosCond = this.funcionarios().filter(
-          (f) => f.condominioId === cond.id && f.statusFuncionario === StatusFuncionario.ATIVO,
+          (f) => f.clienteId === cond.id && f.statusFuncionario === StatusFuncionario.ATIVO,
         );
 
         let diasParaVencimento: number | null = null;
@@ -199,7 +200,8 @@ export class DashboardComponent implements OnInit {
         return {
           id: cond.id,
           nome: cond.nome,
-          cnpj: cond.cnpj,
+          cidade: cond.cidade,
+          estado: cond.estado,
           ativo: cond.ativo,
           faturamentoMensal: contrato?.valorTotalMensal ?? 0,
           custoEstimado,
@@ -219,7 +221,7 @@ export class DashboardComponent implements OnInit {
   funcionariosRanking = computed<FuncionarioRanking[]>(() => {
     const { inicio, fim } = this.mesAtual;
 
-    const alocacoesMes = this.alocacoes().filter((a) => {
+    const diariasMes = this.diarias().filter((a) => {
       const data = new Date(a.data);
       return data >= inicio && data <= fim;
     });
@@ -227,31 +229,31 @@ export class DashboardComponent implements OnInit {
     return this.funcionarios()
       .filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
       .map((func) => {
-        const alocacoesFuncionario = alocacoesMes.filter((a) => a.funcionarioId === func.id);
-        const confirmadas = alocacoesFuncionario.filter(
-          (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+        const diariasFuncionario = diariasMes.filter((a) => a.funcionarioId === func.id);
+        const confirmadas = diariasFuncionario.filter(
+          (a) => a.statusDiaria === StatusDiaria.CONFIRMADA,
         ).length;
-        const faltas = alocacoesFuncionario.filter(
-          (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
+        const faltas = diariasFuncionario.filter(
+          (a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
         ).length;
-        const total = alocacoesFuncionario.length;
+        const total = diariasFuncionario.length;
         const taxaPresenca = total > 0 ? Math.round((confirmadas / total) * 100) : 100;
 
-        const condominio = this.condominios().find((c) => c.id === func.condominioId);
+        const cliente = this.clientes().find((c) => c.id === func.clienteId);
 
         return {
           id: func.id,
           nome: func.nome,
-          condominioNome: condominio?.nome ?? 'Desconhecido',
+          clienteNome: cliente?.nome ?? 'Desconhecido',
           tipoFuncionario: func.tipoFuncionario,
-          alocacoesNoMes: total,
+          diariasNoMes: total,
           faltasNoMes: faltas,
           taxaPresenca,
           salarioTotal: func.salarioTotal,
         };
       })
-      .filter((f) => f.alocacoesNoMes > 0)
-      .sort((a, b) => b.alocacoesNoMes - a.alocacoesNoMes);
+      .filter((f) => f.diariasNoMes > 0)
+      .sort((a, b) => b.diariasNoMes - a.diariasNoMes);
   });
 
   // Top 5 com mais trabalhos
@@ -275,10 +277,10 @@ export class DashboardComponent implements OnInit {
         const diasRestantes = Math.ceil(
           (dataFim.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24),
         );
-        const condominio = this.condominios().find((cond) => cond.id === c.condominioId);
+        const cliente = this.clientes().find((cond) => cond.id === c.clienteId);
         return {
           id: c.id,
-          condominioNome: condominio?.nome || 'Desconhecido',
+          clienteNome: cliente?.nome || 'Desconhecido',
           dataFim: c.dataFim,
           diasRestantes,
           valorTotalMensal: c.valorTotalMensal,
@@ -295,19 +297,19 @@ export class DashboardComponent implements OnInit {
   loadAllData(): void {
     this.loading.set(true);
     Promise.all([
-      this.loadCondominios(),
+      this.loadClientes(),
       this.loadFuncionarios(),
       this.loadPostos(),
-      this.loadAlocacoes(),
+      this.loadDiarias(),
       this.loadContratos(),
     ]).finally(() => this.loading.set(false));
   }
 
-  loadCondominios(): Promise<void> {
+  loadClientes(): Promise<void> {
     return new Promise((resolve) => {
-      this.condominioService.getAll().subscribe({
+      this.clienteService.getAll().subscribe({
         next: (data) => {
-          this.condominios.set(data);
+          this.clientes.set(data);
           resolve();
         },
         error: () => resolve(),
@@ -339,11 +341,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  loadAlocacoes(): Promise<void> {
+  loadDiarias(): Promise<void> {
     return new Promise((resolve) => {
-      this.alocacaoService.getAll().subscribe({
+      this.diariaService.getAll().subscribe({
         next: (data) => {
-          this.alocacoes.set(data);
+          this.diarias.set(data);
           resolve();
         },
         error: () => resolve(),

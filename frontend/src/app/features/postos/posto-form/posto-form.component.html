@@ -15,8 +15,8 @@
       <p class="subtitle">
         {{
           isEditMode()
-            ? 'Atualize as configurações do turno'
-            : 'Preencha os dados para cadastrar um novo posto de trabalho'
+            ? 'Atualize a localização do posto'
+            : 'Preencha os dados do local de trabalho do cliente'
         }}
       </p>
     </div>
@@ -37,115 +37,56 @@
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
     <div class="form-card">
-      <!-- Seção 1: Vinculação -->
       <h3 class="section-title">Vinculação</h3>
-
       <div class="form-row">
         <div class="form-group">
-          <label for="condominioId" class="form-label">
-            Condomínio <span class="required">*</span>
+          <label for="clienteId" class="form-label">
+            Cliente <span class="required">*</span>
           </label>
-          <select
-            id="condominioId"
-            formControlName="condominioId"
-            class="form-input"
-            [class.error]="hasError('condominioId')"
-          >
-            <option value="">Selecione um condomínio</option>
-            @for (cond of condominios(); track cond.id) {
+          <select id="clienteId" formControlName="clienteId" class="form-input" [class.error]="hasError('clienteId')">
+            <option value="">Selecione um cliente</option>
+            @for (cond of clientes(); track cond.id) {
               <option [value]="cond.id">{{ cond.nome }}</option>
             }
           </select>
-          @if (hasError('condominioId')) {
-            <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="contratoId" class="form-label">
-            Contrato <span class="required">*</span>
-          </label>
-          <select
-            id="contratoId"
-            formControlName="contratoId"
-            class="form-input"
-            [class.error]="hasError('contratoId')"
-            [attr.disabled]="!form.get('condominioId')?.value || isEditMode() ? true : null"
-          >
-            <option value="">
-              @if (!form.get('condominioId')?.value) {
-                Selecione um condomínio primeiro
-              } @else if (contratos().length === 0) {
-                Nenhum contrato ativo disponível
-              } @else {
-                Selecione um contrato
-              }
-            </option>
-            @for (c of contratos(); track c.id) {
-              <option [value]="c.id">{{ c.descricao }}</option>
-            }
-          </select>
-          @if (hasError('contratoId')) {
-            <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
-          }
-          @if (form.get('condominioId')?.value && contratos().length === 0 && !isEditMode()) {
-            <span class="help-text">Nenhum contrato ativo. Cadastre um contrato primeiro.</span>
-          }
+          @if (hasError('clienteId')) { <span class="error-message">{{ getErrorMessage('clienteId') }}</span> }
         </div>
       </div>
 
-      <!-- Seção 2: Configurações do Turno -->
-      <h3 class="section-title">Configurações do Turno</h3>
+      <h3 class="section-title">Dados do Posto</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome" class="form-label">Nome do Posto <span class="required">*</span></label>
+          <input type="text" id="nome" formControlName="nome" class="form-input" placeholder="Ex: Portaria Principal" />
+          @if (hasError('nome')) { <span class="error-message">{{ getErrorMessage('nome') }}</span> }
+        </div>
+        <div class="form-group">
+          <label for="endereco" class="form-label">Endereço <span class="required">*</span></label>
+          <input type="text" id="endereco" formControlName="endereco" class="form-input" placeholder="Rua..." />
+          @if (hasError('endereco')) { <span class="error-message">{{ getErrorMessage('endereco') }}</span> }
+        </div>
+      </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="horarioInicio" class="form-label">
-            Horário Início <span class="required">*</span>
-          </label>
-          <input
-            type="time"
-            id="horarioInicio"
-            formControlName="horarioInicio"
-            class="form-input"
-            readonly
-          />
-          <span class="help-text">Importado do horário de troca do condomínio</span>
+          <label for="cidade" class="form-label">Cidade <span class="required">*</span></label>
+          <input type="text" id="cidade" formControlName="cidade" class="form-input" placeholder="Sua Cidade" />
+          @if (hasError('cidade')) { <span class="error-message">{{ getErrorMessage('cidade') }}</span> }
         </div>
-
         <div class="form-group">
-          <label for="horarioFim" class="form-label">
-            Horário Fim <span class="required">*</span>
-          </label>
-          <input
-            type="time"
-            id="horarioFim"
-            formControlName="horarioFim"
-            class="form-input"
-            readonly
-          />
-          <span class="help-text">Calculado automaticamente (12h após o início)</span>
+          <label for="estado" class="form-label">Estado <span class="required">*</span></label>
+          <input type="text" id="estado" formControlName="estado" class="form-input" placeholder="UF" maxlength="2" />
+          @if (hasError('estado')) { <span class="error-message">{{ getErrorMessage('estado') }}</span> }
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="checkbox-label">
-          <input type="checkbox" formControlName="permiteDobrarEscala" />
-          <span>Permite Dobrar Escala</span>
-        </label>
-        <span class="help-text">Permite que funcionários façam dobras programadas neste posto</span>
-      </div>
-
-      <!-- Footer -->
       <div class="form-footer">
         <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
         <div class="button-group">
-          <button type="button" class="btn-secondary" routerLink="/postos" [disabled]="loading()">
-            Cancelar
-          </button>
+          <button type="button" class="btn-secondary" routerLink="/postos" [disabled]="loading()">Cancelar</button>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             @if (loading()) {
-              <span class="spinner-small"></span>
-              Salvando...
+              <span class="spinner-small"></span> Salvando...
             } @else {
               {{ isEditMode() ? 'Atualizar' : 'Cadastrar' }} Posto
             }

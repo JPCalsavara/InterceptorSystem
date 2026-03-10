@@ -1,0 +1,999 @@
+<div class="wizard-container">
+  <!-- Header -->
+  <header class="wizard-header">
+    <h1>Novo Cliente Completo</h1>
+    <p class="subtitle">Crie um cliente com contrato e funcionários em 3 passos</p>
+  </header>
+
+  <!-- Progress Indicator -->
+  <div class="progress-container">
+    <div class="progress-steps">
+      @for (step of steps; track step.number) {
+        <div
+          class="step-item"
+          [class.active]="currentStep() === step.number"
+          [class.clickable]="true"
+          (click)="goToStep(step.number)"
+        >
+          <div class="step-circle">
+            @if (currentStep() === step.number) {
+              <div class="step-circle-filled"></div>
+            } @else {
+              <span class="step-number">{{ step.number }}</span>
+            }
+          </div>
+          <div class="step-label">
+            @if (step.icon === 'building-office') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="step-icon-svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+              </svg>
+            } @else if (step.icon === 'document-text') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="step-icon-svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="step-icon-svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+              </svg>
+            }
+            <span class="step-text">{{ step.label }}</span>
+          </div>
+        </div>
+        @if (!$last) {
+          <div class="step-connector" [class.active]="currentStep() > step.number"></div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="error-message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+        </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Step Content -->
+  <div class="wizard-content">
+    <!-- STEP 1: Cliente -->
+    @if (currentStep() === 1) {
+      <div class="step-content">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.2em;height:1.2em">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+        </svg>
+        Dados do Cliente
+      </h2>
+
+        <form [formGroup]="formCliente" class="form-grid">
+          <div class="form-card">
+            <!-- Nome -->
+            <div class="form-group">
+              <label for="nome" class="form-label">
+                Nome do Cliente <span class="required">*</span>
+              </label>
+              <input
+                id="nome"
+                type="text"
+                formControlName="nome"
+                class="form-input"
+                [class.error]="hasError('nome')"
+                placeholder="Ex: Cliente Horizonte Verde"
+              />
+              @if (hasError('nome')) {
+                <span class="error-message">{{ getErrorMessage('nome') }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <!-- Cidade -->
+              <div class="form-group">
+                <label for="cidade" class="form-label"> Cidade <span class="required">*</span> </label>
+                <input
+                  id="cidade"
+                  type="text"
+                  formControlName="cidade"
+                  class="form-input"
+                  [class.error]="hasError('cidade')"
+                  placeholder="Ex: São Paulo"
+                />
+                @if (hasError('cidade')) {
+                  <span class="error-message">{{ getErrorMessage('cidade') }}</span>
+                }
+              </div>
+
+              <!-- Estado -->
+              <div class="form-group" style="flex: 0 0 120px">
+                <label for="estado" class="form-label"> UF <span class="required">*</span> </label>
+                <input
+                  id="estado"
+                  type="text"
+                  formControlName="estado"
+                  class="form-input"
+                  [class.error]="hasError('estado')"
+                  placeholder="SP"
+                  maxlength="2"
+                  style="text-transform: uppercase"
+                />
+                @if (hasError('estado')) {
+                  <span class="error-message">{{ getErrorMessage('estado') }}</span>
+                }
+              </div>
+            </div>
+
+            <h3 class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              Configurações Operacionais
+            </h3>
+
+            <!-- Número de Postos e Funcionários por Posto -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="numeroPostos" class="form-label">
+                  Número de Postos (Slots) <span class="required">*</span>
+                </label>
+                <input
+                  id="numeroPostos"
+                  type="number"
+                  formControlName="numeroPostos"
+                  class="form-input"
+                  [class.error]="hasError('numeroPostos')"
+                  placeholder="Ex: 2"
+                  min="2"
+                  max="4"
+                />
+                @if (hasError('numeroPostos')) {
+                  <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
+                }
+                <span class="help-text">2 = 12x36, 3 = 8h, 4 = 6h</span>
+              </div>
+            </div>
+
+            <!-- Email Gestor e Telefone Emergência -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
+                <input
+                  id="emailGestor"
+                  type="email"
+                  formControlName="emailGestor"
+                  class="form-input"
+                  [class.error]="hasError('emailGestor')"
+                  placeholder="gestor@cliente.com.br"
+                />
+                @if (hasError('emailGestor')) {
+                  <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
+                <input
+                  id="telefoneEmergencia"
+                  type="tel"
+                  formControlName="telefoneEmergencia"
+                  class="form-input"
+                  [class.error]="hasError('telefoneEmergencia')"
+                  placeholder="(11) 98765-4321"
+                  maxlength="15"
+                  (input)="formatarTelefone($event)"
+                />
+                @if (hasError('telefoneEmergencia')) {
+                  <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
+                }
+                <span class="help-text">Digite apenas números</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- STEP 2: Contrato (Opcional) -->
+    @if (currentStep() === 2) {
+      <div class="step-content">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.2em;height:1.2em">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+        Contrato (Opcional)
+      </h2>
+
+        <form [formGroup]="formContrato" class="form-container">
+          <div class="form-card">
+            <!-- Checkbox para habilitar criação do contrato -->
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="criarContrato" class="checkbox-input" />
+                <span class="checkbox-text">Criar contrato neste momento</span>
+              </label>
+              <span class="help-text">Você pode criar o contrato depois se preferir</span>
+            </div>
+
+            @if (formContrato.get('criarContrato')?.value) {
+              <!-- Descrição -->
+              <div class="form-group">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea
+                  id="descricao"
+                  formControlName="descricao"
+                  class="form-input"
+                  [class.error]="
+                    formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched
+                  "
+                  rows="3"
+                  placeholder="Ex: Contrato de prestação de serviços de vigilância"
+                ></textarea>
+                @if (
+                  formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched
+                ) {
+                  <span class="error-message">Descrição é obrigatória</span>
+                }
+              </div>
+
+              <!-- Valores Base -->
+              <h3 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                </svg>
+                Valores Base
+              </h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="valorDiariaCobrada" class="form-label">
+                    Valor Diária por Funcionário (R$) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="valorDiariaCobrada"
+                    type="number"
+                    formControlName="valorDiariaCobrada"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('valorDiariaCobrada')?.invalid &&
+                      formContrato.get('valorDiariaCobrada')?.touched
+                    "
+                    placeholder="Ex: 100.00"
+                    step="0.01"
+                    min="0.01"
+                  />
+                  @if (
+                    formContrato.get('valorDiariaCobrada')?.invalid &&
+                    formContrato.get('valorDiariaCobrada')?.touched
+                  ) {
+                    <span class="error-message"
+                      >Valor da diária é obrigatório e deve ser maior que zero</span
+                    >
+                  }
+                  <span class="help-text"
+                    >Valor cobrado por dia de trabalho de cada funcionário</span
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="quantidadeFuncionarios" class="form-label">
+                    Quantidade de Funcionários <span class="required">*</span>
+                  </label>
+                  <input
+                    id="quantidadeFuncionarios"
+                    type="number"
+                    [value]="quantidadeTotalFuncionarios()"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text">
+                    Calculado baseado no número de postos (slots):
+                    {{ formCliente.get('numeroPostos')?.value || 0 }} total
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="numeroDePostos" class="form-label">
+                    Número de Postos de Trabalho <span class="required">*</span>
+                  </label>
+                  <input
+                    id="numeroDePostos"
+                    type="number"
+                    [value]="formCliente.get('numeroPostos')?.value || 0"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text"> Importado do cliente (Step 1) </span>
+                </div>
+
+                <div class="form-group">
+                  <label for="valorBeneficiosExtrasMensal" class="form-label">
+                    Benefícios Extras Mensais (R$) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="valorBeneficiosExtrasMensal"
+                    type="number"
+                    formControlName="valorBeneficiosExtrasMensal"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('valorBeneficiosExtrasMensal')?.invalid &&
+                      formContrato.get('valorBeneficiosExtrasMensal')?.touched
+                    "
+                    placeholder="Ex: 350.00"
+                    step="0.01"
+                    min="0"
+                  />
+                  @if (
+                    formContrato.get('valorBeneficiosExtrasMensal')?.invalid &&
+                    formContrato.get('valorBeneficiosExtrasMensal')?.touched
+                  ) {
+                    <span class="error-message">Benefícios extras são obrigatórios</span>
+                  }
+                  <span class="help-text"
+                    >Vale-transporte, vale-alimentação, plano de saúde, etc.</span
+                  >
+                </div>
+              </div>
+
+              <!-- Percentuais e Margens -->
+              <h3 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                </svg>
+                Percentuais e Margens
+              </h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="percentualAdicionalNoturno" class="form-label">
+                    Adicional Noturno (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="percentualAdicionalNoturno"
+                    type="number"
+                    formControlName="percentualAdicionalNoturno"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualAdicionalNoturno')?.invalid &&
+                      formContrato.get('percentualAdicionalNoturno')?.touched
+                    "
+                    placeholder="Ex: 20.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualAdicionalNoturno')?.invalid &&
+                    formContrato.get('percentualAdicionalNoturno')?.touched
+                  ) {
+                    <span class="error-message">Adicional noturno é obrigatório</span>
+                  }
+                  <span class="help-text"
+                    >Adicional obrigatório por CLT (Art. 73). Mínimo legal: 20%</span
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="percentualImpostos" class="form-label">
+                    Encargos e Provisões (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="percentualImpostos"
+                    type="number"
+                    formControlName="percentualImpostos"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualImpostos')?.invalid &&
+                      formContrato.get('percentualImpostos')?.touched
+                    "
+                    placeholder="Ex: 15.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualImpostos')?.invalid &&
+                    formContrato.get('percentualImpostos')?.touched
+                  ) {
+                    <span class="error-message">Percentual de encargos e provisões é obrigatório</span>
+                  }
+                  <span class="help-text">INSS, FGTS, PIS, etc. Recomendado: 15%</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="margemLucroPercentual" class="form-label">
+                    Margem de Lucro (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="margemLucroPercentual"
+                    type="number"
+                    formControlName="percentualMargemLucro"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualMargemLucro')?.invalid &&
+                      formContrato.get('percentualMargemLucro')?.touched
+                    "
+                    placeholder="Ex: 15.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualMargemLucro')?.invalid &&
+                    formContrato.get('percentualMargemLucro')?.touched
+                  ) {
+                    <span class="error-message">Margem de lucro é obrigatória</span>
+                  }
+                  <span class="help-text">Percentual de lucro desejado. Mercado: 10-20%</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="margemCoberturaFaltasPercentual" class="form-label">
+                    Margem Cobertura de Faltas (%) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="margemCoberturaFaltasPercentual"
+                    type="number"
+                    formControlName="percentualMargemFaltas"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('percentualMargemFaltas')?.invalid &&
+                      formContrato.get('percentualMargemFaltas')?.touched
+                    "
+                    placeholder="Ex: 10.00"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  @if (
+                    formContrato.get('percentualMargemFaltas')?.invalid &&
+                    formContrato.get('percentualMargemFaltas')?.touched
+                  ) {
+                    <span class="error-message">Margem de cobertura de faltas é obrigatória</span>
+                  }
+                  <span class="help-text"
+                    >Reserva para cobrir faltas e substituições. Recomendado: 8-12%</span
+                  >
+                </div>
+              </div>
+
+              <!-- Período do Contrato -->
+              <h3 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                </svg>
+                Período do Contrato
+              </h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="dataInicio" class="form-label">
+                    Data de Início <span class="required">*</span>
+                  </label>
+                  <input
+                    id="dataInicio"
+                    type="date"
+                    formControlName="dataInicio"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('dataInicio')?.invalid &&
+                      formContrato.get('dataInicio')?.touched
+                    "
+                  />
+                  @if (
+                    formContrato.get('dataInicio')?.invalid &&
+                    formContrato.get('dataInicio')?.touched
+                  ) {
+                    <span class="error-message">Data de início é obrigatória</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="mesesDuracao" class="form-label">
+                    Duração (meses) <span class="required">*</span>
+                  </label>
+                  <input
+                    id="mesesDuracao"
+                    type="number"
+                    formControlName="mesesDuracao"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('mesesDuracao')?.invalid &&
+                      formContrato.get('mesesDuracao')?.touched
+                    "
+                    placeholder="Ex: 6"
+                    min="1"
+                    max="60"
+                    step="1"
+                  />
+                  @if (
+                    formContrato.get('mesesDuracao')?.invalid &&
+                    formContrato.get('mesesDuracao')?.touched
+                  ) {
+                    <span class="error-message">Duração é obrigatória (1-60 meses)</span>
+                  }
+                  <span class="help-text">Duração do contrato em meses (1-60)</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="dataFim" class="form-label">
+                  Data de Término (Calculada)
+                  @if (calcularDataFim()) {
+                    <span class="duration-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:0.875em;height:0.875em">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                      </svg>
+                      {{ calcularDuracaoMeses() }}
+                    </span>
+                  }
+                </label>
+                <div class="calculated-value">
+                  <span class="value-display">{{ calcularDataFim() }}</span>
+                  <span class="help-text"
+                    >Calculada automaticamente: Data início + Duração em meses</span
+                  >
+                </div>
+              </div>
+
+              <!-- Breakdown de Custos (Resumo Visual) -->
+              <div class="breakdown-section">
+                <h3 class="section-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                  </svg>
+                  Resumo Financeiro Mensal
+                </h3>
+
+                <div class="breakdown-grid">
+                  <div class="breakdown-card">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.5rem;height:1.5rem">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                        </svg>
+                      </span>
+                      <span class="label">Funcionários</span>
+                    </div>
+                    <div class="breakdown-value">{{ quantidadeTotalFuncionarios() }}</div>
+                    <div class="breakdown-detail">
+                      {{ formCliente.get('numeroPostos')?.value || 0 }} postos (slots)
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.5rem;height:1.5rem">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                        </svg>
+                      </span>
+                      <span class="label">Custo Base Real</span>
+                    </div>
+                    <div class="breakdown-value">{{ custoOperacional() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      Salários + Benefícios + Encargos Trabalhistas (65%) + Encargos e Provisões
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card success">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.5rem;height:1.5rem">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                        </svg>
+                      </span>
+                      <span class="label">Lucro Bruto</span>
+                    </div>
+                    <div class="breakdown-value">{{ margemLucro() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('percentualMargemLucro')?.value || 0 }}% sobre o custo
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card warning">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.5rem;height:1.5rem">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                      </span>
+                      <span class="label">Cobertura Faltas</span>
+                    </div>
+                    <div class="breakdown-value">{{ margemFaltas() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('percentualMargemFaltas')?.value || 0 }}% de segurança
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-value">
+                  <div class="total-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                    </svg>
+                    Faturamento Total Mensal
+                  </div>
+                  <div class="total-amount">{{ faturamentoMensal() | currency: 'BRL' }}</div>
+                  <div class="total-detail">Valor cobrado mensalmente do cliente</div>
+                </div>
+
+                <!-- Estimativa por escala -->
+                @if (formContrato.get('valorDiariaCobrada')?.value) {
+                  <div class="escala-estimate">
+                    <h4 class="escala-estimate-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.638 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.12-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z" />
+                    </svg>
+                    Custo estimado por funcionário / mês
+                  </h4>
+                    <div class="escala-estimate-cards">
+                      <div class="escala-card">
+                        <div class="escala-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.5rem;height:1.5rem">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                          </svg>
+                        </div>
+                        <div class="escala-label">12×36</div>
+                        <div class="escala-days">~15 dias</div>
+                        <div class="escala-value">{{ custoEstimado12x36() | currency: 'BRL' }}</div>
+                      </div>
+                      <div class="escala-card">
+                        <div class="escala-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.5rem;height:1.5rem">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                          </svg>
+                        </div>
+                        <div class="escala-label">5×2</div>
+                        <div class="escala-days">~22 dias</div>
+                        <div class="escala-value">{{ custoEstimado5x2() | currency: 'BRL' }}</div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="required-note">
+                <span class="required">*</span> Campos obrigatórios para criar o contrato
+              </div>
+            }
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- STEP 3: Funcionários (Opcional) -->
+    @if (currentStep() === 3) {
+      <div class="step-content">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.2em;height:1.2em">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+        </svg>
+        Funcionários (Opcional)
+      </h2>
+
+        <form [formGroup]="formFuncionarios" class="form-container">
+          <div class="form-card">
+            <!-- Info sobre importação automática -->
+            <div class="info-banner">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <div>
+                <strong>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1em;height:1em;vertical-align:middle">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                </svg>
+                Dados Importados Automaticamente
+              </strong>
+                <p>
+                  O cliente e contrato criados nos passos anteriores serão associados
+                  automaticamente aos funcionários.
+                </p>
+              </div>
+            </div>
+
+            <!-- Lista de Funcionários -->
+            <div class="funcionarios-section">
+              <div class="section-header">
+                <h3 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+                Lista de Funcionários
+              </h3>
+                <button type="button" class="btn-secondary" (click)="addFuncionario()">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Adicionar Funcionário
+                </button>
+              </div>
+
+              @if (funcionarios.length === 0) {
+                <div class="empty-state">
+                  <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"
+                    />
+                  </svg>
+                  <p>Nenhum funcionário adicionado ainda</p>
+                  <span>Clique em "Adicionar Funcionário" para começar ou pule esta etapa</span>
+                </div>
+              }
+
+              <div formArrayName="funcionarios">
+                @for (func of funcionarios.controls; track $index; let i = $index) {
+                  <div class="funcionario-card" [formGroupName]="i">
+                    <div class="card-header">
+                      <h4>Funcionário #{{ i + 1 }}</h4>
+                      <button
+                        type="button"
+                        class="btn-remove"
+                        (click)="removeFuncionario(i)"
+                        title="Remover funcionário"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fill-rule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Dados Pessoais -->
+                    <h5 class="subsection-title">Dados Pessoais</h5>
+
+                    <div class="form-group">
+                      <label [for]="'nome-' + i" class="form-label">
+                        Nome Completo <span class="required">*</span>
+                      </label>
+                      <input
+                        [id]="'nome-' + i"
+                        type="text"
+                        formControlName="nome"
+                        class="form-input"
+                        [class.error]="func.get('nome')?.invalid && func.get('nome')?.touched"
+                        placeholder="Ex: João da Silva Santos"
+                      />
+                      @if (func.get('nome')?.invalid && func.get('nome')?.touched) {
+                        <span class="error-message"
+                          >Nome completo é obrigatório (mín. 3 caracteres)</span
+                        >
+                      }
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label [for]="'cpf-' + i" class="form-label">
+                          CPF <span class="required">*</span>
+                        </label>
+                        <input
+                          [id]="'cpf-' + i"
+                          type="text"
+                          formControlName="cpf"
+                          class="form-input"
+                          [class.error]="func.get('cpf')?.invalid && func.get('cpf')?.touched"
+                          placeholder="000.000.000-00"
+                          maxlength="14"
+                        />
+                        @if (func.get('cpf')?.invalid && func.get('cpf')?.touched) {
+                          <span class="error-message">CPF inválido (formato: 000.000.000-00)</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label [for]="'celular-' + i" class="form-label">Celular</label>
+                        <input
+                          [id]="'celular-' + i"
+                          type="text"
+                          formControlName="celular"
+                          class="form-input"
+                          [class.error]="
+                            func.get('celular')?.invalid && func.get('celular')?.touched
+                          "
+                          placeholder="(00) 00000-0000"
+                          maxlength="15"
+                        />
+                        @if (func.get('celular')?.invalid && func.get('celular')?.touched) {
+                          <span class="error-message">Formato inválido (00) 00000-0000</span>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Dados Profissionais -->
+                    <h5 class="subsection-title">Dados Profissionais</h5>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label [for]="'tipoFuncionario-' + i" class="form-label">
+                          Tipo de Funcionário <span class="required">*</span>
+                        </label>
+                        <select
+                          [id]="'tipoFuncionario-' + i"
+                          formControlName="tipoFuncionario"
+                          class="form-input"
+                          [class.error]="
+                            func.get('tipoFuncionario')?.invalid &&
+                            func.get('tipoFuncionario')?.touched
+                          "
+                        >
+                          <option value="">Selecione</option>
+                          <option value="CLT">CLT (Regime CLT)</option>
+                          <option value="TERCEIRIZADO">Terceirizado</option>
+                          <option value="FREELANCER">Freelancer</option>
+                        </select>
+                        @if (
+                          func.get('tipoFuncionario')?.invalid &&
+                          func.get('tipoFuncionario')?.touched
+                        ) {
+                          <span class="error-message">Tipo de funcionário é obrigatório</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label [for]="'tipoEscala-' + i" class="form-label">
+                          Escala de Trabalho <span class="required">*</span>
+                        </label>
+                        <select
+                          [id]="'tipoEscala-' + i"
+                          formControlName="tipoEscala"
+                          class="form-input"
+                          [class.error]="
+                            func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched
+                          "
+                        >
+                          <option value="">Selecione</option>
+                          <option value="DOZE_POR_TRINTA_SEIS">
+                            12x36 (12h trabalho, 36h descanso)
+                          </option>
+                          <option value="SEMANAL_COMERCIAL">
+                            Semanal Comercial (5x2, 44h/semana)
+                          </option>
+                        </select>
+                        @if (func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched) {
+                          <span class="error-message">Escala de trabalho é obrigatória</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label [for]="'statusFuncionario-' + i" class="form-label">
+                        Status <span class="required">*</span>
+                      </label>
+                      <select
+                        [id]="'statusFuncionario-' + i"
+                        formControlName="statusFuncionario"
+                        class="form-input"
+                        [class.error]="
+                          func.get('statusFuncionario')?.invalid &&
+                          func.get('statusFuncionario')?.touched
+                        "
+                      >
+                        <option value="">Selecione</option>
+                        <option value="ATIVO">Ativo</option>
+                        <option value="FERIAS">Férias</option>
+                        <option value="AFASTADO">Afastado</option>
+                        <option value="DEMITIDO">Demitido</option>
+                      </select>
+                      @if (
+                        func.get('statusFuncionario')?.invalid &&
+                        func.get('statusFuncionario')?.touched
+                      ) {
+                        <span class="error-message">Status é obrigatório</span>
+                      }
+                    </div>
+
+                    <!-- Valores Calculados Automaticamente (Info) -->
+                    <div class="auto-calculated-info">
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      <p>
+                        <strong>Valores salariais serão calculados automaticamente</strong> com
+                        base no contrato vigente do cliente
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Resumo -->
+            @if (funcionarios.length > 0) {
+              <div class="summary-card">
+                <h4>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1em;height:1em;vertical-align:middle">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                </svg>
+                Resumo
+              </h4>
+                <div class="summary-grid">
+                  <div class="summary-item">
+                    <span class="label">Total de Funcionários:</span>
+                    <span class="value">{{ funcionarios.length }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">Funcionários Ativos:</span>
+                    <span class="value success">
+                      {{ contarFuncionariosPorStatus('ATIVO') }}
+                    </span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">CLT:</span>
+                    <span class="value">{{ contarFuncionariosPorTipo('CLT') }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">Terceirizados:</span>
+                    <span class="value">{{ contarFuncionariosPorTipo('TERCEIRIZADO') }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="wizard-footer">
+    <div class="footer-left">
+      <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="loading()">
+        Cancelar
+      </button>
+    </div>
+
+    <div class="footer-right">
+      @if (canGoBack()) {
+        <button type="button" class="btn-back" (click)="previousStep()" [disabled]="loading()">
+          ← Anterior
+        </button>
+      }
+
+      @if (!isLastStep()) {
+        <button
+          type="button"
+          class="btn-next"
+          (click)="nextStep()"
+          [disabled]="!canGoNext() || loading()"
+        >
+          Próximo →
+        </button>
+      } @else {
+        <button type="button" class="btn-finish" (click)="onSubmit()" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner-small"></span>
+            Criando...
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1em;height:1em">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            Finalizar
+          }
+        </button>
+      }
+    </div>
+  </div>
+</div>

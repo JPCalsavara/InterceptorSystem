@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
 import {
   Funcionario,
   StatusFuncionario,
   TipoFuncionario,
   TipoEscala,
-  Condominio,
+  Cliente,
   Contrato,
 } from '../../../models/index';
 
@@ -23,18 +23,18 @@ import {
 })
 export class FuncionarioListComponent implements OnInit {
   private service = inject(FuncionarioService);
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
 
   funcionarios = signal<Funcionario[]>([]);
-  condominios = signal<Condominio[]>([]);
+  clientes = signal<Cliente[]>([]);
   contratos = signal<Contrato[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
   // Filtros
-  filtroCondominio = signal<string>('');
+  filtroCliente = signal<string>('');
   filtroTipo = signal<string>('');
   filtroEscala = signal<string>('');
 
@@ -47,9 +47,9 @@ export class FuncionarioListComponent implements OnInit {
   funcionariosFiltrados = computed(() => {
     let resultado = this.funcionarios();
 
-    const condominioFiltro = this.filtroCondominio();
-    if (condominioFiltro) {
-      resultado = resultado.filter((f) => f.condominioId === condominioFiltro);
+    const clienteFiltro = this.filtroCliente();
+    if (clienteFiltro) {
+      resultado = resultado.filter((f) => f.clienteId === clienteFiltro);
     }
 
     const tipoFiltro = this.filtroTipo();
@@ -67,14 +67,14 @@ export class FuncionarioListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFuncionarios();
-    this.loadCondominios();
+    this.loadClientes();
     this.loadContratos();
   }
 
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => console.error('Erro ao carregar clientes:', err),
     });
   }
 
@@ -166,12 +166,14 @@ export class FuncionarioListComponent implements OnInit {
     const labels = {
       [TipoEscala.DOZE_POR_TRINTA_SEIS]: '12x36',
       [TipoEscala.SEMANAL_COMERCIAL]: 'Semanal',
+      [TipoEscala.ALCALA_8H]: 'Alcalá 8h',
+      [TipoEscala.FOLGUISTA]: 'Folguista',
     };
     return labels[escala] || 'Desconhecido';
   }
 
-  getCondominioNome(condominioId: string): string {
-    const cond = this.condominios().find((c) => c.id === condominioId);
+  getClienteNome(clienteId: string): string {
+    const cond = this.clientes().find((c) => c.id === clienteId);
     return cond?.nome || 'Não atribuído';
   }
 
@@ -189,7 +191,7 @@ export class FuncionarioListComponent implements OnInit {
   }
 
   limparFiltros(): void {
-    this.filtroCondominio.set('');
+    this.filtroCliente.set('');
     this.filtroTipo.set('');
     this.filtroEscala.set('');
   }
@@ -197,7 +199,9 @@ export class FuncionarioListComponent implements OnInit {
   getSalarioSimuladoMensal(func: Funcionario): number {
     const contrato = this.contratos().find((c) => c.id === func.contratoId);
     if (!contrato) return 0;
-    const diasMedio = func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : 22;
+    let diasMedio = 22;
+    if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
+    else if (func.tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8; // Arbitrary for simulation
     return (
       diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
     );

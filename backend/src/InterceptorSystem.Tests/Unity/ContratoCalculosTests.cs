@@ -9,19 +9,35 @@ namespace InterceptorSystem.Tests.Unity;
 /// </summary>
 public class ContratoCalculosTests
 {
+    /// <summary>
+    /// Popula a coleção Funcionarios no Contrato com N funcionários dummy.
+    /// Necessário porque QuantidadeFuncionarios = Math.Max(1, Funcionarios.Count).
+    /// </summary>
+    private static void PopularFuncionarios(Contrato contrato, int quantidade = 12)
+    {
+        var empresaId = contrato.EmpresaId;
+        for (int i = 0; i < quantidade; i++)
+        {
+            var func = new Funcionario(
+                empresaId, Guid.NewGuid(), contrato.Id,
+                $"Func {i}", $"{i:00000000000}", "11999999999",
+                StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+            contrato.Funcionarios.Add(func);
+        }
+    }
     [Fact]
     public void CalcularSalarioBase_DeveConsiderarTodasAsMargens()
     {
         // Arrange - Cenário realista
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
-        // Criar condomínio (necessário para calcular QuantidadeFuncionarios)
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
+        // Criar cliente (necessário para calcular QuantidadeFuncionarios)
+        var cliente = new Cliente(empresaId, "Residencial Teste", "00000000000000", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Contrato Teste",
             valorTotalMensal: 72000m,
             valorDiariaCobrada: 100m,
@@ -37,7 +53,8 @@ public class ContratoCalculosTests
         );
         
         // Simular navegação (normalmente feita pelo EF Core)
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, cliente);
+        PopularFuncionarios(contrato, 12);
 
         // Act
         var salarioBase = contrato.CalcularSalarioBasePorFuncionario();
@@ -58,14 +75,14 @@ public class ContratoCalculosTests
     {
         // Arrange - Mesmo valor total mas SEM margens
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
-        // Criar condomínio (necessário para calcular QuantidadeFuncionarios)
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
+        // Criar cliente (necessário para calcular QuantidadeFuncionarios)
+        var cliente = new Cliente(empresaId, "Residencial Teste", "00000000000000", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Sem Margens",
             valorTotalMensal: 72000m,
             valorDiariaCobrada: 100m,
@@ -81,7 +98,8 @@ public class ContratoCalculosTests
         );
         
         // Simular navegação (normalmente feita pelo EF Core)
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, cliente);
+        PopularFuncionarios(contrato, 12);
 
         // Act
         var salarioBase = contrato.CalcularSalarioBasePorFuncionario();
@@ -97,13 +115,13 @@ public class ContratoCalculosTests
     {
         // Arrange - Margens muito altas para o valor total
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
+        var cliente = new Cliente(empresaId, "Residencial Teste", "00000000000000", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Margens Altas Demais",
             valorTotalMensal: 1000m,                // Valor muito baixo
             valorDiariaCobrada: 100m,
@@ -118,7 +136,8 @@ public class ContratoCalculosTests
             status: StatusContrato.ATIVO
         );
         
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, cliente);
+        PopularFuncionarios(contrato, 12);
 
         // Act & Assert
         // (1000 - 150 - 200 - 100 - 900) = -350 (negativo!)
@@ -135,11 +154,11 @@ public class ContratoCalculosTests
     {
         // Arrange
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Adicional Noturno",
             valorTotalMensal: 10000m,
             valorDiariaCobrada: 100m,
@@ -169,13 +188,13 @@ public class ContratoCalculosTests
     {
         // Arrange
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
+        var cliente = new Cliente(empresaId, "Residencial Teste", "00000000000000", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Benefícios",
             valorTotalMensal: 10000m,
             valorDiariaCobrada: 100m,
@@ -190,7 +209,8 @@ public class ContratoCalculosTests
             status: StatusContrato.ATIVO
         );
         
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, cliente);
+        PopularFuncionarios(contrato, 12);
 
         // Act
         var beneficiosPorFuncionario = contrato.CalcularBeneficiosPorFuncionario();
@@ -206,13 +226,13 @@ public class ContratoCalculosTests
         // Arrange - Cenário real documentado
         // Contrato: R$ 72.000/mês para 12 funcionários
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
-        var condominio = new Condominio(empresaId, "Residencial Estrela", "12.345.678/0001-90", "Av. Estrela, 456", 6, TimeSpan.FromHours(6));
+        var cliente = new Cliente(empresaId, "Residencial Estrela", "00000000000000", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Residencial Estrela - Contrato 2026",
             valorTotalMensal: 72000m,
             valorDiariaCobrada: 100m,
@@ -227,7 +247,8 @@ public class ContratoCalculosTests
             status: StatusContrato.ATIVO
         );
         
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, cliente);
+        PopularFuncionarios(contrato, 12);
 
         // Act - Calcular tudo
         var salarioBase = contrato.CalcularSalarioBasePorFuncionario();

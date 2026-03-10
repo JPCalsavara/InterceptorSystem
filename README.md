@@ -4,7 +4,7 @@
 
 ## 📋 Sobre o Projeto
 
-**InterceptorSystem** é uma plataforma SaaS de gestão de segurança patrimonial para condomínios, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **condomínios, funcionários, postos de trabalho, alocações e contratos** com regras de negócio robustas em Clean Architecture. Inclui **autenticação JWT**, **gestão de contas e assinaturas** (FREE/BASIC/PRO), **notificações por e-mail** (SMTP) e **integração WhatsApp** para substituição de alocações via chatbot.
+**InterceptorSystem** é uma plataforma SaaS de gestão de segurança patrimonial para clientes, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **clientes, funcionários, postos de trabalho, diárias e contratos** com regras de negócio robustas em Clean Architecture. Inclui **autenticação JWT**, **gestão de contas e assinaturas** (FREE/BASIC/PRO), **notificações por e-mail** (SMTP) e **integração WhatsApp** para substituição de diárias via chatbot.
 
 ## 🚀 Quick Start
 
@@ -45,18 +45,18 @@ docker compose up -d
 
 ### Backend
 
-- **CRUD completo** para Condomínio, Funcionário, PostoDeTrabalho, Alocação e Contrato
-- **Criação em cascata** via `POST /api/condominios-completos` (Condomínio + Contrato + Postos em 1 request)
+- **CRUD completo** para Cliente, Funcionário, Posto, Diária e Contrato
+- **Criação em cascata** via `POST /api/clientes-completos` (Cliente + Contrato + Postos em 1 request)
 - **Cálculo automático de salário** baseado no contrato vigente
-- **Alocações em lote** via `POST /api/alocacoes/batch`
+- **Diárias em lote** via `POST /api/diarias/batch`
 - **Cálculos financeiros de contrato** via `POST /api/contrato-calculos`
 - **Auto-finalização de contratos** vencidos ao listar
 - **Multi-tenant** com filtros globais por `EmpresaId`
-- **Quantidade ideal de funcionários por posto** calculada do condomínio
+- **Quantidade ideal de funcionários por posto** calculada do cliente
 - **Autenticação JWT** com registro, login, verificação de e-mail e reset de senha
 - **Gestão de contas SaaS** com planos de assinatura (FREE, BASIC, PRO)
 - **Notificações por e-mail** via SMTP (MailKit) — verificação, reset de senha, alteração de e-mail
-- **Integração WhatsApp** via Meta API — chatbot para substituição de alocações
+- **Integração WhatsApp** via Meta API — chatbot para substituição de diárias
 
 ### Frontend
 
@@ -64,14 +64,14 @@ docker compose up -d
 - **Fluxo de autenticação completo**: login, cadastro, esqueci a senha, nova senha, verificação de e-mail
 - **Gestão de conta**: perfil, alteração de dados, seleção de plano
 - **Dashboard financeiro** com análise por período (mensal, trimestral, semestral, anual)
-- **Wizard de criação de condomínio** em 3 steps com validação progressiva
-- **3 modos de visualização de alocações**: Diário (lista), Semanal (kanban), Mensal (calendário)
+- **Wizard de criação de cliente** em 3 steps com validação progressiva
+- **3 modos de visualização de diárias**: Diário (lista), Semanal (kanban), Mensal (calendário)
 - **Dark mode / Light mode** com toggle no navbar e persistência em localStorage
-- **Cálculos em tempo real** nos formulários de contrato e condomínio
+- **Cálculos em tempo real** nos formulários de contrato e cliente
 - **Formulários com máscaras** (ngx-mask): CNPJ, CPF, celular — formatação visual com `dropSpecialCharacters`
-- **Detail de condomínio** com breakdown financeiro completo
-- **Detail de funcionário** com alocações, faltas, salário simulado e projeção de mês completo
-- **Detail de posto de trabalho** com alocações e estatísticas
+- **Detail de cliente** com breakdown financeiro completo
+- **Detail de funcionário** com diárias, faltas, salário simulado e projeção de mês completo
+- **Detail de posto de trabalho** com diárias e estatísticas
 - **Auth Guard** protegendo rotas autenticadas
 - **Auth Interceptor** injetando token JWT em todas as requisições
 
@@ -170,7 +170,7 @@ SMTP__SECURESOCKET=StartTls
 
 ### Integração com Meta (WhatsApp Business API)
 
-O sistema possui um **chatbot WhatsApp** integrado via **Meta Webhook** para processar substituições de alocações de segurança de forma conversacional.
+O sistema possui um **chatbot WhatsApp** integrado via **Meta Webhook** para processar substituições de diárias de segurança de forma conversacional.
 
 | Endpoint              | Método | Descrição                                    |
 | --------------------- | ------ | -------------------------------------------- |
@@ -179,10 +179,10 @@ O sistema possui um **chatbot WhatsApp** integrado via **Meta Webhook** para pro
 
 ### Fluxo Conversacional (Estado da Sessão)
 
-O bot guia o usuário por um fluxo de substituição de alocação:
+O bot guia o usuário por um fluxo de substituição de diária:
 
 ```
-AguardandoCondominio → AguardandoPosto → AguardandoData
+AguardandoCliente → AguardandoPosto → AguardandoData
 → AguardandoFuncionarioSubstituido → AguardandoFuncionarioSubstituto
 → AguardandoConfirmacao → Concluida / Cancelada
 ```
@@ -192,8 +192,8 @@ AguardandoCondominio → AguardandoPosto → AguardandoData
 
 ### Ranking de Substitutos (`SubstitutoRankerService`)
 
-- Funcionário deve estar `ATIVO` e sem alocação no dia
-- Score = quantidade de alocações nos últimos 30 dias (menos = mais disponível)
+- Funcionário deve estar `ATIVO` e sem diária no dia
+- Score = quantidade de diárias nos últimos 30 dias (menos = mais disponível)
 - Indicador de disponibilidade: Alta / Média / Baixa
 
 ### Entidade `SessaoWhatsapp`
@@ -216,26 +216,26 @@ META__PHONENUMBERID=seu-phone-number-id
 
 ## 📐 Regras de Negócio por Entidade
 
-### Condomínio
+### Cliente
 
 | Regra                | Descrição                                                                  |
 | -------------------- | -------------------------------------------------------------------------- |
-| CNPJ único           | Não pode haver dois condomínios com o mesmo CNPJ na mesma empresa          |
+| CNPJ único           | Não pode haver dois clientes com o mesmo CNPJ na mesma empresa          |
 | Configs operacionais | `QuantidadeIdealPorTurno`, `HorarioTrocaTurno`, `EmailGestor` obrigatórios |
 | Base para postos     | Horário de troca define turnos criados automaticamente                     |
 
 ```
-✅ Criar condomínio com 6 funcionários ideais por turno → Status 201
-❌ CNPJ duplicado → "Já existe um condomínio cadastrado com este CNPJ" (409)
+✅ Criar cliente com 6 funcionários ideais por turno → Status 201
+❌ CNPJ duplicado → "Já existe um cliente cadastrado com este CNPJ" (409)
 ❌ QuantidadeIdealPorTurno ≤ 0 → Validação falha (400)
 ```
 
-### PostoDeTrabalho
+### Posto
 
 | Regra                     | Descrição                                                                       |
 | ------------------------- | ------------------------------------------------------------------------------- |
 | Turno de 12h              | Diferença entre `HorarioInicio` e `HorarioFim` deve ser exatamente 12 horas     |
-| Vinculado ao condomínio   | `CondominioId` obrigatório e deve pertencer à mesma empresa                     |
+| Vinculado ao cliente   | `ClienteId` obrigatório e deve pertencer à mesma empresa                     |
 | Vinculado ao contrato     | `ContratoId` obrigatório — contrato deve estar `ATIVO` ou `PENDENTE`            |
 | Limite de postos          | Não pode exceder `Contrato.NumeroDePostos` postos por contrato                  |
 | Permite dobra de escala   | `PermiteDobrarEscala` define se funcionários podem fazer dobra                  |
@@ -254,13 +254,13 @@ META__PHONENUMBERID=seu-phone-number-id
 | CPF único                           | Não pode haver dois funcionários com mesmo CPF                                                       |
 | Vínculo obrigatório com contrato    | Todo funcionário deve ter `ContratoId` apontando para contrato `ATIVO`                               |
 | Salários calculados automaticamente | `SalarioBase`, `AdicionalNoturno` e `Beneficios` derivados do contrato                               |
-| Adicional noturno por horário       | Baseado em `PostoDeTrabalho.TemHorarioNoturno` — turno que passa pelo intervalo 22h–5h (CLT Art. 73) |
+| Adicional noturno por horário       | Baseado em `Posto.TemHorarioNoturno` — turno que passa pelo intervalo 22h–5h (CLT Art. 73) |
 
 **Fórmula de Salário:**
 
 ```
 SalarioBase        = Contrato.ValorTotalMensal / Contrato.QuantidadeFuncionarios
-AdicionalNoturno   = SalarioBase × Contrato.PercentualAdicionalNoturno  (se PostoDeTrabalho.TemHorarioNoturno = true, i.e., turno passa por 22h–5h)
+AdicionalNoturno   = SalarioBase × Contrato.PercentualAdicionalNoturno  (se Posto.TemHorarioNoturno = true, i.e., turno passa por 22h–5h)
 Beneficios         = Contrato.ValorBeneficiosExtrasMensal / Contrato.QuantidadeFuncionarios
 SalarioTotal       = SalarioBase + AdicionalNoturno + Beneficios
 ```
@@ -272,52 +272,52 @@ SalarioTotal       = SalarioBase + AdicionalNoturno + Beneficios
 ❌ Contrato FINALIZADO → "Contrato não está vigente" (400)
 ```
 
-### Alocação
+### Diária
 
 | Regra                     | Descrição                                                    |
 | ------------------------- | ------------------------------------------------------------ |
-| Mesmo condomínio          | Funcionário e posto devem ser do mesmo condomínio            |
-| Sem alocações simultâneas | Uma alocação por funcionário por data                        |
+| Mesmo cliente          | Funcionário e posto devem ser do mesmo cliente            |
+| Sem diárias simultâneas | Uma diária por funcionário por data                        |
 | Sem dias consecutivos     | Bloqueado exceto para `DOBRA_PROGRAMADA`                     |
 | Descanso pós-dobra        | Após dobra programada, obrigatório descansar no dia seguinte |
 
 ```
-✅ Alocação REGULAR 10/01 → Criada
-❌ Mesma pessoa 10/01 e 11/01 REGULAR → "Não é permitido alocações em dias consecutivos" (400)
+✅ Diária REGULAR 10/01 → Criada
+❌ Mesma pessoa 10/01 e 11/01 REGULAR → "Não é permitido diárias em dias consecutivos" (400)
 ✅ Mesma pessoa 10/01 REGULAR + 11/01 DOBRA_PROGRAMADA → Permitido
-❌ Após DOBRA, nova alocação no dia seguinte → "Funcionário deve descansar após dobra" (400)
-❌ Funcionário Cond. A em Posto Cond. B → "Devem pertencer ao mesmo condomínio" (400)
+❌ Após DOBRA, nova diária no dia seguinte → "Funcionário deve descansar após dobra" (400)
+❌ Funcionário Cond. A em Posto Cond. B → "Devem pertencer ao mesmo cliente" (400)
 ```
 
 ### Contrato
 
 | Regra                            | Descrição                                                                                         |
 | -------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Um vigente por condomínio        | Máximo 1 contrato `ATIVO` ou `PENDENTE` por condomínio                                            |
+| Um vigente por cliente        | Máximo 1 contrato `ATIVO` ou `PENDENTE` por cliente                                            |
 | Auto-finalização                 | Contratos com `DataFim` vencida são marcados `FINALIZADO` no GetAll                               |
 | Período válido                   | `DataFim` > `DataInicio`                                                                          |
 | Status                           | `ATIVO` → `PENDENTE` → `FINALIZADO`                                                               |
-| QuantidadeFuncionarios calculado | `[NotMapped]` — derivado de `Condominio.QuantidadeIdealPorTurno × NumeroDePostos`, não persistido |
+| QuantidadeFuncionarios calculado | `[NotMapped]` — derivado de `Cliente.QuantidadeIdealPorTurno × NumeroDePostos`, não persistido |
 
 **Fórmula de Cálculo do Valor Total:**
 
 ```
-QuantidadeFuncionarios = Condominio.QuantidadeIdealPorTurno × NumeroDePostos
+QuantidadeFuncionarios = Cliente.QuantidadeIdealPorTurno × NumeroDePostos
 custoBase    = (ValorDiariaCobrada × 30 × QuantidadeFuncionarios × NumeroDePostos) + ValorBeneficios
 somaMargens  = percentualImpostos + margemLucro + margemCoberturaFaltas
 valorTotal   = custoBase / (1 - somaMargens)
 ```
 
 ```
-✅ Contrato único por condomínio → Criado
-❌ Segundo contrato ATIVO no mesmo condomínio → "Já existe contrato vigente" (409)
+✅ Contrato único por cliente → Criado
+❌ Segundo contrato ATIVO no mesmo cliente → "Já existe contrato vigente" (409)
 ✅ Contrato FINALIZADO + novo ATIVO → Permitido
 ✅ Contrato expirado → Marcado FINALIZADO automaticamente no next GetAll
 ```
 
-### Criação em Cascata (`POST /api/condominios-completos`)
+### Criação em Cascata (`POST /api/clientes-completos`)
 
-Cria Condomínio + Contrato + Postos em **1 único request**.
+Cria Cliente + Contrato + Postos em **1 único request**.
 
 | Regra            | Descrição                                                       |
 | ---------------- | --------------------------------------------------------------- |
@@ -326,9 +326,9 @@ Cria Condomínio + Contrato + Postos em **1 único request**.
 | Horários automáticos | `24h / NumeroDePostos` por turno                            |
 
 ```json
-POST /api/condominios-completos
+POST /api/clientes-completos
 {
-  "condominio": {
+  "cliente": {
     "nome": "Residencial Estrela",
     "cnpj": "12.345.678/0001-90",
     "endereco": "Rua das Flores, 123",
@@ -350,8 +350,8 @@ POST /api/condominios-completos
 ```
 
 ```
-✅ 1 request → Condomínio + Contrato + Postos criados
-✅ POST /api/condominios-completos/validar → Dry-run (não persiste)
+✅ 1 request → Cliente + Contrato + Postos criados
+✅ POST /api/clientes-completos/validar → Dry-run (não persiste)
 ❌ Quantidades inconsistentes → Erro 400
 ❌ Não divisível → Erro 400
 ```
@@ -374,7 +374,7 @@ InterceptorSystem.Tests/          → Unity + Integration tests
 
 | Módulo            | Descrição                                                    |
 | ----------------- | ------------------------------------------------------------ |
-| `Administrativo`  | Condomínio, Funcionário, PostoDeTrabalho, Alocação, Contrato |
+| `Administrativo`  | Cliente, Funcionário, Posto, Diária, Contrato |
 | `Auth`            | Conta (SaaS), TokenVerificacao, PlanoAssinatura              |
 | `Whatsapp`        | SessaoWhatsapp, EstadoConversa                               |
 
@@ -386,11 +386,11 @@ InterceptorSystem.Tests/          → Unity + Integration tests
 | `StatusFuncionario`   | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO`                                |
 | `TipoEscala`          | `DOZE_POR_TRINTA_SEIS`, `SEIS_POR_UM`                                    |
 | `TipoFuncionario`     | `CLT`, `TERCEIRIZADO`, `FREELANCE`                                        |
-| `StatusAlocacao`      | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                             |
-| `TipoAlocacao`        | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                             |
+| `StatusDiaria`      | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                             |
+| `TipoDiaria`        | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                             |
 | `PlanoAssinatura`     | `FREE`, `BASIC`, `PRO`                                                    |
 | `TipoTokenVerificacao`| `EmailVerificacao`, `AlteracaoSenha`, `AlteracaoEmail`, `VerificacaoTelefone` |
-| `EstadoConversa`      | `AguardandoCondominio`, `AguardandoPosto`, `AguardandoData`, `AguardandoFuncionarioSubstituido`, `AguardandoFuncionarioSubstituto`, `AguardandoConfirmacao`, `Concluida`, `Cancelada` |
+| `EstadoConversa`      | `AguardandoCliente`, `AguardandoPosto`, `AguardandoData`, `AguardandoFuncionarioSubstituido`, `AguardandoFuncionarioSubstituto`, `AguardandoConfirmacao`, `Concluida`, `Cancelada` |
 
 ### Frontend (Angular 21 Standalone)
 
@@ -399,12 +399,12 @@ core/
   guards/            → auth.guard.ts
   interceptors/      → auth.interceptor.ts
 features/
-  condominios/       → list/, form/, detail/, condominio-wizard/
+  clientes/       → list/, form/, detail/, cliente-wizard/
   funcionarios/      → list/, form/, detail/
   contratos/         → list/, form/
   postos/            → list/, form/, detail/
-  alocacoes/         → list/, form/, detail/
-services/            → comunicação com API (auth, condominios, contratos, etc.)
+  diarias/         → list/, form/, detail/
+services/            → comunicação com API (auth, clientes, contratos, etc.)
 models/              → interfaces TypeScript (alinhados com DTOs)
 shared/              → navbar, sidebar, layout
 pages/               → landing, login, cadastro, esqueci-senha, nova-senha,
@@ -571,13 +571,13 @@ InterceptorSystem/
 │       │       ├── AuthController.cs
 │       │       ├── ContaController.cs
 │       │       ├── WhatsappWebhookController.cs
-│       │       ├── CondominioController.cs
-│       │       ├── CondominiosCompletosController.cs
+│       │       ├── ClienteController.cs
+│       │       ├── ClientesCompletosController.cs
 │       │       ├── ContratosController.cs
 │       │       ├── ContratoCalculosController.cs
 │       │       ├── FuncionariosController.cs
-│       │       ├── PostosDeTrabalhoController.cs
-│       │       └── AlocacoesController.cs
+│       │       ├── PostosController.cs
+│       │       └── DiariasController.cs
 │       ├── InterceptorSystem.Application/
 │       │   └── Modulos/
 │       │       ├── Administrativo/    → Services, DTOs, Interfaces
@@ -605,8 +605,8 @@ InterceptorSystem/
 │   │   ├── core/
 │   │   │   ├── guards/               → auth.guard.ts
 │   │   │   └── interceptors/         → auth.interceptor.ts
-│   │   ├── features/                 → condominios, funcionarios, contratos,
-│   │   │                               postos, alocacoes
+│   │   ├── features/                 → clientes, funcionarios, contratos,
+│   │   │                               postos, diarias
 │   │   ├── services/                 → auth.service.ts + outros
 │   │   ├── models/                   → interfaces TypeScript
 │   │   ├── shared/                   → navbar, sidebar, layout
@@ -644,13 +644,13 @@ dotnet test --filter "Category=Integration"
 
 | Módulo            | Testes Unitários | Testes de Integração |
 | ----------------- | ---------------- | -------------------- |
-| Condomínio        | ✅               | ✅                   |
-| PostoDeTrabalho   | ✅               | ✅                   |
+| Cliente        | ✅               | ✅                   |
+| Posto   | ✅               | ✅                   |
 | Funcionário       | ✅               | ✅                   |
-| Alocação          | ✅               | ✅                   |
+| Diária          | ✅               | ✅                   |
 | Contrato          | ✅               | ✅                   |
 | Cálculos Contrato | ✅               | ✅                   |
-| Alocações Batch   | ✅               | ✅                   |
+| Diárias Batch   | ✅               | ✅                   |
 | Criação Cascata   | ✅               | ✅                   |
 | Autenticação      | ✅               | ✅                   |
 
@@ -687,18 +687,18 @@ POST   /api/whatsapp/webhook       (recebe mensagens)
 ### Criação em Cascata
 
 ```http
-POST   /api/condominios-completos
-POST   /api/condominios-completos/validar
+POST   /api/clientes-completos
+POST   /api/clientes-completos/validar
 ```
 
 ### CRUD Principal
 
 ```http
-GET/POST/PUT/DELETE  /api/condominios
+GET/POST/PUT/DELETE  /api/clientes
 GET/POST/PUT/DELETE  /api/contratos
 GET/POST/PUT/DELETE  /api/funcionarios
-GET/POST/PUT/DELETE  /api/postos-de-trabalho
-GET/POST/PUT/DELETE  /api/alocacoes
+GET/POST/PUT/DELETE  /api/postos
+GET/POST/PUT/DELETE  /api/diarias
 ```
 
 ### Cálculos
@@ -743,11 +743,11 @@ POST   /api/contrato-calculos/calcular-valor-total
 
 - [ ] Sistema RAG para WhatsApp (atendimento premium)
 - [ ] Agente de suporte ao cliente via LLM + RAG
-- [ ] AI Profiler: eficiência operacional, ausências, alocações dupla vs normal
+- [ ] AI Profiler: eficiência operacional, ausências, diárias dupla vs normal
 
 ### 🔑 Controle de Acesso & Ponto
 
-- [ ] Reconhecimento facial para entrada no condomínio
+- [ ] Reconhecimento facial para entrada no cliente
 - [ ] Reconhecimento facial para batida de ponto (clock-in)
 - [ ] Analytics: ponto planejado vs realizado
 - [ ] Avaliação de funcionários por pontualidade e assiduidade
@@ -763,7 +763,7 @@ POST   /api/contrato-calculos/calcular-valor-total
 - [ ] Exibição de valores mensais ao invés de total anual nos contratos
 - [ ] Cálculo de 13º salário conforme operação
 - [ ] Preview de salário base por tipo de escala (12x36, 5x2)
-- [ ] Configuração específica para terceirizados multi-condomínio
+- [ ] Configuração específica para terceirizados multi-cliente
 
 ---
 

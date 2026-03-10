@@ -7,7 +7,7 @@ namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
 public class Funcionario : Entity, IAggregateRoot
 {
-    public Guid CondominioId { get; private set; }
+    public Guid? ClienteId { get; private set; }
     public Guid ContratoId { get; private set; }
     public string Nome { get; private set; } = null!;
     public string Cpf { get; private set; } = null!;
@@ -16,9 +16,9 @@ public class Funcionario : Entity, IAggregateRoot
     public TipoEscala TipoEscala { get; private set; }
     public TipoFuncionario TipoFuncionario { get; private set; }
 
-    public Condominio? Condominio { get; private set; }
+    public Cliente? Cliente { get; private set; }
     public Contrato? Contrato { get; private set; }
-    public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
+    public ICollection<Diaria> Diarias { get; private set; } = new List<Diaria>();
 
     // FASE 3: Propriedades Calculadas (não persistem no banco)
     
@@ -30,7 +30,7 @@ public class Funcionario : Entity, IAggregateRoot
     
     /// <summary>
     /// Adicional noturno (aplicado quando trabalha em posto noturno - 22h às 5h conforme CLT).
-    /// Verifica se o funcionário possui alocações confirmadas em postos de trabalho com horário noturno.
+    /// Verifica se o funcionário possui diárias confirmadas em postos de trabalho com horário noturno.
     /// CLT Art. 73: Trabalho noturno urbano é o executado entre 22h de um dia e 5h do dia seguinte.
     /// </summary>
     [NotMapped]
@@ -41,13 +41,13 @@ public class Funcionario : Entity, IAggregateRoot
             if (Contrato == null)
                 return 0m;
 
-            // Verifica se tem alocações confirmadas em postos noturnos
-            var temAlocacaoNoturna = Alocacoes
-                .Any(a => a.StatusAlocacao == StatusAlocacao.CONFIRMADA && 
-                         a.PostoDeTrabalho != null && 
-                         a.PostoDeTrabalho.TemHorarioNoturno);
+            // Verifica se tem diárias confirmadas em postos noturnos
+            var temDiariaNoturna = Diarias
+                .Any(a => a.StatusDiaria == StatusDiaria.CONFIRMADA && 
+                         a.Alocacao != null && 
+                         a.Alocacao.TemHorarioNoturno);
 
-            return temAlocacaoNoturna 
+            return temDiariaNoturna 
                 ? Contrato.CalcularAdicionalNoturno(SalarioBase) 
                 : 0m;
         }
@@ -69,7 +69,7 @@ public class Funcionario : Entity, IAggregateRoot
 
     public Funcionario(
         Guid empresaId,
-        Guid condominioId,
+        Guid? clienteId,
         Guid contratoId,
         string nome,
         string cpf,
@@ -79,7 +79,6 @@ public class Funcionario : Entity, IAggregateRoot
         TipoFuncionario tipoFuncionario)
     {
         CheckRule(empresaId == Guid.Empty, "O funcionário deve pertencer a uma empresa.");
-        CheckRule(condominioId == Guid.Empty, "O funcionário deve estar vinculado a um condomínio.");
         CheckRule(contratoId == Guid.Empty, "O funcionário deve estar vinculado a um contrato.");
         CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
         CheckRule(string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
@@ -90,7 +89,7 @@ public class Funcionario : Entity, IAggregateRoot
         CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
 
         EmpresaId = empresaId;
-        CondominioId = condominioId;
+        ClienteId = clienteId;
         ContratoId = contratoId;
         Nome = nome;
         Cpf = ExtrairDigitos(cpf);
