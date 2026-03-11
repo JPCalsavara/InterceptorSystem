@@ -23,6 +23,7 @@ export enum TipoEscala {
   SEMANAL_COMERCIAL = 'SEMANAL_COMERCIAL',
   ALCALA_8H = 'ALCALA_8H',
   FOLGUISTA = 'FOLGUISTA',
+  OITO_HORAS_SEIS_POR_DOIS = 'OITO_HORAS_SEIS_POR_DOIS',
 }
 
 export enum StatusDiaria {

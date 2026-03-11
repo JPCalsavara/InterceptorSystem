@@ -85,30 +85,30 @@ export class ClienteWizardComponent implements OnInit {
   });
 
   // Custo estimado por escala (diária × dias, sem contar benefícios pois varia)
-  custoEstimado12x36 = computed(() => {
+  custoEstimado12x36(): number {
     const postos = this.formContrato?.get('postosConfig')?.value || [];
     const diaria = postos.length > 0 ? (postos[0].valorDiariaCobrada || 0) : 0;
     return 15 * diaria;
-  });
+  }
 
-  custoEstimado5x2 = computed(() => {
+  custoEstimado5x2(): number {
     const postos = this.formContrato?.get('postosConfig')?.value || [];
     const diaria = postos.length > 0 ? (postos[0].valorDiariaCobrada || 0) : 0;
     return 22 * diaria;
-  });
+  }
 
-  totalFuncionariosPorPostos = computed(() => {
+  totalFuncionariosPorPostos(): number {
     return this.funcionarios?.length || 0;
-  });
+  }
 
-  quantidadeTotalFuncionarios = computed(() => {
+  quantidadeTotalFuncionarios(): number {
     const postos = this.formContrato?.get('postosConfig')?.value || [];
     let total = 0;
     for (const posto of postos) {
       total += (posto.quantidadeAlocacoes || 0) * (posto.quantidadeFuncionariosPorAlocacao || 0);
     }
     return total;
-  });
+  }
 
   ngOnInit(): void {
     this.buildForms();
