@@ -203,6 +203,7 @@ export class FuncionarioListComponent implements OnInit {
     let diasMedio = 22;
     if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
     else if (func.tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8; // Arbitrary for simulation
+    else if (func.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) diasMedio = 26;
     return (
       diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
     );
