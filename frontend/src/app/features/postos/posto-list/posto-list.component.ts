@@ -140,21 +140,6 @@ export class PostoListComponent implements OnInit {
     return contrato ? contrato.descricao : '—';
   }
 
-  getContratoDoCliente(clienteId: string): string {
-    const contrato = this.contratos().find(
-      (c) => c.clienteId === clienteId && c.status === StatusContrato.ATIVO,
-    );
-    return contrato?.descricao || '—';
-  }
-
-  getCapacidadeMaxDobras(clienteId: string): number {
-    return 0;
-  }
-
-  getPermiteDobras(clienteId: string): boolean {
-    return false;
-  }
-
   confirmDelete(id: string, nome: string, cidade: string): void {
     const postoNome = this.formatNome(nome, cidade);
     if (confirm(`Deseja excluir o posto "${postoNome}"?`)) {

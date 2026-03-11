@@ -125,12 +125,11 @@ export class PostoDetailComponent implements OnInit {
     });
   });
 
-  // Se este posto recebe bônus noturno
-  recebeBonus = computed(() => {
-    const p = this.posto();
+  // Se este posto tem configurações de contrato para bônus
+  recebeBonusContrato = computed(() => {
     const c = this.contrato();
-    if (!p || !c) return false;
-    return this.calcularProporcaoNoturna(p) > 0 && (c.percentualAdicionalNoturno || 0) > 0;
+    if (!c) return false;
+    return (c.percentualAdicionalNoturno || 0) > 0;
   });
 
   // Total ganho no mês selecionado (apenas confirmadas)
@@ -215,15 +214,14 @@ export class PostoDetailComponent implements OnInit {
     });
   }
 
-  // Proporção de horas noturnas do turno (CLT Art. 73: 22h–05h) — 0.0 a 1.0
-  private calcularProporcaoNoturna(posto: Posto): number {
-    return 0; // FASE 2: Horários movidos para alocação
+  diariaRecebeBonus(diaria: Diaria): boolean {
+    const alocacao = this.alocacoes().find(a => a.id === diaria.alocacaoId);
+    return !!alocacao?.temHorarioNoturno && this.recebeBonusContrato();
   }
 
   // Calcula o valor de uma diária (multiplicador FDS + adicional noturno proporcional)
   calcularValorDiaria(diaria: Diaria): number {
     const contrato = this.contrato();
-    const posto = this.posto();
     if (!contrato) return 0;
 
     let valor = contrato.valorDiariaCobrada || 0;
@@ -233,11 +231,8 @@ export class PostoDetailComponent implements OnInit {
     if (diaSemana === 0) valor *= 2.0;       // +100% domingo
     else if (diaSemana === 6) valor *= 1.5;  // +50% sábado
 
-    if (posto) {
-      const proporcaoNoturna = this.calcularProporcaoNoturna(posto);
-      if (proporcaoNoturna > 0) {
-        valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
-      }
+    if (this.diariaRecebeBonus(diaria)) {
+      valor *= 1 + (contrato.percentualAdicionalNoturno || 0);
     }
 
     return valor;

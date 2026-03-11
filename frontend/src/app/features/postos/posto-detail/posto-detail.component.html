@@ -280,10 +280,10 @@
             <div class="noturno-row">
               <span class="noturno-row-label">Bônus Noturno (CLT Art. 73)</span>
               <span class="noturno-row-value">
-                @if (recebeBonus()) {
+                @if (recebeBonusContrato()) {
                   <span class="badge badge-success"
                     >Sim — {{ contrato()!.percentualAdicionalNoturno * 100 | number: '1.0-1' }}%
-                    adicional proporcional</span
+                    adicional (depende do turno)</span
                   >
                 } @else {
                   <span class="badge badge-inactive">Não</span>
@@ -343,7 +343,7 @@
                         }}</span>
                       </td>
                       <td class="col-valor">
-                        @if (recebeBonus()) {
+                        @if (diariaRecebeBonus(diaria)) {
                           <span class="badge badge-success">Sim</span>
                         } @else {
                           <span class="badge badge-inactive">Não</span>
