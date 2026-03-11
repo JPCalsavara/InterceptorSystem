@@ -144,8 +144,7 @@ public class Contrato : Entity, IAggregateRoot
         CheckRule(valorDiariaCobrada <= 0, "O valor da diária deve ser maior que zero.");
         CheckPercentual(percentualAdicionalNoturno, "Percentual de adicional noturno inválido.");
         CheckRule(valorBeneficiosExtrasMensal < 0, "Valor de benefícios não pode ser negativo.");
-        CheckPercentual(percentualImpostos, "Percentual de impostos inválido.");
-        CheckRule(numeroDePostos < 2 || numeroDePostos > 4, "Número de postos deve estar entre 2 e 4 (ex: 2=12x36, 3=8h, 4=6h).");
+        CheckRule(numeroDePostos < 1, "Número de postos deve ser maior ou igual a 1.");
         CheckPercentual(margemLucroPercentual, "Margem de lucro inválida.");
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
         CheckRule(dataFim <= dataInicio, "A data final deve ser posterior à data inicial.");
@@ -191,8 +190,7 @@ public class Contrato : Entity, IAggregateRoot
         CheckRule(valorDiariaCobrada <= 0, "O valor da diária deve ser maior que zero.");
         CheckPercentual(percentualAdicionalNoturno, "Percentual de adicional noturno inválido.");
         CheckRule(valorBeneficiosExtrasMensal < 0, "Valor de benefícios não pode ser negativo.");
-        CheckPercentual(percentualImpostos, "Percentual de impostos inválido.");
-        CheckRule(numeroDePostos < 2 || numeroDePostos > 4, "Número de postos deve estar entre 2 e 4.");
+        CheckRule(numeroDePostos < 1, "Número de postos deve ser maior ou igual a 1.");
         CheckPercentual(margemLucroPercentual, "Margem de lucro inválida.");
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
         CheckRule(dataFim <= dataInicio, "A data final deve ser posterior à data inicial.");
