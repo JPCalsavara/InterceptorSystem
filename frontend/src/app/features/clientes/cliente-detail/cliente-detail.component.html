@@ -482,7 +482,7 @@
           @for (posto of postos(); track posto.id) {
             <div class="posto-card">
               <div class="posto-header">
-                <h3>Posto #{{ $index + 1 }}</h3>
+                <h3>{{ posto.nome }}</h3>
                 <div class="posto-actions">
                   <a [routerLink]="['/postos', posto.id, 'editar']" class="btn-icon" title="Editar">
                     <svg
@@ -503,11 +503,24 @@
               </div>
               <div class="posto-info">
                 <div class="info-row">
-                  <span class="label">Horário:</span>
-                  <span class="value">{{ posto.nome }} - {{ posto.cidade }}</span>
+                  <span class="label">Local:</span>
+                  <span class="value">{{ posto.cidade }} - {{ posto.estado }}</span>
                 </div>
-
-
+              </div>
+              
+              <div class="alocacoes-list">
+                <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">Turnos/Alocações</h4>
+                @for (alocacao of getAlocacoesPorPosto(posto.id); track alocacao.id) {
+                  <div style="background: var(--surface-color); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid var(--border-color); margin-bottom: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                      <strong>{{ getEscalaLabel(alocacao.tipoEscala) }}</strong>
+                      <span class="badge badge-info">{{ formatHorario(alocacao.horarioInicio, alocacao.horarioFim) }}</span>
+                    </div>
+                  </div>
+                }
+                @if (getAlocacoesPorPosto(posto.id).length === 0) {
+                  <p style="font-size: 0.85rem; color: var(--text-muted);">Nenhuma alocação cadastrada neste posto.</p>
+                }
               </div>
             </div>
           }

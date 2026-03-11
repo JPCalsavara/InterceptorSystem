@@ -387,6 +387,21 @@ export class ClienteDetailComponent implements OnInit {
     return `${posto.nome} - ${posto.cidade}`;
   }
 
+  getAlocacoesPorPosto(postoId: string): Alocacao[] {
+    return this.alocacoes().filter((a) => a.postoId === postoId);
+  }
+
+  getEscalaLabel(tipo: string): string {
+    const labels: Record<string, string> = {
+      DOZE_POR_TRINTA_SEIS: '12x36',
+      SEMANAL_COMERCIAL: 'Comercial',
+      ALCALA_8H: '8 Horas',
+      FOLGUISTA: 'Folguista',
+      OITO_HORAS_SEIS_POR_DOIS: '8h (6x2)',
+    };
+    return labels[tipo] || tipo;
+  }
+
   getStatusBadgeClass(status: StatusDiaria): string {
     const classes = {
       [StatusDiaria.CONFIRMADA]: 'badge-success',
