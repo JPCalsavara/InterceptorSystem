@@ -82,6 +82,7 @@ export class AlocacaoListComponent implements OnInit {
       [TipoEscala.SEMANAL_COMERCIAL]: 'Comercial',
       [TipoEscala.ALCALA_8H]: '8 Horas',
       [TipoEscala.FOLGUISTA]: 'Folguista',
+      [TipoEscala.OITO_HORAS_SEIS_POR_DOIS]: '8h (6x2)',
     };
     return labels[tipo] || tipo;
   }

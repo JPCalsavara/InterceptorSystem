@@ -86,8 +86,8 @@ export class ContratoDetailComponent implements OnInit {
       .map((f) => ({
         funcionario: f,
         custo: this.calcularCustoFuncionario(f, c),
-        diasMes: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : f.tipoEscala === TipoEscala.FOLGUISTA ? 8 : 22,
-        escala: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? '12×36' : f.tipoEscala === TipoEscala.ALCALA_8H ? 'Alcalá 8h' : f.tipoEscala === TipoEscala.FOLGUISTA ? 'Folguista' : '5×2',
+        diasMes: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : f.tipoEscala === TipoEscala.FOLGUISTA ? 8 : f.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS ? 26 : 22,
+        escala: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? '12×36' : f.tipoEscala === TipoEscala.ALCALA_8H ? 'Alcalá 8h' : f.tipoEscala === TipoEscala.FOLGUISTA ? 'Folguista' : f.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS ? '8h (6×2)' : '5×2',
       }));
   });
 
@@ -99,6 +99,7 @@ export class ContratoDetailComponent implements OnInit {
     let dias = 22;
     if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) dias = 15;
     else if (func.tipoEscala === TipoEscala.FOLGUISTA) dias = 8;
+    else if (func.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) dias = 26;
     return dias * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0);
   }
 

@@ -1,7 +1,7 @@
 import { Component, input, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+
 import { FeriadosService } from '../../../services/feriados.service';
 import {
   Diaria,
@@ -36,7 +36,7 @@ interface WeekColumn {
 @Component({
   selector: 'app-diarias-view',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './diarias-view.component.html',
   styleUrl: './diarias-view.component.scss',
 })
