@@ -56,13 +56,11 @@ export class FuncionarioFormComponent implements OnInit {
   ];
 
   escalaOptions = [
-    {
-      value: TipoEscala.DOZE_POR_TRINTA_SEIS,
-      label: '12x36 (12 horas trabalhadas, 36 de descanso)',
-    },
+    { value: TipoEscala.DOZE_POR_TRINTA_SEIS, label: '12x36 (12 horas trabalhadas, 36 de descanso)' },
     { value: TipoEscala.SEMANAL_COMERCIAL, label: 'Semanal Comercial (44h semanais)' },
     { value: TipoEscala.ALCALA_8H, label: 'Alcalá 8h (Segunda a Sábado)' },
     { value: TipoEscala.FOLGUISTA, label: 'Folguista' },
+    { value: TipoEscala.OITO_HORAS_SEIS_POR_DOIS, label: '8h (6x2)' },
   ];
 
   ngOnInit(): void {

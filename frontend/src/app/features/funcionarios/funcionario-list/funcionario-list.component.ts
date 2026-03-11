@@ -168,6 +168,7 @@ export class FuncionarioListComponent implements OnInit {
       [TipoEscala.SEMANAL_COMERCIAL]: 'Semanal',
       [TipoEscala.ALCALA_8H]: 'Alcalá 8h',
       [TipoEscala.FOLGUISTA]: 'Folguista',
+      [TipoEscala.OITO_HORAS_SEIS_POR_DOIS]: '8h (6x2)',
     };
     return labels[escala] || 'Desconhecido';
   }
