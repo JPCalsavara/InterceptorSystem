@@ -49,7 +49,7 @@ public class PostosController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("cliente/{clienteId}")]
+    [HttpGet("/api/clientes/{clienteId}/postos")]
     [ProducesResponseType(typeof(IEnumerable<PostoDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByCliente(Guid clienteId)
     {

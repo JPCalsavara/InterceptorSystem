@@ -19,6 +19,10 @@ export class FuncionarioService {
     return this.http.get<Funcionario>(`${this.apiUrl}/${id}`);
   }
 
+  getByClienteId(clienteId: string): Observable<Funcionario[]> {
+    return this.http.get<Funcionario[]>(`${environment.apiUrl}/api/clientes/${clienteId}/funcionarios`);
+  }
+
   create(dto: CreateFuncionarioDto): Observable<Funcionario> {
     return this.http.post<Funcionario>(this.apiUrl, dto);
   }

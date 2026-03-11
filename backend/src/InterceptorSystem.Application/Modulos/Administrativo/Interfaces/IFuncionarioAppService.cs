@@ -9,5 +9,6 @@ public interface IFuncionarioAppService
     Task DeleteAsync(Guid id);
     Task<FuncionarioDtoOutput?> GetByIdAsync(Guid id);
     Task<IEnumerable<FuncionarioDtoOutput>> GetAllAsync();
+    Task<IEnumerable<FuncionarioDtoOutput>> GetByClienteIdAsync(Guid clienteId);
 }
 

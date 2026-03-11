@@ -139,4 +139,9 @@ public class FuncionarioAppService : IFuncionarioAppService
         var cliente = await _clienteRepository.GetByIdAsync(clienteId);
         return cliente != null;
     }
+    public async Task<IEnumerable<FuncionarioDtoOutput>> GetByClienteIdAsync(Guid clienteId)
+    {
+        var funcionarios = await _repository.GetByClienteAsync(clienteId);
+        return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
+    }
 }

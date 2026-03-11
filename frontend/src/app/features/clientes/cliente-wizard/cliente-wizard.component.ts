@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { of, firstValueFrom } from 'rxjs';
+import { of, firstValueFrom, forkJoin } from 'rxjs';
 import { CriarClienteCompletoOutput } from '../../../services/cliente-completo.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
@@ -86,12 +86,14 @@ export class ClienteWizardComponent implements OnInit {
 
   // Custo estimado por escala (diária × dias, sem contar benefícios pois varia)
   custoEstimado12x36 = computed(() => {
-    const diaria = this.formContrato?.get('valorDiariaCobrada')?.value || 0;
+    const postos = this.formContrato?.get('postosConfig')?.value || [];
+    const diaria = postos.length > 0 ? (postos[0].valorDiariaCobrada || 0) : 0;
     return 15 * diaria;
   });
 
   custoEstimado5x2 = computed(() => {
-    const diaria = this.formContrato?.get('valorDiariaCobrada')?.value || 0;
+    const postos = this.formContrato?.get('postosConfig')?.value || [];
+    const diaria = postos.length > 0 ? (postos[0].valorDiariaCobrada || 0) : 0;
     return 22 * diaria;
   });
 
@@ -100,9 +102,12 @@ export class ClienteWizardComponent implements OnInit {
   });
 
   quantidadeTotalFuncionarios = computed(() => {
-    const numeroPostos = this.formCliente?.get('numeroPostos')?.value || 0;
-    const funcionariosPorPostoExibicao = 1; // Simplified for now
-    return numeroPostos;
+    const postos = this.formContrato?.get('postosConfig')?.value || [];
+    let total = 0;
+    for (const posto of postos) {
+      total += (posto.quantidadeAlocacoes || 0) * (posto.quantidadeFuncionariosPorAlocacao || 0);
+    }
+    return total;
   });
 
   ngOnInit(): void {
@@ -123,38 +128,51 @@ export class ClienteWizardComponent implements OnInit {
             return of(null);
           }
 
-          // Validar campos necessários
-          if (!valores.valorDiariaCobrada || !this.quantidadeTotalFuncionarios()) {
-            this.breakdown.set(null);
-            return of(null);
-          }
+          const postos = valores.postosConfig || [];
+          if (!postos.length) return of(null);
 
-          // Chamar backend com mesma estrutura do contrato-form
+          // Build input for each posto
+          const requests = postos.map((posto: any) => {
+             const qtdeFuncionarios = (posto.quantidadeAlocacoes || 1) * (posto.quantidadeFuncionariosPorAlocacao || 1);
+             const input = {
+                valorDiariaCobrada: posto.valorDiariaCobrada || 0,
+                quantidadeFuncionarios: qtdeFuncionarios,
+                numeroDePostos: posto.quantidadeAlocacoes || 1,
+                numeroDePostosNoturnos: Math.floor((posto.quantidadeAlocacoes || 1) / 2),
+                valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal || 0,
+                percentualImpostos: (valores.percentualImpostos || 0) / 100,
+                percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
+                margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
+                margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,
+             };
+             return this.calculoService.calcularValorTotal(input);
+          });
+
           this.calculando.set(true);
-
-          const input = {
-            valorDiariaCobrada: valores.valorDiariaCobrada,
-            quantidadeFuncionarios: this.formCliente.get('numeroPostos')?.value || 2,
-            numeroDePostos: this.formCliente.get('numeroPostos')?.value || 2,
-            // Padrão: metade dos postos são noturnos (12x36 típico: 1 diurno + 1 noturno)
-            numeroDePostosNoturnos: Math.floor(
-              (this.formCliente.get('numeroPostos')?.value || 2) / 2,
-            ),
-            valorBeneficiosExtrasMensal: valores.valorBeneficiosExtrasMensal || 0,
-            percentualImpostos: (valores.percentualImpostos || 0) / 100,
-            percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
-            margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
-            margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,
-          };
-
-          return this.calculoService.calcularValorTotal(input);
+          return forkJoin(requests);
         }),
       )
       .subscribe({
-        next: (resultado) => {
+        next: (resultados: any) => {
           this.calculando.set(false);
-          if (resultado) {
-            this.breakdown.set(resultado);
+          if (resultados && resultados.length > 0) {
+             const combined = {
+                valorTotalMensal: 0,
+                custoBaseMensal: 0,
+                valorMargemLucro: 0,
+                valorMargemFaltas: 0
+             };
+             resultados.forEach((res: any) => {
+                if (res) {
+                   combined.valorTotalMensal += res.valorTotalMensal || 0;
+                   combined.custoBaseMensal += res.custoBaseMensal || 0;
+                   combined.valorMargemLucro += res.valorMargemLucro || 0;
+                   combined.valorMargemFaltas += res.valorMargemFaltas || 0;
+                }
+             });
+             this.breakdown.set(combined);
+          } else {
+             this.breakdown.set(null);
           }
         },
         error: (err) => {
@@ -164,14 +182,13 @@ export class ClienteWizardComponent implements OnInit {
         },
       });
 
-    // Também observar mudanças no formCliente (numeroPostos, funcionariosPorPosto)
-    this.formCliente.valueChanges
+    // Também observar mudanças nos campos profundos de Array para forçar recálculo
+    this.formContrato.get('postosConfig')?.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => {
-        // Forçar recálculo disparando valueChanges no formContrato
         const criarContrato = this.formContrato.get('criarContrato')?.value;
         if (criarContrato) {
-          this.formContrato.patchValue(this.formContrato.value, { emitEvent: true });
+          this.formContrato.patchValue({ ...this.formContrato.value }, { emitEvent: true });
         }
       });
   }
@@ -180,9 +197,9 @@ export class ClienteWizardComponent implements OnInit {
     // Etapa 1: Cliente
     this.formCliente = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
+      cnpj: ['', [Validators.required, Validators.pattern(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/)]],
       cidade: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
-      numeroPostos: [2, [Validators.required, Validators.min(2), Validators.max(4)]],
       emailGestor: [''],
       telefoneEmergencia: [''],
     });
@@ -191,8 +208,9 @@ export class ClienteWizardComponent implements OnInit {
     this.formContrato = this.fb.group({
       criarContrato: [false], // Checkbox para habilitar
       descricao: ['Contrato de prestação de serviços de vigilância', []],
-      valorDiariaCobrada: [100, [Validators.required, Validators.min(0.01)]],
-      valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]],
+      numeroPostos: [1, [Validators.required, Validators.min(1)]],
+      postosConfig: this.fb.array([this.createPostoConfigGroup()]),
+
       percentualImpostos: [15, [Validators.required, Validators.min(0), Validators.max(100)]],
       percentualAdicionalNoturno: [
         20,
@@ -210,11 +228,40 @@ export class ClienteWizardComponent implements OnInit {
       adicionarFuncionarios: [false], // Checkbox para habilitar
       funcionarios: this.fb.array([]),
     });
+    this.setupPostosConfigWatcher();
+  }
+
+  createPostoConfigGroup(): FormGroup {
+    return this.fb.group({
+      quantidadeAlocacoes: [2, [Validators.required, Validators.min(1)]],
+      quantidadeFuncionariosPorAlocacao: [1, [Validators.required, Validators.min(1)]],
+      valorDiariaCobrada: [100, [Validators.required, Validators.min(0.01)]],
+      valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  setupPostosConfigWatcher() {
+    this.formContrato.get('numeroPostos')?.valueChanges.subscribe(num => {
+      const currentLen = this.postosConfig.length;
+      if (num > currentLen && num <= 20) {
+        for (let i = currentLen; i < num; i++) {
+          this.postosConfig.push(this.createPostoConfigGroup());
+        }
+      } else if (num < currentLen && num >= 1) {
+        for (let i = currentLen - 1; i >= num; i--) {
+          this.postosConfig.removeAt(i);
+        }
+      }
+    });
   }
 
   // Getters para FormArrays
   get funcionarios(): FormArray {
     return this.formFuncionarios.get('funcionarios') as FormArray;
+  }
+
+  get postosConfig(): FormArray {
+    return this.formContrato.get('postosConfig') as FormArray;
   }
 
   // Helpers para validação
@@ -252,13 +299,6 @@ export class ClienteWizardComponent implements OnInit {
   }
 
   isEdit = signal(false); // Wizard sempre é criação, nunca edição
-
-  calcularQuantidadeFuncionarios(): void {
-    // Force o recálculo do computed signal
-    const numeroPostos = this.formCliente.get('numeroPostos')?.value || 0;
-    const funcionariosPorPosto = this.formCliente.get('funcionariosPorPosto')?.value || 0;
-    // O computed signal será automaticamente atualizado
-  }
 
   formatarTelefone(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -502,21 +542,16 @@ export class ClienteWizardComponent implements OnInit {
     const formClienteValue = this.formCliente.value;
     const formContratoValue = this.formContrato.value;
 
-    // Converter horário para formato backend (HH:mm -> HH:mm:ss)
-    const horario = formClienteValue.horarioTrocaTurno;
-    const horarioCompleto =
-      horario && horario.includes(':00', 5) ? horario : (horario || '06:00') + ':00';
-
     // Limpar telefone (remover parênteses, espaços e hífens) - aceita null/vazio
     let telefone = formClienteValue.telefoneEmergencia || '';
     if (telefone) {
       telefone = telefone.replace(/[\(\)\s\-]/g, '');
     }
 
-    // Calcular quantidade total de funcionários
-    const numeroPostos = formClienteValue.numeroPostos || 2;
-    const funcionariosPorPosto = formClienteValue.funcionariosPorPosto || 2;
-    const quantidadeTotalFuncionarios = numeroPostos * funcionariosPorPosto;
+    // Determinar valores agregados/médios ou do primeiro posto para o payload base do backend
+    const postosConfigValues = formContratoValue.postosConfig || [];
+    const firstConfig = postosConfigValues[0] || {};
+    const numeroPostos = formContratoValue.numeroPostos || 1;
 
     // Data de término calculada
     const dataFim = this.calcularDataFim();
@@ -524,6 +559,7 @@ export class ClienteWizardComponent implements OnInit {
     return {
       cliente: {
         nome: formClienteValue.nome,
+        cnpj: formClienteValue.cnpj,
         cidade: formClienteValue.cidade,
         estado: formClienteValue.estado,
         emailGestor: formClienteValue.emailGestor || null,
@@ -532,9 +568,9 @@ export class ClienteWizardComponent implements OnInit {
       contrato: {
         descricao: formContratoValue.descricao || `Contrato - ${formClienteValue.nome}`,
         valorTotalMensal: this.faturamentoMensal(),
-        valorDiariaCobrada: formContratoValue.valorDiariaCobrada,
+        valorDiariaCobrada: firstConfig.valorDiariaCobrada || 0,
         percentualAdicionalNoturno: (formContratoValue.percentualAdicionalNoturno || 0) / 100,
-        valorBeneficiosExtrasMensal: formContratoValue.valorBeneficiosExtrasMensal || 0,
+        valorBeneficiosExtrasMensal: firstConfig.valorBeneficiosExtrasMensal || 0,
         percentualImpostos: (formContratoValue.percentualImpostos || 0) / 100,
         margemLucroPercentual: (formContratoValue.percentualMargemLucro || 0) / 100,
         margemCoberturaFaltasPercentual: (formContratoValue.percentualMargemFaltas || 0) / 100,
@@ -551,21 +587,13 @@ export class ClienteWizardComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const formValue = this.formCliente.value;
 
-      // Converter horário para formato backend (HH:mm -> HH:mm:ss)
-      const horario = formValue.horarioTrocaTurno;
-      const horarioCompleto = horario.includes(':00', 5) ? horario : horario + ':00';
-
       // Limpar telefone (remover parênteses, espaços e hífens)
       let telefone = formValue.telefoneEmergencia || '';
       telefone = telefone.replace(/[\(\)\s\-]/g, '');
 
-      // Calcular quantidade total de funcionários
-      const numeroPostos = formValue.numeroPostos || 2;
-      const funcionariosPorPosto = formValue.funcionariosPorPosto || 2;
-      const quantidadeTotalFuncionarios = numeroPostos * funcionariosPorPosto;
-
       const payload = {
         nome: formValue.nome,
+        cnpj: formValue.cnpj,
         cidade: formValue.cidade,
         estado: formValue.estado,
         emailGestor: formValue.emailGestor || null,

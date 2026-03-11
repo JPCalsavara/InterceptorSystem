@@ -316,6 +316,21 @@ dotnet ef migrations add DomainRenamePhase2
 
 ---
 
+### 2F. Lazy Fetching & Independent Data Endpoints (Nova Abordagem de Performance)
+
+Para evitar *Over-fetching* (Explosão Cartesiana) e não sobrecarregar a memória, as rotas do backend não utilizam o padrão de `Eager Loading` massivo em `Cliente` (ou seja, `GetClienteById` não embute listas enormes com os filhos `Funcionarios` ou `Postos` por `.Include()`).
+
+*   **Novo Padrão:** O `Frontend` na tela de detalhes do Cliente fará **Lazy Fetching** consultando endpoints específicos sob demanda (quando a respectiva aba for aberta).
+*   **Novas Rotas de Domínio a serem Criadas:**
+    *   `GET /api/clientes/{clienteId}/postos` (Tridimensiona via `PostosController` e `PostoAppService.GetByClienteIdAsync`)
+    *   `GET /api/clientes/{clienteId}/funcionarios` (Tridimensiona via `FuncionariosController` e `FuncionarioAppService.GetByClienteIdAsync`)
+*   **Benefícios:**
+    *   Tempo de resposta por aba cai drasticamente.
+    *   Não onera os DTOs do Cliente (que permanecem estritos aos `Nome`, `Cnpj`, `Cidade`, etc).
+    *   O Cache passa a atuar separadamente (se um Funcionario muda, ele invalida o seu respectivo cache, e não destrói o array pai de Clientes).
+
+---
+
 ## Phase 3 — Daily Rates & Value Tags
 
 **Goal**: Fully replace contract-based salary with tag-based daily rates.
@@ -406,6 +421,19 @@ Add interest form section with: Name, Email, Phone, Location Name, Message. Uses
 #### [NEW] `InterestController.cs` — `POST api/interest` (public, no auth)
 #### [NEW] `InterestDto.cs` — `nome`, `email`, `telefone`, `localidade`, `mensagem`
 #### [NEW] `IInterestService.cs` / `InterestService.cs` — composes email and sends to `interceptor.gerencia@gmail.com`
+
+---
+
+## Phase 6 — Frontend Caching & Performance
+
+**Goal**: Implementar cache no frontend para reduzir as consultas e criar um mecanismo de invalidação por evento.
+
+### Estratégia de Cache Recomendada
+Para o Angular (versão atual do projeto v21), a estratégia mais recomendada de gerenciamento de estado (Store/Cache) é o uso de **Signals via Services** (Service-based State Management).
+
+- **Por que é a melhor opção?** Sendo o projeto já aderente à reatividade moderna do ecossistema, utilizar um **Cache-Based Service** nativo com `signal<T | null>(null)` é o modelo mais enxuto, direto e performático. Ele evita o peso adicional (boilerplate) das abordagens puramente estritas tipo "NgRx Store" clássico sem abrir mão de controle de dados real time.
+- **Funcionamento (Read-Through):** O método `getAll()` do serviço primeiro deve verificar se seu `.cacheData()` privado de coleção detém os dados em memória e devolver instâncias com o `of(this.cacheData())`. Se nulo ele chama a API nativamente no fluxo e atualiza (`.set()`).
+- **Invalidação Baseada em Evento:** Sempre que executar com sucesso um POST, DELETE, PUT disparar um hook/sinal emitindo a nulidade do cache alvo `this.cacheData.set(null)`. E nas chamadas subsequentes das telas de listagem trará o reload sem fricções.
 
 ---
 

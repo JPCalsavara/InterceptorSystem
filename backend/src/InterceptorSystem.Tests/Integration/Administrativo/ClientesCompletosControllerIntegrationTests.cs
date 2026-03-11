@@ -170,7 +170,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
                 Status: StatusContrato.ATIVO
             ),
             CriarPostosAutomaticamente: true,
-            NumeroDePostos: 5 // ❌ Número inválido (deve ser 2-4)
+            NumeroDePostos: 0 // ❌ Número inválido (deve ser >= 1)
         );
 
         // Act

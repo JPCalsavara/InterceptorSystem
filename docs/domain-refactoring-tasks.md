@@ -52,12 +52,18 @@
 ### 2G. Cliente CNPJ Unique ✅
 - [x] Make CNPJ unique in Cliente
 
+### 2H. Configuração de Endpoints Lazy Fetching (Nova Tarefa) ✅
+- [x] Criar endpoint `GET /api/clientes/{id}/funcionarios` no `FuncionariosController` para carregar funcionários associados sob demanda.
+- [x] Criar endpoint `GET /api/clientes/{id}/postos` no `PostosController` para carregar postos associados sob demanda.
+- [x] Atualizar `IFuncionarioAppService`/`IPostoAppService` e repositórios para suportar passagem de `clienteId`.
+- [x] Frontend: Refatorar interfaces de detalhes (`cliente-detail.component`) para chamar as novas rotas em vez de carregar tudo via `.Include()`.
+
 ## Phase 3: Frontend Alignment
 
-### 3A. Cliente Pages
-- [ ] Fix Cliente detail page
-- [ ] Fix Cliente list page
-- [ ] Fix Cliente form page
+### 3A. Cliente Pages ✅
+- [x] Fix Cliente detail page
+- [x] Fix Cliente list page
+- [x] Fix Cliente form page
 
 ### 3B. Posto Pages
 - [ ] Fix Posto detail page
@@ -94,3 +100,9 @@
 ## Phase 6: Interest Form
 - [ ] Frontend: form on landing page
 - [ ] Backend: InterestController + email service
+
+## Phase 7: Caching e Performance do Frontend
+- [ ] Estruturação do Cache no Frontend com Angular Signals (Service layer).
+- [ ] Implementar sistema para retenção em cache da listagem (`Read-Through`) nos métodos `getAll()`.
+- [ ] Disparar eventos de Invalidação (`Cache Invalidation Event`) após interações de Create/Update/Delete.
+- [ ] Validação visual e de Network (Aba Network) para atestar a ausência de chamadas web constantes/redundantes.

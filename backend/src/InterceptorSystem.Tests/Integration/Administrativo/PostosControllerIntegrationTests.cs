@@ -152,7 +152,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         await CriarPostoTeste(clienteId2, "Portaria C");
 
         // Act
-        var response = await _client.GetAsync($"/api/postos/cliente/{clienteId1}");
+        var response = await _client.GetAsync($"/api/clientes/{clienteId1}/postos");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -170,7 +170,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         var clienteId = await CriarClienteTeste();
 
         // Act
-        var response = await _client.GetAsync($"/api/postos/cliente/{clienteId}");
+        var response = await _client.GetAsync($"/api/clientes/{clienteId}/postos");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -282,7 +282,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
         // 3. READ (GetByCliente)
-        var getByClienteResponse = await _client.GetAsync($"/api/postos/cliente/{clienteId}");
+        var getByClienteResponse = await _client.GetAsync($"/api/clientes/{clienteId}/postos");
         Assert.Equal(HttpStatusCode.OK, getByClienteResponse.StatusCode);
         var postosDoCliente = await getByClienteResponse.Content.ReadFromJsonAsync<List<PostoDto>>(_jsonOptions);
         Assert.Contains(postosDoCliente!, p => p.Id == created.Id);

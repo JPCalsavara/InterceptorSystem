@@ -81,8 +81,8 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
         if (input.Contrato.DataFim <= input.Contrato.DataInicio)
             return Task.FromResult<(bool, string?)>((false, "Data de fim do contrato deve ser posterior à data de início."));
 
-        if (input.NumeroDePostos < 2 || input.NumeroDePostos > 4)
-            return Task.FromResult<(bool, string?)>((false, "Número de postos deve estar entre 2 e 4."));
+        if (input.NumeroDePostos < 1)
+            return Task.FromResult<(bool, string?)>((false, "O número de alocações (postos/turnos) deve ser maior que zero."));
 
         return Task.FromResult<(bool, string?)>((true, null));
     }

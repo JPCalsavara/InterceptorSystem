@@ -314,9 +314,9 @@ export class ClienteDetailComponent implements OnInit {
 
   private loadRelatedData(id: string): void {
     // Carregar funcionários
-    this.funcionarioService.getAll().subscribe({
+    this.funcionarioService.getByClienteId(id).subscribe({
       next: (funcionarios) => {
-        this.funcionarios.set(funcionarios.filter((f) => f.clienteId === id));
+        this.funcionarios.set(funcionarios);
       },
       error: (err) => console.warn('Erro ao carregar funcionários:', err),
     });

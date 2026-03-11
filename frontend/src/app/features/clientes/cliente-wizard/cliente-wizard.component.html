@@ -89,6 +89,26 @@
             </div>
 
             <div class="form-row">
+              <!-- CNPJ -->
+              <div class="form-group">
+                <label for="cnpj" class="form-label">
+                  CNPJ <span class="required">*</span>
+                </label>
+                <input
+                  id="cnpj"
+                  type="text"
+                  formControlName="cnpj"
+                  class="form-input"
+                  [class.error]="hasError('cnpj')"
+                  placeholder="00.000.000/0000-00"
+                />
+                @if (hasError('cnpj')) {
+                  <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
               <!-- Cidade -->
               <div class="form-group">
                 <label for="cidade" class="form-label"> Cidade <span class="required">*</span> </label>
@@ -124,36 +144,7 @@
               </div>
             </div>
 
-            <h3 class="section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg>
-              Configurações Operacionais
-            </h3>
 
-            <!-- Número de Postos e Funcionários por Posto -->
-            <div class="form-row">
-              <div class="form-group">
-                <label for="numeroPostos" class="form-label">
-                  Número de Postos (Slots) <span class="required">*</span>
-                </label>
-                <input
-                  id="numeroPostos"
-                  type="number"
-                  formControlName="numeroPostos"
-                  class="form-input"
-                  [class.error]="hasError('numeroPostos')"
-                  placeholder="Ex: 2"
-                  min="2"
-                  max="4"
-                />
-                @if (hasError('numeroPostos')) {
-                  <span class="error-message">{{ getErrorMessage('numeroPostos') }}</span>
-                }
-                <span class="help-text">2 = 12x36, 3 = 8h, 4 = 6h</span>
-              </div>
-            </div>
 
             <!-- Email Gestor e Telefone Emergência -->
             <div class="form-row">
@@ -237,51 +228,111 @@
                 }
               </div>
 
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="numeroPostos" class="form-label">
+                    Quantidade de Postos Físicos <span class="required">*</span>
+                  </label>
+                  <input
+                    id="numeroPostos"
+                    type="number"
+                    formControlName="numeroPostos"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('numeroPostos')?.invalid &&
+                      formContrato.get('numeroPostos')?.touched
+                    "
+                    placeholder="Ex: 1"
+                    min="1"
+                  />
+                  @if (
+                    formContrato.get('numeroPostos')?.invalid &&
+                    formContrato.get('numeroPostos')?.touched
+                  ) {
+                    <span class="error-message">Quantidade de postos é obrigatória</span>
+                  }
+                  <span class="help-text">Se houver mais de um posto, você configurará cada um individualmente.</span>
+                </div>
+              </div>
+
               <!-- Valores Base -->
               <h3 class="section-title">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:1.1em;height:1.1em;vertical-align:middle">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
                 </svg>
-                Valores Base
+                Configurações por Posto e Alocações
               </h3>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="valorDiariaCobrada" class="form-label">
-                    Valor Diária por Funcionário (R$) <span class="required">*</span>
-                  </label>
-                  <input
-                    id="valorDiariaCobrada"
-                    type="number"
-                    formControlName="valorDiariaCobrada"
-                    class="form-input"
-                    [class.error]="
-                      formContrato.get('valorDiariaCobrada')?.invalid &&
-                      formContrato.get('valorDiariaCobrada')?.touched
-                    "
-                    placeholder="Ex: 100.00"
-                    step="0.01"
-                    min="0.01"
-                  />
-                  @if (
-                    formContrato.get('valorDiariaCobrada')?.invalid &&
-                    formContrato.get('valorDiariaCobrada')?.touched
-                  ) {
-                    <span class="error-message"
-                      >Valor da diária é obrigatório e deve ser maior que zero</span
-                    >
-                  }
-                  <span class="help-text"
-                    >Valor cobrado por dia de trabalho de cada funcionário</span
-                  >
-                </div>
+              <div formArrayName="postosConfig">
+                @for (postoCtrl of postosConfig.controls; track $index) {
+                  <div [formGroupName]="$index" class="form-card" style="margin-bottom: 20px; background: rgba(0,0,0,0.02)">
+                    <h4 class="section-title" style="margin-top: 0">Configuração do Posto {{ $index + 1 }}</h4>
 
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label class="form-label">
+                          Qtd. Alocações Est. (Turnos) <span class="required">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          formControlName="quantidadeAlocacoes"
+                          class="form-input"
+                          placeholder="Ex: 2"
+                          min="1"
+                        />
+                        <span class="help-text">Ex: 2 para posto 12x36 (Diurno e Noturno).</span>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">
+                          Funcionários por Alocação <span class="required">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          formControlName="quantidadeFuncionariosPorAlocacao"
+                          class="form-input"
+                          placeholder="Ex: 1"
+                          min="1"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label class="form-label">
+                          Valor Diária por Funcionário (R$) <span class="required">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          formControlName="valorDiariaCobrada"
+                          class="form-input"
+                          placeholder="Ex: 100.00"
+                          step="0.01"
+                          min="0.01"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label class="form-label">
+                          Benefícios Extras Mensais (R$) <span class="required">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          formControlName="valorBeneficiosExtrasMensal"
+                          class="form-input"
+                          placeholder="Ex: 350.00"
+                          step="0.01"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="form-row" style="margin-bottom: 24px;">
                 <div class="form-group">
-                  <label for="quantidadeFuncionarios" class="form-label">
-                    Quantidade de Funcionários <span class="required">*</span>
-                  </label>
+                  <label class="form-label">Total de Funcionários Estimados</label>
                   <input
-                    id="quantidadeFuncionarios"
                     type="number"
                     [value]="quantidadeTotalFuncionarios()"
                     class="form-input calculated-field"
@@ -289,54 +340,8 @@
                     disabled
                   />
                   <span class="help-text">
-                    Calculado baseado no número de postos (slots):
-                    {{ formCliente.get('numeroPostos')?.value || 0 }} total
+                    Calculado baseado nas configurações acima
                   </span>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="numeroDePostos" class="form-label">
-                    Número de Postos de Trabalho <span class="required">*</span>
-                  </label>
-                  <input
-                    id="numeroDePostos"
-                    type="number"
-                    [value]="formCliente.get('numeroPostos')?.value || 0"
-                    class="form-input calculated-field"
-                    readonly
-                    disabled
-                  />
-                  <span class="help-text"> Importado do cliente (Step 1) </span>
-                </div>
-
-                <div class="form-group">
-                  <label for="valorBeneficiosExtrasMensal" class="form-label">
-                    Benefícios Extras Mensais (R$) <span class="required">*</span>
-                  </label>
-                  <input
-                    id="valorBeneficiosExtrasMensal"
-                    type="number"
-                    formControlName="valorBeneficiosExtrasMensal"
-                    class="form-input"
-                    [class.error]="
-                      formContrato.get('valorBeneficiosExtrasMensal')?.invalid &&
-                      formContrato.get('valorBeneficiosExtrasMensal')?.touched
-                    "
-                    placeholder="Ex: 350.00"
-                    step="0.01"
-                    min="0"
-                  />
-                  @if (
-                    formContrato.get('valorBeneficiosExtrasMensal')?.invalid &&
-                    formContrato.get('valorBeneficiosExtrasMensal')?.touched
-                  ) {
-                    <span class="error-message">Benefícios extras são obrigatórios</span>
-                  }
-                  <span class="help-text"
-                    >Vale-transporte, vale-alimentação, plano de saúde, etc.</span
-                  >
                 </div>
               </div>
 

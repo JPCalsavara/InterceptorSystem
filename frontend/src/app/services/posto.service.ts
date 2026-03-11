@@ -24,7 +24,7 @@ export class PostoService {
   }
 
   getByClienteId(clienteId: string): Observable<Posto[]> {
-    return this.http.get<Posto[]>(`${this.apiUrl}/cliente/${clienteId}`);
+    return this.http.get<Posto[]>(`${environment.apiUrl}/api/clientes/${clienteId}/postos`);
   }
 
 
