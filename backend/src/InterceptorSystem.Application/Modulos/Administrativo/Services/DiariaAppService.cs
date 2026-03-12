@@ -124,6 +124,12 @@ public class DiariaAppService : IDiariaAppService
         return diarias.Select(DiariaDtoOutput.FromEntity)!;
     }
 
+    public async Task<IEnumerable<DiariaDtoOutput>> GetByClienteIdAsync(Guid clienteId)
+    {
+        var diarias = await _repository.GetByClienteIdAsync(clienteId);
+        return diarias.Select(DiariaDtoOutput.FromEntity)!;
+    }
+
     public async Task<IEnumerable<DiariaComFuncionarioDto>> GetByPostoEDataAsync(Guid postoId, DateOnly data)
     {
         // Bridge: Posto → Alocações → Diárias (since Diária now references AlocacaoId, not PostoId)

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PostoService } from '../../../services/posto.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
@@ -21,14 +21,17 @@ interface PostoPorCliente {
   postos: Posto[];
 }
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-posto-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './posto-list.component.html',
   styleUrl: './posto-list.component.scss',
 })
 export class PostoListComponent implements OnInit {
+  private route = inject(ActivatedRoute);
   private service = inject(PostoService);
   private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
@@ -44,17 +47,28 @@ export class PostoListComponent implements OnInit {
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  // Filtros
+  filtroCliente = signal<string>('');
+
   // Agrupa postos por cliente
   postosPorCliente = computed<PostoPorCliente[]>(() => {
+    const filtro = this.filtroCliente();
+
     const clientesMap = new Map<string, Cliente>();
-    this.clientes().forEach((c) => clientesMap.set(c.id, c));
+    this.clientes().forEach((c) => {
+      if (!filtro || c.id === filtro) {
+        clientesMap.set(c.id, c);
+      }
+    });
 
     const grupos = new Map<string, Posto[]>();
     this.postos().forEach((posto) => {
-      if (!grupos.has(posto.clienteId)) {
-        grupos.set(posto.clienteId, []);
+      if (!filtro || posto.clienteId === filtro) {
+        if (!grupos.has(posto.clienteId)) {
+          grupos.set(posto.clienteId, []);
+        }
+        grupos.get(posto.clienteId)!.push(posto);
       }
-      grupos.get(posto.clienteId)!.push(posto);
     });
 
     const resultado: PostoPorCliente[] = [];
@@ -69,6 +83,10 @@ export class PostoListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    const clienteId = this.route.snapshot.queryParamMap.get('clienteId');
+    if (clienteId) {
+      this.filtroCliente.set(clienteId);
+    }
     this.loadAll();
   }
 

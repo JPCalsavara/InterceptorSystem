@@ -10,14 +10,18 @@ public record CreateFuncionarioDtoInput(
     string Celular,
     StatusFuncionario StatusFuncionario,
     TipoEscala TipoEscala,
-    TipoFuncionario TipoFuncionario);
+    TipoFuncionario TipoFuncionario,
+    // Phase 4: optional tag IDs to assign on creation
+    IReadOnlyList<Guid>? TagIds = null);
 
 public record UpdateFuncionarioDtoInput(
     string Nome,
     string Celular,
     StatusFuncionario StatusFuncionario,
     TipoEscala TipoEscala,
-    TipoFuncionario TipoFuncionario);
+    TipoFuncionario TipoFuncionario,
+    // Phase 4: full replacement of tag set (null = no change)
+    IReadOnlyList<Guid>? TagIds = null);
 
 public record FuncionarioDtoOutput(
     Guid Id,
@@ -29,16 +33,20 @@ public record FuncionarioDtoOutput(
     StatusFuncionario StatusFuncionario,
     TipoEscala TipoEscala,
     TipoFuncionario TipoFuncionario,
-    // FASE 3: Campos calculados automaticamente
-    decimal SalarioBase,
-    decimal AdicionalNoturno,
-    decimal Beneficios,
-    decimal SalarioTotal,
+    // Phase 4: tag-based cost fields
+    IReadOnlyList<TagDtoOutput> Tags,
+    decimal CustoMensalReal,
+    decimal CustoMensalEstimado,
     bool Ativo)
 {
     public static FuncionarioDtoOutput? FromEntity(Domain.Modulos.Administrativo.Entidades.Funcionario entity)
     {
         if (entity == null) return null;
+        var tags = entity.Tags
+            .Select(ft => TagDtoOutput.FromEntity(ft.Tag))
+            .Where(t => t != null)
+            .Select(t => t!)
+            .ToList();
         return new FuncionarioDtoOutput(
             entity.Id,
             entity.ClienteId,
@@ -49,11 +57,9 @@ public record FuncionarioDtoOutput(
             entity.StatusFuncionario,
             entity.TipoEscala,
             entity.TipoFuncionario,
-            // FASE 3: Campos calculados
-            entity.SalarioBase,
-            entity.AdicionalNoturno,
-            entity.Beneficios,
-            entity.SalarioTotal,
+            tags,
+            entity.CustoMensalReal,
+            entity.CustoMensalEstimado,
             true);
     }
 }

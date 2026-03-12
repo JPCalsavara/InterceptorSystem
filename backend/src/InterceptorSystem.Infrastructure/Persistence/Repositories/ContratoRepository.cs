@@ -22,6 +22,8 @@ public class ContratoRepository : IContratoRepository
     {
         return await _context.Contratos
             .Include(c => c.Cliente) // FASE 3: Necessário para calcular QuantidadeFuncionarios
+            .Include(c => c.Tags)
+                .ThenInclude(ct => ct.Tag)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
@@ -29,6 +31,18 @@ public class ContratoRepository : IContratoRepository
     {
         return await _context.Contratos
             .Include(c => c.Cliente) // FASE 3: Necessário para calcular QuantidadeFuncionarios
+            .Include(c => c.Tags)
+                .ThenInclude(ct => ct.Tag)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId)
+    {
+        return await _context.Contratos
+            .Include(c => c.Cliente)
+            .Include(c => c.Tags)
+                .ThenInclude(ct => ct.Tag)
+            .Where(c => c.ClienteId == clienteId)
             .ToListAsync();
     }
 

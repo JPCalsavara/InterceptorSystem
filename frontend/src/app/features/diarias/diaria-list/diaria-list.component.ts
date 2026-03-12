@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DiariaService } from '../../../services/diaria.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { PostoService } from '../../../services/posto.service';
@@ -53,6 +53,7 @@ export class DiariaListComponent implements OnInit {
   private clienteService = inject(ClienteService);
   private feriadosService = inject(FeriadosService);
   private alocacaoService = inject(AlocacaoService);
+  private router = inject(Router);
 
   clienteIdFixed = input<string>('');
 
@@ -65,6 +66,15 @@ export class DiariaListComponent implements OnInit {
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
   editingDiariaId = signal<string | null>(null);
+
+  isCronogramaView = computed(() => this.router.url.startsWith('/cronograma'));
+  baseRoute = computed(() => (this.isCronogramaView() ? '/cronograma' : '/diarias'));
+  pageTitle = computed(() => (this.isCronogramaView() ? 'Cronograma' : 'Diárias'));
+  pageSubtitle = computed(() =>
+    this.isCronogramaView()
+      ? 'Gerencie o cronograma diário de funcionários'
+      : 'Gerencie todas as diárias de funcionários',
+  );
 
   // View mode
   viewMode = signal<ViewMode>('daily');
@@ -90,7 +100,7 @@ export class DiariaListComponent implements OnInit {
         .filter((p) => p.clienteId === clienteId)
         .map((p) => p.id);
       resultado = resultado.filter((a) => {
-        const aloc = this.alocacoes().find(al => al.id === a.alocacaoId);
+        const aloc = this.alocacoes().find((al) => al.id === a.alocacaoId);
         return aloc && postosDoCliente.includes(aloc.postoId);
       });
     }
@@ -135,7 +145,9 @@ export class DiariaListComponent implements OnInit {
       const dayPostos = this.postos()
         .map((posto) => {
           const cliente = this.clientes().find((c) => c.id === posto.clienteId);
-          const alocIds = this.alocacoes().filter(al => al.postoId === posto.id).map(al => al.id);
+          const alocIds = this.alocacoes()
+            .filter((al) => al.postoId === posto.id)
+            .map((al) => al.id);
           const diarias = this.diariasFiltradas().filter(
             (a) => alocIds.includes(a.alocacaoId) && a.data === dateStr,
           );
@@ -244,18 +256,21 @@ export class DiariaListComponent implements OnInit {
 
   loadAll(): void {
     this.loading.set(true);
+    const fixedClienteId = this.clienteIdFixed();
+
     Promise.all([
-      this.loadDiarias(),
-      this.loadFuncionarios(),
-      this.loadPostos(),
-      this.loadAlocacoes(),
+      this.loadDiarias(fixedClienteId),
+      this.loadFuncionarios(fixedClienteId),
+      this.loadPostos(fixedClienteId),
+      this.loadAlocacoes(fixedClienteId),
       this.loadClientes(),
     ]).finally(() => this.loading.set(false));
   }
 
-  loadDiarias(): Promise<void> {
+  loadDiarias(clienteId?: string): Promise<void> {
     return new Promise((resolve) => {
-      this.service.getAll().subscribe({
+      const request$ = clienteId ? this.service.getByClienteId(clienteId) : this.service.getAll();
+      request$.subscribe({
         next: (data) => {
           this.diarias.set(data);
           resolve();
@@ -269,9 +284,12 @@ export class DiariaListComponent implements OnInit {
     });
   }
 
-  loadFuncionarios(): Promise<void> {
+  loadFuncionarios(clienteId?: string): Promise<void> {
     return new Promise((resolve) => {
-      this.funcionarioService.getAll().subscribe({
+      const request$ = clienteId
+        ? this.funcionarioService.getByClienteId(clienteId)
+        : this.funcionarioService.getAll();
+      request$.subscribe({
         next: (data) => {
           this.funcionarios.set(data);
           resolve();
@@ -284,9 +302,12 @@ export class DiariaListComponent implements OnInit {
     });
   }
 
-  loadPostos(): Promise<void> {
+  loadPostos(clienteId?: string): Promise<void> {
     return new Promise((resolve) => {
-      this.postoService.getAll().subscribe({
+      const request$ = clienteId
+        ? this.postoService.getByClienteId(clienteId)
+        : this.postoService.getAll();
+      request$.subscribe({
         next: (data) => {
           this.postos.set(data);
           resolve();
@@ -299,9 +320,12 @@ export class DiariaListComponent implements OnInit {
     });
   }
 
-  loadAlocacoes(): Promise<void> {
+  loadAlocacoes(clienteId?: string): Promise<void> {
     return new Promise((resolve) => {
-      this.alocacaoService.getAll().subscribe({
+      const request$ = clienteId
+        ? this.alocacaoService.getByClienteId(clienteId)
+        : this.alocacaoService.getAll();
+      request$.subscribe({
         next: (data) => {
           this.alocacoes.set(data);
           resolve();

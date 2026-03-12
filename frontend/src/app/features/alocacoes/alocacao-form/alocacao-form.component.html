@@ -1,0 +1,161 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/alocacoes">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Voltar
+      </button>
+      <h1>{{ isEditMode() ? 'Editar Turno' : 'Novo Turno (Alocação)' }}</h1>
+      <p class="subtitle">Defina o horário e escala para um posto de trabalho específico</p>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-card">
+      @if (isEditMode()) {
+        <div class="alert alert-info" style="margin-bottom: 1rem">
+          Em modo de edição, cliente, posto e contrato ficam bloqueados. Apenas os dados do turno
+          podem ser alterados.
+        </div>
+      }
+
+      <h3 class="section-title">Contexto</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Cliente <span class="required">*</span></label>
+          <select
+            formControlName="clienteId"
+            class="form-input"
+            [class.error]="hasError('clienteId')"
+          >
+            <option value="">Selecione o Cliente</option>
+            @for (c of clientes(); track c.id) {
+              <option [value]="c.id">{{ c.nome }}</option>
+            }
+          </select>
+          @if (hasError('clienteId')) {
+            <span class="error-msg">Obrigatório</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Posto de Trabalho <span class="required">*</span></label>
+          <select formControlName="postoId" class="form-input" [class.error]="hasError('postoId')">
+            <option value="">Selecione o Posto</option>
+            @for (p of filteredPostos(); track p.id) {
+              <option [value]="p.id">{{ p.nome }}</option>
+            }
+          </select>
+          @if (hasError('postoId')) {
+            <span class="error-msg">Obrigatório</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contrato Vinculado <span class="required">*</span></label>
+          <select
+            formControlName="contratoId"
+            class="form-input"
+            [class.error]="hasError('contratoId')"
+          >
+            <option value="">Selecione o Contrato</option>
+            @for (c of filteredContratos(); track c.id) {
+              <option [value]="c.id">{{ c.descricao }}</option>
+            }
+          </select>
+          @if (hasError('contratoId')) {
+            <span class="error-msg">Obrigatório</span>
+          }
+        </div>
+      </div>
+
+      <h3 class="section-title" style="margin-top: 2rem">Configuração do Turno</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Horário Início <span class="required">*</span></label>
+          <input
+            type="time"
+            formControlName="horarioInicio"
+            class="form-input"
+            [class.error]="hasError('horarioInicio')"
+          />
+          @if (hasError('horarioInicio')) {
+            <span class="error-msg">Obrigatório</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Horário Fim <span class="required">*</span></label>
+          <input
+            type="time"
+            formControlName="horarioFim"
+            class="form-input"
+            [class.error]="hasError('horarioFim')"
+          />
+          @if (hasError('horarioFim')) {
+            <span class="error-msg">Obrigatório</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tipo de Escala <span class="required">*</span></label>
+          <select
+            formControlName="tipoEscala"
+            class="form-input"
+            [class.error]="hasError('tipoEscala')"
+          >
+            @for (opt of tipoEscalaOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group" style="margin-top: 1.5rem">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="permiteDobrarEscala" />
+          Permitir dobra nesta escala (Horas Extras)
+        </label>
+      </div>
+
+      <div class="form-footer">
+        <div class="button-group">
+          <button
+            type="button"
+            class="btn-secondary"
+            routerLink="/alocacoes"
+            [disabled]="loading()"
+          >
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner-small"></span> Salvando...
+            } @else {
+              {{ isEditMode() ? 'Salvar Alterações' : 'Criar Turno' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -22,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IDiariaAppService, DiariaAppService>();
         services.AddScoped<IContratoAppService, ContratoAppService>();
         services.AddScoped<IAlocacaoAppService, AlocacaoAppService>();
+        services.AddScoped<ITagAppService, TagAppService>(); // Phase 4
 
         // FASE 5: Serviço Orquestrador para Criação em Cascata
         services.AddScoped<IClienteOrquestradorService, ClienteOrquestradorService>();

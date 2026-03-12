@@ -29,6 +29,7 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
+            .Where(p => p.Ativo)
             .ToListAsync();
     }
 
@@ -36,7 +37,7 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
-            .Where(p => p.ClienteId == clienteId)
+            .Where(p => p.ClienteId == clienteId && p.Ativo)
             .ToListAsync();
     }
 

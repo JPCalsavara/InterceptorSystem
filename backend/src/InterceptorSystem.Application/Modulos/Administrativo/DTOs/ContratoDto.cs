@@ -17,6 +17,7 @@ public record CreateContratoDtoInput(
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status,
+    IReadOnlyList<ContratoTagInput>? Tags = null,
     decimal? ValorDiariaVigilante = null);
 
 public record UpdateContratoDtoInput(
@@ -32,7 +33,24 @@ public record UpdateContratoDtoInput(
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status,
+    IReadOnlyList<ContratoTagInput>? Tags = null,
     decimal? ValorDiariaVigilante = null);
+
+public record ContratoTagInput(
+    Guid TagId,
+    decimal ValorDiaria);
+
+public record ContratoTagDtoOutput(
+    Guid TagId,
+    string TagNome,
+    decimal ValorDiaria)
+{
+    public static ContratoTagDtoOutput? FromEntity(ContratoTag? entity)
+    {
+        if (entity == null || entity.Tag == null) return null;
+        return new ContratoTagDtoOutput(entity.TagId, entity.Tag.Nome, entity.ValorDiaria);
+    }
+}
 
 public record ContratoDtoOutput(
     Guid Id,
@@ -50,11 +68,17 @@ public record ContratoDtoOutput(
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status,
+    IReadOnlyList<ContratoTagDtoOutput> Tags,
     decimal? ValorDiariaVigilante = null)
 {
     public static ContratoDtoOutput? FromEntity(Contrato? entity)
     {
         if (entity == null) return null;
+        var tags = entity.Tags
+            .Select(ContratoTagDtoOutput.FromEntity)
+            .Where(t => t != null)
+            .Select(t => t!)
+            .ToList();
         return new ContratoDtoOutput(
             entity.Id,
             entity.ClienteId,
@@ -71,6 +95,7 @@ public record ContratoDtoOutput(
             entity.DataInicio,
             entity.DataFim,
             entity.Status,
+            tags,
             entity.ValorDiariaVigilante);
     }
 }

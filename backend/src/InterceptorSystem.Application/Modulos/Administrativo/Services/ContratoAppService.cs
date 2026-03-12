@@ -1,9 +1,11 @@
+using System.Linq;
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -11,16 +13,35 @@ public class ContratoAppService : IContratoAppService
 {
     private readonly IContratoRepository _repository;
     private readonly IClienteRepository _clienteRepository;
+    private readonly ITagRepository _tagRepository;
     private readonly ICurrentTenantService _tenantService;
+    private readonly IMemoryCache _cache;
 
     public ContratoAppService(
         IContratoRepository repository,
         IClienteRepository clienteRepository,
-        ICurrentTenantService tenantService)
+        ITagRepository tagRepository,
+        ICurrentTenantService tenantService,
+        IMemoryCache cache)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
+        _tagRepository = tagRepository;
         _tenantService = tenantService;
+        _cache = cache;
+    }
+
+    private static string GetAllCacheKey(Guid empresaId) => $"Contratos_{empresaId}";
+    private static string GetByClienteCacheKey(Guid empresaId, Guid clienteId) =>
+        $"Contratos_{empresaId}_Cliente_{clienteId}";
+
+    private void InvalidateContratoCache(Guid empresaId, Guid? clienteId = null)
+    {
+        _cache.Remove(GetAllCacheKey(empresaId));
+        if (clienteId.HasValue)
+        {
+            _cache.Remove(GetByClienteCacheKey(empresaId, clienteId.Value));
+        }
     }
 
     public async Task<ContratoDtoOutput> CreateAsync(CreateContratoDtoInput input)
@@ -54,8 +75,28 @@ public class ContratoAppService : IContratoAppService
             input.Status,
             input.ValorDiariaVigilante);
 
+        if (input.Tags != null)
+        {
+            foreach (var tagInput in input.Tags)
+            {
+                var tag = await _tagRepository.GetByIdAsync(tagInput.TagId);
+                if (tag == null)
+                {
+                    throw new KeyNotFoundException($"Tag não encontrada: {tagInput.TagId}.");
+                }
+            }
+
+            var tags = input.Tags
+                .DistinctBy(t => t.TagId)
+                .Select(t => new ContratoTag(empresaId, contrato.Id, t.TagId, t.ValorDiaria))
+                .ToList();
+            contrato.DefinirTags(tags);
+        }
+
         _repository.Add(contrato);
         await _repository.UnitOfWork.CommitAsync();
+
+        InvalidateContratoCache(empresaId, input.ClienteId);
 
         var saved = await _repository.GetByIdAsync(contrato.Id)
             ?? throw new InvalidOperationException("Contrato não encontrado após persistência.");
@@ -93,10 +134,32 @@ public class ContratoAppService : IContratoAppService
             input.DataFim,
             input.ValorDiariaVigilante);
 
+        if (input.Tags != null)
+        {
+            var empresaIdForTags = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+            foreach (var tagInput in input.Tags)
+            {
+                var tag = await _tagRepository.GetByIdAsync(tagInput.TagId);
+                if (tag == null)
+                {
+                    throw new KeyNotFoundException($"Tag não encontrada: {tagInput.TagId}.");
+                }
+            }
+
+            var tags = input.Tags
+                .DistinctBy(t => t.TagId)
+                .Select(t => new ContratoTag(empresaIdForTags, contrato.Id, t.TagId, t.ValorDiaria))
+                .ToList();
+            contrato.DefinirTags(tags);
+        }
+
         contrato.AtualizarStatus(input.Status);
 
         _repository.Update(contrato);
         await _repository.UnitOfWork.CommitAsync();
+
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        InvalidateContratoCache(empresaId, contrato.ClienteId);
 
         var saved = await _repository.GetByIdAsync(contrato.Id)
             ?? throw new InvalidOperationException("Contrato não encontrado após atualização.");
@@ -111,6 +174,9 @@ public class ContratoAppService : IContratoAppService
 
         _repository.Remove(contrato);
         await _repository.UnitOfWork.CommitAsync();
+
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        InvalidateContratoCache(empresaId, contrato.ClienteId);
     }
 
     public async Task<ContratoDtoOutput?> GetByIdAsync(Guid id)
@@ -121,6 +187,14 @@ public class ContratoAppService : IContratoAppService
 
     public async Task<IEnumerable<ContratoDtoOutput>> GetAllAsync()
     {
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        var cacheKey = GetAllCacheKey(empresaId);
+
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<ContratoDtoOutput>? cached) && cached != null)
+        {
+            return cached;
+        }
+
         var contratos = await _repository.GetAllAsync();
         
         // BL-10: Auto-finalização de contratos vencidos
@@ -140,8 +214,34 @@ public class ContratoAppService : IContratoAppService
         if (alterados)
         {
             await _repository.UnitOfWork.CommitAsync();
+            InvalidateContratoCache(empresaId);
         }
-        
-        return contratos.Select(ContratoDtoOutput.FromEntity)!;
+
+        var result = contratos
+            .Select(ContratoDtoOutput.FromEntity)
+            .Where(dto => dto != null)
+            .Select(dto => dto!);
+        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
+
+        return result;
+    }
+
+    public async Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId)
+    {
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        var cacheKey = GetByClienteCacheKey(empresaId, clienteId);
+
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<ContratoDtoOutput>? cached) && cached != null)
+        {
+            return cached;
+        }
+
+        var contratos = await _repository.GetByClienteIdAsync(clienteId);
+        var result = contratos
+            .Select(ContratoDtoOutput.FromEntity)
+            .Where(dto => dto != null)
+            .Select(dto => dto!);
+        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
+        return result;
     }
 }

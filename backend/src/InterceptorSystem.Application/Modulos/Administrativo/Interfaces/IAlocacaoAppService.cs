@@ -9,6 +9,7 @@ public interface IAlocacaoAppService
     Task DeleteAsync(Guid id);
     Task<AlocacaoDto?> GetByIdAsync(Guid id);
     Task<IEnumerable<AlocacaoDto>> GetAllAsync();
+    Task<IEnumerable<AlocacaoDto>> GetByClienteIdAsync(Guid clienteId);
     Task<IEnumerable<AlocacaoDto>> GetByPostoIdAsync(Guid postoId);
     Task<IEnumerable<AlocacaoDto>> GetByContratoIdAsync(Guid contratoId);
 }

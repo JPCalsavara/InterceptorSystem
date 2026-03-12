@@ -20,50 +20,55 @@ public class Funcionario : Entity, IAggregateRoot
     public Contrato? Contrato { get; private set; }
     public ICollection<Diaria> Diarias { get; private set; } = new List<Diaria>();
 
-    // FASE 3: Propriedades Calculadas (não persistem no banco)
-    
+    // Phase 4: employee role tags
+    public ICollection<FuncionarioTag> Tags { get; private set; } = new List<FuncionarioTag>();
+
     /// <summary>
-    /// Salário base calculado automaticamente a partir do contrato
+    /// Custo mensal real baseado na soma das Diárias confirmadas do mês corrente + Benefícios.
+    /// Phase 4: substitui SalarioBase calculado pelo contrato.
     /// </summary>
     [NotMapped]
-    public decimal SalarioBase => Contrato?.CalcularSalarioBasePorFuncionario() ?? 0m;
-    
+    public decimal CustoMensalReal
+    {
+        get
+        {
+            var hoje = DateOnly.FromDateTime(DateTime.Today);
+            var valorDiarias = Diarias
+                .Where(d => d.StatusDiaria == StatusDiaria.CONFIRMADA &&
+                            d.Data.Year == hoje.Year &&
+                            d.Data.Month == hoje.Month)
+                .Sum(d => d.ValorDiaria);
+
+            return valorDiarias + (Contrato?.CalcularBeneficiosPorFuncionario() ?? 0m);
+        }
+    }
+
     /// <summary>
-    /// Adicional noturno (aplicado quando trabalha em posto noturno - 22h às 5h conforme CLT).
-    /// Verifica se o funcionário possui diárias confirmadas em postos de trabalho com horário noturno.
-    /// CLT Art. 73: Trabalho noturno urbano é o executado entre 22h de um dia e 5h do dia seguinte.
+    /// Custo mensal estimado: usa o maior ValorDiaria configurado no contrato
+    /// dentre as tags atribuídas ao funcionário × 30 dias + Benefícios.
+    /// Fallback quando não há diárias confirmadas no mês.
     /// </summary>
     [NotMapped]
-    public decimal AdicionalNoturno
+    public decimal CustoMensalEstimado
     {
         get
         {
             if (Contrato == null)
                 return 0m;
 
-            // Verifica se tem diárias confirmadas em postos noturnos
-            var temDiariaNoturna = Diarias
-                .Any(a => a.StatusDiaria == StatusDiaria.CONFIRMADA && 
-                         a.Alocacao != null && 
-                         a.Alocacao.TemHorarioNoturno);
+            var funcionarioTagIds = Tags
+                .Select(ft => ft.TagId)
+                .ToHashSet();
 
-            return temDiariaNoturna 
-                ? Contrato.CalcularAdicionalNoturno(SalarioBase) 
-                : 0m;
+            var valorDiaria = Contrato.Tags
+                .Where(ct => funcionarioTagIds.Contains(ct.TagId))
+                .Select(ct => ct.ValorDiaria)
+                .DefaultIfEmpty(Contrato.ValorDiariaVigilante ?? 0m)
+                .Max();
+
+            return Math.Round(valorDiaria * 30, 2) + Contrato.CalcularBeneficiosPorFuncionario();
         }
     }
-    
-    /// <summary>
-    /// Benefícios mensais calculados automaticamente
-    /// </summary>
-    [NotMapped]
-    public decimal Beneficios => Contrato?.CalcularBeneficiosPorFuncionario() ?? 0m;
-    
-    /// <summary>
-    /// Salário total = Salário Base + Adicional Noturno + Benefícios
-    /// </summary>
-    [NotMapped]
-    public decimal SalarioTotal => SalarioBase + AdicionalNoturno + Beneficios;
 
     protected Funcionario() { }
 
@@ -117,6 +122,16 @@ public class Funcionario : Entity, IAggregateRoot
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
+    }
+
+    /// <summary>
+    /// Replaces the full tag set. Phase 4.
+    /// </summary>
+    public void DefinirTags(IEnumerable<FuncionarioTag> novasTags)
+    {
+        Tags.Clear();
+        foreach (var tag in novasTags)
+            Tags.Add(tag);
     }
 
     /// <summary>

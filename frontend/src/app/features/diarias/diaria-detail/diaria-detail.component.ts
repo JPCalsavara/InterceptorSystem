@@ -41,6 +41,14 @@ export class DiariaDetailComponent implements OnInit {
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  get baseRoute(): string {
+    return this.router.url.startsWith('/cronograma') ? '/cronograma' : '/diarias';
+  }
+
+  get pageTitle(): string {
+    return this.baseRoute === '/cronograma' ? 'Detalhes do Cronograma' : 'Detalhes da Diária';
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -151,7 +159,7 @@ export class DiariaDetailComponent implements OnInit {
     if (confirm(`Deseja excluir a diária do dia ${this.formatDate(aloc.data)}?`)) {
       this.service.delete(aloc.id).subscribe({
         next: () => {
-          this.router.navigate(['/diarias']);
+          this.router.navigate([this.baseRoute]);
         },
         error: (err) => {
           this.error.set('Erro ao excluir diária.');
@@ -169,4 +177,3 @@ export class DiariaDetailComponent implements OnInit {
     this.successMessage.set(null);
   }
 }
-

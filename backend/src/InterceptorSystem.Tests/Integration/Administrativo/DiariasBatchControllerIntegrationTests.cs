@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 
@@ -16,7 +17,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve criar 3 diárias com sucesso")]
     public async Task CreateBatch_DeveCriar3Diarias_ComSucesso()
     {
         // Arrange - Criar dados completos: cliente → contrato → posto → alocação → funcionário
@@ -43,7 +44,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
         Assert.All(result, a => Assert.Equal(StatusDiaria.CONFIRMADA, a.StatusDiaria));
     }
 
-    [Fact]
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve retornar 400 quando lista vazia")]
     public async Task CreateBatch_DeveFalhar400_QuandoListaVazia()
     {
         // Arrange
@@ -60,7 +61,34 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
         Assert.Contains("Nenhuma diária foi informada", error["error"]);
     }
 
-    [Fact]
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve retornar 400 quando lista é nula")]
+    public async Task CreateBatch_DeveFalhar400_QuandoListaNula()
+    {
+        var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+        var response = await Client.PostAsync("/api/diarias/batch", content);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var errorContent = await response.Content.ReadAsStringAsync();
+        Assert.Contains("errors", errorContent, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Diarias", errorContent, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve retornar 400 quando item possui funcionário inválido")]
+    public async Task CreateBatch_DeveFalhar400_QuandoItemComFuncionarioInvalido()
+    {
+        var (_, _, alocacaoId, _) = await CriarDadosCompletosAsync();
+        var batch = new CreateDiariasBatchDtoInput(new List<CreateDiariaDtoInput>
+        {
+            new(Guid.Empty, alocacaoId, new DateOnly(2026, 1, 18), StatusDiaria.CONFIRMADA, TipoDiaria.REGULAR),
+        });
+
+        var response = await Client.PostAsJsonAsync("/api/diarias/batch", batch);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve criar ~91 diárias para escala 12x36 em 6 meses")]
     public async Task CreateBatch_DeveCriar91Diarias_Escala12x36_6Meses()
     {
         // Arrange
@@ -98,7 +126,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
         Assert.All(result, a => Assert.Equal(alocacaoId, a.AlocacaoId));
     }
 
-    [Fact]
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve criar ~130 diárias para escala semanal em 6 meses")]
     public async Task CreateBatch_DeveCriar130Diarias_EscalaSemanal_6Meses()
     {
         // Arrange

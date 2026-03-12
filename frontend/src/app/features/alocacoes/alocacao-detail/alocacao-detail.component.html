@@ -1,0 +1,121 @@
+<div class="page-container">
+  @if (error()) {
+    <div class="alert alert-error" style="margin-bottom: 1rem">
+      {{ error() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando detalhes do turno...</p>
+    </div>
+  }
+
+  @if (!loading() && alocacao()) {
+    <div class="page-header">
+      <div class="header-content">
+        <button class="btn-back" routerLink="/alocacoes">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Voltar
+        </button>
+        <h1>
+          Turno: {{ alocacao()!.horarioInicio.substring(0, 5) }} -
+          {{ alocacao()!.horarioFim.substring(0, 5) }}
+        </h1>
+        <div class="header-meta">
+          <span class="badge badge-info">{{ getEscalaLabel(alocacao()!.tipoEscala) }}</span>
+          @if (alocacao()!.temHorarioNoturno) {
+            <span class="badge badge-warning">Adicional Noturno</span>
+          }
+        </div>
+      </div>
+      <div class="header-actions">
+        <a [routerLink]="['/alocacoes', alocacao()!.id, 'editar']" class="btn-secondary"
+          >Editar Turno</a
+        >
+      </div>
+    </div>
+
+    <div class="details-grid">
+      <!-- Info Card -->
+      <div class="card detail-card">
+        <h3 class="card-title">Localização e Contrato</h3>
+        <div class="info-group">
+          <label>Cliente</label>
+          <p>
+            <strong>{{ cliente()?.nome || '—' }}</strong>
+          </p>
+        </div>
+        <div class="info-group">
+          <label>Posto de Trabalho</label>
+          <p>{{ posto()?.nome || '—' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Endereço</label>
+          <p>{{ posto()?.endereco }}, {{ posto()?.cidade }} - {{ posto()?.estado }}</p>
+        </div>
+      </div>
+
+      <!-- Config Card -->
+      <div class="card detail-card">
+        <h3 class="card-title">Configurações Operacionais</h3>
+        <div class="info-group">
+          <label>Escala</label>
+          <p>{{ getEscalaLabel(alocacao()!.tipoEscala) }}</p>
+        </div>
+        <div class="info-group">
+          <label>Permite Dobra (HE)</label>
+          <p>{{ alocacao()!.permiteDobrarEscala ? 'Sim' : 'Não' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Horário Noturno</label>
+          <p>{{ alocacao()!.temHorarioNoturno ? 'Identificado automaticamente' : 'Não' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Escala Próximos Dias -->
+    <div class="card" style="margin-top: 2rem">
+      <h3 class="card-title">Próximos Funcionários (Escala)</h3>
+      @if (nextDiarias().length === 0) {
+        <p class="empty-msg">Nenhuma diária programada para este turno nos próximos dias.</p>
+      } @else {
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Funcionário</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of nextDiarias(); track d.id) {
+                <tr>
+                  <td>{{ formatDate(d.data) }}</td>
+                  <td>
+                    <a [routerLink]="['/funcionarios', d.funcionarioId]" class="link">
+                      {{ getFuncionarioNome(d.funcionarioId) }}
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(d.statusDiaria)">
+                      {{ d.statusDiaria }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

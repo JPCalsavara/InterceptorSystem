@@ -38,6 +38,10 @@ export class DiariaBatchFormComponent implements OnInit {
   private alocacaoService = inject(AlocacaoService);
   private router = inject(Router);
 
+  get baseRoute(): string {
+    return this.router.url.startsWith('/cronograma') ? '/cronograma' : '/diarias';
+  }
+
   form!: FormGroup;
   clientes = signal<Cliente[]>([]);
   contratos = signal<Contrato[]>([]);
@@ -96,7 +100,7 @@ export class DiariaBatchFormComponent implements OnInit {
       this.form.get('contratoId')?.reset({ value: '', disabled: !id });
       this.form.get('alocacaoId')?.reset({ value: '', disabled: !id });
       this.form.get('funcionarioId')?.reset({ value: '', disabled: !id });
-      
+
       this.contratos.set([]);
       this.alocacoes.set([]);
       this.funcionarios.set([]);
@@ -125,7 +129,7 @@ export class DiariaBatchFormComponent implements OnInit {
         this.selectedFuncionarioEscala.set(null);
         return;
       }
-      const func = this.funcionarios().find(f => f.id === funcId);
+      const func = this.funcionarios().find((f) => f.id === funcId);
       this.selectedFuncionarioEscala.set(func?.tipoEscala ?? null);
       // Reset diaPartida ao trocar funcionário
       this.form.get('diaPartida')?.setValue('TRABALHA');
@@ -136,9 +140,7 @@ export class DiariaBatchFormComponent implements OnInit {
     this.contratoService.getAll().subscribe({
       next: (data) => {
         this.contratos.set(
-          data.filter(
-            (c) => c.clienteId === clienteId && c.status !== StatusContrato.FINALIZADO,
-          ),
+          data.filter((c) => c.clienteId === clienteId && c.status !== StatusContrato.FINALIZADO),
         );
       },
       error: (err) => this.handleError('Erro ao carregar contratos.', err),
@@ -236,17 +238,13 @@ export class DiariaBatchFormComponent implements OnInit {
     this.diariaService.createBatch(diarias).subscribe({
       next: (result) => {
         console.log(`${result.length} diárias criadas com sucesso!`);
-        this.router.navigate(['/diarias']);
+        this.router.navigate([this.baseRoute]);
       },
       error: (err) => this.handleError('Erro ao criar diárias em lote.', err),
     });
   }
 
-  private createDiariaDto(
-    funcionarioId: string,
-    alocacaoId: string,
-    data: Date,
-  ): CreateDiariaDto {
+  private createDiariaDto(funcionarioId: string, alocacaoId: string, data: Date): CreateDiariaDto {
     return {
       funcionarioId,
       alocacaoId,
@@ -264,7 +262,7 @@ export class DiariaBatchFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/diarias']);
+    this.router.navigate([this.baseRoute]);
   }
 
   markAllAsTouched(): void {

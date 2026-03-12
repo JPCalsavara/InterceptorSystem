@@ -72,8 +72,8 @@ interface FuncionarioRanking {
   tipoFuncionario: string;
   diariasNoMes: number;
   faltasNoMes: number;
-  taxaPresenca: number; // 0-100
-  salarioTotal?: number;
+  taxaPresenca: number;
+  custoMensal?: number;
 }
 
 interface DadosMensais {
@@ -256,7 +256,7 @@ export class DashboardComponent implements OnInit {
           diariasNoMes: total,
           faltasNoMes: faltas,
           taxaPresenca,
-          salarioTotal: func.salarioTotal,
+          custoMensal: func.custoMensalReal ?? func.custoMensalEstimado,
         };
       })
       .filter((f) => f.diariasNoMes > 0)

@@ -52,6 +52,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
                 input.Contrato.DataInicio,
                 input.Contrato.DataFim,
                 input.Contrato.Status,
+                null,
                 input.Contrato.ValorDiariaVigilante
             );
 

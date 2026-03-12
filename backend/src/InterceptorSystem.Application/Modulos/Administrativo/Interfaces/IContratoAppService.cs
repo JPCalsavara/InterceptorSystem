@@ -9,5 +9,6 @@ public interface IContratoAppService
     Task DeleteAsync(Guid id);
     Task<ContratoDtoOutput?> GetByIdAsync(Guid id);
     Task<IEnumerable<ContratoDtoOutput>> GetAllAsync();
+    Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId);
 }
 

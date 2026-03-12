@@ -9,13 +9,17 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
+  // HttpClient provided via provideHttpClient() in app.config.ts
   template: `
     <div class="landing-page">
       <!-- Header -->
@@ -28,6 +32,7 @@ import { AuthService } from '../../services/auth.service';
             <a href="#sistema" class="nav-link hide-mobile">Sistema</a>
             <a href="#numeros" class="nav-link hide-mobile">Números</a>
             <a href="#lideranca" class="nav-link hide-mobile">Liderança</a>
+            <a href="#contato" class="nav-link hide-mobile">Contato</a>
 
             <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Menu">
               @if (isMobileMenuOpen()) {
@@ -80,6 +85,7 @@ import { AuthService } from '../../services/auth.service';
             <a href="#sistema" class="mobile-link" (click)="toggleMobileMenu()">Sistema</a>
             <a href="#numeros" class="mobile-link" (click)="toggleMobileMenu()">Números</a>
             <a href="#lideranca" class="mobile-link" (click)="toggleMobileMenu()">Liderança</a>
+            <a href="#contato" class="mobile-link" (click)="toggleMobileMenu()">Contato</a>
             <div class="mobile-actions">
               <a routerLink="/login" class="btn-outline mobile-btn" (click)="toggleMobileMenu()"
                 >Entrar</a
@@ -104,11 +110,12 @@ import { AuthService } from '../../services/auth.service';
             <h1 class="hero-title">
               Assessoria<br />
               <span class="hero-title-accent">inteligente</span><br />
-              em segurança<br />condominial
+              em Associação<br />Condominial
             </h1>
             <p class="hero-description">
-              A <strong>Interceptor Assessoria Inteligente</strong> oferece segurança terceirizada,
-              consultoria especializada e gerenciamento completo — segurança e administrativo — para
+              A <strong>Interceptor Assessoria Inteligente</strong> e uma
+              <strong>Empresa de Gestao e Facilities em Associacoes Condominiais</strong>, com
+              consultoria especializada e gerenciamento operacional e administrativo completo para
               clientes nas cidades de Porto Feliz, Tietê, Tatuí, Boituva e Salto.
             </p>
             <div class="hero-actions">
@@ -155,7 +162,7 @@ import { AuthService } from '../../services/auth.service';
                   d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
                 />
               </svg>
-              <span>120+ equipe</span>
+              <span>50+ equipe</span>
             </div>
             <div class="hv-float hv-float-2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -165,7 +172,7 @@ import { AuthService } from '../../services/auth.service';
                   d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"
                 />
               </svg>
-              <span>15+ clientes</span>
+              <span>7+ clientes</span>
             </div>
             <div class="hv-float hv-float-3">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -175,7 +182,7 @@ import { AuthService } from '../../services/auth.service';
                   d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>R$ 1M+/mês</span>
+              <span>R$ 400k+/mês</span>
             </div>
           </div>
         </div>
@@ -197,19 +204,19 @@ import { AuthService } from '../../services/auth.service';
           <div class="stats-label">Nossa Empresa em Números</div>
           <div class="stats-row">
             <div class="stat-item">
-              <span class="stat-n">15+</span>
+              <span class="stat-n">7+</span>
               <span class="stat-l">Clientes Atendidos</span>
               <span class="stat-d">Região metropolitana de Sorocaba</span>
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
-              <span class="stat-n">120+</span>
+              <span class="stat-n">50+</span>
               <span class="stat-l">Funcionários Gerenciados</span>
-              <span class="stat-d">Vigilantes, porteiros e supervisores</span>
+              <span class="stat-d">Vigias, porteiros e supervisores</span>
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
-              <span class="stat-n">R$1M+</span>
+              <span class="stat-n">R$400k+</span>
               <span class="stat-l">Folha de Pagamento</span>
               <span class="stat-d">Gerenciamento mensal de custos</span>
             </div>
@@ -217,7 +224,7 @@ import { AuthService } from '../../services/auth.service';
             <div class="stat-item">
               <span class="stat-n">10+</span>
               <span class="stat-l">Anos de Experiência</span>
-              <span class="stat-d">No mercado de segurança patrimonial</span>
+              <span class="stat-d">No mercado de gestão e facilities condominiais</span>
             </div>
           </div>
         </div>
@@ -230,17 +237,18 @@ import { AuthService } from '../../services/auth.service';
             <div class="section-eyebrow">Sobre Nós</div>
             <h2 class="section-title">Interceptor<br />Assessoria Inteligente</h2>
             <p class="about-text">
-              Somos uma empresa especializada em
-              <strong>segurança patrimonial terceirizada</strong>, <strong>consultoria</strong> e
-              <strong>gerenciamento operacional e administrativo</strong> para clientes.
-              Atualmente atendemos <strong>7 clientes</strong> nas cidades de
+              Somos uma
+              <strong>Empresa de Gestao e Facilities em Associacoes Condominiais</strong>, com
+              <strong>consultoria</strong> e
+              <strong>gerenciamento operacional e administrativo</strong> para clientes. Atualmente
+              atendemos <strong>7 clientes</strong> nas cidades de
               <strong>Porto Feliz, Tietê, Tatuí, Boituva e Salto</strong>.
             </p>
             <p class="about-text">
               Com mais de uma década de experiência no setor, desenvolvemos soluções sob medida para
-              cada cliente — desde a diária de profissionais de segurança até a gestão completa
-              da operação administrativa. Nossa metodologia garante proteção eficiente,
-              transparência total e tranquilidade para síndicos e moradores.
+              cada cliente — da operação de facilities à gestão completa administrativa. Nossa
+              metodologia garante eficiência operacional, transparência total e tranquilidade para
+              síndicos e moradores.
             </p>
           </div>
           <div class="about-values">
@@ -255,10 +263,8 @@ import { AuthService } from '../../services/auth.service';
                 </svg>
               </div>
               <div class="value-content">
-                <h4>Segurança Terceirizada</h4>
-                <p>
-                  Profissionais qualificados e treinados, escalas cobertas e supervisão contínua
-                </p>
+                <h4>Operacao de Facilities</h4>
+                <p>Profissionais qualificados, escalas cobertas e supervisão contínua</p>
               </div>
             </div>
             <div class="value-item">
@@ -273,7 +279,7 @@ import { AuthService } from '../../services/auth.service';
               </div>
               <div class="value-content">
                 <h4>Consultoria Especializada</h4>
-                <p>Análise e otimização da operação de segurança com foco em resultados reais</p>
+                <p>Análise e otimização da operação com foco em resultados reais</p>
               </div>
             </div>
             <div class="value-item">
@@ -304,7 +310,7 @@ import { AuthService } from '../../services/auth.service';
             <div class="section-eyebrow center">Nossos Serviços</div>
             <h2 class="features-title">Soluções completas<br />para sua operação</h2>
             <p class="features-subtitle">
-              Da vigilância terceirizada à gestão financeira — tudo que seu cliente precisa
+              Da operacao de facilities à gestão financeira — tudo que seu cliente precisa
             </p>
           </div>
 
@@ -320,10 +326,10 @@ import { AuthService } from '../../services/auth.service';
                   />
                 </svg>
               </div>
-              <h3>Vigilância Terceirizada</h3>
+              <h3>Facilities Operacionais</h3>
               <p>
-                Profissionais qualificados e treinados para segurança patrimonial de clientes.
-                Escalas 12x36 e comercial com cobertura completa.
+                Profissionais qualificados para operação condominial de campo. Escalas 12x36 e
+                comercial com cobertura completa.
               </p>
             </div>
             <div class="feature-card">
@@ -373,8 +379,8 @@ import { AuthService } from '../../services/auth.service';
               </div>
               <h3>Gestão de Equipes</h3>
               <p>
-                Seleção, treinamento, supervisão e gestão completa de vigilantes, porteiros e
-                equipes de segurança patrimonial.
+                Seleção, treinamento, supervisão e gestão completa de equipes operacionais para
+                associações condominiais.
               </p>
             </div>
             <div class="feature-card">
@@ -428,7 +434,7 @@ import { AuthService } from '../../services/auth.service';
             <h2 class="section-title">InterceptorSystem</h2>
             <p class="product-lead">
               A plataforma digital desenvolvida pela própria Interceptor para revolucionar a gestão
-              de segurança condominial.
+              de associacoes condominiais.
             </p>
             <p class="product-text">
               O <strong>InterceptorSystem</strong> centraliza toda a operação: escalas de trabalho,
@@ -626,9 +632,9 @@ import { AuthService } from '../../services/auth.service';
           <div class="leadership-quote-area">
             <div class="big-quote-mark">"</div>
             <blockquote class="leader-quote">
-              Nosso objetivo é oferecer segurança com a mesma eficiência e transparência que
-              esperamos de qualquer serviço de excelência. Cada cliente que atendemos recebe
-              atenção personalizada porque entendemos que segurança não é commodity — é confiança.
+              Nosso objetivo é oferecer gestão e facilities com a mesma eficiência e transparência
+              que esperamos de qualquer serviço de excelência. Cada cliente que atendemos recebe
+              atenção personalizada porque entendemos que gestão condominial exige confiança.
             </blockquote>
             <div class="quote-author-info">
               <div class="qa-name">Luciano Calsavara</div>
@@ -642,9 +648,9 @@ import { AuthService } from '../../services/auth.service';
             <div class="section-eyebrow">Liderança</div>
             <h2 class="section-title">Luciano Calsavara</h2>
             <p class="leader-bio">
-              Com mais de <strong>10 anos de experiência</strong> na gestão de segurança
-              patrimonial, Luciano fundou a Interceptor com foco em excelência operacional e
-              inovação no atendimento a clientes.
+              Com mais de <strong>10 anos de experiência</strong> em gestão operacional, Luciano
+              fundou a Interceptor com foco em excelência e inovação no atendimento a associações
+              condominiais.
             </p>
             <p class="leader-bio">
               Sua vivência direta no campo — desde a diária de vigilantes até a negociação de
@@ -660,7 +666,7 @@ import { AuthService } from '../../services/auth.service';
                     d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M18.75 4.236c.982.143 1.954.317 2.916.52a6.003 6.003 0 01-5.395 4.972m0 0a8.001 8.001 0 00-10.582 0m10.582 0L14.25 10.5m-10.582 0L10.5 10.5"
                   />
                 </svg>
-                <span>+10 anos no setor de segurança</span>
+                <span>+10 anos no setor de gestao e facilities</span>
               </div>
               <div class="lh-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -715,10 +721,10 @@ import { AuthService } from '../../services/auth.service';
               />
             </svg>
           </div>
-          <h2>Seu cliente merece<br />a melhor assessoria</h2>
+          <h2>Seu cliente merece<br />a melhor gestão e facilities</h2>
           <p>
             Entre em contato e descubra como a Interceptor Assessoria Inteligente pode transformar a
-            segurança e a gestão do seu cliente.
+            gestão e as operações do seu cliente.
           </p>
           <a routerLink="/cadastro" class="btn-cta">
             Criar conta no InterceptorSystem
@@ -733,12 +739,104 @@ import { AuthService } from '../../services/auth.service';
         </div>
       </section>
 
+      <!-- ─── CONTATO ────────────────────────────────────────────────────── -->
+      <section class="contact-section" id="contato">
+        <div class="contact-inner">
+          <div class="contact-header">
+            <div class="section-eyebrow">Contato</div>
+            <h2 class="section-title">Fale com a Nossa Equipe</h2>
+            <p class="contact-subtitle">
+              Envie sua mensagem e retornaremos para apresentar como nossa
+              <strong>Empresa de Gestao e Facilities em Associacoes Condominiais</strong>
+              pode apoiar sua operação.
+            </p>
+          </div>
+
+          <form class="contact-form" (ngSubmit)="onContactSubmit()" #contactForm="ngForm">
+            <div class="contact-grid">
+              <div class="contact-field">
+                <label for="contactName">Nome</label>
+                <input
+                  id="contactName"
+                  name="contactName"
+                  type="text"
+                  [(ngModel)]="contactName"
+                  required
+                  placeholder="Seu nome completo"
+                />
+              </div>
+
+              <div class="contact-field">
+                <label for="contactCity">Cidade</label>
+                <input
+                  id="contactCity"
+                  name="contactCity"
+                  type="text"
+                  [(ngModel)]="contactCity"
+                  required
+                  placeholder="Ex: Porto Feliz"
+                />
+              </div>
+
+              <div class="contact-field">
+                <label for="contactState">Estado</label>
+                <input
+                  id="contactState"
+                  name="contactState"
+                  type="text"
+                  maxlength="2"
+                  [(ngModel)]="contactState"
+                  required
+                  placeholder="SP"
+                />
+              </div>
+
+              <div class="contact-field">
+                <label for="contactEmail">Email</label>
+                <input
+                  id="contactEmail"
+                  name="contactEmail"
+                  type="email"
+                  [(ngModel)]="contactEmail"
+                  required
+                  placeholder="voce@empresa.com"
+                />
+              </div>
+            </div>
+
+            <div class="contact-field full">
+              <label for="contactDescription">Descricao</label>
+              <textarea
+                id="contactDescription"
+                name="contactDescription"
+                rows="5"
+                [(ngModel)]="contactDescription"
+                required
+                placeholder="Descreva sua necessidade"
+              ></textarea>
+            </div>
+
+            @if (contactMessage()) {
+              <div class="contact-feedback success">{{ contactMessage() }}</div>
+            }
+
+            <button
+              type="submit"
+              class="btn-contact"
+              [disabled]="!contactForm.form.valid || isContactSubmitting()"
+            >
+              {{ isContactSubmitting() ? 'Enviando...' : 'Enviar Contato' }}
+            </button>
+          </form>
+        </div>
+      </section>
+
       <!-- ─── FOOTER ─────────────────────────────────────────────────────── -->
       <footer class="landing-footer">
         <div class="footer-inner">
           <div class="footer-brand">
             <img [src]="logoSrc()" alt="Interceptor Assessoria Inteligente" class="footer-logo" />
-            <p class="footer-tagline">Segurança com excelência e transparência.</p>
+            <p class="footer-tagline">Gestao e Facilities com excelencia e transparencia.</p>
           </div>
           <div class="footer-location">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -2025,6 +2123,116 @@ import { AuthService } from '../../services/auth.service';
         }
       }
 
+      /* ── CONTATO ─────────────────────────────────────────────── */
+      .contact-section {
+        padding: 5rem 2rem;
+        background: linear-gradient(180deg, var(--bg-primary) 0%, var(--surface-card) 100%);
+      }
+
+      .contact-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        background: var(--surface-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-2xl);
+        padding: 2rem;
+        box-shadow: 0 8px 28px rgba(10, 25, 47, 0.08);
+      }
+
+      .contact-header {
+        margin-bottom: var(--space-6);
+      }
+
+      .contact-subtitle {
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin: var(--space-3) 0 0;
+      }
+
+      .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-4);
+      }
+
+      .contact-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .contact-field.full {
+        margin-top: var(--space-4);
+      }
+
+      .contact-field label {
+        font-size: var(--text-sm);
+        font-weight: var(--fw-semibold);
+        color: var(--text-primary);
+      }
+
+      .contact-field input,
+      .contact-field textarea {
+        width: 100%;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        padding: 0.875rem 1rem;
+        font-size: var(--text-sm);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .contact-field input:focus,
+      .contact-field textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.15);
+      }
+
+      .contact-feedback {
+        margin-top: var(--space-4);
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+      }
+
+      .contact-feedback.success {
+        background: rgba(46, 125, 50, 0.12);
+        border: 1px solid rgba(46, 125, 50, 0.35);
+        color: #2e7d32;
+      }
+
+      .btn-contact {
+        margin-top: var(--space-5);
+        border: none;
+        border-radius: var(--radius-lg);
+        background: var(--primary-color);
+        color: white;
+        padding: 0.9rem 1.4rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--text-sm);
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .btn-contact:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(21, 101, 192, 0.22);
+      }
+
+      .btn-contact:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
       /* ── FOOTER ──────────────────────────────────────────────── */
       .landing-footer {
         padding: var(--space-12) 2rem;
@@ -2136,6 +2344,18 @@ import { AuthService } from '../../services/auth.service';
       @media (max-width: 600px) {
         :host {
           --header-height: 72px;
+        }
+
+        .contact-section {
+          padding: 3.5rem 1.5rem;
+        }
+
+        .contact-inner {
+          padding: 1.25rem;
+        }
+
+        .contact-grid {
+          grid-template-columns: 1fr;
         }
 
         .hero {
@@ -2294,10 +2514,19 @@ import { AuthService } from '../../services/auth.service';
 export class LandingComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private http = inject(HttpClient);
 
   isDarkMode = signal(false);
   isMobileMenuOpen = signal(false);
   isHeaderVisible = signal(true);
+  contactMessage = signal<string | null>(null);
+
+  contactName = '';
+  contactCity = '';
+  contactState = '';
+  contactEmail = '';
+  contactDescription = '';
+
   private lastScrollY = 0;
   private scrollThreshold = 100;
 
@@ -2327,6 +2556,40 @@ export class LandingComponent implements OnInit {
     }
     this.initializeTheme();
     this.setupScrollListener();
+  }
+
+  isContactSubmitting = signal(false);
+
+  onContactSubmit(): void {
+    if (this.isContactSubmitting()) return;
+    this.isContactSubmitting.set(true);
+    this.contactMessage.set(null);
+
+    const payload = {
+      nome: this.contactName,
+      cidade: this.contactCity,
+      estado: this.contactState,
+      email: this.contactEmail,
+      descricao: this.contactDescription,
+    };
+
+    this.http.post(`${environment.apiUrl}/api/contato`, payload).subscribe({
+      next: () => {
+        this.contactMessage.set('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+        this.contactName = '';
+        this.contactCity = '';
+        this.contactState = '';
+        this.contactEmail = '';
+        this.contactDescription = '';
+        this.isContactSubmitting.set(false);
+      },
+      error: () => {
+        this.contactMessage.set(
+          'Erro ao enviar mensagem. Tente novamente ou entre em contato pelo e-mail.',
+        );
+        this.isContactSubmitting.set(false);
+      },
+    });
   }
 
   private setupScrollListener(): void {

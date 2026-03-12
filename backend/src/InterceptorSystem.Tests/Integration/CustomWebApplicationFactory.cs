@@ -38,6 +38,7 @@ public class NoOpEmailService : IEmailService
     public Task EnviarVerificacaoEmailAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
     public Task EnviarResetSenhaAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
     public Task EnviarConfirmacaoAlteracaoEmailAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
+    public Task EnviarContatoAsync(string nome, string cidade, string estado, string emailRemetente, string descricao) => Task.CompletedTask;
 }
 
 /// <summary>
@@ -129,6 +130,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
             services.AddScoped<IDiariaRepository, DiariaRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
 
             // Repositório e serviços de autenticação
             services.AddScoped<IContaRepository, ContaRepository>();

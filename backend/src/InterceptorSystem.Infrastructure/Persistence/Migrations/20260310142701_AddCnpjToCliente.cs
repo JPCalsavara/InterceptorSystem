@@ -18,6 +18,25 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                 nullable: false,
                 defaultValue: "");
 
+            // Resolve duplicates created by legacy data before creating the unique index.
+            // Keeps the first (EmpresaId, Cnpj) and rewrites subsequent duplicates.
+            migrationBuilder.Sql(@"
+                WITH duplicated AS (
+                    SELECT
+                        ""Id"",
+                        ROW_NUMBER() OVER (
+                            PARTITION BY ""EmpresaId"", ""Cnpj""
+                            ORDER BY ""CreatedAt"", ""Id""
+                        ) AS rn
+                    FROM ""Clientes""
+                )
+                UPDATE ""Clientes"" c
+                SET ""Cnpj"" = 'DUP' || SUBSTRING(MD5(c.""Id""::text) FROM 1 FOR 11)
+                FROM duplicated d
+                WHERE c.""Id"" = d.""Id""
+                  AND d.rn > 1;
+            ");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Clientes_EmpresaId_Cnpj",
                 table: "Clientes",

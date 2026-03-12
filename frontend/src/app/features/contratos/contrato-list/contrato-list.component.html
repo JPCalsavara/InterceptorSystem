@@ -196,6 +196,10 @@
                   }}</span>
                 </div>
               </div>
+              <div class="card-tags-preview">
+                <span class="tag-label">Tags / diária</span>
+                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
+              </div>
               <div class="card-info">
                 <span class="badge" [ngClass]="getStatusClass(contrato.status)">
                   {{ getStatusLabel(contrato.status) }}
@@ -278,6 +282,10 @@
                     getContratoLucro(contrato) | currency: 'BRL'
                   }}</span>
                 </div>
+              </div>
+              <div class="card-tags-preview">
+                <span class="tag-label">Tags / diária</span>
+                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
               </div>
               <div class="card-info">
                 <span class="card-date"
@@ -362,6 +370,10 @@
                   }}</span>
                 </div>
               </div>
+              <div class="card-tags-preview">
+                <span class="tag-label">Tags / diária</span>
+                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
+              </div>
               <div class="card-info">
                 <span class="card-date"
                   >Vence em {{ getDiasParaVencimento(contrato.dataFim) }} dias</span
@@ -445,6 +457,10 @@
                   }}</span>
                 </div>
               </div>
+              <div class="card-tags-preview">
+                <span class="tag-label">Tags / diária</span>
+                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
+              </div>
               <div class="card-info">
                 <span class="card-date"
                   >Vence em {{ getDiasParaVencimento(contrato.dataFim) }} dias</span
@@ -524,6 +540,10 @@
                     {{ contrato.dataFim | date: 'dd/MM/yy' }}</span
                   >
                 </div>
+              </div>
+              <div class="card-tags-preview">
+                <span class="tag-label">Tags / diária</span>
+                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
               </div>
               <div class="card-info">
                 <span class="badge badge-neutral"> Finalizado </span>

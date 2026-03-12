@@ -1,4 +1,4 @@
-<div [class]="isEmbedded ? 'form-container-embedded' : 'form-container'">
+<div [class]="isEmbedded ? 'form-container-embedded' : 'form-container page-container'">
   <!-- Header (apenas na página standalone) -->
   @if (!isEmbedded) {
     <div class="form-header">
@@ -12,7 +12,7 @@
         </svg>
         Voltar
       </button>
-      <h1>{{ isEditMode() ? 'Editar Diária' : 'Nova Diária' }}</h1>
+      <h1>{{ pageTitle }}</h1>
     </div>
   }
 

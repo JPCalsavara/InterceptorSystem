@@ -15,8 +15,20 @@ import { LayoutStateService } from '../services/layout-state.service';
     <div class="app-layout">
       <app-sidebar />
       <main class="main-content">
-        <app-email-verification-banner />
-        <router-outlet />
+        <div class="main-content-inner">
+          <app-email-verification-banner />
+          <div class="page-router-slot">
+            <router-outlet />
+          </div>
+
+          <footer class="system-footer">
+            <div class="footer-brand">Interceptor System</div>
+            <div class="footer-meta">
+              Gestao interna de clientes, postos, alocacoes e cronogramas.
+            </div>
+            <div class="footer-copy">{{ currentYear }} Interceptor. Ambiente interno.</div>
+          </footer>
+        </div>
       </main>
     </div>
   `,
@@ -39,13 +51,46 @@ import { LayoutStateService } from '../services/layout-state.service';
         flex: 1;
         min-width: 0;
         margin-left: 260px;
-        padding: var(--space-8);
         min-height: calc(100vh - 64px);
         background: var(--bg-primary);
 
+        .main-content-inner {
+          min-height: calc(100vh - 64px);
+          display: flex;
+          flex-direction: column;
+          padding: var(--space-8) var(--space-6) var(--space-6);
+        }
+
+        .page-router-slot {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .system-footer {
+          margin-top: var(--space-8);
+          padding: var(--space-4) 0 0;
+          border-top: 1px solid var(--border-subtle);
+          color: var(--text-secondary);
+          display: grid;
+          gap: var(--space-2);
+          font-size: var(--text-sm);
+        }
+
+        .footer-brand {
+          color: var(--text-primary);
+          font-weight: var(--fw-semibold);
+        }
+
+        .footer-copy {
+          font-size: var(--text-xs);
+        }
+
         @media (max-width: 768px) {
           margin-left: 0;
-          padding: var(--space-4);
+
+          .main-content-inner {
+            padding: var(--space-4) var(--space-3);
+          }
         }
       }
 
@@ -73,6 +118,8 @@ import { LayoutStateService } from '../services/layout-state.service';
 })
 export class AppShellComponent {
   layoutState = inject(LayoutStateService);
+  currentYear = new Date().getFullYear();
+
   overlayVisible = computed(
     () => this.layoutState.leftDrawerOpen() || this.layoutState.rightDrawerOpen(),
   );

@@ -86,8 +86,24 @@ export class ContratoDetailComponent implements OnInit {
       .map((f) => ({
         funcionario: f,
         custo: this.calcularCustoFuncionario(f, c),
-        diasMes: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? 15 : f.tipoEscala === TipoEscala.FOLGUISTA ? 8 : f.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS ? 26 : 22,
-        escala: f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS ? '12×36' : f.tipoEscala === TipoEscala.ALCALA_8H ? 'Alcalá 8h' : f.tipoEscala === TipoEscala.FOLGUISTA ? 'Folguista' : f.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS ? '8h (6×2)' : '5×2',
+        diasMes:
+          f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS
+            ? 15
+            : f.tipoEscala === TipoEscala.FOLGUISTA
+              ? 8
+              : f.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS
+                ? 26
+                : 22,
+        escala:
+          f.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS
+            ? '12×36'
+            : f.tipoEscala === TipoEscala.ALCALA_8H
+              ? 'Alcalá 8h'
+              : f.tipoEscala === TipoEscala.FOLGUISTA
+                ? 'Folguista'
+                : f.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS
+                  ? '8h (6×2)'
+                  : '5×2',
       }));
   });
 
@@ -193,7 +209,29 @@ export class ContratoDetailComponent implements OnInit {
     }
   }
 
+  getTagRatesPreview(): string {
+    const tags = this.contrato()?.tags ?? [];
+    if (tags.length === 0) {
+      return 'Sem tags tarifadas neste contrato';
+    }
+
+    return tags.map((tag) => `${tag.tagNome}: ${this.formatCurrency(tag.valorDiaria)}`).join(' • ');
+  }
+
+  getMaiorTagRate(): number {
+    const tags = this.contrato()?.tags ?? [];
+    return tags.length > 0 ? Math.max(...tags.map((tag) => tag.valorDiaria)) : 0;
+  }
+
   formatHorario(horarioInicio: string, horarioFim: string): string {
     return `${horarioInicio.substring(0, 5)} – ${horarioFim.substring(0, 5)}`;
+  }
+
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+    }).format(value || 0);
   }
 }

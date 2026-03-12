@@ -1,7 +1,7 @@
 <div class="page-container">
   <div class="page-header">
     <div class="header-content">
-      <button class="btn-back" routerLink="/diarias">
+      <button class="btn-back" [routerLink]="baseRoute">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
           <path
             fill-rule="evenodd"
@@ -27,9 +27,7 @@
       <h3 class="section-title">Seleção Principal</h3>
 
       <div class="form-group">
-        <label for="clienteId" class="form-label"
-          >Cliente <span class="required">*</span></label
-        >
+        <label for="clienteId" class="form-label">Cliente <span class="required">*</span></label>
         <select
           id="clienteId"
           formControlName="clienteId"
@@ -82,7 +80,11 @@
           >
             <option value="">Selecione um turno</option>
             @for (aloc of alocacoes(); track aloc.id) {
-              <option [value]="aloc.id">{{ aloc.horarioInicio.substring(0, 5) }} - {{ aloc.horarioFim.substring(0, 5) }} ({{ aloc.tipoEscala }})</option>
+              <option [value]="aloc.id">
+                {{ aloc.horarioInicio.substring(0, 5) }} - {{ aloc.horarioFim.substring(0, 5) }} ({{
+                  aloc.tipoEscala
+                }})
+              </option>
             }
           </select>
           @if (hasError('alocacaoId')) {

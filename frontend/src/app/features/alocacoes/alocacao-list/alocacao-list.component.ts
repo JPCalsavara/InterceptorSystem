@@ -14,10 +14,12 @@ interface AlocacaoView extends Alocacao {
   contratoDesc: string;
 }
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-alocacao-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './alocacao-list.component.html',
   styleUrl: './alocacao-list.component.scss',
 })
@@ -34,8 +36,28 @@ export class AlocacaoListComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
+  // Filtros
+  filtroCliente = signal<string>('');
+  filtroPosto = signal<string>('');
+
   alocacoesView = computed(() => {
-    return this.alocacoes().map((aloc) => {
+    let result = this.alocacoes();
+
+    const clienteFiltro = this.filtroCliente();
+    const postoFiltro = this.filtroPosto();
+
+    if (clienteFiltro) {
+      const postoIds = this.postos()
+        .filter((p) => p.clienteId === clienteFiltro)
+        .map((p) => p.id);
+      result = result.filter((a) => postoIds.includes(a.postoId));
+    }
+
+    if (postoFiltro) {
+      result = result.filter((a) => a.postoId === postoFiltro);
+    }
+
+    return result.map((aloc) => {
       const posto = this.postos().find((p) => p.id === aloc.postoId);
       const cliente = this.clientes().find((c) => c.id === posto?.clienteId);
       const contrato = this.contratos().find((c) => c.id === aloc.contratoId);

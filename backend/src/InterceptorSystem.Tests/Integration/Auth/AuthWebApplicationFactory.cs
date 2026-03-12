@@ -76,6 +76,7 @@ public class AuthWebApplicationFactory : WebApplicationFactory<Program>
             services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
             services.AddScoped<IDiariaRepository, DiariaRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
 
             // Repositório e serviços de autenticação
             services.AddScoped<IContaRepository, ContaRepository>();

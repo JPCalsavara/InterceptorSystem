@@ -27,6 +27,19 @@ public class AlocacaoRepository : IAlocacaoRepository
         return await _context.Alocacoes.ToListAsync();
     }
 
+    public async Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId)
+    {
+        return await _context.Alocacoes
+            .Join(
+                _context.Postos,
+                alocacao => alocacao.PostoId,
+                posto => posto.Id,
+                (alocacao, posto) => new { alocacao, posto })
+            .Where(x => x.posto.ClienteId == clienteId && x.posto.Ativo)
+            .Select(x => x.alocacao)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId)
     {
         return await _context.Alocacoes.Where(a => a.PostoId == postoId).ToListAsync();

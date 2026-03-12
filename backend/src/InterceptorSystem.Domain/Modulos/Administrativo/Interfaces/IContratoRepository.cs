@@ -6,6 +6,7 @@ namespace InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 
 public interface IContratoRepository : IRepository<Contrato>
 {
+    Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId);
     Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null);
 }
 

@@ -2,12 +2,27 @@
   <!-- Header -->
   <div class="page-header">
     <div class="header-content">
-      <h1>Diárias</h1>
-      <p class="subtitle">Gerencie todas as diárias de funcionários</p>
+      <h1>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="color: var(--primary-color); width: 1em; height: 1em"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8.25 2.25v2.25m7.5-2.25v2.25M3 8.25h18M5.25 4.5h13.5A2.25 2.25 0 0121 6.75v12A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75v-12A2.25 2.25 0 015.25 4.5zM8.25 12h7.5M8.25 15.75h4.5"
+          />
+        </svg>
+        {{ pageTitle() }}
+      </h1>
+      <p class="subtitle">{{ pageSubtitle() }}</p>
     </div>
     <div class="header-actions">
-      <button class="btn-secondary" routerLink="/diarias/batch">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <button class="btn-secondary btn-md" [routerLink]="[baseRoute(), 'batch']">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="width: 1em; height: 1em">
           <path
             fill-rule="evenodd"
             d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v10H5V5z"
@@ -19,8 +34,8 @@
         </svg>
         Diária Múltipla
       </button>
-      <button class="btn-primary" routerLink="/diarias/novo">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <button class="btn-primary btn-md" [routerLink]="[baseRoute(), 'novo']">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="width: 1em; height: 1em">
           <path
             fill-rule="evenodd"
             d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
@@ -268,7 +283,7 @@
         </svg>
         <h3>Nenhuma diária encontrada</h3>
         <p>Não há diárias cadastradas para os filtros selecionados.</p>
-        <button class="btn-primary" routerLink="/diarias/novo">Nova Diária</button>
+        <button class="btn-primary" [routerLink]="[baseRoute(), 'novo']">Nova Diária</button>
       </div>
     }
 
@@ -340,11 +355,7 @@
             </div>
 
             <div class="card-actions">
-              <button
-                class="btn-icon"
-                [routerLink]="['/diarias', diaria.id]"
-                title="Ver detalhes"
-              >
+              <button class="btn-icon" [routerLink]="[baseRoute(), diaria.id]" title="Ver detalhes">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                   <path
@@ -411,10 +422,7 @@
                       <div class="func-name">{{ getFuncionarioNome(diaria.funcionarioId) }}</div>
                       <div class="func-badges">
                         @if (diaria.statusDiaria !== 'CANCELADA') {
-                          <span
-                            class="mini-badge"
-                            [ngClass]="getStatusClass(diaria.statusDiaria)"
-                          >
+                          <span class="mini-badge" [ngClass]="getStatusClass(diaria.statusDiaria)">
                             {{ getStatusLabel(diaria.statusDiaria) }}
                           </span>
                         }

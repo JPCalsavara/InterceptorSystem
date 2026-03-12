@@ -212,10 +212,71 @@ export const routes: Routes = [
                 (m) => m.AlocacaoListComponent,
               ),
           },
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/alocacoes/alocacao-form/alocacao-form.component').then(
+                (m) => m.AlocacaoFormComponent,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/alocacoes/alocacao-form/alocacao-form.component').then(
+                (m) => m.AlocacaoFormComponent,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/alocacoes/alocacao-detail/alocacao-detail.component').then(
+                (m) => m.AlocacaoDetailComponent,
+              ),
+          },
         ],
       },
       {
         path: 'diarias',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/diarias/diaria-list/diaria-list.component').then(
+                (m) => m.DiariaListComponent,
+              ),
+          },
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/diarias/diaria-form/diaria-form.component').then(
+                (m) => m.DiariaFormComponent,
+              ),
+          },
+          {
+            path: 'batch',
+            loadComponent: () =>
+              import('./features/diarias/diaria-batch-form/diaria-batch-form.component').then(
+                (m) => m.DiariaBatchFormComponent,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/diarias/diaria-form/diaria-form.component').then(
+                (m) => m.DiariaFormComponent,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/diarias/diaria-detail/diaria-detail.component').then(
+                (m) => m.DiariaDetailComponent,
+              ),
+          },
+        ],
+      },
+      {
+        path: 'cronograma',
         children: [
           {
             path: '',

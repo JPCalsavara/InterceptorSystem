@@ -62,6 +62,17 @@ export class DiariaFormComponent implements OnInit, OnChanges {
   isEditMode = signal(false);
   diariaId: string | null = null;
 
+  get baseRoute(): string {
+    return this.router.url.startsWith('/cronograma') ? '/cronograma' : '/diarias';
+  }
+
+  get pageTitle(): string {
+    if (this.isEditMode()) {
+      return this.baseRoute === '/cronograma' ? 'Editar Item do Cronograma' : 'Editar Diária';
+    }
+    return this.baseRoute === '/cronograma' ? 'Novo Item do Cronograma' : 'Nova Diária';
+  }
+
   statusOptions = [
     { value: StatusDiaria.CONFIRMADA, label: 'Confirmada' },
     { value: StatusDiaria.CANCELADA, label: 'Cancelada' },
@@ -195,7 +206,7 @@ export class DiariaFormComponent implements OnInit, OnChanges {
           if (this.isEmbedded) {
             this.savedEvent.emit();
           } else {
-            this.router.navigate(['/diarias']);
+            this.router.navigate([this.baseRoute]);
           }
         },
         error: (err) => {
@@ -211,7 +222,6 @@ export class DiariaFormComponent implements OnInit, OnChanges {
         data: formValue.data,
         statusDiaria: formValue.statusDiaria,
         tipoDiaria: formValue.tipoDiaria,
-        valorDiaria: 0, // Backend calculando ou precisa vir do contrato
       };
 
       this.service.create(createDto).subscribe({
@@ -220,7 +230,7 @@ export class DiariaFormComponent implements OnInit, OnChanges {
           if (this.isEmbedded) {
             this.savedEvent.emit();
           } else {
-            this.router.navigate(['/diarias']);
+            this.router.navigate([this.baseRoute]);
           }
         },
         error: (err) => {
@@ -240,7 +250,7 @@ export class DiariaFormComponent implements OnInit, OnChanges {
     if (this.isEmbedded) {
       this.cancelledEvent.emit();
     } else {
-      this.router.navigate(['/diarias']);
+      this.router.navigate([this.baseRoute]);
     }
   }
 }

@@ -191,8 +191,7 @@ export class ContratoListComponent implements OnInit {
 
     // Funcionários ativos deste cliente
     const ativos = this.funcionarios().filter(
-      (f) =>
-        f.clienteId === contrato.clienteId && f.statusFuncionario === StatusFuncionario.ATIVO,
+      (f) => f.clienteId === contrato.clienteId && f.statusFuncionario === StatusFuncionario.ATIVO,
     );
 
     // Benefícios: se há ativos reais, usa qtd real; senao usa estimativa do contrato
@@ -212,5 +211,27 @@ export class ContratoListComponent implements OnInit {
 
   getValorMensal(contrato: Contrato): number {
     return contrato.valorTotalMensal || 0;
+  }
+
+  getTagRatesPreview(contrato: Contrato): string {
+    const tags = contrato.tags ?? [];
+    if (tags.length === 0) {
+      return 'Sem tags tarifadas';
+    }
+
+    return tags.map((tag) => `${tag.tagNome}: ${this.formatCurrency(tag.valorDiaria)}`).join(' • ');
+  }
+
+  getMaxTagRate(contrato: Contrato): number {
+    const tags = contrato.tags ?? [];
+    return tags.length > 0 ? Math.max(...tags.map((tag) => tag.valorDiaria)) : 0;
+  }
+
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+    }).format(value || 0);
   }
 }

@@ -53,6 +53,14 @@
             <span class="info-label">Funcionários Necessários</span>
             <span class="info-value">{{ contrato()!.quantidadeFuncionarios }}</span>
           </div>
+          <div class="info-item">
+            <span class="info-label">Tags / Diárias</span>
+            <span class="info-value">{{ getTagRatesPreview() }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Maior Diária por Tag</span>
+            <span class="info-value">{{ getMaiorTagRate() | currency: 'BRL' }}</span>
+          </div>
         </div>
       </div>
 
@@ -277,9 +285,7 @@
               <tbody>
                 @for (posto of postos(); track posto.id) {
                   <tr>
-                    <td class="horario">
-                      {{ posto.nome }} - {{ posto.cidade }}
-                    </td>
+                    <td class="horario">{{ posto.nome }} - {{ posto.cidade }}</td>
                     <td>{{ contrato()!.quantidadeFuncionarios }}</td>
                     <td>
                       <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>

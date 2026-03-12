@@ -5,6 +5,7 @@ using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
 namespace InterceptorSystem.Tests.Unity;
@@ -13,6 +14,7 @@ public class ContratoAppServiceTests
 {
     private readonly Mock<IContratoRepository> _contratoRepo = new();
     private readonly Mock<IClienteRepository> _clienteRepo = new();
+    private readonly Mock<ITagRepository> _tagRepo = new();
     private readonly Mock<ICurrentTenantService> _tenantService = new();
     private readonly Mock<IUnitOfWork> _uow = new();
     private readonly ContratoAppService _service;
@@ -20,7 +22,13 @@ public class ContratoAppServiceTests
     public ContratoAppServiceTests()
     {
         _contratoRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        _service = new ContratoAppService(_contratoRepo.Object, _clienteRepo.Object, _tenantService.Object);
+        _tenantService.Setup(t => t.EmpresaId).Returns(Guid.NewGuid());
+        _service = new ContratoAppService(
+            _contratoRepo.Object,
+            _clienteRepo.Object,
+            _tagRepo.Object,
+            _tenantService.Object,
+            new MemoryCache(new MemoryCacheOptions()));
     }
 
     [Fact]
@@ -66,6 +74,8 @@ public class ContratoAppServiceTests
     [Fact]
     public async Task Create_DeveFalhar_QuandoTenantNaoDefinido()
     {
+        _tenantService.Setup(t => t.EmpresaId).Returns((Guid?)null);
+
         var input = new CreateContratoDtoInput(
             Guid.NewGuid(),
             "Contrato",

@@ -162,13 +162,11 @@ export class ClienteDetailComponent implements OnInit {
   });
 
   dobrasRealizadas = computed(() => {
-    return this.diariasPeriodo().filter((a) => a.tipoDiaria === TipoDiaria.DOBRA_PROGRAMADA)
-      .length;
+    return this.diariasPeriodo().filter((a) => a.tipoDiaria === TipoDiaria.DOBRA_PROGRAMADA).length;
   });
 
   substituicoesRealizadas = computed(() => {
-    return this.diariasPeriodo().filter((a) => a.tipoDiaria === TipoDiaria.SUBSTITUICAO)
-      .length;
+    return this.diariasPeriodo().filter((a) => a.tipoDiaria === TipoDiaria.SUBSTITUICAO).length;
   });
 
   custoMedioPorFuncionario = computed(() => {
@@ -214,7 +212,7 @@ export class ClienteDetailComponent implements OnInit {
           a.statusDiaria === StatusDiaria.CANCELADA,
       )
       .forEach((a) => {
-        const aloc = this.alocacoes().find(al => al.id === a.alocacaoId);
+        const aloc = this.alocacoes().find((al) => al.id === a.alocacaoId);
         if (aloc) {
           const count = faltasPorPosto.get(aloc.postoId) || 0;
           faltasPorPosto.set(aloc.postoId, count + 1);
@@ -313,51 +311,27 @@ export class ClienteDetailComponent implements OnInit {
   }
 
   private loadRelatedData(id: string): void {
-    // Carregar funcionários
-    this.funcionarioService.getByClienteId(id).subscribe({
-      next: (funcionarios) => {
+    forkJoin({
+      funcionarios: this.funcionarioService.getByClienteId(id),
+      postos: this.postoService.getByClienteId(id),
+      alocacoes: this.alocacaoService.getByClienteId(id),
+      diarias: this.diariaService.getByClienteId(id),
+      contratos: this.contratoService.getByClienteId(id),
+    }).subscribe({
+      next: ({ funcionarios, postos, alocacoes, diarias, contratos }) => {
         this.funcionarios.set(funcionarios);
-      },
-      error: (err) => console.warn('Erro ao carregar funcionários:', err),
-    });
-
-    // Carregar postos
-    this.postoService.getByClienteId(id).subscribe({
-      next: (postos) => {
         this.postos.set(postos);
-
-        // Carregar alocações para este cliente (via postos)
-        this.alocacaoService.getAll().subscribe({
-          next: (alocacoes) => {
-            const postoIds = postos.map((p) => p.id);
-            const filteredAlocs = alocacoes.filter(al => postoIds.includes(al.postoId));
-            this.alocacoes.set(filteredAlocs);
-            
-            const alocIds = filteredAlocs.map(al => al.id);
-            // Carregar diárias
-            this.diariaService.getAll().subscribe({
-              next: (diarias) => {
-                this.diarias.set(diarias.filter((a) => alocIds.includes(a.alocacaoId)));
-              },
-              error: (err) => console.warn('Erro ao carregar diárias:', err),
-            });
-          },
-          error: (err) => console.warn('Erro ao carregar alocações:', err),
-        });
+        this.alocacoes.set(alocacoes);
+        this.diarias.set(diarias);
+        this.contratos.set(contratos);
+        this.loading.set(false);
       },
-      error: (err) => console.warn('Erro ao carregar postos:', err),
-    });
-
-    // Carregar contratos
-    this.contratoService.getAll().subscribe({
-      next: (contratos) => {
-        this.contratos.set(contratos.filter((c) => c.clienteId === id));
+      error: (err) => {
+        console.warn('Erro ao carregar dados relacionados do cliente:', err);
+        this.error.set('Erro ao carregar dados relacionados do cliente');
+        this.loading.set(false);
       },
-      error: (err) => console.warn('Erro ao carregar contratos:', err),
     });
-
-    // Dados carregados
-    this.loading.set(false);
   }
 
   getStatusLabel(status: StatusDiaria): string {
@@ -483,7 +457,7 @@ export class ClienteDetailComponent implements OnInit {
     for (const func of this.funcionarios()) {
       const contrato = contratos.find((c) => c.id === func.contratoId);
       if (!contrato) {
-        map.set(func.id, func.salarioTotal || 0);
+        map.set(func.id, func.custoMensalEstimado || func.custoMensalReal || 0);
         continue;
       }
 
@@ -525,7 +499,7 @@ export class ClienteDetailComponent implements OnInit {
   });
 
   private calcularProporcaoNoturna(alocacaoId: string): number {
-    const aloc = this.alocacoes().find(a => a.id === alocacaoId);
+    const aloc = this.alocacoes().find((a) => a.id === alocacaoId);
     return aloc && aloc.temHorarioNoturno ? 1.0 : 0;
   }
 
@@ -616,18 +590,15 @@ export class ClienteDetailComponent implements OnInit {
 
   // Contadores para diárias (evitar filtros no template)
   diariasConfirmadas = computed(() => {
-    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA)
-      .length;
+    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA).length;
   });
 
   diariasFaltas = computed(() => {
-    return this.diariasPeriodo().filter(
-      (a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
-    ).length;
+    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA)
+      .length;
   });
 
   diariasCancelamentos = computed(() => {
-    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.CANCELADA)
-      .length;
+    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.CANCELADA).length;
   });
 }

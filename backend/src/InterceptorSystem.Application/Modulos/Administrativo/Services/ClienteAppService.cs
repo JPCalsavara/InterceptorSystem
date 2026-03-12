@@ -78,7 +78,16 @@ public class ClienteAppService : IClienteAppService
             throw new KeyNotFoundException("Cliente não encontrado.");
 
         _repository.Remove(cliente);
-        await _repository.UnitOfWork.CommitAsync();
+        try
+        {
+            await _repository.UnitOfWork.CommitAsync();
+        }
+        catch (Exception ex) when (IsDeleteBlockedByRelationship(ex))
+        {
+            throw new InvalidOperationException(
+                "Não é possível excluir este cliente porque existem registros vinculados (ex.: contratos). Remova os vínculos antes de excluir.",
+                ex);
+        }
         
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("...");
         _cache.Remove($"Clientes_{empresaId}");
@@ -107,5 +116,17 @@ public class ClienteAppService : IClienteAppService
         }
 
         return cachedList ?? Enumerable.Empty<ClienteDtoOutput>();
+    }
+
+    private static bool IsDeleteBlockedByRelationship(Exception exception)
+    {
+        for (var current = exception; current is not null; current = current.InnerException)
+        {
+            var message = current.Message;
+            if (message.Contains("23503") || message.Contains("FK_Contratos_Clientes_ClienteId"))
+                return true;
+        }
+
+        return false;
     }
 }

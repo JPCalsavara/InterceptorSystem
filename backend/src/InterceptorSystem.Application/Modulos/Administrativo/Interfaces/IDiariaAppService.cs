@@ -11,6 +11,7 @@ public interface IDiariaAppService
     Task DeleteAsync(Guid id);
     Task<DiariaDtoOutput?> GetByIdAsync(Guid id);
     Task<IEnumerable<DiariaDtoOutput>> GetAllAsync();
+    Task<IEnumerable<DiariaDtoOutput>> GetByClienteIdAsync(Guid clienteId);
 
     /// <summary>Retorna diárias de um posto em uma data específica, incluindo nome do funcionário.</summary>
     Task<IEnumerable<DiariaComFuncionarioDto>> GetByPostoEDataAsync(Guid postoId, DateOnly data);

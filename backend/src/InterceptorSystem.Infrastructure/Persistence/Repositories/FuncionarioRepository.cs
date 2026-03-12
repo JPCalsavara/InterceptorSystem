@@ -22,30 +22,50 @@ public class FuncionarioRepository : IFuncionarioRepository
         => await _context.Funcionarios
             .Include(f => f.Contrato)
                 .ThenInclude(c => c.Cliente)
+            .Include(f => f.Contrato)
+                .ThenInclude(c => c.Tags)
+                    .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)
+            .Include(f => f.Tags)
+                .ThenInclude(ft => ft.Tag)
             .FirstOrDefaultAsync(f => f.Id == id);
 
     public async Task<IEnumerable<Funcionario>> GetAllAsync()
         => await _context.Funcionarios
             .Include(f => f.Contrato)
                 .ThenInclude(c => c.Cliente)
+            .Include(f => f.Contrato)
+                .ThenInclude(c => c.Tags)
+                    .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)
+            .Include(f => f.Tags)
+                .ThenInclude(ft => ft.Tag)
             .ToListAsync();
 
     public async Task<Funcionario?> GetByCpfAsync(string cpf)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
                 .ThenInclude(c => c.Cliente)
+            .Include(f => f.Contrato)
+                .ThenInclude(c => c.Tags)
+                    .ThenInclude(ct => ct.Tag)
+            .Include(f => f.Tags)
+                .ThenInclude(ft => ft.Tag)
             .FirstOrDefaultAsync(f => f.Cpf == cpf);
 
     public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
                 .ThenInclude(c => c.Cliente)
+            .Include(f => f.Contrato)
+                .ThenInclude(c => c.Tags)
+                    .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)
+            .Include(f => f.Tags)
+                .ThenInclude(ft => ft.Tag)
             .Where(f => f.ClienteId == clienteId)
             .ToListAsync();
 

@@ -23,6 +23,22 @@ public class DiariaRepository : IDiariaRepository
     public async Task<IEnumerable<Diaria>> GetAllAsync()
         => await _context.Diarias.ToListAsync();
 
+    public async Task<IEnumerable<Diaria>> GetByClienteIdAsync(Guid clienteId)
+        => await _context.Diarias
+            .Join(
+                _context.Alocacoes,
+                diaria => diaria.AlocacaoId,
+                alocacao => alocacao.Id,
+                (diaria, alocacao) => new { diaria, alocacao })
+            .Join(
+                _context.Postos,
+                x => x.alocacao.PostoId,
+                posto => posto.Id,
+                (x, posto) => new { x.diaria, posto })
+            .Where(x => x.posto.ClienteId == clienteId && x.posto.Ativo)
+            .Select(x => x.diaria)
+            .ToListAsync();
+
     public async Task<IEnumerable<Diaria>> GetByFuncionarioAsync(Guid funcionarioId)
         => await _context.Diarias.Where(a => a.FuncionarioId == funcionarioId).ToListAsync();
 

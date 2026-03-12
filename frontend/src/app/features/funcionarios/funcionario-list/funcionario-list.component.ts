@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
+import { TagService } from '../../../services/tag.service';
 import {
   Funcionario,
   StatusFuncionario,
@@ -12,6 +13,7 @@ import {
   TipoEscala,
   Cliente,
   Contrato,
+  Tag,
 } from '../../../models/index';
 
 @Component({
@@ -25,10 +27,12 @@ export class FuncionarioListComponent implements OnInit {
   private service = inject(FuncionarioService);
   private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
+  private tagService = inject(TagService);
 
   funcionarios = signal<Funcionario[]>([]);
   clientes = signal<Cliente[]>([]);
   contratos = signal<Contrato[]>([]);
+  tags = signal<Tag[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -37,6 +41,7 @@ export class FuncionarioListComponent implements OnInit {
   filtroCliente = signal<string>('');
   filtroTipo = signal<string>('');
   filtroEscala = signal<string>('');
+  filtroTag = signal<string>('');
 
   // Enums para dropdown
   StatusFuncionario = StatusFuncionario;
@@ -62,6 +67,11 @@ export class FuncionarioListComponent implements OnInit {
       resultado = resultado.filter((f) => f.tipoEscala === escalaFiltro);
     }
 
+    const tagFiltro = this.filtroTag();
+    if (tagFiltro) {
+      resultado = resultado.filter((f) => f.tags && f.tags.some((t) => t.id === tagFiltro));
+    }
+
     return resultado;
   });
 
@@ -69,6 +79,14 @@ export class FuncionarioListComponent implements OnInit {
     this.loadFuncionarios();
     this.loadClientes();
     this.loadContratos();
+    this.loadTags();
+  }
+
+  loadTags(): void {
+    this.tagService.getAll().subscribe({
+      next: (data) => this.tags.set(data),
+      error: (err) => console.error('Erro ao carregar tags:', err),
+    });
   }
 
   loadClientes(): void {
@@ -195,6 +213,7 @@ export class FuncionarioListComponent implements OnInit {
     this.filtroCliente.set('');
     this.filtroTipo.set('');
     this.filtroEscala.set('');
+    this.filtroTag.set('');
   }
 
   getSalarioSimuladoMensal(func: Funcionario): number {
@@ -202,7 +221,8 @@ export class FuncionarioListComponent implements OnInit {
     if (!contrato) return 0;
     let diasMedio = 22;
     if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
-    else if (func.tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8; // Arbitrary for simulation
+    else if (func.tipoEscala === TipoEscala.FOLGUISTA)
+      diasMedio = 8; // Arbitrary for simulation
     else if (func.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) diasMedio = 26;
     return (
       diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)

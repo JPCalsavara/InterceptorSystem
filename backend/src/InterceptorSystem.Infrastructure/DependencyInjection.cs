@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IContratoRepository, ContratoRepository>();
         services.AddScoped<IContaRepository, ContaRepository>();
         services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
+        services.AddScoped<ITagRepository, TagRepository>(); // Phase 4
 
         // 3. Auth Services
         services.AddScoped<IJwtTokenService, JwtTokenService>();

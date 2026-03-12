@@ -48,6 +48,14 @@ public class ContratosController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("/api/clientes/{clienteId}/contratos")]
+    [ProducesResponseType(typeof(IEnumerable<ContratoDtoOutput>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByCliente(Guid clienteId)
+    {
+        var result = await _service.GetByClienteIdAsync(clienteId);
+        return Ok(result);
+    }
+
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(ContratoDtoOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

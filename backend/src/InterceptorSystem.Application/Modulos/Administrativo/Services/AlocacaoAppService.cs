@@ -90,6 +90,12 @@ public class AlocacaoAppService : IAlocacaoAppService
         return alocacoes.Select(AlocacaoDto.FromEntity);
     }
 
+    public async Task<IEnumerable<AlocacaoDto>> GetByClienteIdAsync(Guid clienteId)
+    {
+        var alocacoes = await _repository.GetByClienteIdAsync(clienteId);
+        return alocacoes.Select(AlocacaoDto.FromEntity);
+    }
+
     public async Task<IEnumerable<AlocacaoDto>> GetByPostoIdAsync(Guid postoId)
     {
         var alocacoes = await _repository.GetByPostoIdAsync(postoId);

@@ -18,6 +18,7 @@ public class AlocacaoController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<AlocacaoDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AlocacaoDto>>> GetAll()
     {
         var result = await _appService.GetAllAsync();
@@ -25,6 +26,8 @@ public class AlocacaoController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(AlocacaoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AlocacaoDto>> GetById(Guid id)
     {
         var result = await _appService.GetByIdAsync(id);
@@ -32,7 +35,16 @@ public class AlocacaoController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("/api/clientes/{clienteId}/alocacoes")]
+    [ProducesResponseType(typeof(IEnumerable<AlocacaoDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<AlocacaoDto>>> GetByClienteId(Guid clienteId)
+    {
+        var result = await _appService.GetByClienteIdAsync(clienteId);
+        return Ok(result);
+    }
+
     [HttpGet("posto/{postoId}")]
+    [ProducesResponseType(typeof(IEnumerable<AlocacaoDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AlocacaoDto>>> GetByPostoId(Guid postoId)
     {
         var result = await _appService.GetByPostoIdAsync(postoId);
@@ -40,6 +52,7 @@ public class AlocacaoController : ControllerBase
     }
 
     [HttpGet("contrato/{contratoId}")]
+    [ProducesResponseType(typeof(IEnumerable<AlocacaoDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AlocacaoDto>>> GetByContratoId(Guid contratoId)
     {
         var result = await _appService.GetByContratoIdAsync(contratoId);
@@ -47,6 +60,7 @@ public class AlocacaoController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(AlocacaoDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<AlocacaoDto>> Create(CreateAlocacaoInput input)
     {
         var result = await _appService.CreateAsync(input);
@@ -54,6 +68,7 @@ public class AlocacaoController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(typeof(AlocacaoDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<AlocacaoDto>> Update(Guid id, UpdateAlocacaoInput input)
     {
         var result = await _appService.UpdateAsync(id, input);
@@ -61,6 +76,7 @@ public class AlocacaoController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _appService.DeleteAsync(id);

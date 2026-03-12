@@ -38,6 +38,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
         return result!.Id;
     }
 
+
     #endregion
 
     #region POST /api/clientes - Create Tests

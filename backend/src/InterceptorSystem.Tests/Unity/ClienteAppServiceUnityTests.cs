@@ -251,6 +251,34 @@ public class ClienteAppServiceTests
         _mockRepo.Verify(r => r.Remove(It.IsAny<Cliente>()), Times.Never);
     }
 
+    [Fact(DisplayName = "DeleteAsync - Deve lançar erro de negócio quando cliente possui vínculos")]
+    public async Task DeleteAsync_DeveFalharComMensagemDeNegocio_QuandoDeleteBloqueadoPorRelacionamento()
+    {
+        // --- ARRANGE ---
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var cliente = new Cliente(
+            empresaId,
+            "Cliente com Vinculo",
+            "00000000000000",
+            "São Paulo",
+            "SP"
+        );
+
+        _mockRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(cliente);
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockUow
+            .Setup(u => u.CommitAsync())
+            .ThrowsAsync(new Exception("23503: update or delete on table \"Clientes\" violates foreign key constraint \"FK_Contratos_Clientes_ClienteId\""));
+
+        // --- ACT ---
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteAsync(clienteId));
+
+        // --- ASSERT ---
+        Assert.Contains("Não é possível excluir este cliente", exception.Message);
+        _mockRepo.Verify(r => r.Remove(cliente), Times.Once);
+    }
+
     #endregion
 
     #region GetByIdAsync Tests

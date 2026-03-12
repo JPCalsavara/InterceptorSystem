@@ -67,6 +67,23 @@ export interface UpdateClienteDto {
   telefoneEmergencia?: string;
 }
 
+export interface Tag {
+  id: string;
+  nome: string;
+  descricao?: string;
+}
+
+export interface ContratoTagRate {
+  tagId: string;
+  tagNome: string;
+  valorDiaria: number;
+}
+
+export interface ContratoTagInput {
+  tagId: string;
+  valorDiaria: number;
+}
+
 // Contrato
 export interface Contrato {
   id: string;
@@ -77,13 +94,15 @@ export interface Contrato {
   percentualAdicionalNoturno: number;
   valorBeneficiosExtrasMensal: number;
   percentualImpostos: number;
-  numeroDePostos: number; // Número de turnos/postos
-  quantidadeFuncionarios: number; // Read-only: calculado pelo backend (quantidadeIdealPorTurno × numeroDePostos)
+  numeroDePostos: number;
+  quantidadeFuncionarios: number;
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
+  tags?: ContratoTagRate[];
+  valorDiariaVigilante?: number | null;
 }
 
 export interface CreateContratoDto {
@@ -94,12 +113,14 @@ export interface CreateContratoDto {
   percentualAdicionalNoturno: number;
   valorBeneficiosExtrasMensal: number;
   percentualImpostos: number;
-  numeroDePostos: number; // Backend calcula quantidadeFuncionarios a partir disso
+  numeroDePostos: number;
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
+  tags?: ContratoTagInput[];
+  valorDiariaVigilante?: number | null;
 }
 
 export interface UpdateContratoDto {
@@ -109,19 +130,21 @@ export interface UpdateContratoDto {
   percentualAdicionalNoturno: number;
   valorBeneficiosExtrasMensal: number;
   percentualImpostos: number;
-  numeroDePostos: number; // Backend calcula quantidadeFuncionarios a partir disso
+  numeroDePostos: number;
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
+  tags?: ContratoTagInput[];
+  valorDiariaVigilante?: number | null;
 }
 
 // Funcionario
 export interface Funcionario {
   id: string;
   clienteId: string;
-  contratoId: string; // FASE 2 backend - obrigatório
+  contratoId: string;
   nome: string;
   cpf: string;
   celular: string;
@@ -129,12 +152,9 @@ export interface Funcionario {
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
   ativo: boolean;
-
-  // FASE 3 backend - Campos calculados (read-only, vindos do backend)
-  salarioBase?: number;
-  adicionalNoturno?: number;
-  beneficios?: number;
-  salarioTotal?: number;
+  tags?: Tag[];
+  custoMensalReal?: number;
+  custoMensalEstimado?: number;
 }
 
 export interface CreateFuncionarioDto {
@@ -146,6 +166,7 @@ export interface CreateFuncionarioDto {
   statusFuncionario: StatusFuncionario;
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
+  tagIds?: string[]; // Phase 4: Tag assignment
 }
 
 export interface UpdateFuncionarioDto {
@@ -154,6 +175,7 @@ export interface UpdateFuncionarioDto {
   statusFuncionario: StatusFuncionario;
   tipoEscala: TipoEscala;
   tipoFuncionario: TipoFuncionario;
+  tagIds?: string[]; // Phase 4: Tag assignment
 }
 // Alocacao (Shift Slot)
 export interface Alocacao {

@@ -1,7 +1,7 @@
 <div class="detail-container">
   <!-- Header -->
   <div class="detail-header">
-    <button class="btn-back" routerLink="/diarias">
+    <button class="btn-back" [routerLink]="baseRoute">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path
           fill-rule="evenodd"
@@ -11,7 +11,7 @@
       </svg>
       Voltar
     </button>
-    <h1>Detalhes da Diária</h1>
+    <h1>{{ pageTitle }}</h1>
   </div>
 
   <!-- Loading -->
@@ -189,8 +189,6 @@
                 <span class="value">{{ posto()!.nome }} - {{ posto()!.cidade }}</span>
               </div>
             </div>
-
-
           </div>
         </div>
       }
@@ -245,7 +243,7 @@
 
       <!-- Actions -->
       <div class="detail-actions">
-        <button class="btn-secondary" [routerLink]="['/diarias', 'editar', diaria()!.id]">
+        <button class="btn-secondary" [routerLink]="[baseRoute, diaria()!.id, 'editar']">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
             <path
               d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"

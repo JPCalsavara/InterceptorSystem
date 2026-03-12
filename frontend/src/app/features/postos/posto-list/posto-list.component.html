@@ -24,8 +24,8 @@
       </h1>
       <p class="subtitle">Gerencie todos os postos de trabalho por cliente</p>
     </div>
-    <button class="btn-primary" routerLink="/postos/novo">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+    <button class="btn-primary btn-md" routerLink="/postos/novo">
+      <svg viewBox="0 0 20 20" fill="currentColor" style="width: 1em; height: 1em">
         <path
           fill-rule="evenodd"
           d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
@@ -91,6 +91,54 @@
     </div>
   }
 
+  <!-- Filtros -->
+  @if (!loading() && postos().length > 0) {
+    <div class="filters-section" style="margin-bottom: 2rem">
+      <h3
+        class="filters-title"
+        style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 1.1rem"
+      >
+        Filtros
+      </h3>
+      <div
+        class="filters-grid"
+        style="
+          display: grid;
+          gap: 1rem;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        "
+      >
+        <div class="filter-group">
+          <label
+            for="filtroCliente"
+            class="filter-label"
+            style="display: block; margin-bottom: 0.5rem; font-weight: 500"
+            >Buscar por Cliente</label
+          >
+          <select
+            id="filtroCliente"
+            class="filter-select"
+            style="
+              width: 100%;
+              padding: 0.75rem;
+              border-radius: 8px;
+              border: 1px solid var(--border-color);
+              background: var(--surface-color);
+              color: var(--text-color);
+            "
+            [ngModel]="filtroCliente()"
+            (ngModelChange)="filtroCliente.set($event)"
+          >
+            <option value="">Todos</option>
+            @for (cond of clientes(); track cond.id) {
+              <option [value]="cond.id">{{ cond.nome }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Cards por Cliente -->
   @if (!loading() && postosPorCliente().length > 0) {
     <div class="clientes-grid">
@@ -102,7 +150,6 @@
           </div>
 
           <!-- Informações do cliente -->
-
 
           <div class="postos-grid">
             @for (posto of grupo.postos; track posto.id) {

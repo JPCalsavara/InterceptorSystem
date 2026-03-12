@@ -5,6 +5,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -12,19 +13,38 @@ public class FuncionarioAppService : IFuncionarioAppService
 {
     private readonly IFuncionarioRepository _repository;
     private readonly IClienteRepository _clienteRepository;
-    private readonly IContratoRepository _contratoRepository; // FASE 2: Novo repositório
+    private readonly IContratoRepository _contratoRepository;
+    private readonly ITagRepository _tagRepository; // Phase 4
     private readonly ICurrentTenantService _tenantService;
+    private readonly IMemoryCache _cache;
 
     public FuncionarioAppService(
         IFuncionarioRepository repository,
         IClienteRepository clienteRepository,
-        IContratoRepository contratoRepository, // FASE 2: Injetar repositório de contrato
-        ICurrentTenantService tenantService)
+        IContratoRepository contratoRepository,
+        ITagRepository tagRepository, // Phase 4
+        ICurrentTenantService tenantService,
+        IMemoryCache cache)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
-        _contratoRepository = contratoRepository; // FASE 2: Atribuir repositório
+        _contratoRepository = contratoRepository;
+        _tagRepository = tagRepository;
         _tenantService = tenantService;
+        _cache = cache;
+    }
+
+    private static string GetAllCacheKey(Guid empresaId) => $"Funcionarios_{empresaId}";
+    private static string GetByClienteCacheKey(Guid empresaId, Guid clienteId) =>
+        $"Funcionarios_{empresaId}_Cliente_{clienteId}";
+
+    private void InvalidateFuncionarioCache(Guid empresaId, Guid? clienteId = null)
+    {
+        _cache.Remove(GetAllCacheKey(empresaId));
+        if (clienteId.HasValue)
+        {
+            _cache.Remove(GetByClienteCacheKey(empresaId, clienteId.Value));
+        }
     }
 
     public async Task<FuncionarioDtoOutput> CreateAsync(CreateFuncionarioDtoInput input)
@@ -64,7 +84,6 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new InvalidOperationException("Já existe um funcionário cadastrado com este CPF.");
         }
 
-        // FASE 3: Funcionário sem parâmetros de salário (calculados automaticamente)
         var funcionario = new Funcionario(
             empresaId,
             input.ClienteId,
@@ -76,8 +95,29 @@ public class FuncionarioAppService : IFuncionarioAppService
             input.TipoEscala,
             input.TipoFuncionario);
 
+        // Phase 4: assign initial tags
+        if (input.TagIds != null && input.TagIds.Count > 0)
+        {
+            foreach (var tagId in input.TagIds)
+            {
+                var tag = await _tagRepository.GetByIdAsync(tagId);
+                if (tag == null)
+                {
+                    throw new KeyNotFoundException($"Tag não encontrada: {tagId}.");
+                }
+            }
+
+            var novasTags = input.TagIds
+                .Distinct()
+                .Select(tagId => new FuncionarioTag(empresaId, funcionario.Id, tagId))
+                .ToList();
+            funcionario.DefinirTags(novasTags);
+        }
+
         _repository.Add(funcionario);
         await _repository.UnitOfWork.CommitAsync();
+
+        InvalidateFuncionarioCache(empresaId, input.ClienteId);
 
         return FuncionarioDtoOutput.FromEntity(funcionario)!;
     }
@@ -90,7 +130,6 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new KeyNotFoundException("Funcionário não encontrado.");
         }
 
-        // FASE 3: Atualizar sem parâmetros de salário (calculados automaticamente)
         funcionario.AtualizarDados(
             input.Nome,
             input.Celular,
@@ -98,8 +137,31 @@ public class FuncionarioAppService : IFuncionarioAppService
             input.TipoEscala,
             input.TipoFuncionario);
 
+        // Phase 4: replace tags if provided
+        if (input.TagIds != null)
+        {
+            var empresaIdForTags = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
+            foreach (var tagId in input.TagIds)
+            {
+                var tag = await _tagRepository.GetByIdAsync(tagId);
+                if (tag == null)
+                {
+                    throw new KeyNotFoundException($"Tag não encontrada: {tagId}.");
+                }
+            }
+
+            var novasTags = input.TagIds
+                .Distinct()
+                .Select(tagId => new FuncionarioTag(empresaIdForTags, funcionario.Id, tagId))
+                .ToList();
+            funcionario.DefinirTags(novasTags);
+        }
+
         _repository.Update(funcionario);
         await _repository.UnitOfWork.CommitAsync();
+
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        InvalidateFuncionarioCache(empresaId, funcionario.ClienteId);
 
         return FuncionarioDtoOutput.FromEntity(funcionario)!;
     }
@@ -114,6 +176,9 @@ public class FuncionarioAppService : IFuncionarioAppService
 
         _repository.Remove(funcionario);
         await _repository.UnitOfWork.CommitAsync();
+
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        InvalidateFuncionarioCache(empresaId, funcionario.ClienteId);
     }
 
     public async Task<FuncionarioDtoOutput?> GetByIdAsync(Guid id)
@@ -124,8 +189,18 @@ public class FuncionarioAppService : IFuncionarioAppService
 
     public async Task<IEnumerable<FuncionarioDtoOutput>> GetAllAsync()
     {
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        var cacheKey = GetAllCacheKey(empresaId);
+
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<FuncionarioDtoOutput>? cached) && cached != null)
+        {
+            return cached;
+        }
+
         var funcionarios = await _repository.GetAllAsync();
-        return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
+        var result = funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
+        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
+        return result;
     }
 
     public async Task<bool> CpfJaExisteAsync(string cpf)
@@ -141,7 +216,17 @@ public class FuncionarioAppService : IFuncionarioAppService
     }
     public async Task<IEnumerable<FuncionarioDtoOutput>> GetByClienteIdAsync(Guid clienteId)
     {
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
+        var cacheKey = GetByClienteCacheKey(empresaId, clienteId);
+
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<FuncionarioDtoOutput>? cached) && cached != null)
+        {
+            return cached;
+        }
+
         var funcionarios = await _repository.GetByClienteAsync(clienteId);
-        return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
+        var result = funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
+        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
+        return result;
     }
 }

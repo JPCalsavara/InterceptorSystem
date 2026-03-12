@@ -194,6 +194,39 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Contratos", (string)null);
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.ContratoTag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ValorDiaria")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("ContratoId", "TagId")
+                        .IsUnique();
+
+                    b.ToTable("ContratoTags", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Diaria", b =>
                 {
                     b.Property<Guid>("Id")
@@ -297,6 +330,36 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Funcionarios", (string)null);
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.FuncionarioTag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FuncionarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("FuncionarioId", "TagId")
+                        .IsUnique();
+
+                    b.ToTable("FuncionarioTags", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -340,6 +403,35 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.HasIndex("ClienteId");
 
                     b.ToTable("Postos", (string)null);
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId", "Nome")
+                        .IsUnique();
+
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.Conta", b =>
@@ -526,6 +618,25 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Cliente");
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.ContratoTag", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", "Contrato")
+                        .WithMany("Tags")
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contrato");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Diaria", b =>
                 {
                     b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", "Alocacao")
@@ -561,6 +672,25 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Cliente");
 
                     b.Navigation("Contrato");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.FuncionarioTag", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", "Funcionario")
+                        .WithMany("Tags")
+                        .HasForeignKey("FuncionarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Funcionario");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>
@@ -602,11 +732,15 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Alocacoes");
 
                     b.Navigation("Funcionarios");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
                 {
                     b.Navigation("Diarias");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>

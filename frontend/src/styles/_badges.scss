@@ -51,4 +51,11 @@
     color: var(--text-secondary);
     border: 1px solid var(--border-subtle);
   }
+
+  &.badge-tag {
+    background: var(--primary-color-light, rgba(59, 130, 246, 0.1)); // Light blue background
+    color: var(--primary-color, #3b82f6); // Medium blue text
+    border: 1px solid var(--primary-color, #3b82f6);
+    font-weight: var(--fw-medium);
+  }
 }

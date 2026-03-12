@@ -64,6 +64,14 @@ public class DiariasController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("/api/clientes/{clienteId}/diarias")]
+    [ProducesResponseType(typeof(IEnumerable<DiariaDtoOutput>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByCliente(Guid clienteId)
+    {
+        var result = await _service.GetByClienteIdAsync(clienteId);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(DiariaDtoOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

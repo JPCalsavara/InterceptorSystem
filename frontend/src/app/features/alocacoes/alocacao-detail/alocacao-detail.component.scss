@@ -1,0 +1,33 @@
+.page-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.details-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-top: 2rem;
+}
+
+.detail-card {
+  height: 100%;
+}
+
+.info-group {
+  margin-bottom: 1.25rem;
+  
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+  }
+  
+  p {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}

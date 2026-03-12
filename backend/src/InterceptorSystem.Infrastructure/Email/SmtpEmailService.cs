@@ -58,6 +58,34 @@ public class SmtpEmailService : IEmailService
         await EnviarAsync(destinatario, assunto, corpo);
     }
 
+    public async Task EnviarContatoAsync(string nome, string cidade, string estado, string emailRemetente, string descricao)
+    {
+        var assunto = $"[Site] Contato de {nome} — {cidade}/{estado.ToUpper()}";
+        var corpo = $"""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="utf-8"></head>
+            <body style="font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px;">
+              <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h2 style="color: #1976d2; margin-top: 0;">Novo contato pelo site</h2>
+                <table style="width:100%; border-collapse:collapse; font-size:15px; color:#333;">
+                  <tr><td style="padding:6px 0;"><strong>Nome:</strong></td><td>{nome}</td></tr>
+                  <tr><td style="padding:6px 0;"><strong>Cidade/Estado:</strong></td><td>{cidade} / {estado.ToUpper()}</td></tr>
+                  <tr><td style="padding:6px 0;"><strong>E-mail:</strong></td><td><a href="mailto:{emailRemetente}">{emailRemetente}</a></td></tr>
+                </table>
+                <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                <p style="font-size:15px; color:#333;"><strong>Mensagem:</strong></p>
+                <p style="font-size:15px; color:#555; white-space:pre-wrap;">{descricao}</p>
+                <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                <p style="color:#999; font-size:12px;">Interceptor System — Gestão e Facilities em Associações Condominiais</p>
+              </div>
+            </body>
+            </html>
+            """;
+
+        await EnviarAsync("interceptor.gerencia@gmail.com", assunto, corpo);
+    }
+
     private async Task EnviarAsync(string destinatario, string assunto, string corpoHtml)
     {
         var message = new MimeMessage();

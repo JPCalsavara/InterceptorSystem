@@ -42,7 +42,11 @@ export class ClienteListComponent implements OnInit {
   }
 
   confirmDelete(id: string, nome: string): void {
-    if (confirm(`Deseja realmente excluir o cliente "${nome}"?`)) {
+    const confirmMessage =
+      `Tem certeza que deseja excluir o cliente "${nome}"?\n\n` +
+      'Esta ação não pode ser desfeita.';
+
+    if (confirm(confirmMessage)) {
       this.deleteCliente(id);
     }
   }
@@ -57,7 +61,13 @@ export class ClienteListComponent implements OnInit {
         setTimeout(() => this.successMessage.set(null), 3000);
       },
       error: (err) => {
-        this.error.set('Erro ao excluir cliente. Tente novamente.');
+        const backendMessage = err?.error?.error;
+        const message =
+          typeof backendMessage === 'string' && backendMessage.trim().length > 0
+            ? backendMessage
+            : 'Erro ao excluir cliente. Tente novamente.';
+
+        this.error.set(message);
         this.loading.set(false);
         console.error('Erro:', err);
       },

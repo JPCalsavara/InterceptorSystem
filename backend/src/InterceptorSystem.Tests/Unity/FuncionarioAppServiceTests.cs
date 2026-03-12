@@ -9,6 +9,7 @@ using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
 namespace InterceptorSystem.Tests.Unity;
@@ -44,7 +45,14 @@ public class FuncionarioAppServiceTests
     public FuncionarioAppServiceTests()
     {
         _funcionarioRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        _service = new FuncionarioAppService(_funcionarioRepo.Object, _clienteRepo.Object, _contratoRepo.Object, _tenantService.Object); // FASE 2: Adicionar contratoRepo
+        _tenantService.Setup(t => t.EmpresaId).Returns(Guid.NewGuid());
+        _service = new FuncionarioAppService(
+            _funcionarioRepo.Object,
+            _clienteRepo.Object,
+            _contratoRepo.Object,
+            new Mock<InterceptorSystem.Domain.Modulos.Administrativo.Interfaces.ITagRepository>().Object,
+            _tenantService.Object,
+            new MemoryCache(new MemoryCacheOptions())); // Phase 4: ITagRepository
     }
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
@@ -142,6 +150,7 @@ public class FuncionarioAppServiceTests
     public async Task CreateAsync_DeveFalhar_QuandoTenantNaoDefinido()
     {
         var input = CriarInputValido(Guid.NewGuid(), Guid.NewGuid());
+        _tenantService.Setup(t => t.EmpresaId).Returns((Guid?)null);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         _funcionarioRepo.Verify(r => r.Add(It.IsAny<Funcionario>()), Times.Never);

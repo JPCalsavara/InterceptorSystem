@@ -22,8 +22,8 @@
       </h1>
       <p class="subtitle">Gerencie todos os funcionários cadastrados</p>
     </div>
-    <button class="btn-primary" routerLink="/funcionarios/novo">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+    <button class="btn-primary btn-md" routerLink="/funcionarios/novo">
+      <svg viewBox="0 0 20 20" fill="currentColor" style="width: 1em; height: 1em">
         <path
           fill-rule="evenodd"
           d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
@@ -93,7 +93,7 @@
           <select
             id="filtroCliente"
             class="filter-select"
-            [(ngModel)]="filtroCliente"
+            [ngModel]="filtroCliente()"
             (ngModelChange)="filtroCliente.set($event)"
           >
             <option value="">Todos</option>
@@ -108,7 +108,7 @@
           <select
             id="filtroTipo"
             class="filter-select"
-            [(ngModel)]="filtroTipo"
+            [ngModel]="filtroTipo()"
             (ngModelChange)="filtroTipo.set($event)"
           >
             <option value="">Todos</option>
@@ -123,7 +123,7 @@
           <select
             id="filtroEscala"
             class="filter-select"
-            [(ngModel)]="filtroEscala"
+            [ngModel]="filtroEscala()"
             (ngModelChange)="filtroEscala.set($event)"
           >
             <option value="">Todos</option>
@@ -132,6 +132,21 @@
             <option [value]="TipoEscala.ALCALA_8H">Alcalá 8h</option>
             <option [value]="TipoEscala.FOLGUISTA">Folguista</option>
             <option [value]="TipoEscala.OITO_HORAS_SEIS_POR_DOIS">8h (6x2)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filtroTag" class="filter-label">Função / Papel</label>
+          <select
+            id="filtroTag"
+            class="filter-select"
+            [ngModel]="filtroTag()"
+            (ngModelChange)="filtroTag.set($event)"
+          >
+            <option value="">Todas</option>
+            @for (tag of tags(); track tag.id) {
+              <option [value]="tag.id">{{ tag.nome }}</option>
+            }
           </select>
         </div>
 
@@ -186,6 +201,9 @@
             <span class="badge" [ngClass]="getStatusClass(func.statusFuncionario)">
               {{ getStatusLabel(func.statusFuncionario) }}
             </span>
+            @for (tag of func.tags; track tag.id) {
+              <span class="badge badge-tag">{{ tag.nome }}</span>
+            }
           </div>
 
           <div class="card-details">

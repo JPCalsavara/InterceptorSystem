@@ -95,7 +95,11 @@ interface NavItem {
                 }
                 @case ('clock') {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
                   </svg>
                 }
               }
@@ -251,7 +255,7 @@ export class SidebarComponent implements OnInit {
     postos: null,
     alocacoes: null,
     diarias: null,
-    contratos: null
+    contratos: null,
   });
 
   navItems: NavItem[] = [
@@ -261,12 +265,13 @@ export class SidebarComponent implements OnInit {
     { label: 'Funcionários', route: '/funcionarios', icon: 'user-group', countKey: 'funcionarios' },
     { label: 'Postos', route: '/postos', icon: 'map-pin', countKey: 'postos' },
     { label: 'Alocações', route: '/alocacoes', icon: 'clock', countKey: 'alocacoes' },
-    { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' },
+    { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' }
   ];
 
   ngOnInit() {
     this.clienteService.getAll().subscribe({
-      next: (data) => this.counts.update(c => ({ ...c, clientes: data.filter((x: any) => x.ativo).length }))
+      next: (data) =>
+        this.counts.update((c) => ({ ...c, clientes: data.filter((x: any) => x.ativo).length })),
     });
     this.funcionarioService.getAll().subscribe({
       next: (data) =>
@@ -280,10 +285,14 @@ export class SidebarComponent implements OnInit {
       next: (data) => this.counts.update((c) => ({ ...c, postos: data.length })),
     });
     this.alocacaoService.getAll().subscribe({
-      next: (data) => this.counts.update(c => ({ ...c, alocacoes: data.length }))
+      next: (data) => this.counts.update((c) => ({ ...c, alocacoes: data.length })),
     });
     this.diariaService.getAll().subscribe({
-      next: (data) => this.counts.update(c => ({ ...c, diarias: data.filter((x: any) => x.statusDiaria === StatusDiaria.CONFIRMADA).length }))
+      next: (data) =>
+        this.counts.update((c) => ({
+          ...c,
+          diarias: data.filter((x: any) => x.statusDiaria === StatusDiaria.CONFIRMADA).length,
+        })),
     });
     this.contratoService.getAll().subscribe({
       next: (data) =>

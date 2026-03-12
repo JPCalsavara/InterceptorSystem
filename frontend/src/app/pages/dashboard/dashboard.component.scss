@@ -165,17 +165,11 @@
   width: 32px;
   height: 32px;
 }
-.dashboard-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
   padding-bottom: 1.5rem;
   border-bottom: 2px solid var(--border-color);
 
@@ -1082,10 +1076,6 @@
 // Responsive
 // ============================================================
 @include r.tablet {
-  .dashboard-container {
-    padding: 1rem;
-  }
-
   .metricas-grid {
     grid-template-columns: 1fr;
   }

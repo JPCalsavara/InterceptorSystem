@@ -4,6 +4,7 @@ using InterceptorSystem.Application.Modulos.Administrativo.Services;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
 namespace InterceptorSystem.Tests.Unity;
@@ -29,11 +30,13 @@ public class PostoAppServiceTests
         _mockUow = new Mock<IUnitOfWork>();
 
         _mockRepo.Setup(r => r.UnitOfWork).Returns(_mockUow.Object);
+        _mockTenant.Setup(t => t.EmpresaId).Returns(Guid.NewGuid());
 
         _service = new PostoAppService(
             _mockRepo.Object,
             _mockClienteRepo.Object,
-            _mockTenant.Object);
+            _mockTenant.Object,
+            new MemoryCache(new MemoryCacheOptions()));
     }
 
     #region CreateAsync Tests
