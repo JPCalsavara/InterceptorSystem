@@ -221,30 +221,38 @@ META__PHONENUMBERID=seu-phone-number-id
 | Regra                | Descrição                                                                  |
 | -------------------- | -------------------------------------------------------------------------- |
 | CNPJ único           | Não pode haver dois clientes com o mesmo CNPJ na mesma empresa          |
-| Configs operacionais | `QuantidadeIdealPorTurno`, `HorarioTrocaTurno`, `EmailGestor` obrigatórios |
-| Base para postos     | Horário de troca define turnos criados automaticamente                     |
+| Configs Base         | `EmailGestor`, `TelefoneEmergencia` opcionais                              |
+| Localidade base      | Cidade e Estado fornecem configuração inicial para postos de trabalho      |
 
 ```
-✅ Criar cliente com 6 funcionários ideais por turno → Status 201
+✅ Criar cliente (dados básicos) → Status 201
 ❌ CNPJ duplicado → "Já existe um cliente cadastrado com este CNPJ" (409)
-❌ QuantidadeIdealPorTurno ≤ 0 → Validação falha (400)
 ```
 
-### Posto
+### Posto (Localização Física)
+
+| Regra                  | Descrição                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------- |
+| Representação          | Local físico vinculado a um Cliente (preenchido com Cidade/Estado do Cliente)      |
+| Vinculado ao cliente   | `ClienteId` obrigatório e deve pertencer à mesma empresa                        |
+| Base para alocações    | Contém múltiplas `Alocações` (turnos) para o funcionamento do posto                |
+
+```
+✅ Posto "Portaria Principal" atrelado ao Cliente → Criado com sucesso
+```
+
+### Alocação (Slot de Turno)
 
 | Regra                     | Descrição                                                                       |
 | ------------------------- | ------------------------------------------------------------------------------- |
-| Turno de 12h              | Diferença entre `HorarioInicio` e `HorarioFim` deve ser exatamente 12 horas     |
-| Vinculado ao cliente   | `ClienteId` obrigatório e deve pertencer à mesma empresa                     |
-| Vinculado ao contrato     | `ContratoId` obrigatório — contrato deve estar `ATIVO` ou `PENDENTE`            |
-| Limite de postos          | Não pode exceder `Contrato.NumeroDePostos` postos por contrato                  |
-| Permite dobra de escala   | `PermiteDobrarEscala` define se funcionários podem fazer dobra                  |
+| Vínculo Duplo             | Pertence a um `Posto` e vincula-se a um `Contrato` vigente                      |
+| Turno flexível            | Suporta Horário Comercial, Alcalá 8h, Folguista e 12h (sem limite rígido)       |
 | Horário noturno detectado | `TemHorarioNoturno` (calculado) — `true` se o turno passa pelo intervalo 22h–5h |
+| Permite dobra de escala   | `PermiteDobrarEscala` define se funcionários podem fazer dobra                  |
 
 ```
-✅ Posto 06:00-18:00 → Criado com sucesso
-✅ Posto 18:00-06:00 (madrugada) → Criado com sucesso
-❌ Posto 08:00-16:00 (8h) → "O turno deve ter exatamente 12 horas" (400)
+✅ Alocação 12x36 (06:00-18:00) → Criado com sucesso
+✅ Alocação Alcalá 8h (14:00-22:00) → Criado com sucesso
 ```
 
 ### Funcionário
@@ -252,41 +260,27 @@ META__PHONENUMBERID=seu-phone-number-id
 | Regra                               | Descrição                                                                                            |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | CPF único                           | Não pode haver dois funcionários com mesmo CPF                                                       |
-| Vínculo obrigatório com contrato    | Todo funcionário deve ter `ContratoId` apontando para contrato `ATIVO`                               |
-| Salários calculados automaticamente | `SalarioBase`, `AdicionalNoturno` e `Beneficios` derivados do contrato                               |
-| Adicional noturno por horário       | Baseado em `Posto.TemHorarioNoturno` — turno que passa pelo intervalo 22h–5h (CLT Art. 73) |
-
-**Fórmula de Salário:**
+| Vínculo Opcional                    | Pode ter `ClienteId` nulo (Terceirizado/Especial) ou vinculado a um Cliente específico               |
+| Tags de Diária                      | Possui relação Many-to-Many com `Tag` (ex: "PM", "Vigia Avulso") determinando seu custo diário       |
+| Custo Real Dinâmico                 | Valores não são mais fixos, cálculo = Σ `ValorDiaria` (do Contrato via Tag) + `Beneficios`           |
 
 ```
-SalarioBase        = Contrato.ValorTotalMensal / Contrato.QuantidadeFuncionarios
-AdicionalNoturno   = SalarioBase × Contrato.PercentualAdicionalNoturno  (se Posto.TemHorarioNoturno = true, i.e., turno passa por 22h–5h)
-Beneficios         = Contrato.ValorBeneficiosExtrasMensal / Contrato.QuantidadeFuncionarios
-SalarioTotal       = SalarioBase + AdicionalNoturno + Beneficios
-```
-
-```
-✅ Funcionário com contrato ATIVO → Salário calculado automaticamente
+✅ Funcionário [PM] → Histórico financeiro mensal via soma de Diárias
 ❌ CPF duplicado → "CPF já cadastrado" (409)
-❌ Contrato inexistente → "Contrato não encontrado" (404)
-❌ Contrato FINALIZADO → "Contrato não está vigente" (400)
 ```
 
-### Diária
+### Diária (Designação)
 
 | Regra                     | Descrição                                                    |
 | ------------------------- | ------------------------------------------------------------ |
-| Mesmo cliente          | Funcionário e posto devem ser do mesmo cliente            |
-| Sem diárias simultâneas | Uma diária por funcionário por data                        |
+| Vinculada à Alocação      | Registra a ida do Funcionário a um turno específico (`AlocacaoId`) |
+| Snapshot de Preço         | Recebe `ValorDiaria` no momento da criação com base no acordo/Tag  |
 | Sem dias consecutivos     | Bloqueado exceto para `DOBRA_PROGRAMADA`                     |
 | Descanso pós-dobra        | Após dobra programada, obrigatório descansar no dia seguinte |
 
 ```
-✅ Diária REGULAR 10/01 → Criada
-❌ Mesma pessoa 10/01 e 11/01 REGULAR → "Não é permitido diárias em dias consecutivos" (400)
-✅ Mesma pessoa 10/01 REGULAR + 11/01 DOBRA_PROGRAMADA → Permitido
+✅ Diária REGULAR (ValorDiaria=150) → Criada
 ❌ Após DOBRA, nova diária no dia seguinte → "Funcionário deve descansar após dobra" (400)
-❌ Funcionário Cond. A em Posto Cond. B → "Devem pertencer ao mesmo cliente" (400)
 ```
 
 ### Contrato
@@ -295,52 +289,32 @@ SalarioTotal       = SalarioBase + AdicionalNoturno + Beneficios
 | -------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Um vigente por cliente        | Máximo 1 contrato `ATIVO` ou `PENDENTE` por cliente                                            |
 | Auto-finalização                 | Contratos com `DataFim` vencida são marcados `FINALIZADO` no GetAll                               |
-| Período válido                   | `DataFim` > `DataInicio`                                                                          |
-| Status                           | `ATIVO` → `PENDENTE` → `FINALIZADO`                                                               |
-| QuantidadeFuncionarios calculado | `[NotMapped]` — derivado de `Cliente.QuantidadeIdealPorTurno × NumeroDePostos`, não persistido |
-
-**Fórmula de Cálculo do Valor Total:**
+| Precificação via Tags            | Define os valores acordados para cada tipo de serviço (Tag) cobrados pelo cliente através de `ContratoTag` |
 
 ```
-QuantidadeFuncionarios = Cliente.QuantidadeIdealPorTurno × NumeroDePostos
-custoBase    = (ValorDiariaCobrada × 30 × QuantidadeFuncionarios × NumeroDePostos) + ValorBeneficios
-somaMargens  = percentualImpostos + margemLucro + margemCoberturaFaltas
-valorTotal   = custoBase / (1 - somaMargens)
-```
-
-```
-✅ Contrato único por cliente → Criado
+✅ Contrato com ContratoTags (PM=R$350, Limpeza=R$100) → Criado
 ❌ Segundo contrato ATIVO no mesmo cliente → "Já existe contrato vigente" (409)
-✅ Contrato FINALIZADO + novo ATIVO → Permitido
-✅ Contrato expirado → Marcado FINALIZADO automaticamente no next GetAll
 ```
 
 ### Criação em Cascata (`POST /api/clientes-completos`)
 
-Cria Cliente + Contrato + Postos em **1 único request**.
+Cria Cliente + Contrato + Postos + Alocações em **1 único request**.
 
 | Regra            | Descrição                                                       |
 | ---------------- | --------------------------------------------------------------- |
-| Consistência     | `QuantidadeIdealPorTurno` == `QuantidadeFuncionarios` do contrato |
-| Divisibilidade   | Quantidade de funcionários divisível pelo número de postos      |
-| Horários automáticos | `24h / NumeroDePostos` por turno                            |
+| Simplicidade     | Permite inicializar a base da associação de forma rápida        |
+| Alocações Autom. | Gera alocações divididas igualmente de acordo com o pedido      |
 
 ```json
 POST /api/clientes-completos
 {
   "cliente": {
     "nome": "Residencial Estrela",
-    "cnpj": "12.345.678/0001-90",
-    "endereco": "Rua das Flores, 123",
-    "quantidadeIdealPorTurno": 6,
-    "horarioTrocaTurno": "06:00:00",
-    "emailGestor": "gestor@estrela.com"
+    "cnpj": "12.345.678/0001-90"
   },
   "contrato": {
     "descricao": "Contrato 2026",
-    "valorDiariaCobrada": 100.00,
-    "quantidadeFuncionarios": 6,
-    "numeroDePostos": 1,
+    "valorBeneficios": 300.00,
     "dataInicio": "2026-01-10",
     "dataFim": "2026-12-31"
   },
@@ -350,10 +324,7 @@ POST /api/clientes-completos
 ```
 
 ```
-✅ 1 request → Cliente + Contrato + Postos criados
-✅ POST /api/clientes-completos/validar → Dry-run (não persiste)
-❌ Quantidades inconsistentes → Erro 400
-❌ Não divisível → Erro 400
+✅ 1 request → Cliente + Contrato + Postos + Alocações criados
 ```
 
 ---
@@ -374,7 +345,7 @@ InterceptorSystem.Tests/          → Unity + Integration tests
 
 | Módulo            | Descrição                                                    |
 | ----------------- | ------------------------------------------------------------ |
-| `Administrativo`  | Cliente, Funcionário, Posto, Diária, Contrato |
+| `Administrativo`  | Cliente, Funcionario, Posto, Alocacao, Diaria, Contrato, Tag |
 | `Auth`            | Conta (SaaS), TokenVerificacao, PlanoAssinatura              |
 | `Whatsapp`        | SessaoWhatsapp, EstadoConversa                               |
 
@@ -384,7 +355,7 @@ InterceptorSystem.Tests/          → Unity + Integration tests
 | --------------------- | ------------------------------------------------------------------------- |
 | `StatusContrato`      | `ATIVO`, `PENDENTE`, `FINALIZADO`                                         |
 | `StatusFuncionario`   | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO`                                |
-| `TipoEscala`          | `DOZE_POR_TRINTA_SEIS`, `SEIS_POR_UM`                                    |
+| `TipoEscala`          | `DOZE_POR_TRINTA_SEIS`, `OITO_HORAS_SEIS_POR_DOIS`, `SEMANAL_COMERCIAL`, `ALCALA_8H`, `FOLGUISTA` |
 | `TipoFuncionario`     | `CLT`, `TERCEIRIZADO`, `FREELANCE`                                        |
 | `StatusDiaria`      | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                             |
 | `TipoDiaria`        | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                             |
