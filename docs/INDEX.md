@@ -15,11 +15,12 @@ docs/
 
 ## Documentos Principais
 
-| Arquivo                     | Descrição                                                                          |
-| --------------------------- | ---------------------------------------------------------------------------------- |
-| `/README.md`                | Visão geral, auth, regras de negócio, arquitetura, Docker, WhatsApp, tecnologias   |
-| `/CHANGELOG.md`             | Histórico de versões (v1.0 → v3.0)                                                 |
-| `docs/guias/QUICK_START.md` | Referência rápida: Docker, migrations, testes, payloads                            |
+| Arquivo                                                 | Descrição                                                                                               |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `/README.md`                                            | Visão geral, auth, regras de negócio, arquitetura, Docker, WhatsApp, tecnologias                        |
+| `/CHANGELOG.md`                                         | Histórico de versões (v1.0 → v3.0)                                                                      |
+| `docs/guias/QUICK_START.md`                             | Referência rápida: Docker, migrations, testes, payloads                                                 |
+| `docs/refactory/form-detail-ui-standardization-plan.md` | Plano de padronização de forms/details (dark/light, responsividade, eficiência e padding-top de listas) |
 
 ## Versões
 
