@@ -684,59 +684,50 @@ POST   /api/contrato-calculos/calcular-valor-total
 
 ## ⏭️ Próximos Passos
 
-### 🔧 Dívida Técnica / Refatoração
+### 🎨 Padronização de UI e Design System
+- [ ] Implementar as 8 Fases do `REFACTORING_PLAN.md` (Sidebars, Navbar, Dashboards)
+- [ ] Aplicar tokens semânticos rigorosos (cores, tipografia, espaçamentos) em todos os forms e details
+- [ ] Padronizar tratamento de erros e SVGs inline (`REVIEW_A1_ANGULAR_COMPONENTS.md`)
+- [ ] Garantir responsividade fluida via mixins/breakpoints em telas de detalhes (Mobile/Tablet)
 
-- [ ] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (Domain, DTOs, Tests, Frontend, Migration — 71+ arquivos)
-- [ ] Configuração `IOptions<T>` com validação estrita via Data Annotations para todos os settings (SMTP, Meta, JWT já feito)
-- [ ] Ajustar BCrypt work factor para 12 (explícito, ao invés do default 11)
-- [ ] Value Objects (Email, Telefone, Dinheiro, Cnpj)
-- [ ] Domain Events para notificações automáticas
-- [ ] CQRS para relatórios financeiros
+### 🔧 Dívida Técnica / Refatoração
+- [ ] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (em todo o sistema)
+- [ ] Endpoint de Interesse (`InterestController` + Sender de E-mail) — backend restante da Phase 5
+- [ ] Domain Events na infraestrutura usando MediatR (`docs/refactory/logic-refactory.md`)
+- [ ] CQRS para relatórios financeiros pesados
+- [x] Cache Coordenador no frontend c/ invalidação por dependência (Concluído)
+- [x] Refatoração de Domínio (Turnos Flexíveis, Alocações, Entidade Tag) (Concluído)
 
 ### 🧪 Qualidade
-
 - [ ] Testes E2E com Playwright
 - [ ] Observabilidade (logs estruturados + métricas)
 
 ### ☁️ Infraestrutura / DevOps
-
-- [ ] Subir na nuvem (AWS Free Tier — t3.micro)
-- [ ] Cache com Redis
+- [ ] Subir na nuvem (AWS Free Tier / VPS Linux)
+- [ ] Integrar Redis como Cache L2 no backend
 - [ ] Rate limiting (login, API pública)
-- [ ] Migração futura BCrypt → Argon2id (quando instância ≥ 4 GiB RAM)
+- [ ] Migração futura BCrypt → Argon2id (quando houver >= 4GB RAM)
 
 ### 💰 Módulo Financeiro
-
-- [ ] Geração de folha de pagamento baseada em escalas reais
-- [ ] Relatórios em PDF (escalas, folha de pagamento)
-- [ ] Geração de PDFs dinâmicos e boletos bancários
+- [ ] Geração de folha de pagamento baseada no somatório de diárias reais
+- [ ] Relatórios e exportação PDF (escalas, folha)
 - [ ] Integração com gateway de pagamento
 
 ### 🤖 AI & RAG
-
-- [ ] Sistema RAG para WhatsApp (atendimento premium)
+- [ ] Sistema RAG para WhatsApp (resolução contextual de dúvidas de plantão)
 - [ ] Agente de suporte ao cliente via LLM + RAG
-- [ ] AI Profiler: eficiência operacional, ausências, diárias dupla vs normal
+- [ ] AI Profiler: análise de eficiência por funcionário, detecção de absenteísmo
 
 ### 🔑 Controle de Acesso & Ponto
-
-- [ ] Reconhecimento facial para entrada no cliente
-- [ ] Reconhecimento facial para batida de ponto (clock-in)
-- [ ] Analytics: ponto planejado vs realizado
-- [ ] Avaliação de funcionários por pontualidade e assiduidade
-
-### 🏢 Ecossistema Admin
-
-- [ ] Super-Admin Dashboard (gráficos de uso, receita total, "Valor Economizado")
-- [ ] Gestão de amenidades (salão de festas, áreas comuns)
+- [ ] Reconhecimento facial no aplicativo para batida de ponto
+- [ ] Analytics: Diárias agendadas vs Ponto executado
+- [ ] Score de assiduidade de colaboradores
 
 ### 💼 UX & Business Logic
-
-- [ ] Contratos: redesign com datas em formato natural para não-programadores
-- [ ] Exibição de valores mensais ao invés de total anual nos contratos
-- [ ] Cálculo de 13º salário conforme operação
-- [ ] Preview de salário base por tipo de escala (12x36, 5x2)
-- [ ] Configuração específica para terceirizados multi-cliente
+- [ ] UX Form Contratos: layout aprimorado para adicionar múltiplas ContratoTags rapidamente
+- [ ] Contratos: Exibição de totais mensais dinâmicos ao invés de anual
+- [ ] Dashboard Super-Admin: Gráficos de receita consolidada, margens e saving do cliente
+- [ ] Preview de escalonamento mensal de diárias baseadas no calendário do funcionário
 
 ---
 
