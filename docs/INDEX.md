@@ -1,6 +1,6 @@
 # Documentação — InterceptorSystem
 
-**Última atualização:** 2026-02-28
+**Última atualização:** 2026-03-23
 
 ---
 
@@ -8,19 +8,23 @@
 
 ```
 docs/
-├── guias/
-│   └── QUICK_START.md   # Comandos essenciais de desenvolvimento
+├── design-system/       # Tokens visuais, regras e padrões de refatoração do UI
+├── guias/               # Referências de desenvolvimento e regras de negócio
+├── refactory/           # Planos e tarefas de refatoração em andamento
+├── reviews/             # Code reviews e análises de qualidade
 └── INDEX.md             # Este arquivo
 ```
 
-## Documentos Principais
+## Diretórios e Documentos Principais
 
-| Arquivo                                                 | Descrição                                                                                               |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `/README.md`                                            | Visão geral, auth, regras de negócio, arquitetura, Docker, WhatsApp, tecnologias                        |
-| `/CHANGELOG.md`                                         | Histórico de versões (v1.0 → v3.0)                                                                      |
-| `docs/guias/QUICK_START.md`                             | Referência rápida: Docker, migrations, testes, payloads                                                 |
-| `docs/refactory/form-detail-ui-standardization-plan.md` | Plano de padronização de forms/details (dark/light, responsividade, eficiência e padding-top de listas) |
+| Diretório/Arquivo | Descrição |
+| --- | --- |
+| `/README.md` | Visão geral, arquitetura, domínio, Docker, infra, APIs |
+| `/CHANGELOG.md` | Histórico de versões do sistema |
+| `docs/design-system/` | Padrões de CSS, tokens (`DESIGN_PATTERN.md`) e plano de refatoração UI |
+| `docs/guias/` | Guias de desenvolvimento, deploy, payload (`QUICK_START.md`) e regras (`analise_regras_negocio.md`) |
+| `docs/refactory/` | Planos técnicos, lógicas backend/frontend e roadmap de evolução |
+| `docs/reviews/` | Relatórios das reviews conduzidas (ex: Angular components styling/UI standardization) |
 
 ## Versões
 
