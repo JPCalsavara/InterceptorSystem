@@ -45,14 +45,13 @@ docker compose up -d
 
 ### Backend
 
-- **CRUD completo** para Cliente, Funcionário, Posto, Diária e Contrato
-- **Criação em cascata** via `POST /api/clientes-completos` (Cliente + Contrato + Postos em 1 request)
-- **Cálculo automático de salário** baseado no contrato vigente
+- **CRUD completo** para Cliente, Funcionário, Posto, Alocação, Diária, Contrato e Tag
+- **Cálculos financeiros via Tags** (novo modelo dinâmico substituindo salário fixo)
+- **Lazy Fetching e Cache Coordenador**: queries otimizadas (`/api/clientes/{id}/funcionarios`)
+- **Turnos flexíveis**: suporte completo a Comercial, 8h (Alcalá), Folguista e 12h
+- **Criação em cascata** via `POST /api/clientes-completos` (Cliente + Contrato + Postos + Alocações em 1 request)
 - **Diárias em lote** via `POST /api/diarias/batch`
-- **Cálculos financeiros de contrato** via `POST /api/contrato-calculos`
 - **Auto-finalização de contratos** vencidos ao listar
-- **Multi-tenant** com filtros globais por `EmpresaId`
-- **Quantidade ideal de funcionários por posto** calculada do cliente
 - **Autenticação JWT** com registro, login, verificação de e-mail e reset de senha
 - **Gestão de contas SaaS** com planos de assinatura (FREE, BASIC, PRO)
 - **Notificações por e-mail** via SMTP (MailKit) — verificação, reset de senha, alteração de e-mail
@@ -60,20 +59,17 @@ docker compose up -d
 
 ### Frontend
 
-- **Landing page pública** com informações do sistema
+- **Landing page pública** focada em gestão de serviços e facilities
+- **Design System próprio**: uso massivo de CSS tokens, cores semânticas e SVGs otimizados (`docs/design-system`)
+- **Gestão de Cache e Invalidação Reativa**: baseada na `EntityCacheCoordinatorService` para poupar requests
+- **Sidebar Desktop Colapsável**: com persistência local de layout
+- **Padronização Visual**: formulários responsivos, mensagens de erro padronizadas e botões unificados
 - **Fluxo de autenticação completo**: login, cadastro, esqueci a senha, nova senha, verificação de e-mail
-- **Gestão de conta**: perfil, alteração de dados, seleção de plano
 - **Dashboard financeiro** com análise por período (mensal, trimestral, semestral, anual)
-- **Wizard de criação de cliente** em 3 steps com validação progressiva
 - **3 modos de visualização de diárias**: Diário (lista), Semanal (kanban), Mensal (calendário)
-- **Dark mode / Light mode** com toggle no navbar e persistência em localStorage
-- **Cálculos em tempo real** nos formulários de contrato e cliente
-- **Formulários com máscaras** (ngx-mask): CNPJ, CPF, celular — formatação visual com `dropSpecialCharacters`
-- **Detail de cliente** com breakdown financeiro completo
-- **Detail de funcionário** com diárias, faltas, salário simulado e projeção de mês completo
-- **Detail de posto de trabalho** com diárias e estatísticas
-- **Auth Guard** protegendo rotas autenticadas
-- **Auth Interceptor** injetando token JWT em todas as requisições
+- **Dark mode / Light mode** dinâmico e suportado em todas as telas
+- **Formulários validados por Schema (Zod)** e com máscaras (ngx-mask)
+- **Auth Guard** protegendo rotas autenticadas e **Auth Interceptor** de JWT
 
 ### Infraestrutura
 
@@ -576,8 +572,8 @@ InterceptorSystem/
 │   │   ├── core/
 │   │   │   ├── guards/               → auth.guard.ts
 │   │   │   └── interceptors/         → auth.interceptor.ts
-│   │   ├── features/                 → clientes, funcionarios, contratos,
-│   │   │                               postos, diarias
+│   │   ├── features/                 → clientes, contratos, funcionarios,
+│   │   │                               postos, alocacoes, diarias, tags
 │   │   ├── services/                 → auth.service.ts + outros
 │   │   ├── models/                   → interfaces TypeScript
 │   │   ├── shared/                   → navbar, sidebar, layout
@@ -589,9 +585,11 @@ InterceptorSystem/
 │   └── package.json
 │
 ├── docs/
-│   ├── INDEX.md
-│   └── guias/
-│       └── QUICK_START.md
+│   ├── design-system/
+│   ├── guias/
+│   ├── refactory/
+│   ├── reviews/
+│   └── INDEX.md
 │
 ├── .env.example
 ├── .github/workflows/ci.yml
@@ -662,14 +660,18 @@ POST   /api/clientes-completos
 POST   /api/clientes-completos/validar
 ```
 
-### CRUD Principal
+### CRUD Principal & Scoped Endpoints
 
 ```http
 GET/POST/PUT/DELETE  /api/clientes
+GET                  /api/clientes/{id}/postos
+GET                  /api/clientes/{id}/funcionarios
 GET/POST/PUT/DELETE  /api/contratos
 GET/POST/PUT/DELETE  /api/funcionarios
 GET/POST/PUT/DELETE  /api/postos
+GET/POST/PUT/DELETE  /api/alocacoes
 GET/POST/PUT/DELETE  /api/diarias
+GET/POST/PUT/DELETE  /api/tags
 ```
 
 ### Cálculos
