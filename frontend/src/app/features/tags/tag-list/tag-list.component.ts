@@ -45,6 +45,10 @@ export class TagListComponent implements OnInit {
     this.loadTags();
   }
 
+  limparFiltros(): void {
+    this.filtroNome.set('');
+  }
+
   loadTags(): void {
     this.loading.set(true);
     this.error.set(null);
