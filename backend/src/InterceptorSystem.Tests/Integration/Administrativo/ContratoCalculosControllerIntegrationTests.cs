@@ -27,7 +27,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostos: 2,
             NumeroDePostosNoturnos: 1,      // 1 dos 2 postos tem horário noturno
             ValorBeneficiosExtrasMensal: 3600m,
-            PercentualImpostos: 0.15m,    
+            PercentualEncargosProvisoes: 0.15m,    
             PercentualAdicionalNoturno: 0.2m,// 15%
             MargemLucroPercentual: 0.20m,           // 20%
             MargemCoberturaFaltasPercentual: 0.10m  // 10%
@@ -77,7 +77,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostos: 2,
             NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
-            PercentualImpostos: 0.50m, 
+            PercentualEncargosProvisoes: 0.50m, 
             PercentualAdicionalNoturno: 0.2m,// 50%
             MargemLucroPercentual: 0.40m,           // 40%
             MargemCoberturaFaltasPercentual: 0.20m  // 20%
@@ -107,7 +107,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostos: 2,
             NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
-            PercentualImpostos: 0.15m,
+            PercentualEncargosProvisoes: 0.15m,
             PercentualAdicionalNoturno: 0.2m,
             MargemLucroPercentual: 0.20m,
             MargemCoberturaFaltasPercentual: 0.10m
@@ -137,7 +137,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: 3600m,
             PercentualAdicionalNoturno: 0.2m,
-            PercentualImpostos: 0.15m,
+            PercentualEncargosProvisoes: 0.15m,
             MargemLucroPercentual: 0.20m,
             MargemCoberturaFaltasPercentual: 0.10m
         );
@@ -165,7 +165,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostos: 2,
             NumeroDePostosNoturnos: 1,
             ValorBeneficiosExtrasMensal: -100m,     // ❌ Negativo!
-            PercentualImpostos: 0.15m,
+            PercentualEncargosProvisoes: 0.15m,
             PercentualAdicionalNoturno: 0.2m,
             MargemLucroPercentual: 0.20m,
             MargemCoberturaFaltasPercentual: 0.10m
@@ -194,7 +194,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostos: 2,              // 1 funcionário
             NumeroDePostosNoturnos: 0,      // Sem postos noturnos (cenário mínimo)
             ValorBeneficiosExtrasMensal: 0m,        // Sem benefícios
-            PercentualImpostos: 0m,      
+            PercentualEncargosProvisoes: 0m,      
             PercentualAdicionalNoturno: 0m,// Sem impostos
             MargemLucroPercentual: 0m,              // Sem lucro
             MargemCoberturaFaltasPercentual: 0m     // Sem margem faltas
@@ -239,7 +239,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
             NumeroDePostos: 2,
             NumeroDePostosNoturnos: 1,      // 1 dos 2 postos tem horário noturno
             ValorBeneficiosExtrasMensal: 15000m,
-            PercentualImpostos: 0.25m,       
+            PercentualEncargosProvisoes: 0.25m,       
             PercentualAdicionalNoturno: 0.2m,// 25%
             MargemLucroPercentual: 0.30m,           // 30%
             MargemCoberturaFaltasPercentual: 0.15m  // 15%

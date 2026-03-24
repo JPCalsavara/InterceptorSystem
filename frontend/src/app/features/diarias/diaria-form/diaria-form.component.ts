@@ -59,6 +59,7 @@ export class DiariaFormComponent implements OnInit, OnChanges {
   clientes = signal<Cliente[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
+  submitted = signal(false);
   isEditMode = signal(false);
   diariaId: string | null = null;
 
@@ -183,6 +184,7 @@ export class DiariaFormComponent implements OnInit, OnChanges {
   }
 
   onSubmit(): void {
+    this.submitted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -240,6 +242,11 @@ export class DiariaFormComponent implements OnInit, OnChanges {
         },
       });
     }
+  }
+
+  hasError(name: string): boolean {
+    const ctrl = this.form.get(name);
+    return !!ctrl && ctrl.invalid && (ctrl.touched || this.submitted());
   }
 
   dismissError(): void {

@@ -36,8 +36,7 @@ public class PostoAppServiceTests
             _mockRepo.Object,
             _mockClienteRepo.Object,
             new Mock<ITagRepository>().Object,
-            _mockTenant.Object,
-            new MemoryCache(new MemoryCacheOptions()));
+            _mockTenant.Object);
     }
 
     #region CreateAsync Tests

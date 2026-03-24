@@ -220,7 +220,7 @@
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
     }
 
     &:disabled {
@@ -309,15 +309,15 @@
       font-weight: bold;
 
       &.tendencia-up {
-        color: var(--app-ref-4caf50);
+        color: var(--success-color);
       }
 
       &.tendencia-down {
-        color: var(--app-ref-f44336);
+        color: var(--error-color);
       }
 
       &.tendencia-neutral {
-        color: var(--app-ref-ff9800);
+        color: var(--warning-color);
       }
     }
   }
@@ -367,17 +367,17 @@
   }
 
   &.urgencia-alta {
-    border-left-color: var(--app-ref-f44336);
+    border-left-color: var(--error-color);
     background: rgba(244, 67, 54, 0.05);
   }
 
   &.urgencia-media {
-    border-left-color: var(--app-ref-ff9800);
+    border-left-color: var(--warning-color);
     background: rgba(255, 152, 0, 0.05);
   }
 
   &.urgencia-baixa {
-    border-left-color: var(--app-ref-4caf50);
+    border-left-color: var(--success-color);
     background: rgba(76, 175, 80, 0.05);
   }
 
@@ -465,7 +465,7 @@
     text-align: center;
 
     svg {
-      color: var(--app-ref-4caf50);
+      color: var(--success-color);
       margin-bottom: 1rem;
     }
 
@@ -653,7 +653,7 @@
         color: var(--text-primary);
 
         &.faturamento {
-          color: var(--app-ref-1565c0);
+          color: var(--text-secondary);
         }
         &.custo {
           color: var(--text-secondary);
@@ -670,7 +670,7 @@
     background: rgba(255, 152, 0, 0.08);
     border-radius: var(--radius-md);
     font-size: var(--text-xs);
-    color: var(--app-ref-e65100);
+    color: #e65100;
     text-align: center;
   }
 
@@ -689,7 +689,7 @@
       color: var(--text-secondary);
 
       .footer-sep {
-        color: var(--border-color, var(--app-ref-ccc));
+        color: var(--border-color, #ccc);
         font-size: var(--text-xs);
       }
     }
@@ -701,16 +701,16 @@
       font-weight: var(--fw-semibold);
 
       &.ok {
-        color: var(--app-ref-388e3c);
+        color: #388e3c;
       }
       &.urgencia-media {
-        color: var(--app-ref-f57c00);
+        color: #f57c00;
       }
       &.urgencia-alta {
-        color: var(--app-ref-c62828);
+        color: #c62828;
       }
       &.vencido {
-        color: var(--app-ref-b71c1c);
+        color: #b71c1c;
       }
       &.sem-contrato {
         color: var(--text-secondary);
@@ -727,16 +727,16 @@
 // Lucro / Margem - cores
 // ============================================================
 .lucro-bom {
-  color: var(--app-ref-2e7d32) !important;
+  color: #2e7d32 !important;
 }
 .lucro-medio {
-  color: var(--app-ref-f57c00) !important;
+  color: #f57c00 !important;
 }
 .lucro-baixo {
-  color: var(--app-ref-e65100) !important;
+  color: #e65100 !important;
 }
 .lucro-negativo {
-  color: var(--app-ref-c62828) !important;
+  color: #c62828 !important;
 }
 
 // ============================================================
@@ -786,7 +786,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    color: var(--app-ref-2e7d32);
+    color: #2e7d32;
 
     .ranking-ok-sub {
       color: var(--text-secondary);
@@ -825,7 +825,7 @@
   }
 
   &.ranking-falta {
-    border-left: 3px solid var(--app-ref-ef5350);
+    border-left: 3px solid #ef5350;
   }
 
   .pos-badge {
@@ -842,21 +842,21 @@
     color: var(--text-secondary);
 
     &.pos-1 {
-      background: var(--app-ref-ffd700);
-      color: var(--app-ref-5a4000);
+      background: #ffd700;
+      color: #5a4000;
     }
     &.pos-2 {
-      background: var(--app-ref-c0c0c0);
-      color: var(--app-ref-333);
+      background: #c0c0c0;
+      color: #333;
     }
     &.pos-3 {
-      background: var(--app-ref-cd7f32);
-      color: var(--app-ref-fff);
+      background: #cd7f32;
+      color: #fff;
     }
 
     &.falta-badge {
       background: rgba(244, 67, 54, 0.15);
-      color: var(--app-ref-c62828);
+      color: #c62828;
     }
   }
 
@@ -896,10 +896,10 @@
       line-height: 1;
 
       &.confirmado {
-        color: var(--app-ref-1976d2);
+        color: var(--primary-dark);
       }
       &.falta {
-        color: var(--app-ref-c62828);
+        color: #c62828;
       }
     }
 
@@ -930,13 +930,13 @@
         transition: width 0.4s ease;
 
         &.presenca-alta {
-          background: var(--app-ref-43a047);
+          background: #43a047;
         }
         &.presenca-media {
-          background: var(--app-ref-fb8c00);
+          background: #fb8c00;
         }
         &.presenca-baixa {
-          background: var(--app-ref-e53935);
+          background: #e53935;
         }
       }
     }
@@ -948,13 +948,13 @@
       text-align: right;
 
       &.presenca-alta {
-        color: var(--app-ref-2e7d32);
+        color: #2e7d32;
       }
       &.presenca-media {
-        color: var(--app-ref-e65100);
+        color: #e65100;
       }
       &.presenca-baixa {
-        color: var(--app-ref-b71c1c);
+        color: #b71c1c;
       }
     }
   }

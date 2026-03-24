@@ -241,6 +241,13 @@ export const routes: Routes = [
           import('./features/tags/tag-list/tag-list.component').then((m) => m.TagListComponent),
       },
       {
+        path: 'suporte',
+        loadComponent: () =>
+          import('./features/suporte/suporte-page/suporte-page.component').then(
+            (m) => m.SuportePageComponent,
+          ),
+      },
+      {
         path: 'perfil',
         loadComponent: () =>
           import('./features/perfil/perfil-page/perfil-page.component').then(

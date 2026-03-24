@@ -72,14 +72,14 @@
         id="funcionarioId"
         formControlName="funcionarioId"
         class="form-control"
-        [class.invalid]="form.get('funcionarioId')?.invalid && form.get('funcionarioId')?.touched"
+        [class.error]="hasError('funcionarioId')"
       >
         <option value="">Selecione um funcionário</option>
         @for (func of funcionarios(); track func.id) {
           <option [value]="func.id">{{ func.nome }} - {{ func.cpf }}</option>
         }
       </select>
-      @if (form.get('funcionarioId')?.invalid && form.get('funcionarioId')?.touched) {
+      @if (hasError('funcionarioId')) {
         <span class="error-message">Funcionário é obrigatório</span>
       }
     </div>
@@ -100,14 +100,14 @@
         id="alocacaoId"
         formControlName="alocacaoId"
         class="form-control"
-        [class.invalid]="form.get('alocacaoId')?.invalid && form.get('alocacaoId')?.touched"
+        [class.error]="hasError('alocacaoId')"
       >
         <option value="">Selecione a Alocação</option>
         @for (aloc of alocacoes(); track aloc.id) {
           <option [value]="aloc.id">{{ getAlocacaoLabel(aloc) }}</option>
         }
       </select>
-      @if (form.get('alocacaoId')?.invalid && form.get('alocacaoId')?.touched) {
+      @if (hasError('alocacaoId')) {
         <span class="error-message">A alocação é obrigatória</span>
       }
     </div>
@@ -129,9 +129,9 @@
         id="data"
         formControlName="data"
         class="form-control"
-        [class.invalid]="form.get('data')?.invalid && form.get('data')?.touched"
+        [class.error]="hasError('data')"
       />
-      @if (form.get('data')?.invalid && form.get('data')?.touched) {
+      @if (hasError('data')) {
         <span class="error-message">Data é obrigatória</span>
       }
     </div>
@@ -152,13 +152,13 @@
         id="statusDiaria"
         formControlName="statusDiaria"
         class="form-control"
-        [class.invalid]="form.get('statusDiaria')?.invalid && form.get('statusDiaria')?.touched"
+        [class.error]="hasError('statusDiaria')"
       >
         @for (option of statusOptions; track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
       </select>
-      @if (form.get('statusDiaria')?.invalid && form.get('statusDiaria')?.touched) {
+      @if (hasError('statusDiaria')) {
         <span class="error-message">Status é obrigatório</span>
       }
     </div>
@@ -177,13 +177,13 @@
         id="tipoDiaria"
         formControlName="tipoDiaria"
         class="form-control"
-        [class.invalid]="form.get('tipoDiaria')?.invalid && form.get('tipoDiaria')?.touched"
+        [class.error]="hasError('tipoDiaria')"
       >
         @for (option of tipoOptions; track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
       </select>
-      @if (form.get('tipoDiaria')?.invalid && form.get('tipoDiaria')?.touched) {
+      @if (hasError('tipoDiaria')) {
         <span class="error-message">Tipo é obrigatório</span>
       }
       @if (form.get('tipoDiaria')?.value === 'DOBRA_PROGRAMADA') {

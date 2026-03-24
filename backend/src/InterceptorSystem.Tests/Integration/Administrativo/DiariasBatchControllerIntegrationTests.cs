@@ -204,7 +204,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
             ValorDiariaCobrada: 100m,
             PercentualAdicionalNoturno: 0.20m,
             ValorBeneficiosExtrasMensal: 350m,
-            PercentualImpostos: 0.085m,
+            PercentualEncargosProvisoes: 0.085m,
             NumeroDePostos: 2,
             MargemLucroPercentual: 0.12m,
             MargemCoberturaFaltasPercentual: 0.10m,

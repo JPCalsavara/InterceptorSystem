@@ -34,7 +34,7 @@
   &:hover:not(:disabled) {
     background-color: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
   }
 }
 
@@ -141,7 +141,7 @@
 .action-btn.btn-view:hover,
 .btn-action.btn-view:hover,
 .btn-icon.btn-view:hover {
-  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 4px 8px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
 .action-btn.btn-edit:hover,

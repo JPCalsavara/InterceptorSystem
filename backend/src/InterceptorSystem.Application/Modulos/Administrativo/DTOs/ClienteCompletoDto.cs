@@ -22,7 +22,7 @@ public record CreateContratoCompletoDtoInput(
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
-    decimal PercentualImpostos,
+    decimal PercentualEncargosProvisoes,
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
     DateOnly DataInicio,

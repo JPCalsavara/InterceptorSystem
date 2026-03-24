@@ -48,7 +48,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
                 input.Contrato.ValorDiariaCobrada,
                 input.Contrato.PercentualAdicionalNoturno,
                 input.Contrato.ValorBeneficiosExtrasMensal,
-                input.Contrato.PercentualImpostos,
+                input.Contrato.PercentualEncargosProvisoes,
                 input.NumeroDePostos,
                 input.Contrato.MargemLucroPercentual,
                 input.Contrato.MargemCoberturaFaltasPercentual,

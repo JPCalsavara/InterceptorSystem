@@ -1,6 +1,7 @@
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
@@ -41,6 +42,8 @@ public class Diaria : Entity, IAggregateRoot
         ValorDiaria = valorDiaria;
         StatusDiaria = statusDiaria;
         TipoDiaria = tipoDiaria;
+
+        AddDomainEvent(new DiariaCreatedEvent(EmpresaId, Id));
     }
 
     public void AtualizarStatus(StatusDiaria statusDiaria, TipoDiaria tipoDiaria)
@@ -50,5 +53,12 @@ public class Diaria : Entity, IAggregateRoot
 
         StatusDiaria = statusDiaria;
         TipoDiaria = tipoDiaria;
+
+        AddDomainEvent(new DiariaUpdatedEvent(EmpresaId, Id));
+    }
+
+    public void PrepararExclusao()
+    {
+        AddDomainEvent(new DiariaDeletedEvent(EmpresaId, Id));
     }
 }

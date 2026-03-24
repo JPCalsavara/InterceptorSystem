@@ -40,7 +40,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
                 ValorDiariaCobrada: 120m,
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
-                PercentualImpostos: 0.15m,
+                PercentualEncargosProvisoes: 0.15m,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
@@ -61,8 +61,9 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
         Assert.NotNull(resultado);
         Assert.NotNull(resultado.Cliente);
         Assert.NotNull(resultado.Contrato);
-        // FASE 2B: Postos are physical locations now, not auto-created via orchestrator
-        Assert.Empty(resultado.Postos);
+        // FASE 2B: Postos are created if CriarPostosAutomaticamente is true
+        Assert.NotEmpty(resultado.Postos);
+        Assert.Equal(2, resultado.Postos.Count());
         
         // Verificar que cliente foi criado
         Assert.Equal(input.Cliente.Nome, resultado.Cliente.Nome);
@@ -90,7 +91,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
                 ValorDiariaCobrada: 120m,
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
-                PercentualImpostos: 0.15m,
+                PercentualEncargosProvisoes: 0.15m,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
@@ -125,7 +126,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
                 ValorDiariaCobrada: 120m,
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
-                PercentualImpostos: 0.15m,
+                PercentualEncargosProvisoes: 0.15m,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(-10)), // ❌ Data no passado
@@ -162,7 +163,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
                 ValorDiariaCobrada: 120m,
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 3600m,
-                PercentualImpostos: 0.15m,
+                PercentualEncargosProvisoes: 0.15m,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
@@ -199,7 +200,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
                 ValorDiariaCobrada: 120m,
                 PercentualAdicionalNoturno: 0.30m,
                 ValorBeneficiosExtrasMensal: 4800m,
-                PercentualImpostos: 0.15m,
+                PercentualEncargosProvisoes: 0.15m,
                 MargemLucroPercentual: 0.20m,
                 MargemCoberturaFaltasPercentual: 0.10m,
                 DataInicio: DateOnly.FromDateTime(DateTime.Today.AddDays(1)),

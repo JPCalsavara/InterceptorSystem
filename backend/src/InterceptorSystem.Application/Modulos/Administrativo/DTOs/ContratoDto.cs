@@ -10,7 +10,7 @@ public record CreateContratoDtoInput(
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
-    decimal PercentualImpostos,
+    decimal PercentualEncargosProvisoes,
     int NumeroDePostos, // Número de postos/turnos (QuantidadeFuncionarios será calculado automaticamente)
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
@@ -26,7 +26,7 @@ public record UpdateContratoDtoInput(
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
-    decimal PercentualImpostos,
+    decimal PercentualEncargosProvisoes,
     int NumeroDePostos, // Número de postos/turnos (QuantidadeFuncionarios será calculado automaticamente)
     decimal MargemLucroPercentual,
     decimal MargemCoberturaFaltasPercentual,
@@ -60,7 +60,7 @@ public record ContratoDtoOutput(
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
     decimal ValorBeneficiosExtrasMensal,
-    decimal PercentualImpostos,
+    decimal PercentualEncargosProvisoes,
     int QuantidadeFuncionarios,
     int NumeroDePostos, // ADICIONADO: Número de postos/turnos
     decimal MargemLucroPercentual,
@@ -87,7 +87,7 @@ public record ContratoDtoOutput(
             entity.ValorDiariaCobrada,
             entity.PercentualAdicionalNoturno,
             entity.ValorBeneficiosExtrasMensal,
-            entity.PercentualImpostos,
+            entity.PercentualEncargosProvisoes,
             entity.QuantidadeFuncionarios,
             entity.NumeroDePostos, // ADICIONADO
             entity.MargemLucroPercentual,

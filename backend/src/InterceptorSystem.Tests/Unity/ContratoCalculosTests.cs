@@ -38,7 +38,7 @@ public class ContratoCalculosTests
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,      // 30%
             valorBeneficiosExtrasMensal: 1000m,
-            percentualImpostos: 0.15m,
+            percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,                      // Número de postos/turnos
             margemLucroPercentual: 0.20m,
             margemCoberturaFaltasPercentual: 0.10m,
@@ -74,7 +74,7 @@ public class ContratoCalculosTests
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,
             valorBeneficiosExtrasMensal: 3600m,     // Total
-            percentualImpostos: 0.15m,
+            percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,                      // Número de postos/turnos (12 funcionários)
             margemLucroPercentual: 0.20m,
             margemCoberturaFaltasPercentual: 0.10m,
@@ -108,7 +108,7 @@ public class ContratoCalculosTests
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,
             valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0.15m,
+            percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,
             margemLucroPercentual: 0.20m,
             margemCoberturaFaltasPercentual: 0.10m,

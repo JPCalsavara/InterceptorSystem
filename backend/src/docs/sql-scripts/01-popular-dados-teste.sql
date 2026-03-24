@@ -63,7 +63,7 @@ VALUES
 INSERT INTO "Contratos" (
     "Id", "EmpresaId", "ClienteId", "Descricao", 
     "ValorTotalMensal", "ValorDiariaCobrada", "PercentualAdicionalNoturno", 
-    "ValorBeneficiosExtrasMensal", "PercentualImpostos", "QuantidadeFuncionarios",
+    "ValorBeneficiosExtrasMensal", "PercentualEncargosProvisoes", "QuantidadeFuncionarios",
     "MargemLucroPercentual", "MargemCoberturaFaltasPercentual",
     "DataInicio", "DataFim", "Status", "CreatedAt"
 )

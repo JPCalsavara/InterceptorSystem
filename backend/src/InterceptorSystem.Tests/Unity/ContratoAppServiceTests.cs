@@ -27,8 +27,7 @@ public class ContratoAppServiceTests
             _contratoRepo.Object,
             _clienteRepo.Object,
             _tagRepo.Object,
-            _tenantService.Object,
-            new MemoryCache(new MemoryCacheOptions()));
+            _tenantService.Object);
     }
 
     [Fact]

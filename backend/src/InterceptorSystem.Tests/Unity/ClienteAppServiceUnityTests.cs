@@ -30,7 +30,7 @@ public class ClienteAppServiceTests
         // Configura o repositório para retornar nosso Mock de UnitOfWork
         _mockRepo.Setup(r => r.UnitOfWork).Returns(_mockUow.Object);
 
-        _service = new ClienteAppService(_mockRepo.Object, _mockTenant.Object, _cache);
+        _service = new ClienteAppService(_mockRepo.Object, _mockTenant.Object);
     }
 
     #region CreateAsync Tests

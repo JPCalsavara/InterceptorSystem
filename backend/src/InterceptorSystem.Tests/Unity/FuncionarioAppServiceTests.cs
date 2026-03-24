@@ -51,8 +51,7 @@ public class FuncionarioAppServiceTests
             _clienteRepo.Object,
             _contratoRepo.Object,
             new Mock<InterceptorSystem.Domain.Modulos.Administrativo.Interfaces.ITagRepository>().Object,
-            _tenantService.Object,
-            new MemoryCache(new MemoryCacheOptions())); // Phase 4: ITagRepository
+            _tenantService.Object); // Phase 4: ITagRepository
     }
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]

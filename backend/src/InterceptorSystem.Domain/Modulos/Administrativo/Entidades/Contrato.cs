@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
@@ -55,7 +56,7 @@ public class Contrato : Entity, IAggregateRoot
     /// Percentual de impostos incidentes sobre o valor total (INSS, FGTS, etc.).
     /// Exemplo: 0.15 = 15% do valor total mensal.
     /// </summary>
-    public decimal PercentualImpostos { get; private set; }
+    public decimal PercentualEncargosProvisoes { get; private set; }
     
     /// <summary>
     /// Número de turnos/postos de trabalho no cliente.
@@ -129,7 +130,7 @@ public class Contrato : Entity, IAggregateRoot
         decimal valorDiariaCobrada,
         decimal percentualAdicionalNoturno,
         decimal valorBeneficiosExtrasMensal,
-        decimal percentualImpostos,
+        decimal percentualEncargosProvisoes,
         int numeroDePostos, // Quantidade de turnos (2=12x36, 3=8h, 4=6h)
         decimal margemLucroPercentual,
         decimal margemCoberturaFaltasPercentual,
@@ -150,7 +151,7 @@ public class Contrato : Entity, IAggregateRoot
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
         CheckRule(dataFim <= dataInicio, "A data final deve ser posterior à data inicial.");
         CheckRule(
-            percentualImpostos + margemLucroPercentual + margemCoberturaFaltasPercentual >= 1m,
+            percentualEncargosProvisoes + margemLucroPercentual + margemCoberturaFaltasPercentual >= 1m,
             "A soma dos percentuais (impostos + lucro + faltas) não pode ser >= 100%.");
         CheckRule(!Enum.IsDefined(status), "Status do contrato é obrigatório.");
 
@@ -162,7 +163,7 @@ public class Contrato : Entity, IAggregateRoot
         ValorDiariaVigilante = valorDiariaVigilante;
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
-        PercentualImpostos = percentualImpostos;
+        PercentualEncargosProvisoes = percentualEncargosProvisoes;
         NumeroDePostos = numeroDePostos;
         MargemLucroPercentual = margemLucroPercentual;
         MargemCoberturaFaltasPercentual = margemCoberturaFaltasPercentual;
@@ -170,6 +171,8 @@ public class Contrato : Entity, IAggregateRoot
         DataFim = dataFim;
         Status = status;
         ValorDiariaVigilante = valorDiariaVigilante;
+
+        AddDomainEvent(new ContratoCreatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void AtualizarDados(
@@ -178,7 +181,7 @@ public class Contrato : Entity, IAggregateRoot
         decimal valorDiariaCobrada,
         decimal percentualAdicionalNoturno,
         decimal valorBeneficiosExtrasMensal,
-        decimal percentualImpostos,
+        decimal percentualEncargosProvisoes,
         int numeroDePostos,
         decimal margemLucroPercentual,
         decimal margemCoberturaFaltasPercentual,
@@ -196,7 +199,7 @@ public class Contrato : Entity, IAggregateRoot
         CheckPercentual(margemCoberturaFaltasPercentual, "Margem de faltas inválida.");
         CheckRule(dataFim <= dataInicio, "A data final deve ser posterior à data inicial.");
         CheckRule(
-            percentualImpostos + margemLucroPercentual + margemCoberturaFaltasPercentual >= 1m,
+            percentualEncargosProvisoes + margemLucroPercentual + margemCoberturaFaltasPercentual >= 1m,
             "A soma dos percentuais (impostos + lucro + faltas) não pode ser >= 100%.");
 
         Descricao = descricao;
@@ -204,19 +207,23 @@ public class Contrato : Entity, IAggregateRoot
         ValorDiariaCobrada = valorDiariaCobrada;
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
-        PercentualImpostos = percentualImpostos;
+        PercentualEncargosProvisoes = percentualEncargosProvisoes;
         NumeroDePostos = numeroDePostos;
         MargemLucroPercentual = margemLucroPercentual;
         MargemCoberturaFaltasPercentual = margemCoberturaFaltasPercentual;
         DataInicio = dataInicio;
         DataFim = dataFim;
         ValorDiariaVigilante = valorDiariaVigilante;
+
+        AddDomainEvent(new ContratoUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void AtualizarStatus(StatusContrato status)
     {
         CheckRule(!Enum.IsDefined(status), "Status do contrato é obrigatório.");
         Status = status;
+
+        AddDomainEvent(new ContratoUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void DefinirTags(IEnumerable<ContratoTag> novasTags)
@@ -226,6 +233,13 @@ public class Contrato : Entity, IAggregateRoot
         {
             Tags.Add(tag);
         }
+
+        AddDomainEvent(new ContratoUpdatedEvent(EmpresaId, Id, ClienteId));
+    }
+
+    public void PrepararExclusao()
+    {
+        AddDomainEvent(new ContratoDeletedEvent(EmpresaId, Id, ClienteId));
     }
 
     // Phase 4: CalcularSalarioBasePorFuncionario removed — use Tag-based daily rates instead.

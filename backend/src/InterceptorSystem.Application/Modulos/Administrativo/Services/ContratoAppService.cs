@@ -5,7 +5,6 @@ using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -15,33 +14,17 @@ public class ContratoAppService : IContratoAppService
     private readonly IClienteRepository _clienteRepository;
     private readonly ITagRepository _tagRepository;
     private readonly ICurrentTenantService _tenantService;
-    private readonly IMemoryCache _cache;
 
     public ContratoAppService(
         IContratoRepository repository,
         IClienteRepository clienteRepository,
         ITagRepository tagRepository,
-        ICurrentTenantService tenantService,
-        IMemoryCache cache)
+        ICurrentTenantService tenantService)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
         _tagRepository = tagRepository;
         _tenantService = tenantService;
-        _cache = cache;
-    }
-
-    private static string GetAllCacheKey(Guid empresaId) => $"Contratos_{empresaId}";
-    private static string GetByClienteCacheKey(Guid empresaId, Guid clienteId) =>
-        $"Contratos_{empresaId}_Cliente_{clienteId}";
-
-    private void InvalidateContratoCache(Guid empresaId, Guid? clienteId = null)
-    {
-        _cache.Remove(GetAllCacheKey(empresaId));
-        if (clienteId.HasValue)
-        {
-            _cache.Remove(GetByClienteCacheKey(empresaId, clienteId.Value));
-        }
     }
 
     public async Task<ContratoDtoOutput> CreateAsync(CreateContratoDtoInput input)
@@ -66,7 +49,7 @@ public class ContratoAppService : IContratoAppService
             input.ValorDiariaCobrada,
             input.PercentualAdicionalNoturno,
             input.ValorBeneficiosExtrasMensal,
-            input.PercentualImpostos,
+            input.PercentualEncargosProvisoes,
             input.NumeroDePostos,
             input.MargemLucroPercentual,
             input.MargemCoberturaFaltasPercentual,
@@ -96,8 +79,6 @@ public class ContratoAppService : IContratoAppService
         _repository.Add(contrato);
         await _repository.UnitOfWork.CommitAsync();
 
-        InvalidateContratoCache(empresaId, input.ClienteId);
-
         var saved = await _repository.GetByIdAsync(contrato.Id)
             ?? throw new InvalidOperationException("Contrato não encontrado após persistência.");
 
@@ -126,7 +107,7 @@ public class ContratoAppService : IContratoAppService
             input.ValorDiariaCobrada,
             input.PercentualAdicionalNoturno,
             input.ValorBeneficiosExtrasMensal,
-            input.PercentualImpostos,
+            input.PercentualEncargosProvisoes,
             input.NumeroDePostos,
             input.MargemLucroPercentual,
             input.MargemCoberturaFaltasPercentual,
@@ -158,9 +139,6 @@ public class ContratoAppService : IContratoAppService
         _repository.Update(contrato);
         await _repository.UnitOfWork.CommitAsync();
 
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        InvalidateContratoCache(empresaId, contrato.ClienteId);
-
         var saved = await _repository.GetByIdAsync(contrato.Id)
             ?? throw new InvalidOperationException("Contrato não encontrado após atualização.");
 
@@ -172,11 +150,9 @@ public class ContratoAppService : IContratoAppService
         var contrato = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Contrato não encontrado.");
 
+        contrato.PrepararExclusao();
         _repository.Remove(contrato);
         await _repository.UnitOfWork.CommitAsync();
-
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        InvalidateContratoCache(empresaId, contrato.ClienteId);
     }
 
     public async Task<ContratoDtoOutput?> GetByIdAsync(Guid id)
@@ -187,14 +163,6 @@ public class ContratoAppService : IContratoAppService
 
     public async Task<IEnumerable<ContratoDtoOutput>> GetAllAsync()
     {
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        var cacheKey = GetAllCacheKey(empresaId);
-
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<ContratoDtoOutput>? cached) && cached != null)
-        {
-            return cached;
-        }
-
         var contratos = await _repository.GetAllAsync();
         
         // BL-10: Auto-finalização de contratos vencidos
@@ -214,34 +182,20 @@ public class ContratoAppService : IContratoAppService
         if (alterados)
         {
             await _repository.UnitOfWork.CommitAsync();
-            InvalidateContratoCache(empresaId);
         }
 
-        var result = contratos
+        return contratos
             .Select(ContratoDtoOutput.FromEntity)
             .Where(dto => dto != null)
             .Select(dto => dto!);
-        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
-
-        return result;
     }
 
     public async Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId)
     {
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        var cacheKey = GetByClienteCacheKey(empresaId, clienteId);
-
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<ContratoDtoOutput>? cached) && cached != null)
-        {
-            return cached;
-        }
-
         var contratos = await _repository.GetByClienteIdAsync(clienteId);
-        var result = contratos
+        return contratos
             .Select(ContratoDtoOutput.FromEntity)
             .Where(dto => dto != null)
             .Select(dto => dto!);
-        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
-        return result;
     }
 }

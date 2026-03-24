@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
@@ -102,6 +103,8 @@ public class Funcionario : Entity, IAggregateRoot
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
+
+        AddDomainEvent(new FuncionarioCreatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void AtualizarDados(
@@ -122,6 +125,8 @@ public class Funcionario : Entity, IAggregateRoot
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
+
+        AddDomainEvent(new FuncionarioUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
     /// <summary>
@@ -132,6 +137,13 @@ public class Funcionario : Entity, IAggregateRoot
         Tags.Clear();
         foreach (var tag in novasTags)
             Tags.Add(tag);
+
+        AddDomainEvent(new FuncionarioUpdatedEvent(EmpresaId, Id, ClienteId));
+    }
+
+    public void PrepararExclusao()
+    {
+        AddDomainEvent(new FuncionarioDeletedEvent(EmpresaId, Id, ClienteId));
     }
 
     /// <summary>

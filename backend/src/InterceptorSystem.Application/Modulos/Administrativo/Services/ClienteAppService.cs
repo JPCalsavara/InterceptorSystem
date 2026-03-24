@@ -3,7 +3,6 @@ using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
 using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -11,16 +10,13 @@ public class ClienteAppService : IClienteAppService
 {
     private readonly IClienteRepository _repository;
     private readonly ICurrentTenantService _tenantService;
-    private readonly IMemoryCache _cache;
 
     public ClienteAppService(
         IClienteRepository repository, 
-        ICurrentTenantService tenantService,
-        IMemoryCache cache)
+        ICurrentTenantService tenantService)
     {
         _repository = repository;
         _tenantService = tenantService;
-        _cache = cache;
     }
 
     public async Task<ClienteDtoOutput> CreateAsync(CreateClienteDtoInput input)
@@ -40,8 +36,6 @@ public class ClienteAppService : IClienteAppService
         
         _repository.Add(cliente);
         await _repository.UnitOfWork.CommitAsync();
-        
-        _cache.Remove($"Clientes_{empresaId}");
         
         return ClienteDtoOutput.FromEntity(cliente)!;
     }
@@ -65,9 +59,6 @@ public class ClienteAppService : IClienteAppService
         _repository.Update(cliente);
         await  _repository.UnitOfWork.CommitAsync();
         
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("...");
-        _cache.Remove($"Clientes_{empresaId}");
-        
         return ClienteDtoOutput.FromEntity(cliente)!;
     }
 
@@ -88,9 +79,6 @@ public class ClienteAppService : IClienteAppService
                 "Não é possível excluir este cliente porque existem registros vinculados (ex.: contratos). Remova os vínculos antes de excluir.",
                 ex);
         }
-        
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("...");
-        _cache.Remove($"Clientes_{empresaId}");
     }
 
     public async Task<ClienteDtoOutput?> GetByIdAsync(Guid id)
@@ -101,21 +89,8 @@ public class ClienteAppService : IClienteAppService
 
     public async Task<IEnumerable<ClienteDtoOutput>> GetAllAsync()
     {
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        var cacheKey = $"Clientes_{empresaId}";
-
-        if (!_cache.TryGetValue(cacheKey, out IEnumerable<ClienteDtoOutput>? cachedList))
-        {
-            var lista = await _repository.GetAllAsync();
-            cachedList = lista.Select(c => ClienteDtoOutput.FromEntity(c)).Where(dto => dto != null)!;
-
-            var cacheOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
-
-            _cache.Set(cacheKey, cachedList, cacheOptions);
-        }
-
-        return cachedList ?? Enumerable.Empty<ClienteDtoOutput>();
+        var lista = await _repository.GetAllAsync();
+        return lista.Select(c => ClienteDtoOutput.FromEntity(c)).Where(dto => dto != null)!;
     }
 
     private static bool IsDeleteBlockedByRelationship(Exception exception)

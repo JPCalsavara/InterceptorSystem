@@ -112,7 +112,7 @@
     word-break: break-word;
 
     &.success {
-      color: var(--app-ref-10b981);
+      color: var(--success-color);
       font-weight: 500;
     }
   }
@@ -121,19 +121,19 @@
     background: rgba(251, 191, 36, 0.1);
     padding: 0.75rem;
     border-radius: 0.5rem;
-    border-left: 3px solid var(--app-ref-f59e0b);
+    border-left: 3px solid var(--warning-color);
 
     svg {
-      color: var(--app-ref-f59e0b);
+      color: var(--warning-color);
     }
 
     .label {
-      color: var(--app-ref-d97706);
+      color: var(--warning-color);
       font-weight: 600;
     }
 
     .value {
-      color: var(--app-ref-92400e);
+      color: var(--warning-color);
     }
   }
 }
@@ -143,11 +143,11 @@
     background: rgba(251, 191, 36, 0.15);
 
     .label {
-      color: var(--app-ref-fbbf24);
+      color: var(--warning-color);
     }
 
     .value {
-      color: var(--app-ref-fde68a);
+      color: var(--warning-bg);
     }
   }
 }
@@ -202,7 +202,7 @@
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, var(--app-ref-dc2626) 0%, var(--app-ref-991b1b) 100%);
+  background: linear-gradient(135deg, var(--error-color) 0%, var(--error-color) 100%);
   color: white;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
 

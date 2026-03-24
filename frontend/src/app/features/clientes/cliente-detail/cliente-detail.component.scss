@@ -1,3 +1,5 @@
+@import '../../../../styles/shared-pages';
+
 .detail-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -113,23 +115,23 @@
     min-width: 280px;
 
     &.urgencia-alta {
-      border-left-color: var(--app-ref-ef4444);
+      border-left-color: var(--error-color);
       background: rgba(239, 68, 68, 0.08);
     }
 
     &.urgencia-media {
-      border-left-color: var(--app-ref-f59e0b);
+      border-left-color: var(--warning-color);
       background: rgba(245, 158, 11, 0.08);
     }
 
     &.urgencia-baixa {
-      border-left-color: var(--app-ref-10b981);
+      border-left-color: var(--success-color);
       background: rgba(16, 185, 129, 0.08);
     }
 
     &.urgencia-info {
       border-left-color: var(--primary-color);
-      background: rgba(33, 150, 243, 0.08);
+      background: color-mix(in srgb, var(--primary-color) 8%, transparent);
     }
 
     .alert-icon {
@@ -175,17 +177,7 @@
   }
 
   .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--space-4);
-
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
+    @include responsive-grid('auto-fit', var(--space-4));
   }
 }
 
@@ -215,7 +207,7 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.2) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, transparent) 0%, color-mix(in srgb, var(--primary-color) 20%, transparent) 100%);
   border-radius: var(--radius-lg);
   color: var(--primary-color);
   flex-shrink: 0;
@@ -315,7 +307,7 @@
   &.btn-danger {
     &:hover {
       background: rgba(239, 68, 68, 0.12);
-      color: var(--app-ref-ef4444);
+      color: var(--error-color);
     }
   }
 }
@@ -393,17 +385,7 @@
 }
 
 .metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
-
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  @include responsive-grid(4, var(--space-4));
 }
 
 .metric-card {
@@ -430,7 +412,7 @@
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.2) 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, transparent) 0%, color-mix(in srgb, var(--primary-color) 20%, transparent) 100%);
     border-radius: var(--radius-lg);
     color: var(--primary-color);
     flex-shrink: 0;
@@ -483,17 +465,7 @@
   }
 
   .breakdown-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
-
-    @media (max-width: 1200px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
+    @include responsive-grid(3, var(--space-6));
   }
 
   .breakdown-card {
@@ -505,18 +477,18 @@
     border-left: 4px solid;
 
     &.receita {
-      border-left-color: var(--app-ref-10b981);
+      border-left-color: var(--success-color);
     }
 
     &.custo {
-      border-left-color: var(--app-ref-f59e0b);
+      border-left-color: var(--warning-color);
     }
 
     &.lucro {
       border-left-color: var(--primary-color);
 
       &.negativo {
-        border-left-color: var(--app-ref-ef4444);
+        border-left-color: var(--error-color);
       }
     }
 
@@ -546,7 +518,7 @@
       gap: var(--space-1);
 
       .noturno-detail {
-        color: var(--app-ref-4f46e5);
+        color: var(--color-info);
         font-size: var(--text-xs);
         font-weight: var(--fw-medium);
       }
@@ -681,7 +653,7 @@
     align-items: center;
     border: 1px solid var(--border-subtle);
     box-shadow: var(--shadow-sm);
-    border-left: 4px solid var(--app-ref-f59e0b);
+    border-left: 4px solid var(--warning-color);
 
     @media (max-width: 640px) {
       flex-direction: column;

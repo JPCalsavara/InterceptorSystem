@@ -1,3 +1,5 @@
+@import '../../../../styles/shared-pages';
+
 .detail-page {
   width: 100%;
 }
@@ -119,19 +121,9 @@
 
 /* Cards Grid — 3 colunas × 3 linhas */
 .cards-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  @include responsive-grid(3, 1.5rem);
   grid-template-rows: auto auto auto;
-  gap: 1.5rem;
   margin-bottom: 1.5rem;
-
-  @media (max-width: 1100px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .card-col1-row1 {
@@ -197,7 +189,7 @@
   padding: 0.6rem 0.75rem;
   border-radius: 8px;
   border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary, var(--app-ref-f8fafc));
+  background: var(--bg-secondary, var(--bg-secondary));
   transition: box-shadow 0.15s;
 
   @media (max-width: 480px) {
@@ -221,7 +213,7 @@
   .indicador-pct {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--primary-color, var(--app-ref-2196f3));
+    color: var(--primary-color, var(--primary-color));
     white-space: nowrap;
   }
 
@@ -234,10 +226,10 @@
   &.indicador-highlight {
     background: color-mix(
       in srgb,
-      var(--primary-color, var(--app-ref-2196f3)) 6%,
-      var(--bg-secondary, var(--app-ref-f8fafc))
+      var(--primary-color, var(--primary-color)) 6%,
+      var(--bg-secondary, var(--bg-secondary))
     );
-    border-color: color-mix(in srgb, var(--primary-color, var(--app-ref-2196f3)) 20%, transparent);
+    border-color: color-mix(in srgb, var(--primary-color, var(--primary-color)) 20%, transparent);
 
     .indicador-pct {
       font-size: 1.05rem;
@@ -331,7 +323,7 @@
   padding: 0.45rem 0.55rem;
   border-radius: 8px;
   border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary, var(--app-ref-f8fafc));
+  background: var(--bg-secondary, var(--bg-secondary));
 }
 
 .tag-name {
@@ -478,20 +470,14 @@
 }
 
 .escala-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
+  @include responsive-grid(2, 1rem, 2, 1); // 2 cols desk, 1 col mob
 }
 
 .escala-card {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: var(--bg-secondary, var(--app-ref-f8fafc));
+  background: var(--bg-secondary, var(--bg-secondary));
   border-radius: 12px;
   padding: 1.25rem;
   border: 1px solid var(--border-subtle);

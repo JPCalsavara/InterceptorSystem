@@ -84,7 +84,7 @@ public class ContratoCalculosController : ControllerBase
             if (input.NumeroDePostosNoturnos < 0 || input.NumeroDePostosNoturnos > input.NumeroDePostos)
                 return BadRequest(new { error = "Número de postos noturnos deve estar entre 0 e o total de postos." });
             
-            var somaMargens = input.PercentualImpostos 
+            var somaMargens = input.PercentualEncargosProvisoes 
                 + input.MargemLucroPercentual 
                 + input.MargemCoberturaFaltasPercentual;
             
@@ -123,7 +123,7 @@ public class ContratoCalculosController : ControllerBase
             var valorTotalMensal = custoBaseMensalReal / (1 - somaMargens);
             
             // ETAPA 4: Calcular breakdown
-            var valorImpostos = valorTotalMensal * input.PercentualImpostos;
+            var valorImpostos = valorTotalMensal * input.PercentualEncargosProvisoes;
             var valorLucro = valorTotalMensal * input.MargemLucroPercentual;
             var valorFaltas = valorTotalMensal * input.MargemCoberturaFaltasPercentual;
             

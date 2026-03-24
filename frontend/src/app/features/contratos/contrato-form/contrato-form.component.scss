@@ -79,7 +79,7 @@
     left: 50%;
     transform: translateX(-50%);
     bottom: calc(100% + 10px);
-    background: var(--app-ref-1e293b);
+    background: var(--text-primary);
     color: white;
     padding: 1rem;
     border-radius: 8px;
@@ -104,7 +104,7 @@
       left: 50%;
       transform: translateX(-50%);
       border: 8px solid transparent;
-      border-top-color: var(--app-ref-1e293b);
+      border-top-color: var(--text-primary);
 
       @media (max-width: 640px) {
         left: auto;
@@ -122,7 +122,7 @@
     }
 
     strong {
-      color: var(--app-ref-60a5fa);
+      color: var(--color-info);
     }
   }
 
@@ -276,12 +276,12 @@ select.form-input {
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color) 30%, transparent);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
+    box-shadow: 0 4px 8px color-mix(in srgb, var(--primary-color) 40%, transparent);
   }
 }
 
@@ -306,7 +306,7 @@ select.form-input {
   margin: 0;
 
   .required {
-    color: var(--app-ref-ef4444);
+    color: var(--error-color);
   }
 
   @media (max-width: 640px) {
@@ -340,8 +340,8 @@ select.form-input {
 }
 
 .calculation-display {
-  background: linear-gradient(135deg, var(--app-ref-e3f2fd) 0%, var(--app-ref-bbdefb) 100%);
-  border: 2px solid var(--app-ref-2196f3);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border: 2px solid var(--primary-color);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
@@ -352,7 +352,7 @@ select.form-input {
   .calc-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--app-ref-1565c0);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -360,7 +360,7 @@ select.form-input {
   .calc-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--app-ref-0d47a1);
+    color: var(--text-primary);
   }
 
   @media (max-width: 640px) {
@@ -371,20 +371,20 @@ select.form-input {
 }
 
 .result-card {
-  background: linear-gradient(135deg, var(--app-ref-e3f2fd) 0%, var(--app-ref-bbdefb) 100%);
-  border: 2px solid var(--app-ref-2196f3);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border: 2px solid var(--primary-color);
   border-radius: 12px;
   padding: 2rem;
   display: flex;
   gap: 1.5rem;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(33, 150, 243, 0.1);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--primary-color) 10%, transparent);
 }
 
 .result-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, var(--app-ref-2196f3) 0%, var(--app-ref-1976d2) 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -399,7 +399,7 @@ select.form-input {
   .result-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--app-ref-1565c0);
+    color: var(--text-secondary);
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -408,13 +408,13 @@ select.form-input {
   .result-value {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--app-ref-1e3a8a);
+    color: var(--primary-dark);
     margin: 0 0 0.5rem 0;
   }
 
   .result-info {
     font-size: 0.875rem;
-    color: var(--app-ref-0d47a1);
+    color: var(--text-primary);
     margin: 0;
     font-weight: 500;
   }
@@ -440,7 +440,7 @@ select.form-input {
       width: 20px;
       height: 20px;
       border: 3px solid var(--border-color);
-      border-top-color: var(--app-ref-135fb0);
+      border-top-color: var(--primary-color);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -472,7 +472,7 @@ select.form-input {
 
     &.total {
       grid-column: 1 / -1;
-      background: linear-gradient(135deg, var(--app-ref-2196f3) 0%, var(--app-ref-1976d2) 100%);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
       color: white;
       font-size: 1.125rem;
       font-weight: bold;
@@ -486,7 +486,7 @@ select.form-input {
     }
 
     &.highlight {
-      background: linear-gradient(135deg, var(--app-ref-42a5f5) 0%, var(--app-ref-2196f3) 100%);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%);
       color: white;
       border: none;
 
@@ -535,7 +535,7 @@ select.form-input {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--bg-secondary, var(--app-ref-f8fafc));
+  background: var(--bg-secondary, var(--bg-secondary));
   border-color: var(--border-subtle);
   color: var(--text-primary);
   font-weight: 700;

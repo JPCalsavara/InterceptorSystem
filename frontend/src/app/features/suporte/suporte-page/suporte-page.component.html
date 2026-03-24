@@ -1,0 +1,303 @@
+<div class="page-container page-container-suporte">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <svg class="page-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+        </svg>
+        Suporte
+      </h1>
+      <p class="subtitle">Entenda como o InterceptorSystem funciona e aprenda as melhores práticas.</p>
+    </div>
+  </div>
+
+  <div class="suporte-layout">
+    <aside class="suporte-sidebar">
+      <nav class="suporte-nav">
+        <button class="suporte-nav-item" (click)="scrollToFragment('visao-geral')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.974 0-5.768-1.198-7.843-3.168m15.686 0a9.01 9.01 0 01-2.03 5.424M3.714 7.332A9.01 9.01 0 005.744 12.75" />
+          </svg>
+          Visão Geral
+        </button>
+        <button class="suporte-nav-item" (click)="scrollToFragment('diagrama')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+          </svg>
+          Diagrama do Sistema
+        </button>
+        <button class="suporte-nav-item" (click)="scrollToFragment('como-utilizar')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+          </svg>
+          Passo a Passo
+        </button>
+        <button class="suporte-nav-item" (click)="scrollToFragment('entidades')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+          </svg>
+          Módulos
+        </button>
+        <button class="suporte-nav-item" (click)="scrollToFragment('dicas')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.829 1.58-2.136a3.75 3.75 0 10-7.66 0c.922.307 1.58 1.153 1.58 2.136v.192m-4.5 0h9" />
+          </svg>
+          Dicas e FAQ
+        </button>
+      </nav>
+    </aside>
+
+    <main class="suporte-content">
+      <!-- Visão Geral -->
+      <div id="visao-geral" class="suporte-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.974 0-5.768-1.198-7.843-3.168m15.686 0a9.01 9.01 0 01-2.03 5.424M3.714 7.332A9.01 9.01 0 005.744 12.75" />
+          </svg>
+          Visão Geral
+        </h2>
+        <p class="section-text">
+          O <strong>InterceptorSystem</strong> é uma plataforma projetada para simplificar e organizar a gestão de segurança patrimonial, terceirização de serviços e facilities. O sistema controla toda a operação: desde o fechamento do contrato com o cliente, determinando valores através de Tags de serviço, até o controle diário de postos de trabalho.
+        </p>
+        <p class="section-text">
+          Com ele, você aloca funcionários em turnos flexíveis, registra diárias de trabalho, gerencia dobras ou substituições rapidamente e acompanha o resultado financeiro da sua operação em tempo real.
+        </p>
+      </div>
+
+      <!-- Diagrama do Sistema -->
+      <div id="diagrama" class="suporte-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+          </svg>
+          Diagrama do Sistema
+        </h2>
+        <p class="section-text">Este fluxograma visual ajuda a entender como os módulos do sistema se interligam. O Cliente está no centro de tudo.</p>
+
+        <div class="er-diagram-container">
+          <div class="er-diagram">
+            <!-- Camada 1: Contrato -->
+            <div class="er-row">
+              <div class="er-node">
+                <div class="node-title">Contrato</div>
+                <div class="node-subtitle">Acordo Financeiro</div>
+                <div class="er-connection-vertical arrow-down">
+                  <span class="er-info-badge">Define Regras</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Camada 2: Cliente e Tags -->
+            <div class="er-row">
+              <div class="er-node">
+                <div class="node-title">Cliente</div>
+                <div class="node-subtitle">Contratante do serviço</div>
+                <div class="er-arrow-both"></div>
+              </div>
+              <div class="er-node" style="border-style: dashed;">
+                <div class="node-title">Tags</div>
+                <div class="node-subtitle">Preços / Cargos</div>
+              </div>
+            </div>
+
+            <!-- Camada 3: Postos e Funcionários -->
+            <div class="er-row">
+              <div class="er-node">
+                <div class="er-connection-vertical arrow-down" style="top: -60px; height: 60px;"></div>
+                <div class="node-title">Posto(s)</div>
+                <div class="node-subtitle">Local de Trabalho</div>
+              </div>
+              <div style="width: 140px;"></div> <!-- Spacer -->
+              <div class="er-node">
+                <div class="node-title">Funcionário</div>
+                <div class="node-subtitle">O Executante</div>
+              </div>
+            </div>
+
+            <!-- Camada 4: Alocação e Diárias -->
+            <div class="er-row">
+              <div class="er-node">
+                <div class="er-connection-vertical arrow-down"></div>
+                <div class="node-title">Alocação</div>
+                <div class="node-subtitle">Turno (Ex: 12x36)</div>
+                <div class="er-arrow-right">
+                  <span class="er-info-badge" style="top: -15px;">É Cumprida Em</span>
+                </div>
+              </div>
+              <div class="er-node">
+                <div class="er-connection-vertical arrow-down" style="top: -60px; height: 60px;"></div>
+                <div class="node-title">Diária</div>
+                <div class="node-subtitle">Dia Trabalhado</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo a Passo -->
+      <div id="como-utilizar" class="suporte-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+          </svg>
+          Passo a Passo Padrão
+        </h2>
+        
+        <div class="steps-container">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Cadastre seu Cliente</h4>
+              <p>O primeiro passo é sempre acessar o menu <strong>Clientes</strong> e começar um novo cadastro. Nele você define CNPJ, endereço e contatos.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Associe um Contrato e Defina Tags (Preços)</h4>
+              <p>Acesse o cliente recém criado e crie um <strong>Contrato</strong>. Nele você seleciona quais Tags de Serviço (ex: "Vigia", "Limpeza", "Porteiro") farão parte deste contrato e atribui o preço de venda para cada Tag.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Crie o Posto de Trabalho e suas Alocações</h4>
+              <p>Ainda na visão do cliente, crie os <strong>Postos</strong> (os locais físicos). Em cada posto, registre as <strong>Alocações</strong> (os turnos daquele lugar: ex. 06:00 as 18:00, ou Horário Comercial).</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Vincule as Tags aos Funcionários</h4>
+              <p>Ao criar <strong>Funcionários</strong>, você associa as mesmas Tags a eles. O sistema cruza a Tag que o funcionário tem (ex: "Vigia") com o preço que você vende a mesma Tag naquele Contrato.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>Registre as Diárias</h4>
+              <p>Todo o preparo anterior culmina no módulo de <strong>Diárias</strong>. Você designa o Funcionário X para a Alocação Y no dia Z, e o sistema automaticamente calcula o custo real e a receita esperada. No menu de Diárias ou em Lote (Batch), isso é rápido e simples!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Módulos / Entidades -->
+      <div id="entidades" class="suporte-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6z" />
+          </svg>
+          O que é cada Módulo?
+        </h2>
+        
+        <div class="entities-grid">
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+              </svg>
+              Cliente
+            </div>
+            <p class="entity-desc">É a empresa que contratou os seus serviços. Todo o sistema se desenha a partir de seus clientes.</p>
+          </div>
+          
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+              </svg>
+              Tags
+            </div>
+            <p class="entity-desc">Representam os Cargos ou Funções (ex: "PM", "Auxiliar", "Vigilante". Elas são quem conectam o preço combinado com o cliente ao perfil do funcionário.</p>
+          </div>
+
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+              Contrato
+            </div>
+            <p class="entity-desc">Acordo financeiro vigente com o cliente. Ele define quanto o cliente pagará por mês por X postos e Y tags.</p>
+          </div>
+
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              Posto
+            </div>
+            <p class="entity-desc">Endereço/local físico num cliente (ex: Portaria A, Galpão B). Um cliente pode ter múltiplos postos.</p>
+          </div>
+
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Alocação
+            </div>
+            <p class="entity-desc">É o "Turno". Cada posto funciona por alocações de horário (ex: Escala Noturna 19h-07h). É a "vaga" na escala.</p>
+          </div>
+
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
+              Funcionário
+            </div>
+            <p class="entity-desc">As pessoas que farão o trabalho. Podem ser exclusivos de um cliente ou coringas. Possuem sua especialidade definida por Tags.</p>
+          </div>
+
+          <div class="entity-card">
+            <div class="entity-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+              </svg>
+              Diária
+            </div>
+            <p class="entity-desc">A união diária entre um Funcionário e uma Alocação. Um dia de trabalho executado num dia específico.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dicas Comuns e FAQ -->
+      <div id="dicas" class="suporte-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.829 1.58-2.136a3.75 3.75 0 10-7.66 0c.922.307 1.58 1.153 1.58 2.136v.192m-4.5 0h9" />
+          </svg>
+          Dicas e Dúvidas Comuns
+        </h2>
+        
+        <div class="faq-list">
+          <div class="faq-item">
+            <h4>O que significa uma Diária "Dobra Programada"?</h4>
+            <p>Usado quando um funcionário fará um turno, e emendará em outro direto. O sistema não permite diárias seguidas, a menos que marcadas como <em>Dobra Programada</em>. É obrigatório conceder o dia seguinte de descanso ou a plataforma indicará erro caso fure essa regra.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>Posso ter mais de um Contrato para o mesmo cliente?</h4>
+            <p>Sim, mas apenas um pode ser "ATIVO" ao mesmo tempo. Se você renovar valores ou anos, deve primeiro finalizar o vigente ou criar o próximo como pendente/futuro.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>Preciso criar clientes/postos rápido! Tem um atalho?</h4>
+            <p>Sim! Na listagem de Clientes, utilize o botão "Criação Completa". O Assistente Wizard permite que você crie de uma vez só: Cliente, Contrato com Tags, Postos e as escalas de cada um dos Postos. Economiza muitos cliques iniciais.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>Se meu funcionário é de várias "Tags" (Funções)?</h4>
+            <p>Selecione todas as Tags que ele possui na tela de cadastro ou edição de funcionários. Mas lembre-se: no momento de criar uma <em>Diária</em>, o sistema detecta se existe alguma interseção entre a Tag dele e a Tag cobrada no contrato. Isso garante a precificação dinâmica e correta todos os dias!</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

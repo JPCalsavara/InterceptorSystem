@@ -1,5 +1,6 @@
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
@@ -54,6 +55,8 @@ public class Posto : Entity, IAggregateRoot
         Cidade = cidade.Trim();
         Estado = estado.Trim().ToUpperInvariant();
         Ativo = true;
+
+        AddDomainEvent(new PostoCreatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void AtualizarDetalhes(
@@ -82,11 +85,14 @@ public class Posto : Entity, IAggregateRoot
         Complemento = string.IsNullOrWhiteSpace(complemento) ? null : complemento.Trim();
         Cidade = cidade.Trim();
         Estado = estado.Trim().ToUpperInvariant();
+
+        AddDomainEvent(new PostoUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void Desativar()
     {
         Ativo = false;
+        AddDomainEvent(new PostoDeletedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void DefinirTags(IEnumerable<PostoTag> novasTags)
@@ -94,6 +100,8 @@ public class Posto : Entity, IAggregateRoot
         Tags.Clear();
         foreach (var tag in novasTags)
             Tags.Add(tag);
+
+        AddDomainEvent(new PostoUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
     private static string NormalizeCep(string cep)

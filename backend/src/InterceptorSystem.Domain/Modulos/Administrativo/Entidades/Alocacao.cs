@@ -2,6 +2,7 @@ using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
+using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
@@ -67,6 +68,8 @@ public class Alocacao : Entity, IAggregateRoot
         HorarioFim = horarioFim;
         TipoEscala = tipoEscala;
         PermiteDobrarEscala = permiteDobrarEscala;
+
+        AddDomainEvent(new AlocacaoCreatedEvent(EmpresaId, Id));
     }
 
     public void AtualizarHorario(TimeSpan inicio, TimeSpan fim, TipoEscala tipoEscala, bool permiteDobrarEscala)
@@ -81,5 +84,12 @@ public class Alocacao : Entity, IAggregateRoot
         HorarioFim = fim;
         TipoEscala = tipoEscala;
         PermiteDobrarEscala = permiteDobrarEscala;
+
+        AddDomainEvent(new AlocacaoUpdatedEvent(EmpresaId, Id));
+    }
+
+    public void PrepararExclusao()
+    {
+        AddDomainEvent(new AlocacaoDeletedEvent(EmpresaId, Id));
     }
 }

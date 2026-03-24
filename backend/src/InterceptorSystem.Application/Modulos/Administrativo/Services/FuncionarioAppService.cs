@@ -5,7 +5,6 @@ using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Application.Modulos.Administrativo.Services;
 
@@ -16,35 +15,19 @@ public class FuncionarioAppService : IFuncionarioAppService
     private readonly IContratoRepository _contratoRepository;
     private readonly ITagRepository _tagRepository; // Phase 4
     private readonly ICurrentTenantService _tenantService;
-    private readonly IMemoryCache _cache;
 
     public FuncionarioAppService(
         IFuncionarioRepository repository,
         IClienteRepository clienteRepository,
         IContratoRepository contratoRepository,
         ITagRepository tagRepository, // Phase 4
-        ICurrentTenantService tenantService,
-        IMemoryCache cache)
+        ICurrentTenantService tenantService)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
         _contratoRepository = contratoRepository;
         _tagRepository = tagRepository;
         _tenantService = tenantService;
-        _cache = cache;
-    }
-
-    private static string GetAllCacheKey(Guid empresaId) => $"Funcionarios_{empresaId}";
-    private static string GetByClienteCacheKey(Guid empresaId, Guid clienteId) =>
-        $"Funcionarios_{empresaId}_Cliente_{clienteId}";
-
-    private void InvalidateFuncionarioCache(Guid empresaId, Guid? clienteId = null)
-    {
-        _cache.Remove(GetAllCacheKey(empresaId));
-        if (clienteId.HasValue)
-        {
-            _cache.Remove(GetByClienteCacheKey(empresaId, clienteId.Value));
-        }
     }
 
     public async Task<FuncionarioDtoOutput> CreateAsync(CreateFuncionarioDtoInput input)
@@ -117,8 +100,6 @@ public class FuncionarioAppService : IFuncionarioAppService
         _repository.Add(funcionario);
         await _repository.UnitOfWork.CommitAsync();
 
-        InvalidateFuncionarioCache(empresaId, input.ClienteId);
-
         return FuncionarioDtoOutput.FromEntity(funcionario)!;
     }
 
@@ -160,9 +141,6 @@ public class FuncionarioAppService : IFuncionarioAppService
         _repository.Update(funcionario);
         await _repository.UnitOfWork.CommitAsync();
 
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        InvalidateFuncionarioCache(empresaId, funcionario.ClienteId);
-
         return FuncionarioDtoOutput.FromEntity(funcionario)!;
     }
 
@@ -174,11 +152,9 @@ public class FuncionarioAppService : IFuncionarioAppService
             throw new KeyNotFoundException("Funcionário não encontrado.");
         }
 
+        funcionario.PrepararExclusao();
         _repository.Remove(funcionario);
         await _repository.UnitOfWork.CommitAsync();
-
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        InvalidateFuncionarioCache(empresaId, funcionario.ClienteId);
     }
 
     public async Task<FuncionarioDtoOutput?> GetByIdAsync(Guid id)
@@ -189,18 +165,8 @@ public class FuncionarioAppService : IFuncionarioAppService
 
     public async Task<IEnumerable<FuncionarioDtoOutput>> GetAllAsync()
     {
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        var cacheKey = GetAllCacheKey(empresaId);
-
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<FuncionarioDtoOutput>? cached) && cached != null)
-        {
-            return cached;
-        }
-
         var funcionarios = await _repository.GetAllAsync();
-        var result = funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
-        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
-        return result;
+        return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
     }
 
     public async Task<bool> CpfJaExisteAsync(string cpf)
@@ -216,17 +182,7 @@ public class FuncionarioAppService : IFuncionarioAppService
     }
     public async Task<IEnumerable<FuncionarioDtoOutput>> GetByClienteIdAsync(Guid clienteId)
     {
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-        var cacheKey = GetByClienteCacheKey(empresaId, clienteId);
-
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<FuncionarioDtoOutput>? cached) && cached != null)
-        {
-            return cached;
-        }
-
         var funcionarios = await _repository.GetByClienteAsync(clienteId);
-        var result = funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
-        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
-        return result;
+        return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
     }
 }

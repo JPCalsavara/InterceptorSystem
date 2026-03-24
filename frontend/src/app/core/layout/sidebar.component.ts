@@ -132,14 +132,14 @@ interface NavItem {
       </div>
 
       <div class="nav-footer">
-        <!-- Meu Perfil -->
-        <a routerLink="/perfil" routerLinkActive="active" class="nav-item" [attr.title]="layoutState.sidebarCollapsed() ? 'Meu Perfil' : null" (click)="layoutState.leftDrawerOpen.set(false)">
+        <!-- Suporte -->
+        <a routerLink="/suporte" routerLinkActive="active" class="nav-item" [attr.title]="layoutState.sidebarCollapsed() ? 'Suporte' : null" (click)="layoutState.leftDrawerOpen.set(false)">
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
             </svg>
           </span>
-          <span class="label">Meu Perfil</span>
+          <span class="label">Suporte</span>
         </a>
 
         <!-- Sair -->

@@ -108,6 +108,7 @@ public class DiariaAppService : IDiariaAppService
         var diaria = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Diária não encontrada.");
 
+        diaria.PrepararExclusao();
         _repository.Remove(diaria);
         await _repository.UnitOfWork.CommitAsync();
     }

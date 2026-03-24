@@ -74,6 +74,7 @@ public class AlocacaoAppService : IAlocacaoAppService
         var alocacao = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Alocação não encontrada.");
 
+        alocacao.PrepararExclusao();
         _repository.Remove(alocacao);
         await _repository.UnitOfWork.CommitAsync();
     }

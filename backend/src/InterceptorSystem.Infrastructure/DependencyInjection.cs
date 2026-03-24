@@ -10,7 +10,9 @@ using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using InterceptorSystem.Infrastructure.Whatsapp;
 using InterceptorSystem.Infrastructure.Whatsapp.BackgroundServices;
+using InterceptorSystem.Infrastructure.Caching.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,13 +27,40 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        // 2. Registro dos Repositórios
-        services.AddScoped<IClienteRepository, ClienteRepository>();
-        services.AddScoped<IPostoRepository, PostoRepository>();
+        // 2. Registro dos Repositórios Base
+        services.AddScoped<ClienteRepository>();
+        services.AddScoped<ContratoRepository>();
+        services.AddScoped<FuncionarioRepository>();
+        services.AddScoped<PostoRepository>();
+        
+        // 2.1 Repositórios Sem Cache
         services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
-        services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
         services.AddScoped<IDiariaRepository, DiariaRepository>();
-        services.AddScoped<IContratoRepository, ContratoRepository>();
+        
+        // 2.2 Registro dos Decorators de Cache (Implementam a interface e envelopam a base)
+        services.AddScoped<IClienteRepository>(provider => 
+            new CachedClienteRepository(
+                provider.GetRequiredService<ClienteRepository>(),
+                provider.GetRequiredService<IMemoryCache>(),
+                provider.GetRequiredService<ICurrentTenantService>()));
+
+        services.AddScoped<IContratoRepository>(provider => 
+            new CachedContratoRepository(
+                provider.GetRequiredService<ContratoRepository>(),
+                provider.GetRequiredService<IMemoryCache>(),
+                provider.GetRequiredService<ICurrentTenantService>()));
+
+        services.AddScoped<IFuncionarioRepository>(provider => 
+            new CachedFuncionarioRepository(
+                provider.GetRequiredService<FuncionarioRepository>(),
+                provider.GetRequiredService<IMemoryCache>(),
+                provider.GetRequiredService<ICurrentTenantService>()));
+
+        services.AddScoped<IPostoRepository>(provider => 
+            new CachedPostoRepository(
+                provider.GetRequiredService<PostoRepository>(),
+                provider.GetRequiredService<IMemoryCache>(),
+                provider.GetRequiredService<ICurrentTenantService>()));
         services.AddScoped<IContaRepository, ContaRepository>();
         services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
         services.AddScoped<ITagRepository, TagRepository>(); // Phase 4

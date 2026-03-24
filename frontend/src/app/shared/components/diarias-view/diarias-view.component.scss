@@ -105,7 +105,7 @@
     &:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 10%, transparent);
     }
   }
 }
@@ -308,14 +308,14 @@
       }
 
       &.status-confirmada {
-        border-left-color: var(--app-ref-10b981);
+        border-left-color: var(--success-color);
       }
       &.status-cancelada {
-        border-left-color: var(--app-ref-6b7280);
+        border-left-color: var(--text-secondary);
         opacity: 0.6;
       }
       &.status-falta_registrada {
-        border-left-color: var(--app-ref-f59e0b);
+        border-left-color: var(--warning-color);
       }
 
       .func-name {
@@ -490,23 +490,23 @@
     }
 
     &.dia-sabado {
-      background: color-mix(in srgb, var(--app-ref-3b82f6) 10%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--color-info) 10%, var(--bg-secondary));
       .cell-date {
-        color: var(--app-ref-2563eb);
+        color: var(--color-info);
       }
     }
 
     &.dia-domingo {
-      background: color-mix(in srgb, var(--app-ref-ef4444) 10%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--error-color) 10%, var(--bg-secondary));
       .cell-date {
-        color: var(--app-ref-dc2626);
+        color: var(--error-color);
       }
     }
 
     &.dia-feriado {
-      background: color-mix(in srgb, var(--app-ref-f59e0b) 12%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--warning-color) 12%, var(--bg-secondary));
       .cell-date {
-        color: var(--app-ref-b45309);
+        color: var(--warning-color);
         text-decoration: underline dotted;
         cursor: help;
       }
@@ -514,7 +514,7 @@
 
     &.dia-feriado.dia-sabado,
     &.dia-feriado.dia-domingo {
-      background: color-mix(in srgb, var(--app-ref-f59e0b) 18%, var(--bg-secondary));
+      background: color-mix(in srgb, var(--warning-color) 18%, var(--bg-secondary));
     }
 
     .cell-date {
@@ -565,128 +565,128 @@
 // ── Employee Color Palette ──────────────────────────────────────────────────
 
 .emp-falta {
-  background: var(--app-ref-dc2626);
-  color: var(--app-ref-fff);
+  background: var(--error-color);
+  color: #fff;
 }
 .emp-substituicao {
-  background: var(--app-ref-b45309);
-  color: var(--app-ref-fff);
+  background: var(--warning-color);
+  color: #fff;
 }
 .emp-cancelada {
-  background: var(--app-ref-6b7280);
-  color: var(--app-ref-fff);
+  background: var(--text-secondary);
+  color: #fff;
 }
 
 .emp-color-0 {
-  background: var(--app-ref-7c3aed);
-  color: var(--app-ref-fff);
+  background: var(--color-info);
+  color: #fff;
 }
 .emp-color-1 {
-  background: var(--app-ref-2563eb);
-  color: var(--app-ref-fff);
+  background: var(--color-info);
+  color: #fff;
 }
 .emp-color-2 {
-  background: var(--app-ref-0891b2);
-  color: var(--app-ref-fff);
+  background: var(--color-info);
+  color: #fff;
 }
 .emp-color-3 {
-  background: var(--app-ref-059669);
-  color: var(--app-ref-fff);
+  background: var(--success-color);
+  color: #fff;
 }
 .emp-color-4 {
-  background: var(--app-ref-c026d3);
-  color: var(--app-ref-fff);
+  background: #c026d3;
+  color: #fff;
 }
 .emp-color-5 {
-  background: var(--app-ref-0d9488);
-  color: var(--app-ref-fff);
+  background: #0d9488;
+  color: #fff;
 }
 .emp-color-6 {
-  background: var(--app-ref-6d28d9);
-  color: var(--app-ref-fff);
+  background: #6d28d9;
+  color: #fff;
 }
 .emp-color-7 {
-  background: var(--app-ref-1d4ed8);
-  color: var(--app-ref-fff);
+  background: #1d4ed8;
+  color: #fff;
 }
 .emp-color-8 {
-  background: var(--app-ref-15803d);
-  color: var(--app-ref-fff);
+  background: #15803d;
+  color: #fff;
 }
 .emp-color-9 {
-  background: var(--app-ref-0369a1);
-  color: var(--app-ref-fff);
+  background: var(--primary-dark);
+  color: #fff;
 }
 .emp-color-10 {
-  background: var(--app-ref-9333ea);
-  color: var(--app-ref-fff);
+  background: #9333ea;
+  color: #fff;
 }
 .emp-color-11 {
-  background: var(--app-ref-0f766e);
-  color: var(--app-ref-fff);
+  background: #0f766e;
+  color: #fff;
 }
 
 :host-context(.dark-mode) {
   .emp-falta {
-    background: var(--app-ref-dc2626);
-    color: var(--app-ref-fff);
+    background: var(--error-color);
+    color: #fff;
   }
   .emp-substituicao {
-    background: var(--app-ref-fde68a);
-    color: var(--app-ref-713f12);
+    background: var(--warning-bg);
+    color: #713f12;
   }
   .emp-cancelada {
-    background: var(--app-ref-9ca3af);
-    color: var(--app-ref-111827);
+    background: var(--border-strong);
+    color: #111827;
   }
 
   .emp-color-0 {
-    background: var(--app-ref-a78bfa);
-    color: var(--app-ref-2e1065);
+    background: #a78bfa;
+    color: #2e1065;
   }
   .emp-color-1 {
-    background: var(--app-ref-60a5fa);
-    color: var(--app-ref-1e3a5f);
+    background: var(--color-info);
+    color: #1e3a5f;
   }
   .emp-color-2 {
-    background: var(--app-ref-38bdf8);
-    color: var(--app-ref-0c3046);
+    background: #38bdf8;
+    color: #0c3046;
   }
   .emp-color-3 {
-    background: var(--app-ref-34d399);
-    color: var(--app-ref-064e3b);
+    background: #34d399;
+    color: #064e3b;
   }
   .emp-color-4 {
-    background: var(--app-ref-e879f9);
-    color: var(--app-ref-4a044e);
+    background: #e879f9;
+    color: #4a044e;
   }
   .emp-color-5 {
-    background: var(--app-ref-2dd4bf);
-    color: var(--app-ref-134e4a);
+    background: #2dd4bf;
+    color: #134e4a;
   }
   .emp-color-6 {
-    background: var(--app-ref-818cf8);
-    color: var(--app-ref-1e1b4b);
+    background: #818cf8;
+    color: #1e1b4b;
   }
   .emp-color-7 {
-    background: var(--app-ref-93c5fd);
-    color: var(--app-ref-1e3a5f);
+    background: #93c5fd;
+    color: #1e3a5f;
   }
   .emp-color-8 {
-    background: var(--app-ref-4ade80);
-    color: var(--app-ref-14532d);
+    background: #4ade80;
+    color: #14532d;
   }
   .emp-color-9 {
-    background: var(--app-ref-7dd3fc);
-    color: var(--app-ref-0c4a6e);
+    background: #7dd3fc;
+    color: var(--primary-dark);
   }
   .emp-color-10 {
-    background: var(--app-ref-c4b5fd);
-    color: var(--app-ref-3b0764);
+    background: #c4b5fd;
+    color: #3b0764;
   }
   .emp-color-11 {
-    background: var(--app-ref-5eead4);
-    color: var(--app-ref-134e4a);
+    background: #5eead4;
+    color: #134e4a;
   }
 }
 
@@ -695,19 +695,19 @@
     &.dia-sabado {
       background: rgba(59, 130, 246, 0.12);
       .cell-date {
-        color: var(--app-ref-93c5fd);
+        color: #93c5fd;
       }
     }
     &.dia-domingo {
       background: rgba(239, 68, 68, 0.12);
       .cell-date {
-        color: var(--app-ref-fca5a5);
+        color: #fca5a5;
       }
     }
     &.dia-feriado {
       background: rgba(245, 158, 11, 0.14);
       .cell-date {
-        color: var(--app-ref-fcd34d);
+        color: #fcd34d;
       }
     }
     &.dia-feriado.dia-sabado,

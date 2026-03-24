@@ -165,7 +165,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("PercentualAdicionalNoturno")
                         .HasColumnType("decimal(5,4)");
 
-                    b.Property<decimal>("PercentualImpostos")
+                    b.Property<decimal>("PercentualEncargosProvisoes")
                         .HasColumnType("decimal(5,4)");
 
                     b.Property<string>("Status")
