@@ -364,7 +364,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         height: 40px;
         flex-shrink: 0;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
         display: flex;
         align-items: center;
         justify-content: center;

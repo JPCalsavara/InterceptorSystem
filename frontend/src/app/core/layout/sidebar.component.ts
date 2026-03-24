@@ -9,8 +9,8 @@ import { ContratoService } from '../../services/contrato.service';
 import { StatusContrato, StatusDiaria, StatusFuncionario } from '../../models/index';
 import { LayoutStateService } from '../services/layout-state.service';
 import { AlocacaoService } from '../../services/alocacao.service';
-
 import { TagService } from '../../services/tag.service';
+import { AuthService } from '../../services/auth.service';
 
 interface NavItem {
   label: string;
@@ -128,6 +128,31 @@ interface NavItem {
             }
           </a>
         }
+      </div>
+
+      <div class="nav-footer">
+        <!-- Meu Perfil -->
+        <a routerLink="/perfil" routerLinkActive="active" class="nav-item" [attr.title]="layoutState.sidebarCollapsed() ? 'Meu Perfil' : null" (click)="layoutState.leftDrawerOpen.set(false)">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </span>
+          <span class="label">Meu Perfil</span>
+        </a>
+
+        <!-- Sair -->
+        <button type="button" class="nav-item btn-logout" (click)="logout()" [attr.title]="layoutState.sidebarCollapsed() ? 'Sair' : null">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+            </svg>
+          </span>
+          <span class="label">Sair</span>
+        </button>
+
+        <div class="nav-divider"></div>
+
 
         <button
           type="button"
@@ -176,8 +201,42 @@ interface NavItem {
       .nav {
         display: flex;
         flex-direction: column;
-        gap: var(--space-2);
         height: 100%;
+      }
+
+      .nav-main {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        flex: 1;
+      }
+
+      .nav-footer {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        margin-top: auto;
+      }
+
+      .btn-logout {
+        background: transparent;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: var(--text-sm);
+      }
+
+      .btn-logout:hover {
+        background: #fee2e2 !important;
+        color: #dc2626 !important;
+      }
+
+      .nav-divider {
+        height: 1px;
+        background: var(--border-subtle);
+        margin: var(--space-2) 0;
       }
 
       .nav-item {
@@ -353,6 +412,7 @@ interface NavItem {
 })
 export class SidebarComponent implements OnInit {
   layoutState = inject(LayoutStateService);
+  private authService = inject(AuthService);
   private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
   private postoService = inject(PostoService);
@@ -418,5 +478,10 @@ export class SidebarComponent implements OnInit {
     this.tagService.getAll().subscribe({
       next: (data) => this.counts.update((c) => ({ ...c, tags: data.length })),
     });
+  }
+
+  logout() {
+    this.layoutState.closeAll();
+    this.authService.logout();
   }
 }
