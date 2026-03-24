@@ -52,18 +52,13 @@
         
         <form class="form-grid">
           <div class="form-group">
-            <label class="form-label">Nome Completo</label>
-            <input type="text" class="form-input" [value]="user()?.nome" disabled>
-          </div>
-          
-          <div class="form-group">
             <label class="form-label">E-mail de Acesso</label>
-            <input type="email" class="form-input" [value]="user()?.email" disabled>
+            <input type="email" class="form-input" [value]="user()?.email || ''" disabled>
           </div>
           
           <div class="form-group">
             <label class="form-label">Nome da Empresa</label>
-            <input type="text" class="form-input" [value]="user()?.nomeEmpresa" disabled>
+            <input type="text" class="form-input" [value]="user()?.nomeEmpresa || ''" disabled>
           </div>
         </form>
 

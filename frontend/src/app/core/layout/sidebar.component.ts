@@ -30,7 +30,8 @@ interface NavItem {
       [class.collapsed]="layoutState.sidebarCollapsed()"
     >
       <nav class="nav">
-        @for (item of navItems; track item.route) {
+        <div class="nav-main">
+          @for (item of navItems; track item.route) {
           <a
             [routerLink]="item.route"
             routerLinkActive="active"
@@ -173,6 +174,7 @@ interface NavItem {
             }
           </svg>
         </button>
+      </div>
       </nav>
     </aside>
   `,
