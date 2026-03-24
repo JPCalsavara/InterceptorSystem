@@ -10,11 +10,13 @@ import { StatusContrato, StatusDiaria, StatusFuncionario } from '../../models/in
 import { LayoutStateService } from '../services/layout-state.service';
 import { AlocacaoService } from '../../services/alocacao.service';
 
+import { TagService } from '../../services/tag.service';
+
 interface NavItem {
   label: string;
   route: string;
   icon: string;
-  countKey?: 'clientes' | 'funcionarios' | 'postos' | 'alocacoes' | 'diarias' | 'contratos';
+  countKey?: 'clientes' | 'funcionarios' | 'postos' | 'alocacoes' | 'diarias' | 'contratos' | 'tags';
 }
 
 @Component({
@@ -357,6 +359,7 @@ export class SidebarComponent implements OnInit {
   private diariaService = inject(DiariaService);
   private contratoService = inject(ContratoService);
   private alocacaoService = inject(AlocacaoService);
+  private tagService = inject(TagService);
 
   counts = signal<Record<string, number | null>>({
     clientes: null,
@@ -365,6 +368,7 @@ export class SidebarComponent implements OnInit {
     alocacoes: null,
     diarias: null,
     contratos: null,
+    tags: null,
   });
 
   navItems: NavItem[] = [
@@ -374,7 +378,7 @@ export class SidebarComponent implements OnInit {
     { label: 'Funcionários', route: '/funcionarios', icon: 'user-group', countKey: 'funcionarios' },
     { label: 'Postos', route: '/postos', icon: 'map-pin', countKey: 'postos' },
     { label: 'Alocações', route: '/alocacoes', icon: 'clock', countKey: 'alocacoes' },
-    { label: 'Tags', route: '/tags', icon: 'tag' },
+    { label: 'Tags', route: '/tags', icon: 'tag', countKey: 'tags' },
     { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' },
   ];
 
@@ -410,6 +414,9 @@ export class SidebarComponent implements OnInit {
           ...c,
           contratos: data.filter((x: any) => x.status === StatusContrato.ATIVO).length,
         })),
+    });
+    this.tagService.getAll().subscribe({
+      next: (data) => this.counts.update((c) => ({ ...c, tags: data.length })),
     });
   }
 }
