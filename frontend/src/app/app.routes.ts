@@ -236,6 +236,11 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'tags',
+        loadComponent: () =>
+          import('./features/tags/tag-list/tag-list.component').then((m) => m.TagListComponent),
+      },
+      {
         path: 'diarias',
         children: [
           {

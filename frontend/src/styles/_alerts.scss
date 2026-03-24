@@ -21,6 +21,7 @@
 .alert.alert-success {
   background: var(--success-bg);
   color: var(--success-color);
+  border: 1px solid color-mix(in srgb, var(--success-color) 20%, transparent);
   border-left: 4px solid var(--success-color);
 }
 
@@ -28,6 +29,7 @@
 .alert.alert-error {
   background: var(--error-bg);
   color: var(--error-text);
+  border: 1px solid var(--error-ring, color-mix(in srgb, var(--error-color) 20%, transparent));
   border-left: 4px solid var(--error-border);
 }
 
@@ -35,6 +37,7 @@
 .alert.alert-info {
   background: var(--color-info-bg);
   color: var(--color-info);
+  border: 1px solid color-mix(in srgb, var(--color-info) 20%, transparent);
   border-left: 4px solid var(--color-info);
 }
 
@@ -42,6 +45,7 @@
 .alert.alert-warning {
   background: var(--warning-bg);
   color: var(--warning-color);
+  border: 1px solid color-mix(in srgb, var(--warning-color) 20%, transparent);
   border-left: 4px solid var(--warning-color);
 }
 

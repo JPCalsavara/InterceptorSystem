@@ -244,7 +244,7 @@ export class FuncionarioFormComponent implements OnInit {
     if (errors['required']) return 'Este campo é obrigatório';
     if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['cpfInvalid']) return 'CPF deve conter 11 dígitos';
+    if (errors['cpfInvalid']) return 'CPF inválido (verifique o formato e os dígitos)';
     if (errors['celularInvalid']) return 'Celular deve conter 10 ou 11 dígitos';
 
     return 'Campo inválido';

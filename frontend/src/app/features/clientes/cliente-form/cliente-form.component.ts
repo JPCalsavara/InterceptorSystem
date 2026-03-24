@@ -187,7 +187,8 @@ export class ClienteFormComponent implements OnInit {
     if (errors['required']) return 'Este campo é obrigatório';
     if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['cnpjInvalid']) return 'CNPJ deve conter 14 dígitos (ex: 12.345.678/0001-90)';
+    if (errors['cnpjInvalid']) return 'CNPJ inválido (verifique o formato e os dígitos)';
+    if (errors['cpfInvalid']) return 'CPF inválido (verifique o formato e os dígitos)';
     if (errors['telefoneInvalid']) return 'Telefone inválido (ex: (11) 99999-9999)';
     if (errors['email']) return 'Email inválido';
 

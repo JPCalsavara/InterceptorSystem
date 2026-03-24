@@ -339,7 +339,8 @@ export class ClienteWizardComponent implements OnInit {
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
     if (errors['min']) return `Valor mínimo: ${errors['min'].min}`;
     if (errors['max']) return `Valor máximo: ${errors['max'].max}`;
-    if (errors['cnpjInvalid']) return 'CNPJ inválido (ex: 12.345.678/0001-90)';
+    if (errors['cnpjInvalid']) return 'CNPJ inválido (verifique o formato e os dígitos)';
+    if (errors['cpfInvalid']) return 'CPF inválido (verifique o formato e os dígitos)';
     if (errors['telefoneInvalid']) return 'Telefone inválido (ex: (11) 99999-9999)';
     if (errors['email']) return 'Email inválido';
 
