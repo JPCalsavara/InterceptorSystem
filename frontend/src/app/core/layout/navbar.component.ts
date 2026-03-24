@@ -606,7 +606,7 @@ export class NavbarComponent implements OnInit {
   isDropdownOpen = signal(false);
   isDarkMode = signal(false);
 
-  logoSrc = computed(() => (this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png'));
+  logoSrc = computed(() => '/logo.png');
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     effect(() => {
