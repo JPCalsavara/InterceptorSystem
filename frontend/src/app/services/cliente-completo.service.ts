@@ -9,7 +9,8 @@ export interface CriarClienteCompletoInput {
   cliente: {
     nome: string;
     cnpj: string;
-    endereco: string;
+    cidade: string;
+    estado: string;
     quantidadeIdealPorTurno: number; // Funcionários ideais por turno
     horarioTrocaTurno: string; // formato "HH:mm:ss"
     emailGestor?: string;

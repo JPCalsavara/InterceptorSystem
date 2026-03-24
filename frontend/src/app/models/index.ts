@@ -42,29 +42,38 @@ export enum TipoDiaria {
 export interface Cliente {
   id: string;
   nome: string;
+  cnpj: string;
   cidade: string;
   estado: string; // UF, e.g. "SP"
   ativo: boolean;
   emailGestor?: string;
   telefoneEmergencia?: string;
+  quantidadeIdealPorTurno?: number;
+  horarioTrocaTurno?: string;
   empresaId?: string;
   dataCriacao?: Date;
 }
 
 export interface CreateClienteDto {
   nome: string;
+  cnpj: string;
   cidade: string;
   estado: string;
   emailGestor?: string;
   telefoneEmergencia?: string;
+  quantidadeIdealPorTurno?: number;
+  horarioTrocaTurno?: string;
 }
 
 export interface UpdateClienteDto {
   nome: string;
+  cnpj: string;
   cidade: string;
   estado: string;
   emailGestor?: string;
   telefoneEmergencia?: string;
+  quantidadeIdealPorTurno?: number;
+  horarioTrocaTurno?: string;
 }
 
 export interface Tag {
@@ -210,7 +219,11 @@ export interface Posto {
   id: string;
   clienteId: string;
   nome: string;
+  tags?: Tag[];
+  cep: string;
   endereco: string;
+  numero: string;
+  complemento?: string | null;
   cidade: string;
   estado: string;
   ativo: boolean;
@@ -220,14 +233,22 @@ export interface Posto {
 export interface CreatePostoDto {
   clienteId: string;
   nome: string;
+  tagIds?: string[];
+  cep: string;
   endereco: string;
+  numero: string;
+  complemento?: string | null;
   cidade: string;
   estado: string;
 }
 
 export interface UpdatePostoDto {
   nome: string;
+  tagIds?: string[];
+  cep: string;
   endereco: string;
+  numero: string;
+  complemento?: string | null;
   cidade: string;
   estado: string;
 }

@@ -2,12 +2,19 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgxMaskDirective } from 'ngx-mask';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of, firstValueFrom, forkJoin } from 'rxjs';
 import { CriarClienteCompletoOutput } from '../../../services/cliente-completo.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
+import { CIDADES_POR_ESTADO, ESTADOS_BRASILEIROS } from '../../../shared/data/br-locations';
+import {
+  cnpjValidator,
+  cpfValidator,
+  telefoneValidator,
+} from '../../../shared/validators/br-documents.validators';
 import {
   StatusContrato,
   StatusFuncionario,
@@ -18,7 +25,7 @@ import {
 @Component({
   selector: 'app-cliente-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
   templateUrl: './cliente-wizard.component.html',
   styleUrls: ['./cliente-wizard.component.scss'],
 })
@@ -39,6 +46,12 @@ export class ClienteWizardComponent implements OnInit {
   formCliente!: FormGroup;
   formContrato!: FormGroup;
   formFuncionarios!: FormGroup;
+
+  estados = ESTADOS_BRASILEIROS;
+  cidadesDisponiveis = computed(() => {
+    const estado = String(this.formCliente?.get('estado')?.value ?? '').toUpperCase();
+    return CIDADES_POR_ESTADO[estado] ?? [];
+  });
 
   // Labels dos steps
   steps = [
@@ -87,13 +100,13 @@ export class ClienteWizardComponent implements OnInit {
   // Custo estimado por escala (diária × dias, sem contar benefícios pois varia)
   custoEstimado12x36(): number {
     const postos = this.formContrato?.get('postosConfig')?.value || [];
-    const diaria = postos.length > 0 ? (postos[0].valorDiariaCobrada || 0) : 0;
+    const diaria = postos.length > 0 ? postos[0].valorDiariaCobrada || 0 : 0;
     return 15 * diaria;
   }
 
   custoEstimado5x2(): number {
     const postos = this.formContrato?.get('postosConfig')?.value || [];
-    const diaria = postos.length > 0 ? (postos[0].valorDiariaCobrada || 0) : 0;
+    const diaria = postos.length > 0 ? postos[0].valorDiariaCobrada || 0 : 0;
     return 22 * diaria;
   }
 
@@ -133,19 +146,20 @@ export class ClienteWizardComponent implements OnInit {
 
           // Build input for each posto
           const requests = postos.map((posto: any) => {
-             const qtdeFuncionarios = (posto.quantidadeAlocacoes || 1) * (posto.quantidadeFuncionariosPorAlocacao || 1);
-             const input = {
-                valorDiariaCobrada: posto.valorDiariaCobrada || 0,
-                quantidadeFuncionarios: qtdeFuncionarios,
-                numeroDePostos: posto.quantidadeAlocacoes || 1,
-                numeroDePostosNoturnos: Math.floor((posto.quantidadeAlocacoes || 1) / 2),
-                valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal || 0,
-                percentualImpostos: (valores.percentualImpostos || 0) / 100,
-                percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
-                margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
-                margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,
-             };
-             return this.calculoService.calcularValorTotal(input);
+            const qtdeFuncionarios =
+              (posto.quantidadeAlocacoes || 1) * (posto.quantidadeFuncionariosPorAlocacao || 1);
+            const input = {
+              valorDiariaCobrada: posto.valorDiariaCobrada || 0,
+              quantidadeFuncionarios: qtdeFuncionarios,
+              numeroDePostos: posto.quantidadeAlocacoes || 1,
+              numeroDePostosNoturnos: Math.floor((posto.quantidadeAlocacoes || 1) / 2),
+              valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal || 0,
+              percentualImpostos: (valores.percentualImpostos || 0) / 100,
+              percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
+              margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
+              margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,
+            };
+            return this.calculoService.calcularValorTotal(input);
           });
 
           this.calculando.set(true);
@@ -156,23 +170,23 @@ export class ClienteWizardComponent implements OnInit {
         next: (resultados: any) => {
           this.calculando.set(false);
           if (resultados && resultados.length > 0) {
-             const combined = {
-                valorTotalMensal: 0,
-                custoBaseMensal: 0,
-                valorMargemLucro: 0,
-                valorMargemFaltas: 0
-             };
-             resultados.forEach((res: any) => {
-                if (res) {
-                   combined.valorTotalMensal += res.valorTotalMensal || 0;
-                   combined.custoBaseMensal += res.custoBaseMensal || 0;
-                   combined.valorMargemLucro += res.valorMargemLucro || 0;
-                   combined.valorMargemFaltas += res.valorMargemFaltas || 0;
-                }
-             });
-             this.breakdown.set(combined);
+            const combined = {
+              valorTotalMensal: 0,
+              custoBaseMensal: 0,
+              valorMargemLucro: 0,
+              valorMargemFaltas: 0,
+            };
+            resultados.forEach((res: any) => {
+              if (res) {
+                combined.valorTotalMensal += res.valorTotalMensal || 0;
+                combined.custoBaseMensal += res.custoBaseMensal || 0;
+                combined.valorMargemLucro += res.valorMargemLucro || 0;
+                combined.valorMargemFaltas += res.valorMargemFaltas || 0;
+              }
+            });
+            this.breakdown.set(combined);
           } else {
-             this.breakdown.set(null);
+            this.breakdown.set(null);
           }
         },
         error: (err) => {
@@ -183,8 +197,9 @@ export class ClienteWizardComponent implements OnInit {
       });
 
     // Também observar mudanças nos campos profundos de Array para forçar recálculo
-    this.formContrato.get('postosConfig')?.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged())
+    this.formContrato
+      .get('postosConfig')
+      ?.valueChanges.pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => {
         const criarContrato = this.formContrato.get('criarContrato')?.value;
         if (criarContrato) {
@@ -197,12 +212,15 @@ export class ClienteWizardComponent implements OnInit {
     // Etapa 1: Cliente
     this.formCliente = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cnpj: ['', [Validators.required, Validators.pattern(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/)]],
-      cidade: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
-      emailGestor: [''],
-      telefoneEmergencia: [''],
+      cnpj: ['', [Validators.required, cnpjValidator]],
+      cidade: ['', [Validators.required]],
+      estado: ['', [Validators.required]],
+      quantidadeIdealPorTurno: [2, [Validators.required, Validators.min(1), Validators.max(10)]],
+      horarioTrocaTurno: ['06:00', [Validators.required]],
+      emailGestor: ['', [Validators.email]],
+      telefoneEmergencia: ['', [telefoneValidator]],
     });
+    this.setupLocationWatcher();
 
     // Etapa 2: Contrato (opcional)
     this.formContrato = this.fb.group({
@@ -231,17 +249,35 @@ export class ClienteWizardComponent implements OnInit {
     this.setupPostosConfigWatcher();
   }
 
+  private setupLocationWatcher(): void {
+    const estadoControl = this.formCliente.get('estado');
+    const cidadeControl = this.formCliente.get('cidade');
+
+    estadoControl?.valueChanges.subscribe((uf: string) => {
+      const estado = String(uf ?? '').toUpperCase();
+      if (estadoControl.value !== estado) {
+        estadoControl.setValue(estado, { emitEvent: false });
+      }
+
+      const cidadesDoEstado = CIDADES_POR_ESTADO[estado] ?? [];
+      const cidadeAtual = String(cidadeControl?.value ?? '');
+      if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
+        cidadeControl?.setValue('');
+      }
+    });
+  }
+
   createPostoConfigGroup(): FormGroup {
     return this.fb.group({
       quantidadeAlocacoes: [2, [Validators.required, Validators.min(1)]],
       quantidadeFuncionariosPorAlocacao: [1, [Validators.required, Validators.min(1)]],
       valorDiariaCobrada: [100, [Validators.required, Validators.min(0.01)]],
-      valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]]
+      valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]],
     });
   }
 
   setupPostosConfigWatcher() {
-    this.formContrato.get('numeroPostos')?.valueChanges.subscribe(num => {
+    this.formContrato.get('numeroPostos')?.valueChanges.subscribe((num) => {
       const currentLen = this.postosConfig.length;
       if (num > currentLen && num <= 20) {
         for (let i = currentLen; i < num; i++) {
@@ -289,42 +325,14 @@ export class ClienteWizardComponent implements OnInit {
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
     if (errors['min']) return `Valor mínimo: ${errors['min'].min}`;
     if (errors['max']) return `Valor máximo: ${errors['max'].max}`;
-    if (errors['pattern']) {
-      if (fieldName === 'cnpj') return 'CNPJ inválido (ex: 12.345.678/0001-90)';
-      if (fieldName === 'telefoneEmergencia') return 'Telefone inválido (digite apenas números)';
-    }
+    if (errors['cnpjInvalid']) return 'CNPJ inválido (ex: 12.345.678/0001-90)';
+    if (errors['telefoneInvalid']) return 'Telefone inválido (ex: (11) 99999-9999)';
     if (errors['email']) return 'Email inválido';
 
     return 'Campo inválido';
   }
 
   isEdit = signal(false); // Wizard sempre é criação, nunca edição
-
-  formatarTelefone(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não é dígito
-
-    // Limita a 11 dígitos
-    if (valor.length > 11) {
-      valor = valor.substring(0, 11);
-    }
-
-    // Formata: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
-    let valorFormatado = '';
-    if (valor.length > 0) {
-      valorFormatado = '(' + valor.substring(0, 2);
-      if (valor.length > 2) {
-        valorFormatado += ') ' + valor.substring(2, valor.length <= 10 ? 6 : 7);
-      }
-      if (valor.length > 6) {
-        valorFormatado += '-' + valor.substring(valor.length <= 10 ? 6 : 7, 11);
-      }
-    }
-
-    // Atualiza o valor do campo sem trigger de validação desnecessária
-    this.formCliente.get('telefoneEmergencia')?.setValue(valorFormatado, { emitEvent: false });
-    input.value = valorFormatado;
-  }
 
   // Métodos auxiliares
   formatDate(date: Date): string {
@@ -368,8 +376,8 @@ export class ClienteWizardComponent implements OnInit {
   addFuncionario(): void {
     const funcionarioForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/)]],
-      celular: ['', [Validators.pattern(/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/)]],
+      cpf: ['', [Validators.required, cpfValidator]],
+      celular: ['', [telefoneValidator]],
       tipoFuncionario: [TipoFuncionario.CLT, [Validators.required]],
       statusFuncionario: [StatusFuncionario.ATIVO, [Validators.required]],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, [Validators.required]],
@@ -562,6 +570,8 @@ export class ClienteWizardComponent implements OnInit {
         cnpj: formClienteValue.cnpj,
         cidade: formClienteValue.cidade,
         estado: formClienteValue.estado,
+        quantidadeIdealPorTurno: formClienteValue.quantidadeIdealPorTurno,
+        horarioTrocaTurno: formClienteValue.horarioTrocaTurno,
         emailGestor: formClienteValue.emailGestor || null,
         telefoneEmergencia: telefone || null,
       },
@@ -596,6 +606,8 @@ export class ClienteWizardComponent implements OnInit {
         cnpj: formValue.cnpj,
         cidade: formValue.cidade,
         estado: formValue.estado,
+        quantidadeIdealPorTurno: formValue.quantidadeIdealPorTurno,
+        horarioTrocaTurno: formValue.horarioTrocaTurno,
         emailGestor: formValue.emailGestor || null,
         telefoneEmergencia: telefone || null,
       };
