@@ -1,13 +1,24 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+
+function senhasIguaisValidator(control: AbstractControl): ValidationErrors | null {
+  const parent = control.parent as FormGroup;
+  if (!parent) return null;
+  const novaSenha = parent.get('novaSenha')?.value;
+  const confirmar = control.value;
+  if (novaSenha && confirmar && novaSenha !== confirmar) {
+    return { senhasNaoIguais: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-nova-senha',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="auth-page">
       <div class="auth-card">
@@ -18,31 +29,73 @@ import { AuthService } from '../../services/auth.service';
         </div>
 
         @if (!concluido()) {
-          <form class="auth-form" (ngSubmit)="onSubmit()">
+          <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="form-group">
               <label for="novaSenha">Nova senha</label>
-              <input
-                id="novaSenha"
-                type="password"
-                name="novaSenha"
-                [(ngModel)]="novaSenha"
-                placeholder="••••••••"
-                required
-                autocomplete="new-password"
-              />
+              <div class="input-password-wrapper">
+                <input
+                  id="novaSenha"
+                  [type]="mostrarSenha() ? 'text' : 'password'"
+                  formControlName="novaSenha"
+                  [class.input-error]="hasError('novaSenha')"
+                  placeholder="8+ carac., 1 maiúscula, 1 num."
+                  autocomplete="new-password"
+                />
+                <button
+                  type="button"
+                  class="toggle-senha"
+                  (click)="mostrarSenha.set(!mostrarSenha())"
+                  [title]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+                >
+                  @if (mostrarSenha()) {
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  } @else {
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if (hasError('novaSenha')) {
+                <span class="field-error">{{ getErrorMessage('novaSenha') }}</span>
+              }
             </div>
 
             <div class="form-group">
               <label for="confirmarSenha">Confirmar nova senha</label>
-              <input
-                id="confirmarSenha"
-                type="password"
-                name="confirmarSenha"
-                [(ngModel)]="confirmarSenha"
-                placeholder="••••••••"
-                required
-                autocomplete="new-password"
-              />
+              <div class="input-password-wrapper">
+                <input
+                  id="confirmarSenha"
+                  [type]="mostrarConfirmar() ? 'text' : 'password'"
+                  formControlName="confirmarSenha"
+                  [class.input-error]="hasError('confirmarSenha')"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                />
+                <button
+                  type="button"
+                  class="toggle-senha"
+                  (click)="mostrarConfirmar.set(!mostrarConfirmar())"
+                  [title]="mostrarConfirmar() ? 'Ocultar senha' : 'Mostrar senha'"
+                >
+                  @if (mostrarConfirmar()) {
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  } @else {
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if (hasError('confirmarSenha')) {
+                <span class="field-error">{{ getErrorMessage('confirmarSenha') }}</span>
+              }
             </div>
 
             @if (erro()) {
@@ -153,6 +206,49 @@ import { AuthService } from '../../services/auth.service';
             color: var(--text-tertiary);
             opacity: 0.7;
           }
+
+          &.input-error {
+            border-color: #dc2626;
+
+            &:focus {
+              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+            }
+          }
+        }
+      }
+
+      .field-error {
+        font-size: var(--text-xs);
+        color: #dc2626;
+        font-weight: var(--fw-medium);
+      }
+
+      .input-password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input {
+          width: 100%;
+          padding-right: 2.75rem;
+        }
+      }
+
+      .toggle-senha {
+        position: absolute;
+        right: var(--space-3);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        padding: 0;
+        line-height: 1;
+        font-size: var(--text-lg);
+
+        &:hover {
+          color: var(--text-primary);
         }
       }
 
@@ -218,16 +314,18 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class NovaSenhaComponent implements OnInit {
+  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  novaSenha = '';
-  confirmarSenha = '';
+  form!: FormGroup;
   token = '';
   carregando = signal(false);
   erro = signal<string | null>(null);
   concluido = signal(false);
+  mostrarSenha = signal(false);
+  mostrarConfirmar = signal(false);
   isDarkMode = signal(false);
   logoSrc = computed(() => this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png');
 
@@ -239,19 +337,52 @@ export class NovaSenhaComponent implements OnInit {
     if (!this.token) {
       this.erro.set('Token não encontrado. Solicite um novo link.');
     }
+
+    this.form = this.fb.group({
+      novaSenha: [
+        '',
+        [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)],
+      ],
+      confirmarSenha: ['', [Validators.required, senhasIguaisValidator]],
+    });
+
+    // Re-validate confirmarSenha when novaSenha changes
+    this.form.get('novaSenha')?.valueChanges.subscribe(() => {
+      this.form.get('confirmarSenha')?.updateValueAndValidity();
+    });
+  }
+
+  hasError(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!field && field.invalid && field.touched;
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    const errors = field.errors;
+
+    if (errors['required']) return 'Este campo é obrigatório';
+    if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
+    if (errors['pattern']) return 'A senha deve conter pelo menos 8 caracteres, 1 maiúscula e 1 número';
+    if (errors['senhasNaoIguais']) return 'As senhas não coincidem';
+
+    return 'Campo inválido';
   }
 
   onSubmit(): void {
-    if (!this.novaSenha || !this.confirmarSenha) return;
-    if (this.novaSenha !== this.confirmarSenha) {
-      this.erro.set('As senhas não coincidem.');
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
     this.erro.set(null);
     this.carregando.set(true);
 
-    this.authService.confirmarResetSenha(this.token, this.novaSenha).subscribe({
+    const { novaSenha } = this.form.value;
+
+    this.authService.confirmarResetSenha(this.token, novaSenha).subscribe({
       next: () => {
         this.carregando.set(false);
         this.concluido.set(true);

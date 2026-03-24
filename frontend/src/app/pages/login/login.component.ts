@@ -1,13 +1,13 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="auth-page">
     <div class="auth-card">
@@ -23,18 +23,20 @@ import { AuthService } from '../../services/auth.service';
           <p class="auth-subtitle">Gerencie suas operações de segurança</p>
         </div>
 
-        <form class="auth-form" (ngSubmit)="onSubmit()" #form="ngForm">
+        <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
           <div class="form-group">
             <label for="email">E-mail</label>
             <input
               id="email"
               type="email"
-              name="email"
-              [(ngModel)]="email"
+              formControlName="email"
+              [class.input-error]="hasError('email')"
               placeholder="sua@empresa.com"
-              required
               autocomplete="email"
             />
+            @if (hasError('email')) {
+              <span class="field-error">{{ getErrorMessage('email') }}</span>
+            }
           </div>
 
           <div class="form-group">
@@ -43,10 +45,9 @@ import { AuthService } from '../../services/auth.service';
               <input
                 id="senha"
                 [type]="mostrarSenha() ? 'text' : 'password'"
-                name="senha"
-                [(ngModel)]="senha"
+                formControlName="senha"
+                [class.input-error]="hasError('senha')"
                 placeholder="••••••••"
-                required
                 autocomplete="current-password"
               />
               <button
@@ -67,6 +68,9 @@ import { AuthService } from '../../services/auth.service';
                 }
               </button>
             </div>
+            @if (hasError('senha')) {
+              <span class="field-error">{{ getErrorMessage('senha') }}</span>
+            }
           </div>
 
           @if (erro()) {
@@ -202,7 +206,21 @@ import { AuthService } from '../../services/auth.service';
             color: var(--text-tertiary);
             opacity: 0.7;
           }
+
+          &.input-error {
+            border-color: #dc2626;
+
+            &:focus {
+              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+            }
+          }
         }
+      }
+
+      .field-error {
+        font-size: var(--text-xs);
+        color: #dc2626;
+        font-weight: var(--fw-medium);
       }
 
       .input-password-wrapper {
@@ -296,8 +314,8 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class LoginComponent implements OnInit {
-  email = '';
-  senha = '';
+  private fb = new FormBuilder();
+  form: FormGroup;
   erro = signal<string | null>(null);
   carregando = signal(false);
   mostrarSenha = signal(false);
@@ -307,20 +325,47 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      senha: ['', [Validators.required]],
+    });
+  }
 
   ngOnInit(): void {
     const saved = localStorage.getItem('theme');
     this.isDarkMode.set(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches));
   }
 
+  hasError(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!field && field.invalid && field.touched;
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    const errors = field.errors;
+
+    if (errors['required']) return 'Este campo é obrigatório';
+    if (errors['email']) return 'E-mail inválido';
+
+    return 'Campo inválido';
+  }
+
   onSubmit(): void {
-    if (!this.email || !this.senha) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.erro.set(null);
     this.carregando.set(true);
 
-    this.authService.login({ email: this.email, senha: this.senha }).subscribe({
+    const { email, senha } = this.form.value;
+
+    this.authService.login({ email, senha }).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
         this.carregando.set(false);

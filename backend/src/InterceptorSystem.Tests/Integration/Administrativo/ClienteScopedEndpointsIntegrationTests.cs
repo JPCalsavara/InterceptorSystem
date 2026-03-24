@@ -201,7 +201,10 @@ public class ClienteScopedEndpointsIntegrationTests : IntegrationTestBase
         var input = new CreatePostoInput(
             clienteId,
             $"Posto {Guid.NewGuid().ToString()[..8]}",
-            "Rua Teste, 123",
+            "01310-100",
+            "Rua Teste",
+            "123",
+            null,
             "São Paulo",
             "SP");
 

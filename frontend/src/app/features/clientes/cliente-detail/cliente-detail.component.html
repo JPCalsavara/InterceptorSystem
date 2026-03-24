@@ -57,16 +57,28 @@
       <div class="header-content">
         <div class="header-info">
           <h1>{{ cliente()!.nome }}</h1>
+          @if (cliente()!.cnpj) {
             <span class="meta-item">
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fill-rule="evenodd"
-                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                  d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2H4a1 1 0 110-2V4zm3 1h2v2H7V5zm4 0h2v2h-2V5zM7 9h2v2H7V9zm4 0h2v2h-2V9zM7 13h2v2H7v-2zm4 0h2v2h-2v-2z"
                   clip-rule="evenodd"
                 />
               </svg>
-              {{ cliente()!.cidade }} - {{ cliente()!.estado }}
+              {{ cliente()!.cnpj }}
             </span>
+          }
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            {{ cliente()!.cidade }} - {{ cliente()!.estado }}
+          </span>
         </div>
 
         <!-- Alerta de Contrato -->
@@ -151,8 +163,6 @@
         Informações Operacionais
       </h2>
       <div class="info-grid">
-
-
         <!-- Email do Gestor -->
         @if (cliente()!.emailGestor) {
           <div class="stat-tile">
@@ -507,33 +517,80 @@
                   <span class="value">{{ posto.cidade }} - {{ posto.estado }}</span>
                 </div>
                 <!-- Link Novo Turno -->
-                <div style="margin-top: 0.5rem;">
-                  <a [routerLink]="['/alocacoes/novo']" [queryParams]="{ clienteId: cliente()!.id, postoId: posto.id }" 
-                     style="font-size: 0.8rem; color: var(--primary-color); display: flex; align-items: center; gap: 0.25rem; font-weight: 500;">
+                <div style="margin-top: 0.5rem">
+                  <a
+                    [routerLink]="['/alocacoes/novo']"
+                    [queryParams]="{ clienteId: cliente()!.id, postoId: posto.id }"
+                    style="
+                      font-size: 0.8rem;
+                      color: var(--primary-color);
+                      display: flex;
+                      align-items: center;
+                      gap: 0.25rem;
+                      font-weight: 500;
+                    "
+                  >
                     <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                     Adicionar Turno
                   </a>
                 </div>
               </div>
-              
+
               <div class="alocacoes-list">
-                <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">Turnos/Alocações</h4>
+                <h4
+                  style="
+                    margin-top: 1rem;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                  "
+                >
+                  Turnos/Alocações
+                </h4>
                 @for (alocacao of getAlocacoesPorPosto(posto.id); track alocacao.id) {
-                  <div style="background: var(--surface-color); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid var(--border-color); margin-bottom: 0.5rem; position: relative;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                  <div
+                    style="
+                      background: var(--surface-color);
+                      padding: 0.75rem;
+                      border-radius: 8px;
+                      font-size: 0.85rem;
+                      border: 1px solid var(--border-color);
+                      margin-bottom: 0.5rem;
+                      position: relative;
+                    "
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; margin-bottom: 0.25rem"
+                    >
                       <strong>{{ getEscalaLabel(alocacao.tipoEscala) }}</strong>
-                      <span class="badge badge-info">{{ formatHorario(alocacao.horarioInicio, alocacao.horarioFim) }}</span>
+                      <span class="badge badge-info">{{
+                        formatHorario(alocacao.horarioInicio, alocacao.horarioFim)
+                      }}</span>
                     </div>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                      <a [routerLink]="['/alocacoes', alocacao.id]" style="color: var(--primary-color); font-size: 0.75rem;">Detalhes</a>
-                      <a [routerLink]="['/alocacoes', alocacao.id, 'editar']" style="color: var(--text-secondary); font-size: 0.75rem;">Editar</a>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem">
+                      <a
+                        [routerLink]="['/alocacoes', alocacao.id]"
+                        style="color: var(--primary-color); font-size: 0.75rem"
+                        >Detalhes</a
+                      >
+                      <a
+                        [routerLink]="['/alocacoes', alocacao.id, 'editar']"
+                        style="color: var(--text-secondary); font-size: 0.75rem"
+                        >Editar</a
+                      >
                     </div>
                   </div>
                 }
                 @if (getAlocacoesPorPosto(posto.id).length === 0) {
-                  <p style="font-size: 0.85rem; color: var(--text-muted);">Nenhuma alocação cadastrada neste posto.</p>
+                  <p style="font-size: 0.85rem; color: var(--text-muted)">
+                    Nenhuma alocação cadastrada neste posto.
+                  </p>
                 }
               </div>
             </div>
@@ -705,6 +762,84 @@
                         />
                       </svg>
                     </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <!-- Tags Operacionais -->
+    <section class="section-tags">
+      <div class="section-header">
+        <h2>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="width: 1.2em; height: 1.2em"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9.568 3.082 20.25 13.764l-6.364 6.364a2.25 2.25 0 0 1-3.182 0L2.25 11.674V4.5a2.25 2.25 0 0 1 2.25-2.25h7.174a2.25 2.25 0 0 1 1.591.659ZM6 6h.008v.008H6V6Z"
+            />
+          </svg>
+          Tags Operacionais ({{ tagsConsolidadas().length }})
+        </h2>
+      </div>
+
+      @if (tagsConsolidadas().length === 0) {
+        <div class="empty-state">
+          <p>Nenhuma tag associada a contratos ou funcionários deste cliente.</p>
+        </div>
+      } @else {
+        <div class="tags-overview">
+          <article class="tag-summary-card">
+            <span class="tag-summary-label">Tags distintas</span>
+            <strong class="tag-summary-value">{{ tagsConsolidadas().length }}</strong>
+          </article>
+          <article class="tag-summary-card">
+            <span class="tag-summary-label">Associações em funcionários</span>
+            <strong class="tag-summary-value">{{ totalFuncionariosComTag() }}</strong>
+          </article>
+          <article class="tag-summary-card">
+            <span class="tag-summary-label">Associações em contratos</span>
+            <strong class="tag-summary-value">{{ totalContratosComTag() }}</strong>
+          </article>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table tags-table">
+            <thead>
+              <tr>
+                <th>Tag</th>
+                <th>Funcionários</th>
+                <th>Contratos</th>
+                <th>Maior diária no contrato</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tag of tagsConsolidadas(); track tag.tagId) {
+                <tr>
+                  <td>
+                    <strong>{{ tag.tagNome }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge badge-info">{{ tag.funcionariosComTag }}</span>
+                  </td>
+                  <td>
+                    <span class="badge badge-secondary">{{ tag.contratosComTag }}</span>
+                  </td>
+                  <td>
+                    @if (tag.maiorValorDiaria > 0) {
+                      <span>{{ formatCurrency(tag.maiorValorDiaria) }}</span>
+                    } @else {
+                      <span class="text-muted">Nao definida</span>
+                    }
                   </td>
                 </tr>
               }

@@ -1,48 +1,5 @@
-.form-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
 .form-container-embedded {
   padding: 1.5rem;
-}
-
-.form-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-
-  h1 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-  }
-}
-
-.btn-back {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: var(--bg-hover);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-  }
-
-  svg {
-    flex-shrink: 0;
-  }
 }
 
 // Info Box
@@ -51,19 +8,19 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem;
-  background: var(--app-ref-e0f2fe);
-  border: 1px solid var(--app-ref-7dd3fc);
+  background: var(--color-info-bg);
+  border: 1px solid color-mix(in srgb, var(--color-info) 30%, transparent);
   border-radius: 0.5rem;
   margin-bottom: 1.5rem;
 
   svg {
     flex-shrink: 0;
-    color: var(--app-ref-0284c7);
+    color: var(--color-info);
   }
 
   p {
     margin: 0;
-    color: var(--app-ref-0c4a6e);
+    color: var(--text-primary);
     font-size: 0.875rem;
     line-height: 1.5;
   }
@@ -71,83 +28,74 @@
 
 :host-context(.dark-mode) {
   .info-box {
-    background: rgba(56, 189, 248, 0.1);
-    border-color: rgba(56, 189, 248, 0.3);
+    background: color-mix(in srgb, var(--color-info) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-info) 42%, transparent);
 
     p {
-      color: var(--app-ref-7dd3fc);
+      color: var(--text-primary);
     }
   }
 
-  .alert-error {
-    background: rgba(220, 38, 38, 0.2);
-    color: var(--app-ref-fca5a5);
-    border-left-color: var(--app-ref-dc2626);
+  .help-text.warning {
+    color: var(--warning-color);
   }
 
-  .help-text.warning {
-    color: var(--app-ref-fbbf24);
+  // Keep form control surfaces consistent with dark theme.
+  .form-control {
+    background: var(--input-bg) !important;
+    color: #ffffff !important;
+    border-color: var(--border-color);
+    color-scheme: dark;
+    caret-color: #ffffff;
+  }
+
+  .form-card {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  }
+
+  .form-actions {
+    border-top-color: var(--border-color);
+  }
+
+  .form-control[type='date']::-webkit-datetime-edit,
+  .form-control[type='time']::-webkit-datetime-edit,
+  .form-control[type='date']::-webkit-datetime-edit-text,
+  .form-control[type='time']::-webkit-datetime-edit-text,
+  .form-control[type='date']::-webkit-datetime-edit-month-field,
+  .form-control[type='date']::-webkit-datetime-edit-day-field,
+  .form-control[type='date']::-webkit-datetime-edit-year-field,
+  .form-control[type='time']::-webkit-datetime-edit-hour-field,
+  .form-control[type='time']::-webkit-datetime-edit-minute-field {
+    color: #ffffff !important;
+  }
+
+  // Improve contrast for date/time native picker icons on dark backgrounds.
+  .form-control[type='date']::-webkit-calendar-picker-indicator,
+  .form-control[type='time']::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1) !important;
+    opacity: 1;
+  }
+
+  // Use a lighter chevron in dark mode for select controls.
+  select.form-control {
+    background-color: var(--input-bg) !important;
+    color: #ffffff !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.7' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+
+    option {
+      background: var(--card-bg);
+      color: #ffffff !important;
+    }
+  }
+
+  // Field icons become clearer against darker form surfaces.
+  .form-label svg {
+    color: var(--color-info);
   }
 }
 
 // Alert
-.alert {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
-  animation: slideDown 0.3s ease-out;
-  position: relative;
-
-  svg {
-    flex-shrink: 0;
-  }
-
-  &-error {
-    background: var(--app-ref-fee2e2);
-    color: var(--app-ref-991b1b);
-    border-left: 4px solid var(--app-ref-dc2626);
-  }
-
-  .alert-close {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    line-height: 1;
-    color: currentColor;
-    cursor: pointer;
-    padding: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 // Form Card
 .form-card {
   background: var(--card-bg);
@@ -182,7 +130,7 @@
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   font-size: 1rem;
-  color: var(--text-primary);
+  color: #000000 !important;
   background: var(--input-bg);
   transition: all 0.2s;
 
@@ -193,10 +141,10 @@
   }
 
   &.invalid {
-    border-color: var(--app-ref-dc2626);
+    border-color: var(--error-border);
 
     &:focus {
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+      box-shadow: 0 0 0 3px var(--error-ring);
     }
   }
 
@@ -231,7 +179,7 @@ select.form-control {
   line-height: 1.5;
 
   &.warning {
-    color: var(--app-ref-d97706);
+    color: var(--warning-color);
     font-weight: 500;
   }
 }
@@ -240,7 +188,7 @@ select.form-control {
   display: block;
   margin-top: 0.5rem;
   font-size: 0.875rem;
-  color: var(--app-ref-dc2626);
+  color: var(--error-text);
 }
 
 // Form Actions
@@ -255,67 +203,6 @@ select.form-control {
   @media (max-width: 640px) {
     flex-direction: column-reverse;
   }
-}
-
-.btn-primary,
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-
-  svg {
-    flex-shrink: 0;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  color: white;
-  box-shadow: var(--shadow-sm);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-}
-
-.btn-secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-
-  &:hover:not(:disabled) {
-    background: var(--bg-hover);
-    border-color: var(--border-hover);
-  }
-}
-
-// Spinner
-.spinner-small {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {

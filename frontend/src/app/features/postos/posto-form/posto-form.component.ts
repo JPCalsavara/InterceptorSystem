@@ -2,9 +2,12 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { PostoService } from '../../../services/posto.service';
 import { ClienteService } from '../../../services/cliente.service';
-import { Cliente, Posto } from '../../../models/index';
+import { ContratoService } from '../../../services/contrato.service';
+import { CepService } from '../../../services/cep.service';
+import { Cliente, Posto, StatusContrato, Tag } from '../../../models/index';
 
 @Component({
   selector: 'app-posto-form',
@@ -17,16 +20,21 @@ export class PostoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(PostoService);
   private clienteService = inject(ClienteService);
+  private contratoService = inject(ContratoService);
+  private cepService = inject(CepService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   form!: FormGroup;
   clientes = signal<Cliente[]>([]);
   loading = signal(false);
+  loadingCep = signal(false);
+  loadingTags = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
   isEditMode = signal(false);
   postoId: string | null = null;
+  contratoTags = signal<Tag[]>([]);
 
   ngOnInit(): void {
     this.postoId = this.route.snapshot.paramMap.get('id');
@@ -35,16 +43,132 @@ export class PostoFormComponent implements OnInit {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       nome: ['', [Validators.required, Validators.maxLength(150)]],
+      tagIds: [[] as string[]],
+      cep: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
       endereco: ['', [Validators.required, Validators.maxLength(250)]],
+      numero: ['', [Validators.required, Validators.maxLength(20)]],
+      complemento: ['', [Validators.maxLength(120)]],
       cidade: ['', [Validators.required, Validators.maxLength(100)]],
-      estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]]
+      estado: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(2),
+          Validators.pattern(/^[A-Za-z]{2}$/),
+        ],
+      ],
     });
 
+    this.setupClienteChange();
     this.loadClientes();
 
     if (this.isEditMode() && this.postoId) {
       this.loadPosto(this.postoId);
     }
+  }
+
+  private setupClienteChange(): void {
+    this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
+      if (!clienteId) {
+        this.contratoTags.set([]);
+        this.applyTagSelectionRules([]);
+        return;
+      }
+
+      this.loadContratoTags(clienteId);
+    });
+  }
+
+  private loadContratoTags(clienteId: string): void {
+    this.loadingTags.set(true);
+
+    this.contratoService
+      .getByClienteId(clienteId)
+      .pipe(finalize(() => this.loadingTags.set(false)))
+      .subscribe({
+        next: (contratos) => {
+          const tags = contratos
+            .filter((contrato) => contrato.status !== StatusContrato.FINALIZADO)
+            .flatMap((contrato) => contrato.tags ?? [])
+            .reduce((acc, current) => {
+              if (!acc.some((item) => item.id === current.tagId)) {
+                acc.push({ id: current.tagId, nome: current.tagNome });
+              }
+              return acc;
+            }, [] as Tag[]);
+
+          this.contratoTags.set(tags);
+          this.applyTagSelectionRules(tags);
+        },
+        error: (err) => {
+          this.contratoTags.set([]);
+          this.applyTagSelectionRules([]);
+          console.error('Erro ao carregar tags por contrato:', err);
+        },
+      });
+  }
+
+  private applyTagSelectionRules(tags: Tag[]): void {
+    const tagControl = this.form.get('tagIds');
+    if (!tagControl) return;
+
+    const availableTagIds = new Set(tags.map((tag) => tag.id));
+    const currentIds = Array.isArray(tagControl.value) ? tagControl.value : [];
+    const sanitizedCurrentIds = currentIds.filter((id: string) => availableTagIds.has(id));
+
+    if (tags.length === 1) {
+      tagControl.setValue([tags[0].id], { emitEvent: false });
+      tagControl.disable({ emitEvent: false });
+      return;
+    }
+
+    tagControl.enable({ emitEvent: false });
+    tagControl.setValue(sanitizedCurrentIds, { emitEvent: false });
+  }
+
+  selectedTagIds(): string[] {
+    const tagControl = this.form.get('tagIds');
+    return Array.isArray(tagControl?.value) ? tagControl?.value : [];
+  }
+
+  isTagSelected(tagId: string): boolean {
+    return this.selectedTagIds().includes(tagId);
+  }
+
+  isSingleTagLocked(): boolean {
+    return this.contratoTags().length === 1;
+  }
+
+  hasMultipleTags(): boolean {
+    return this.contratoTags().length > 1;
+  }
+
+  areAllTagsSelected(): boolean {
+    const tags = this.contratoTags();
+    if (tags.length === 0) return false;
+    return this.selectedTagIds().length === tags.length;
+  }
+
+  onToggleTag(tagId: string, checked: boolean): void {
+    const tagControl = this.form.get('tagIds');
+    if (!tagControl || tagControl.disabled) return;
+
+    const currentIds = this.selectedTagIds();
+    const nextIds = checked
+      ? [...new Set([...currentIds, tagId])]
+      : currentIds.filter((id) => id !== tagId);
+
+    tagControl.setValue(nextIds);
+    tagControl.markAsTouched();
+  }
+
+  onToggleAllTags(checked: boolean): void {
+    const tagControl = this.form.get('tagIds');
+    if (!tagControl || tagControl.disabled) return;
+
+    tagControl.setValue(checked ? this.contratoTags().map((tag) => tag.id) : []);
+    tagControl.markAsTouched();
   }
 
   loadClientes(): void {
@@ -62,12 +186,17 @@ export class PostoFormComponent implements OnInit {
     this.service.getById(id).subscribe({
       next: (data: Posto) => {
         this.form.patchValue({
+          clienteId: data.clienteId,
           nome: data.nome,
+          tagIds: (data.tags ?? []).map((tag) => tag.id),
+          cep: this.cepService.formatCep(data.cep),
           endereco: data.endereco,
+          numero: data.numero,
+          complemento: data.complemento ?? '',
           cidade: data.cidade,
-          estado: data.estado
+          estado: data.estado,
         });
-        this.form.get('clienteId')?.setValue(data.clienteId);
+        this.loadContratoTags(data.clienteId);
         this.form.get('clienteId')?.disable();
         this.loading.set(false);
       },
@@ -91,30 +220,31 @@ export class PostoFormComponent implements OnInit {
     this.error.set(null);
 
     const formValue = this.form.getRawValue();
+    const cepNormalizado = this.cepService.onlyDigits(formValue.cep);
+    const payload = {
+      nome: (formValue.nome || '').trim(),
+      tagIds: formValue.tagIds || [],
+      cep: cepNormalizado,
+      endereco: (formValue.endereco || '').trim(),
+      numero: (formValue.numero || '').trim(),
+      complemento: (formValue.complemento || '').trim() || null,
+      cidade: (formValue.cidade || '').trim(),
+      estado: (formValue.estado || '').trim().toUpperCase(),
+    };
 
     if (this.isEditMode() && this.postoId) {
-      this.service
-        .update(this.postoId, {
-          nome: formValue.nome,
-          endereco: formValue.endereco,
-          cidade: formValue.cidade,
-          estado: formValue.estado,
-        })
-        .subscribe({
-          next: () => this.router.navigate(['/postos']),
-          error: (err) => {
-            this.error.set(err.error?.error || 'Erro ao atualizar posto.');
-            this.loading.set(false);
-          },
-        });
+      this.service.update(this.postoId, payload).subscribe({
+        next: () => this.router.navigate(['/postos']),
+        error: (err) => {
+          this.error.set(err.error?.error || 'Erro ao atualizar posto.');
+          this.loading.set(false);
+        },
+      });
     } else {
       this.service
         .create({
           clienteId: formValue.clienteId,
-          nome: formValue.nome,
-          endereco: formValue.endereco,
-          cidade: formValue.cidade,
-          estado: formValue.estado,
+          ...payload,
         })
         .subscribe({
           next: () => this.router.navigate(['/postos']),
@@ -126,6 +256,80 @@ export class PostoFormComponent implements OnInit {
     }
   }
 
+  onCepInput(): void {
+    const control = this.form.get('cep');
+    if (!control) return;
+
+    const formatted = this.cepService.formatCep(control.value || '');
+    if (formatted !== control.value) {
+      control.setValue(formatted, { emitEvent: false });
+    }
+
+    this.clearCustomCepError();
+  }
+
+  onCepBlur(): void {
+    const cepControl = this.form.get('cep');
+    if (!cepControl) return;
+
+    const cep = cepControl.value || '';
+    if (!this.cepService.isCepValido(cep)) {
+      return;
+    }
+
+    this.loadingCep.set(true);
+    this.error.set(null);
+
+    this.cepService
+      .buscarCep(cep)
+      .pipe(finalize(() => this.loadingCep.set(false)))
+      .subscribe({
+        next: (endereco) => {
+          this.clearCustomCepError();
+          this.form.patchValue({
+            cep: this.cepService.formatCep(endereco.cep),
+            endereco: endereco.logradouro || this.form.get('endereco')?.value,
+            cidade: endereco.cidade || this.form.get('cidade')?.value,
+            estado: (endereco.estado || this.form.get('estado')?.value || '').toUpperCase(),
+            complemento:
+              this.form.get('complemento')?.value ||
+              endereco.complemento ||
+              this.form.get('complemento')?.value,
+          });
+        },
+        error: () => {
+          this.setCustomCepError();
+          this.error.set('CEP não encontrado ou indisponível no momento.');
+        },
+      });
+  }
+
+  onEstadoBlur(): void {
+    const estadoControl = this.form.get('estado');
+    if (!estadoControl) return;
+
+    const normalized = (estadoControl.value || '').toUpperCase().slice(0, 2);
+    if (normalized !== estadoControl.value) {
+      estadoControl.setValue(normalized);
+    }
+  }
+
+  private setCustomCepError(): void {
+    const cepControl = this.form.get('cep');
+    if (!cepControl) return;
+
+    const errors = cepControl.errors || {};
+    cepControl.setErrors({ ...errors, cepNotFound: true });
+  }
+
+  private clearCustomCepError(): void {
+    const cepControl = this.form.get('cep');
+    if (!cepControl?.errors?.['cepNotFound']) return;
+
+    const { cepNotFound, ...rest } = cepControl.errors;
+    cepControl.setErrors(Object.keys(rest).length ? rest : null);
+  }
+
   hasError(fieldName: string): boolean {
     const field = this.form.get(fieldName);
     return field ? field.invalid && (field.touched || this.submitted()) : false;
@@ -135,6 +339,11 @@ export class PostoFormComponent implements OnInit {
     const field = this.form.get(fieldName);
     if (!field || !field.errors || (!field.touched && !this.submitted())) return '';
     if (field.errors['required']) return 'Este campo é obrigatório';
+    if (field.errors['pattern']) {
+      if (fieldName === 'cep') return 'Informe um CEP válido no formato 00000-000';
+      if (fieldName === 'estado') return 'UF deve conter 2 letras';
+    }
+    if (field.errors['cepNotFound']) return 'CEP não encontrado';
     if (field.errors['maxlength']) return 'Ultrapassou o limite de caracteres';
     if (field.errors['minlength']) return 'Mínimo de caracteres não atingido';
     return 'Campo inválido';

@@ -9,7 +9,7 @@ import { CriarClienteCompletoOutput } from '../../../services/cliente-completo.s
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { CIDADES_POR_ESTADO, ESTADOS_BRASILEIROS } from '../../../shared/data/br-locations';
+import { IbgeService } from '../../../services/ibge.service';
 import {
   cnpjValidator,
   cpfValidator,
@@ -34,6 +34,7 @@ export class ClienteWizardComponent implements OnInit {
   private clienteService = inject(ClienteService);
   private calculoService = inject(ContratoCalculoService);
   private funcionarioService = inject(FuncionarioService);
+  private ibgeService = inject(IbgeService);
   private router = inject(Router);
 
   // Controle do wizard
@@ -47,11 +48,8 @@ export class ClienteWizardComponent implements OnInit {
   formContrato!: FormGroup;
   formFuncionarios!: FormGroup;
 
-  estados = ESTADOS_BRASILEIROS;
-  cidadesDisponiveis = computed(() => {
-    const estado = String(this.formCliente?.get('estado')?.value ?? '').toUpperCase();
-    return CIDADES_POR_ESTADO[estado] ?? [];
-  });
+  estados = signal<string[]>([]);
+  cidadesDisponiveis = signal<string[]>([]);
 
   // Labels dos steps
   steps = [
@@ -126,6 +124,13 @@ export class ClienteWizardComponent implements OnInit {
   ngOnInit(): void {
     this.buildForms();
     this.setupAutoCalculo();
+    this.carregarEstados();
+  }
+
+  carregarEstados(): void {
+    this.ibgeService.getEstados().subscribe((estadosObj) => {
+      this.estados.set(estadosObj.map((e) => e.sigla));
+    });
   }
 
   setupAutoCalculo(): void {
@@ -259,9 +264,18 @@ export class ClienteWizardComponent implements OnInit {
         estadoControl.setValue(estado, { emitEvent: false });
       }
 
-      const cidadesDoEstado = CIDADES_POR_ESTADO[estado] ?? [];
-      const cidadeAtual = String(cidadeControl?.value ?? '');
-      if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
+      if (estado) {
+        this.ibgeService.getMunicipiosPorEstado(estado).subscribe((municipios) => {
+          const cidadesDoEstado = municipios.map((m) => m.nome);
+          this.cidadesDisponiveis.set(cidadesDoEstado);
+
+          const cidadeAtual = String(cidadeControl?.value ?? '');
+          if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
+            cidadeControl?.setValue('');
+          }
+        });
+      } else {
+        this.cidadesDisponiveis.set([]);
         cidadeControl?.setValue('');
       }
     });

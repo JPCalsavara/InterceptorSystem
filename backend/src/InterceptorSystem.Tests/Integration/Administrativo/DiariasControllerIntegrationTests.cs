@@ -71,7 +71,15 @@ public class DiariasControllerIntegrationTests : IntegrationTestBase
 
     private async Task<PostoDto> CriarPostoAsync(Guid clienteId)
     {
-        var input = new CreatePostoInput(clienteId, $"Posto Teste {Guid.NewGuid().ToString()[..8]}", "Rua Teste, 123", "São Paulo", "SP");
+        var input = new CreatePostoInput(
+            clienteId,
+            $"Posto Teste {Guid.NewGuid().ToString()[..8]}",
+            "01310-100",
+            "Rua Teste",
+            "123",
+            null,
+            "São Paulo",
+            "SP");
         var response = await Client.PostAsJsonAsync("/api/postos", input);
         response.EnsureSuccessStatusCode();
         return await ReadAsAsync<PostoDto>(response) ?? throw new InvalidOperationException();

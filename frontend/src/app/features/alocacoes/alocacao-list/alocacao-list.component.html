@@ -27,7 +27,7 @@
               clip-rule="evenodd"
             />
           </svg>
-          Novo Turno
+          Nova Alocação
         </button>
       </div>
     </div>
@@ -35,15 +35,18 @@
 
   <!-- Filtros -->
   @if (!loading() && alocacoes().length > 0) {
-    <div class="filters-section card" style="margin-bottom: 2rem; padding: 1.5rem">
-      <div
-        class="filters-grid"
-        style="
-          display: grid;
-          gap: 1.5rem;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        "
-      >
+    <div class="filters-section">
+      <h3 class="filters-title">
+        <svg class="filters-title-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Filtros
+      </h3>
+      <div class="filters-grid">
         <div class="filter-group">
           <label class="filter-label">Cliente</label>
           <select
@@ -144,7 +147,7 @@
               <td>
                 <div class="actions">
                   <a
-                    class="btn-icon btn-edit"
+                    class="action-btn btn-icon btn-edit"
                     [routerLink]="['/alocacoes', aloc.id, 'editar']"
                     title="Editar turno"
                   >
@@ -155,7 +158,7 @@
                     </svg>
                   </a>
                   <button
-                    class="btn-icon btn-delete"
+                    class="action-btn btn-icon btn-danger"
                     (click)="deleteAlocacao(aloc.id)"
                     title="Excluir turno"
                   >

@@ -23,7 +23,7 @@
       </h1>
       <p class="subtitle">Gerencie todos os contratos cadastrados</p>
     </div>
-    <button class="btn-primary" routerLink="/contratos/novo">
+    <button class="btn-primary btn-md" routerLink="/contratos/novo">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path
           fill-rule="evenodd"
@@ -86,7 +86,7 @@
       </svg>
       <h3>Nenhum contrato cadastrado</h3>
       <p>Comece criando seu primeiro contrato</p>
-      <button class="btn-primary" routerLink="/contratos/novo">Criar Primeiro Contrato</button>
+      <button class="btn-primary btn-md" routerLink="/contratos/novo">+ Novo Contrato</button>
     </div>
   }
 
@@ -207,7 +207,7 @@
               </div>
               <div class="card-actions">
                 <button
-                  class="btn-action btn-view"
+                  class="action-btn btn-action btn-view"
                   [routerLink]="['/contratos', contrato.id]"
                   title="Visualizar"
                 >
@@ -221,7 +221,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-edit"
+                  class="action-btn btn-action btn-edit"
                   [routerLink]="['/contratos', contrato.id, 'editar']"
                   title="Editar"
                 >
@@ -232,7 +232,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-delete"
+                  class="action-btn btn-action btn-danger"
                   (click)="confirmDelete(contrato.id, contrato.descricao)"
                   title="Excluir"
                 >
@@ -294,7 +294,7 @@
               </div>
               <div class="card-actions">
                 <button
-                  class="btn-action btn-view"
+                  class="action-btn btn-action btn-view"
                   [routerLink]="['/contratos', contrato.id]"
                   title="Visualizar"
                 >
@@ -308,7 +308,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-edit"
+                  class="action-btn btn-action btn-edit"
                   [routerLink]="['/contratos', contrato.id, 'editar']"
                   title="Editar"
                 >
@@ -319,7 +319,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-delete"
+                  class="action-btn btn-action btn-danger"
                   (click)="confirmDelete(contrato.id, contrato.descricao)"
                   title="Excluir"
                 >
@@ -381,7 +381,7 @@
               </div>
               <div class="card-actions">
                 <button
-                  class="btn-action btn-view"
+                  class="action-btn btn-action btn-view"
                   [routerLink]="['/contratos', contrato.id]"
                   title="Visualizar"
                 >
@@ -395,7 +395,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-edit"
+                  class="action-btn btn-action btn-edit"
                   [routerLink]="['/contratos', contrato.id, 'editar']"
                   title="Editar"
                 >
@@ -406,7 +406,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-delete"
+                  class="action-btn btn-action btn-danger"
                   (click)="confirmDelete(contrato.id, contrato.descricao)"
                   title="Excluir"
                 >
@@ -468,7 +468,7 @@
               </div>
               <div class="card-actions">
                 <button
-                  class="btn-action btn-view"
+                  class="action-btn btn-action btn-view"
                   [routerLink]="['/contratos', contrato.id]"
                   title="Visualizar"
                 >
@@ -482,7 +482,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-edit"
+                  class="action-btn btn-action btn-edit"
                   [routerLink]="['/contratos', contrato.id, 'editar']"
                   title="Editar"
                 >
@@ -493,7 +493,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-delete"
+                  class="action-btn btn-action btn-danger"
                   (click)="confirmDelete(contrato.id, contrato.descricao)"
                   title="Excluir"
                 >
@@ -550,7 +550,7 @@
               </div>
               <div class="card-actions">
                 <button
-                  class="btn-action btn-view"
+                  class="action-btn btn-action btn-view"
                   [routerLink]="['/contratos', contrato.id]"
                   title="Visualizar"
                 >
@@ -564,7 +564,7 @@
                   </svg>
                 </button>
                 <button
-                  class="btn-action btn-delete"
+                  class="action-btn btn-action btn-danger"
                   (click)="confirmDelete(contrato.id, contrato.descricao)"
                   title="Excluir"
                 >

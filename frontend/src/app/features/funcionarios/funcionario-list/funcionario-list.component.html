@@ -12,7 +12,7 @@
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="1.5"
-          style="color: var(--primary-color); width: 1em; height: 1em"
+          class="page-title-icon"
         >
           <path
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
@@ -78,15 +78,22 @@
       </svg>
       <h3>Nenhum funcionário cadastrado</h3>
       <p>Comece criando seu primeiro funcionário</p>
-      <button class="btn-primary" routerLink="/funcionarios/novo">
-        Criar Primeiro Funcionário
-      </button>
+      <button class="btn-primary btn-md" routerLink="/funcionarios/novo">+ Novo Funcionário</button>
     </div>
   }
   @if (!loading() && funcionarios().length > 0) {
     <!-- Filtros -->
     <div class="filters-section">
-      <h3 class="filters-title">Filtros</h3>
+      <h3 class="filters-title">
+        <svg class="filters-title-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Filtros
+      </h3>
       <div class="filters-grid">
         <div class="filter-group">
           <label for="filtroCliente" class="filter-label">Cliente</label>
@@ -225,7 +232,7 @@
 
           <div class="card-actions">
             <button
-              class="btn-action btn-view"
+              class="action-btn btn-action btn-view"
               [routerLink]="['/funcionarios', func.id]"
               title="Visualizar"
             >
@@ -239,7 +246,7 @@
               </svg>
             </button>
             <button
-              class="btn-action btn-edit"
+              class="action-btn btn-action btn-edit"
               [routerLink]="['/funcionarios', func.id, 'editar']"
               title="Editar"
             >
@@ -250,7 +257,7 @@
               </svg>
             </button>
             <button
-              class="btn-action btn-delete"
+              class="action-btn btn-action btn-danger"
               (click)="confirmDelete(func.id, func.nome)"
               title="Excluir"
             >

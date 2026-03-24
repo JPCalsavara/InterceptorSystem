@@ -283,6 +283,83 @@
   color: var(--text-primary);
 }
 
+.contract-tags-panel {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1rem;
+}
+
+.tags-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+
+  h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+}
+
+.tags-count {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+}
+
+.tags-empty {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.tags-table {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.tag-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary, var(--app-ref-f8fafc));
+}
+
+.tag-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tag-rate {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.tags-summary {
+  margin-top: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+}
+
 /* Financial */
 .financial-list {
   display: flex;
@@ -325,15 +402,15 @@
   color: var(--text-primary);
 
   &.deduction {
-    color: var(--app-ref-dc2626);
+    color: var(--color-danger);
   }
 
   &.positive {
-    color: var(--app-ref-059669);
+    color: var(--color-success);
   }
 
   &.negative {
-    color: var(--app-ref-dc2626);
+    color: var(--color-danger);
   }
 }
 
@@ -504,7 +581,7 @@
   }
 
   &:hover {
-    background: var(--bg-secondary, var(--app-ref-f8fafc));
+    background: var(--bg-secondary);
   }
 
   .func-nome {
@@ -520,8 +597,8 @@
     font-weight: 700;
     padding: 0.15rem 0.45rem;
     border-radius: 10px;
-    background: rgba(33, 150, 243, 0.12);
-    color: var(--app-ref-1565c0);
+    background: color-mix(in srgb, var(--color-info) 14%, transparent);
+    color: var(--color-info);
     white-space: nowrap;
   }
 
@@ -569,34 +646,34 @@
   }
 
   &.bk-receita {
-    background: rgba(16, 185, 129, 0.08);
-    border-left-color: var(--app-ref-10b981);
+    background: color-mix(in srgb, var(--color-success) 10%, transparent);
+    border-left-color: var(--color-success);
     .bk-group-total {
-      color: var(--app-ref-059669);
+      color: var(--color-success);
     }
   }
 
   &.bk-custo {
-    background: rgba(239, 68, 68, 0.07);
-    border-left-color: var(--app-ref-ef4444);
+    background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+    border-left-color: var(--color-danger);
     .bk-group-total {
-      color: var(--app-ref-dc2626);
+      color: var(--color-danger);
     }
   }
 
   &.bk-lucro {
-    background: rgba(33, 150, 243, 0.08);
-    border-left-color: var(--app-ref-2196f3);
+    background: color-mix(in srgb, var(--color-info) 10%, transparent);
+    border-left-color: var(--color-info);
     .bk-group-total {
-      color: var(--app-ref-1565c0);
+      color: var(--color-info);
     }
   }
 
   &.bk-prejuizo {
-    background: rgba(239, 68, 68, 0.08);
-    border-left-color: var(--app-ref-ef4444);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+    border-left-color: var(--color-danger);
     .bk-group-total {
-      color: var(--app-ref-dc2626);
+      color: var(--color-danger);
     }
   }
 }
@@ -619,7 +696,7 @@
   transition: background 0.12s;
 
   &:hover {
-    background: var(--bg-secondary, var(--app-ref-f8fafc));
+    background: var(--bg-secondary);
   }
 
   .bk-item-label {
@@ -637,13 +714,13 @@
     white-space: nowrap;
 
     &.deduction {
-      color: var(--app-ref-dc2626);
+      color: var(--color-danger);
     }
     &.positive {
-      color: var(--app-ref-059669);
+      color: var(--color-success);
     }
     &.negative {
-      color: var(--app-ref-dc2626);
+      color: var(--color-danger);
     }
   }
 
@@ -674,7 +751,7 @@
   transition: background 0.12s;
 
   &:hover {
-    background: var(--bg-secondary, var(--app-ref-f8fafc));
+    background: var(--bg-secondary);
   }
 
   .bk-sub-label {

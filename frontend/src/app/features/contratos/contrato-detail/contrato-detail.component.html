@@ -53,14 +53,30 @@
             <span class="info-label">Funcionários Necessários</span>
             <span class="info-value">{{ contrato()!.quantidadeFuncionarios }}</span>
           </div>
-          <div class="info-item">
-            <span class="info-label">Tags / Diárias</span>
-            <span class="info-value">{{ getTagRatesPreview() }}</span>
+        </div>
+
+        <div class="contract-tags-panel">
+          <div class="tags-panel-header">
+            <h3>Tags do Contrato</h3>
+            <span class="tags-count">{{ contrato()!.tags?.length || 0 }} selecionada(s)</span>
           </div>
-          <div class="info-item">
-            <span class="info-label">Maior Diária por Tag</span>
-            <span class="info-value">{{ getMaiorTagRate() | currency: 'BRL' }}</span>
-          </div>
+
+          @if ((contrato()!.tags?.length || 0) === 0) {
+            <p class="tags-empty">Nenhuma tag tarifada cadastrada para este contrato.</p>
+          } @else {
+            <div class="tags-table">
+              @for (tag of contrato()!.tags || []; track tag.tagId) {
+                <div class="tag-row">
+                  <span class="tag-name">{{ tag.tagNome }}</span>
+                  <span class="tag-rate">{{ tag.valorDiaria | currency: 'BRL' }}</span>
+                </div>
+              }
+            </div>
+            <div class="tags-summary">
+              <span>Maior Diária por Tag</span>
+              <strong>{{ getMaiorTagRate() | currency: 'BRL' }}</strong>
+            </div>
+          }
         </div>
       </div>
 

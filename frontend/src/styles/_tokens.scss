@@ -2,7 +2,7 @@
   /* ==========================================================================
      Primitive Colors (Blue Baby Palette)
      ========================================================================== */
-  --blue-50:  #e1f5fe;
+  --blue-50: #e1f5fe;
   --blue-100: #e3f2fd;
   --blue-200: #bbdefb;
   --blue-300: #90caf9;
@@ -26,9 +26,32 @@
   --text-tertiary: #1976d2;
   --border-subtle: #bbdefb;
   --border-strong: #90caf9;
-  
+
   --primary-color: #2196f3;
   --primary-dark: #1976d2;
+
+  /* Semantic action/feedback colors (pastel claro) */
+  --color-success: #4ade80;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #f87171;
+  --color-danger-bg: #fef2f2;
+  --color-info: #60a5fa;
+  --color-info-bg: #eff6ff;
+
+  /* Compatibility aliases used by feature styles */
+  --success-color: var(--color-success);
+  --success-bg: var(--color-success-bg);
+  --warning-color: var(--color-warning);
+  --warning-bg: var(--color-warning-bg);
+  --danger-color: var(--color-danger);
+  --danger-color-dark: #b91c1c;
+  --error-color: var(--color-danger);
+  --error-text: var(--color-danger);
+  --error-bg: var(--color-danger-bg);
+  --error-border: var(--color-danger);
+  --error-ring: rgba(220, 38, 38, 0.18);
 
   --card-bg: #f5faff;
   --input-bg: #ffffff;
@@ -240,6 +263,29 @@ body.dark-mode {
 
   --primary-color: #58a6ff;
   --primary-dark: #4a8fd8;
+
+  /* Semantic action/feedback colors (dark mode) */
+  --color-success: #34d399;
+  --color-success-bg: #052e22;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #3b2f08;
+  --color-danger: #f87171;
+  --color-danger-bg: #3f1517;
+  --color-info: #60a5fa;
+  --color-info-bg: #13253f;
+
+  /* Compatibility aliases used by feature styles */
+  --success-color: var(--color-success);
+  --success-bg: var(--color-success-bg);
+  --warning-color: var(--color-warning);
+  --warning-bg: var(--color-warning-bg);
+  --danger-color: var(--color-danger);
+  --danger-color-dark: #ef4444;
+  --error-color: var(--color-danger);
+  --error-text: var(--color-danger);
+  --error-bg: var(--color-danger-bg);
+  --error-border: var(--color-danger);
+  --error-ring: rgba(248, 113, 113, 0.24);
 
   --card-bg: #1e2738;
   --input-bg: #0d1117;

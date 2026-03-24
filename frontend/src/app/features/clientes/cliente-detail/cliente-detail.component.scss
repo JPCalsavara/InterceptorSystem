@@ -718,8 +718,57 @@
 
 // Tables
 .section-funcionarios,
+.section-tags,
 .section-diarias {
   margin-bottom: var(--space-12);
+}
+
+.tags-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tag-summary-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tag-summary-label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  font-weight: var(--fw-semibold);
+}
+
+.tag-summary-value {
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  font-weight: var(--fw-extrabold);
+}
+
+.tags-table {
+  tbody {
+    td {
+      vertical-align: middle;
+    }
+  }
+}
+
+.text-muted {
+  color: var(--text-muted);
 }
 
 .table-container {

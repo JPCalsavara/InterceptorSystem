@@ -22,6 +22,8 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
+            .Include(p => p.Tags)
+                .ThenInclude(pt => pt.Tag)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -29,6 +31,8 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
+            .Include(p => p.Tags)
+                .ThenInclude(pt => pt.Tag)
             .Where(p => p.Ativo)
             .ToListAsync();
     }
@@ -37,6 +41,8 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
+            .Include(p => p.Tags)
+                .ThenInclude(pt => pt.Tag)
             .Where(p => p.ClienteId == clienteId && p.Ativo)
             .ToListAsync();
     }

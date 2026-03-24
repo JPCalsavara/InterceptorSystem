@@ -1,18 +1,20 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ContratoService } from '../../../services/contrato.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
 import { ClienteService } from '../../../services/cliente.service';
-import { StatusContrato, CalculoValorTotalOutput } from '../../../models/index';
+import { TagService } from '../../../services/tag.service';
+import { StatusContrato, CalculoValorTotalOutput, Tag } from '../../../models/index';
+import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
   selector: 'app-contrato-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TagPickerComponent],
   templateUrl: './contrato-form.component.html',
   styleUrl: './contrato-form.component.scss',
 })
@@ -21,6 +23,7 @@ export class ContratoFormComponent implements OnInit {
   private service = inject(ContratoService);
   private calculoService = inject(ContratoCalculoService);
   private clienteService = inject(ClienteService);
+  private tagService = inject(TagService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -31,6 +34,9 @@ export class ContratoFormComponent implements OnInit {
   error = signal<string | null>(null);
   submitted = signal(false);
   clientes = signal<any[]>([]);
+  tags = signal<Tag[]>([]);
+  selectedTagIds = signal<string[]>([]);
+  tagRateById = signal<Record<string, number>>({});
   duracaoContrato = signal<string>(''); // Duração calculada do contrato
   activeTooltip = signal<string | null>(null); // Controla qual tooltip está aberto
 
@@ -38,6 +44,11 @@ export class ContratoFormComponent implements OnInit {
   calculando = signal(false);
   erroCalculo = signal<string | null>(null);
   breakdown = signal<CalculoValorTotalOutput | null>(null);
+
+  selectedTags = computed(() => {
+    const selected = new Set(this.selectedTagIds());
+    return this.tags().filter((tag) => selected.has(tag.id));
+  });
 
   StatusContrato = StatusContrato;
   statusOptions = [
@@ -48,6 +59,7 @@ export class ContratoFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadClientes();
+    this.loadTags();
     this.buildForm();
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -65,6 +77,13 @@ export class ContratoFormComponent implements OnInit {
     this.clienteService.getAll().subscribe({
       next: (data) => this.clientes.set(data),
       error: (err) => console.error('Erro ao carregar clientes:', err),
+    });
+  }
+
+  loadTags(): void {
+    this.tagService.getAll().subscribe({
+      next: (data) => this.tags.set(data),
+      error: (err) => console.error('Erro ao carregar tags:', err),
     });
   }
 
@@ -183,6 +202,15 @@ export class ContratoFormComponent implements OnInit {
 
     this.service.getById(id).subscribe({
       next: (data) => {
+        const selectedTagIds = (data.tags ?? []).map((tag) => tag.tagId);
+        const rates = (data.tags ?? []).reduce<Record<string, number>>((acc, tag) => {
+          acc[tag.tagId] = tag.valorDiaria;
+          return acc;
+        }, {});
+
+        this.selectedTagIds.set(selectedTagIds);
+        this.tagRateById.set(rates);
+
         this.form.patchValue({
           clienteId: data.clienteId,
           descricao: data.descricao,
@@ -225,6 +253,10 @@ export class ContratoFormComponent implements OnInit {
     // Converter percentuais de 0-100 para 0-1
     const formValue = {
       ...this.form.value,
+      tags: this.selectedTagIds().map((tagId) => ({
+        tagId,
+        valorDiaria: this.getTagRate(tagId),
+      })),
       valorTotalMensal: valorTotalMensal,
       percentualAdicionalNoturno: this.form.value.percentualAdicionalNoturno / 100,
       percentualImpostos: this.form.value.percentualImpostos / 100,
@@ -286,6 +318,19 @@ export class ContratoFormComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  formatDateForDisplay(value: string | null | undefined): string {
+    if (!value || typeof value !== 'string') {
+      return '';
+    }
+
+    const [year, month, day] = value.split('-');
+    if (!year || !month || !day) {
+      return '';
+    }
+
+    return `${day}/${month}/${year}`;
+  }
+
   private calcularDuracaoContrato(): void {
     const inicio = this.form.get('dataInicio')?.value;
     const fim = this.form.get('dataFim')?.value;
@@ -319,6 +364,35 @@ export class ContratoFormComponent implements OnInit {
     } else {
       this.activeTooltip.set(tooltipId);
     }
+  }
+
+  onContratoTagsChange(tagIds: string[]): void {
+    const currentRates = this.tagRateById();
+    const diariaBase = Number(this.form?.value?.valorDiariaCobrada) || 0;
+
+    const nextRates: Record<string, number> = {};
+    for (const tagId of tagIds) {
+      nextRates[tagId] = currentRates[tagId] ?? diariaBase;
+    }
+
+    this.selectedTagIds.set([...new Set(tagIds)]);
+    this.tagRateById.set(nextRates);
+  }
+
+  onTagRateChange(tagId: string, value: string): void {
+    const parsed = Number(value);
+    const safeValue = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+
+    this.tagRateById.update((current) => ({
+      ...current,
+      [tagId]: safeValue,
+    }));
+  }
+
+  getTagRate(tagId: string): number {
+    const value = this.tagRateById()[tagId];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    return Number(this.form?.value?.valorDiariaCobrada) || 0;
   }
 
   cancel(): void {

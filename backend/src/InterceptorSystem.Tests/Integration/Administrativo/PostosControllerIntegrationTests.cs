@@ -43,7 +43,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
 
     private async Task<PostoDto> CriarPostoTeste(Guid clienteId, string nome = "Portaria A")
     {
-        var input = new CreatePostoInput(clienteId, nome, "Rua Teste, 123", "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, nome, "01310-100", "Rua Teste", "123", null, "São Paulo", "SP");
         var response = await _client.PostAsJsonAsync("/api/postos", input);
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<PostoDto>(_jsonOptions))!;
@@ -58,7 +58,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
     {
         // Arrange
         var clienteId = await CriarClienteTeste();
-        var input = new CreatePostoInput(clienteId, "Portaria Principal", "Av. Paulista, 1000", "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, "Portaria Principal", "01310-100", "Av. Paulista", "1000", "Conj. 10", "São Paulo", "SP");
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/postos", input);
@@ -71,7 +71,10 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.NotEqual(Guid.Empty, result.Id);
         Assert.Equal(clienteId, result.ClienteId);
         Assert.Equal("Portaria Principal", result.Nome);
-        Assert.Equal("Av. Paulista, 1000", result.Endereco);
+        Assert.Equal("01310100", result.Cep);
+        Assert.Equal("Av. Paulista", result.Endereco);
+        Assert.Equal("1000", result.Numero);
+        Assert.Equal("Conj. 10", result.Complemento);
         Assert.Equal("São Paulo", result.Cidade);
         Assert.Equal("SP", result.Estado);
         Assert.True(result.Ativo);
@@ -82,7 +85,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
     {
         // Arrange
         var clienteInexistente = Guid.NewGuid();
-        var input = new CreatePostoInput(clienteInexistente, "Portaria A", "Rua X", "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteInexistente, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/postos", input);
@@ -191,7 +194,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         var clienteId = await CriarClienteTeste();
         var created = await CriarPostoTeste(clienteId);
 
-        var updateInput = new UpdatePostoInput("Portaria Atualizada", "Rua Nova, 456", "Campinas", "SP");
+        var updateInput = new UpdatePostoInput("Portaria Atualizada", "13010-111", "Rua Nova", "456", "Bloco B", "Campinas", "SP");
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/postos/{created.Id}", updateInput);
@@ -202,7 +205,10 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         var result = await response.Content.ReadFromJsonAsync<PostoDto>(_jsonOptions);
         Assert.NotNull(result);
         Assert.Equal("Portaria Atualizada", result.Nome);
-        Assert.Equal("Rua Nova, 456", result.Endereco);
+        Assert.Equal("13010111", result.Cep);
+        Assert.Equal("Rua Nova", result.Endereco);
+        Assert.Equal("456", result.Numero);
+        Assert.Equal("Bloco B", result.Complemento);
         Assert.Equal("Campinas", result.Cidade);
     }
 
@@ -211,7 +217,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
     {
         // Arrange
         var idInexistente = Guid.NewGuid();
-        var updateInput = new UpdatePostoInput("Nome", "Endereço", "Cidade", "SP");
+        var updateInput = new UpdatePostoInput("Nome", "01310-100", "Endereço", "10", null, "Cidade", "SP");
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/postos/{idInexistente}", updateInput);
@@ -271,7 +277,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         var clienteId = await CriarClienteTeste();
 
         // 1. CREATE
-        var createInput = new CreatePostoInput(clienteId, "Portaria Fluxo", "Rua A, 100", "São Paulo", "SP");
+        var createInput = new CreatePostoInput(clienteId, "Portaria Fluxo", "01310-100", "Rua A", "100", null, "São Paulo", "SP");
         var createResponse = await _client.PostAsJsonAsync("/api/postos", createInput);
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDto>(_jsonOptions);
@@ -288,7 +294,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         Assert.Contains(postosDoCliente!, p => p.Id == created.Id);
 
         // 4. UPDATE
-        var updateInput = new UpdatePostoInput("Portaria Atualizada", "Rua B, 200", "Campinas", "SP");
+        var updateInput = new UpdatePostoInput("Portaria Atualizada", "13010-111", "Rua B", "200", null, "Campinas", "SP");
         var updateResponse = await _client.PutAsJsonAsync($"/api/postos/{created.Id}", updateInput);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
 

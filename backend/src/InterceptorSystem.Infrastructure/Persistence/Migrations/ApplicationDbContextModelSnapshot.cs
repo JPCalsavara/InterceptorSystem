@@ -369,6 +369,11 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Cep")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
                     b.Property<string>("Cidade")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -376,6 +381,10 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("ClienteId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Complemento")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -398,11 +407,46 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
 
                     b.ToTable("Postos", (string)null);
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoTag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PostoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("PostoId", "TagId")
+                        .IsUnique();
+
+                    b.ToTable("PostoTags", (string)null);
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Tag", b =>
@@ -704,6 +748,25 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Cliente");
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.PostoTag", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", "Posto")
+                        .WithMany("Tags")
+                        .HasForeignKey("PostoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Posto");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.TokenVerificacao", b =>
                 {
                     b.HasOne("InterceptorSystem.Domain.Modulos.Auth.Entidades.Conta", null)
@@ -746,6 +809,8 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>
                 {
                     b.Navigation("Alocacoes");
+
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

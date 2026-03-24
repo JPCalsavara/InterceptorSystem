@@ -87,45 +87,29 @@
       </svg>
       <h3>Nenhum posto cadastrado</h3>
       <p>Comece criando seu primeiro posto de trabalho</p>
-      <button class="btn-primary" routerLink="/postos/novo">Criar Primeiro Posto</button>
+      <button class="btn-primary btn-md" routerLink="/postos/novo">Novo Posto</button>
     </div>
   }
 
   <!-- Filtros -->
   @if (!loading() && postos().length > 0) {
-    <div class="filters-section" style="margin-bottom: 2rem">
-      <h3
-        class="filters-title"
-        style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 1.1rem"
-      >
+    <div class="filters-section">
+      <h3 class="filters-title">
+        <svg class="filters-title-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"
+            clip-rule="evenodd"
+          />
+        </svg>
         Filtros
       </h3>
-      <div
-        class="filters-grid"
-        style="
-          display: grid;
-          gap: 1rem;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        "
-      >
+      <div class="filters-grid">
         <div class="filter-group">
-          <label
-            for="filtroCliente"
-            class="filter-label"
-            style="display: block; margin-bottom: 0.5rem; font-weight: 500"
-            >Buscar por Cliente</label
-          >
+          <label for="filtroCliente" class="filter-label">Buscar por Cliente</label>
           <select
             id="filtroCliente"
             class="filter-select"
-            style="
-              width: 100%;
-              padding: 0.75rem;
-              border-radius: 8px;
-              border: 1px solid var(--border-color);
-              background: var(--surface-color);
-              color: var(--text-color);
-            "
             [ngModel]="filtroCliente()"
             (ngModelChange)="filtroCliente.set($event)"
           >
@@ -177,6 +161,26 @@
 
                 <!-- Informações do Posto -->
                 <div class="card-info">
+                  <div class="info-row">
+                    <span class="info-label">
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      Endereço:
+                    </span>
+                    <span>
+                      {{ posto.endereco }}, {{ posto.numero }}
+                      @if (posto.complemento) {
+                        - {{ posto.complemento }}
+                      }
+                      <br />{{ posto.cidade }}/{{ posto.estado }} - CEP {{ posto.cep }}
+                    </span>
+                  </div>
+
                   <div class="info-row faltas-row">
                     <span class="info-label">
                       <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
@@ -195,7 +199,7 @@
                 <!-- Ações -->
                 <div class="card-actions">
                   <button
-                    class="btn-action btn-view"
+                    class="action-btn btn-action btn-view"
                     [routerLink]="['/postos', posto.id]"
                     title="Ver Detalhes"
                   >
@@ -207,10 +211,9 @@
                         clip-rule="evenodd"
                       />
                     </svg>
-                    Detalhes
                   </button>
                   <button
-                    class="btn-action btn-edit"
+                    class="action-btn btn-action btn-edit"
                     [routerLink]="['/postos', posto.id, 'editar']"
                     title="Editar"
                   >
@@ -219,10 +222,9 @@
                         d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
                       />
                     </svg>
-                    Editar
                   </button>
                   <button
-                    class="btn-action btn-delete"
+                    class="action-btn btn-action btn-danger"
                     (click)="confirmDelete(posto.id, posto.nome, posto.cidade)"
                     title="Excluir"
                   >
@@ -233,7 +235,6 @@
                         clip-rule="evenodd"
                       />
                     </svg>
-                    Excluir
                   </button>
                 </div>
               </div>

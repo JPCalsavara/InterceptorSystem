@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container form-page">
   <div class="page-header">
     <div class="header-content">
       <button class="btn-back" routerLink="/funcionarios">
@@ -205,67 +205,19 @@
       @if (tags().length > 0) {
         <h3 class="section-title">Funções / Papéis</h3>
 
-        @if (showPresetSelection()) {
-          <div class="form-group">
-            <label for="tagIds" class="form-label">
-              Selecionar Presets de Funções <span class="required">*</span>
-            </label>
-            <p class="help-text">
-              Selecione pelo menos um papel além da função padrão ({{ defaultTag()?.nome }})
-            </p>
-            <div class="checkbox-group">
-              @for (tag of additionalTags(); track tag.id) {
-                <label class="checkbox-container">
-                  <input
-                    type="checkbox"
-                    [value]="tag.id"
-                    [checked]="form.get('tagIds')?.value?.includes(tag.id)"
-                    (change)="toggleTag(tag.id)"
-                    [disabled]="loading()"
-                  />
-                  <span class="checkbox-label">
-                    {{ tag.nome }}
-                    @if (tag.descricao) {
-                      <br />
-                      <small class="tag-description">{{ tag.descricao }}</small>
-                    }
-                  </span>
-                </label>
-              }
-            </div>
-            @if (hasError('tagIds')) {
-              <span class="error-message">{{ getErrorMessage('tagIds') }}</span>
-            }
-          </div>
-        } @else {
-          <!-- Optional tag selection when there are other tags -->
-          <div class="form-group">
-            <label for="tagIds" class="form-label"> Funções Adicionais (Opcional) </label>
-            <p class="help-text">
-              Função padrão: <strong>{{ defaultTag()?.nome }}</strong> (sempre incluída)
-            </p>
-            <div class="checkbox-group">
-              @for (tag of additionalTags(); track tag.id) {
-                <label class="checkbox-container">
-                  <input
-                    type="checkbox"
-                    [value]="tag.id"
-                    [checked]="form.get('tagIds')?.value?.includes(tag.id)"
-                    (change)="toggleTag(tag.id)"
-                    [disabled]="loading()"
-                  />
-                  <span class="checkbox-label">
-                    {{ tag.nome }}
-                    @if (tag.descricao) {
-                      <br />
-                      <small class="tag-description">{{ tag.descricao }}</small>
-                    }
-                  </span>
-                </label>
-              }
-            </div>
-          </div>
-        }
+        <app-tag-picker
+          [tags]="tags()"
+          [selectedIds]="form.get('tagIds')?.value || []"
+          [lockedIds]="defaultTag() ? [defaultTag()!.id] : []"
+          [disabled]="loading()"
+          [label]="'Seleção de funções'"
+          [helperText]="
+            defaultTag()
+              ? 'Função padrão ' + defaultTag()!.nome + ' é fixa e sempre será enviada.'
+              : 'Selecione uma ou mais funções para o funcionário.'
+          "
+          (selectionChange)="onTagSelectionChange($event)"
+        />
       }
 
       <div class="form-footer">

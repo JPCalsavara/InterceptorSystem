@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container form-page">
   <div class="page-header">
     <div class="header-content">
       <button class="btn-back" routerLink="/postos">
@@ -43,13 +43,20 @@
           <label for="clienteId" class="form-label">
             Cliente <span class="required">*</span>
           </label>
-          <select id="clienteId" formControlName="clienteId" class="form-input" [class.error]="hasError('clienteId')">
+          <select
+            id="clienteId"
+            formControlName="clienteId"
+            class="form-input"
+            [class.error]="hasError('clienteId')"
+          >
             <option value="">Selecione um cliente</option>
             @for (cond of clientes(); track cond.id) {
               <option [value]="cond.id">{{ cond.nome }}</option>
             }
           </select>
-          @if (hasError('clienteId')) { <span class="error-message">{{ getErrorMessage('clienteId') }}</span> }
+          @if (hasError('clienteId')) {
+            <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
+          }
         </div>
       </div>
 
@@ -57,33 +64,167 @@
       <div class="form-row">
         <div class="form-group">
           <label for="nome" class="form-label">Nome do Posto <span class="required">*</span></label>
-          <input type="text" id="nome" formControlName="nome" class="form-input" placeholder="Ex: Portaria Principal" />
-          @if (hasError('nome')) { <span class="error-message">{{ getErrorMessage('nome') }}</span> }
+          <input
+            type="text"
+            id="nome"
+            formControlName="nome"
+            class="form-input"
+            placeholder="Ex: Portaria Principal"
+          />
+          @if (hasError('nome')) {
+            <span class="error-message">{{ getErrorMessage('nome') }}</span>
+          }
+        </div>
+        <div class="form-group"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tags do Contrato</label>
+
+        @if (!form.get('clienteId')?.value) {
+          <span class="help-text">Selecione um cliente para carregar as tags disponíveis.</span>
+        } @else if (loadingTags()) {
+          <span class="help-text">Carregando tags do contrato...</span>
+        } @else if (contratoTags().length === 0) {
+          <span class="help-text">Nenhuma tag disponível nos contratos ativos deste cliente.</span>
+        } @else {
+          @if (hasMultipleTags()) {
+            <label class="checkbox-label select-all-tags">
+              <input
+                type="checkbox"
+                [checked]="areAllTagsSelected()"
+                (change)="onToggleAllTags($any($event.target).checked)"
+              />
+              <span>Selecionar todas as tags</span>
+            </label>
+          }
+
+          <div class="tags-grid" [class.locked]="isSingleTagLocked()">
+            @for (tag of contratoTags(); track tag.id) {
+              <label class="checkbox-label tag-checkbox" [class.locked]="isSingleTagLocked()">
+                <input
+                  type="checkbox"
+                  [checked]="isTagSelected(tag.id)"
+                  [disabled]="isSingleTagLocked()"
+                  (change)="onToggleTag(tag.id, $any($event.target).checked)"
+                />
+                <span>{{ tag.nome }}</span>
+              </label>
+            }
+          </div>
+
+          @if (isSingleTagLocked()) {
+            <span class="help-text"
+              >Somente uma tag disponível no contrato. Ela fica selecionada automaticamente.</span
+            >
+          }
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cep" class="form-label">CEP <span class="required">*</span></label>
+          <input
+            type="text"
+            id="cep"
+            formControlName="cep"
+            class="form-input"
+            placeholder="00000-000"
+            maxlength="9"
+            (input)="onCepInput()"
+            (blur)="onCepBlur()"
+          />
+          @if (loadingCep()) {
+            <span class="error-message">Consultando CEP...</span>
+          }
+          @if (hasError('cep')) {
+            <span class="error-message">{{ getErrorMessage('cep') }}</span>
+          }
         </div>
         <div class="form-group">
-          <label for="endereco" class="form-label">Endereço <span class="required">*</span></label>
-          <input type="text" id="endereco" formControlName="endereco" class="form-input" placeholder="Rua..." />
-          @if (hasError('endereco')) { <span class="error-message">{{ getErrorMessage('endereco') }}</span> }
+          <label for="cidade" class="form-label">Cidade <span class="required">*</span></label>
+          <input
+            type="text"
+            id="cidade"
+            formControlName="cidade"
+            class="form-input"
+            placeholder="Sua Cidade"
+          />
+          @if (hasError('cidade')) {
+            <span class="error-message">{{ getErrorMessage('cidade') }}</span>
+          }
+        </div>
+        <div class="form-group">
+          <label for="estado" class="form-label">Estado <span class="required">*</span></label>
+          <input
+            type="text"
+            id="estado"
+            formControlName="estado"
+            class="form-input"
+            placeholder="UF"
+            maxlength="2"
+            (blur)="onEstadoBlur()"
+          />
+          @if (hasError('estado')) {
+            <span class="error-message">{{ getErrorMessage('estado') }}</span>
+          }
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="cidade" class="form-label">Cidade <span class="required">*</span></label>
-          <input type="text" id="cidade" formControlName="cidade" class="form-input" placeholder="Sua Cidade" />
-          @if (hasError('cidade')) { <span class="error-message">{{ getErrorMessage('cidade') }}</span> }
+          <label for="endereco" class="form-label"
+            >Rua/Logradouro <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="endereco"
+            formControlName="endereco"
+            class="form-input"
+            placeholder="Rua..."
+          />
+          @if (hasError('endereco')) {
+            <span class="error-message">{{ getErrorMessage('endereco') }}</span>
+          }
         </div>
         <div class="form-group">
-          <label for="estado" class="form-label">Estado <span class="required">*</span></label>
-          <input type="text" id="estado" formControlName="estado" class="form-input" placeholder="UF" maxlength="2" />
-          @if (hasError('estado')) { <span class="error-message">{{ getErrorMessage('estado') }}</span> }
+          <label for="numero" class="form-label">Número <span class="required">*</span></label>
+          <input
+            type="text"
+            id="numero"
+            formControlName="numero"
+            class="form-input"
+            placeholder="Ex: 123"
+          />
+          @if (hasError('numero')) {
+            <span class="error-message">{{ getErrorMessage('numero') }}</span>
+          }
         </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="complemento" class="form-label">Complemento (Opcional)</label>
+          <input
+            type="text"
+            id="complemento"
+            formControlName="complemento"
+            class="form-input"
+            placeholder="Ex: Bloco A, Sala 5"
+          />
+          @if (hasError('complemento')) {
+            <span class="error-message">{{ getErrorMessage('complemento') }}</span>
+          }
+        </div>
+        <div class="form-group"></div>
       </div>
 
       <div class="form-footer">
         <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
         <div class="button-group">
-          <button type="button" class="btn-secondary" routerLink="/postos" [disabled]="loading()">Cancelar</button>
+          <button type="button" class="btn-secondary" routerLink="/postos" [disabled]="loading()">
+            Cancelar
+          </button>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             @if (loading()) {
               <span class="spinner-small"></span> Salvando...

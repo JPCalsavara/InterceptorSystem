@@ -1,13 +1,13 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-esqueci-senha',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="auth-page">
       <div class="auth-card">
@@ -24,18 +24,20 @@ import { AuthService } from '../../services/auth.service';
         </div>
 
         @if (!enviado()) {
-          <form class="auth-form" (ngSubmit)="onSubmit()">
+          <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="form-group">
               <label for="email">E-mail</label>
               <input
                 id="email"
                 type="email"
-                name="email"
-                [(ngModel)]="email"
+                formControlName="email"
+                [class.input-error]="hasError('email')"
                 placeholder="sua@empresa.com"
-                required
                 autocomplete="email"
               />
+              @if (hasError('email')) {
+                <span class="field-error">{{ getErrorMessage('email') }}</span>
+              }
             </div>
 
             <button type="submit" class="btn-primary btn-lg submit-btn" [disabled]="carregando()">
@@ -160,7 +162,21 @@ import { AuthService } from '../../services/auth.service';
             color: var(--text-tertiary);
             opacity: 0.7;
           }
+
+          &.input-error {
+            border-color: #dc2626;
+
+            &:focus {
+              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+            }
+          }
         }
+      }
+
+      .field-error {
+        font-size: var(--text-xs);
+        color: #dc2626;
+        font-weight: var(--fw-medium);
       }
 
       .submit-btn {
@@ -201,24 +217,52 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class EsqueciSenhaComponent implements OnInit {
-  email = '';
+  private fb = new FormBuilder();
+  form: FormGroup;
   enviado = signal(false);
   carregando = signal(false);
   isDarkMode = signal(false);
   logoSrc = computed(() => this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png');
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+    });
+  }
 
   ngOnInit(): void {
     const saved = localStorage.getItem('theme');
     this.isDarkMode.set(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches));
   }
 
+  hasError(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!field && field.invalid && field.touched;
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    const errors = field.errors;
+
+    if (errors['required']) return 'Este campo é obrigatório';
+    if (errors['email']) return 'E-mail inválido';
+
+    return 'Campo inválido';
+  }
+
   onSubmit(): void {
-    if (!this.email) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.carregando.set(true);
 
-    this.authService.solicitarResetSenha(this.email).subscribe({
+    const { email } = this.form.value;
+
+    this.authService.solicitarResetSenha(email).subscribe({
       next: () => {
         this.carregando.set(false);
         this.enviado.set(true);

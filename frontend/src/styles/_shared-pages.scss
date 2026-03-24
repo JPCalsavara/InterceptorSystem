@@ -1,0 +1,430 @@
+/* ==========================================================================
+   Shared Pages (Lists/Details)
+   ========================================================================== */
+
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.header-content {
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.page-title-icon {
+  color: var(--primary-color);
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.page-container.form-page {
+  max-width: 800px;
+}
+
+.page-container.form-page.form-page-wide {
+  max-width: 900px;
+}
+
+.form-page .page-header {
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: var(--space-8);
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.form-page .header-content {
+  width: 100%;
+
+  h1 {
+    font-size: var(--text-3xl);
+    font-weight: var(--fw-bold);
+    color: var(--text-primary);
+    margin: var(--space-4) 0 var(--space-2) 0;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    margin: 0;
+    opacity: 1;
+  }
+}
+
+.form-page .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--primary-color);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--surface-muted);
+  }
+}
+
+.form-page .form-container .form-card,
+.form-page .form-card {
+  background: var(--surface-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-page .section-title {
+  font-size: var(--text-lg);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+  margin: var(--space-6) 0 var(--space-4) 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.form-page .section-title:first-child,
+.form-page .section-title:first-of-type {
+  margin-top: 0;
+}
+
+.form-page .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.form-page .form-group {
+  margin-bottom: var(--space-6);
+}
+
+.form-page .form-label {
+  display: block;
+  font-weight: var(--fw-semibold);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.form-page .form-label .required,
+.form-page .required-note .required {
+  color: var(--error-text);
+}
+
+.form-page .form-input {
+  width: 100%;
+  padding: var(--space-3);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: var(--input-bg);
+  transition: all 0.2s;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+  }
+
+  &.error {
+    border-color: var(--error-border);
+
+    &:focus {
+      box-shadow: 0 0 0 3px var(--error-ring);
+    }
+  }
+
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background: var(--surface-muted);
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+}
+
+.form-page textarea.form-input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-page select.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23135fb0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 0.9rem;
+  cursor: pointer;
+  padding-right: 2.15rem;
+}
+
+.form-page .error-message {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--error-text);
+}
+
+.form-page .form-footer {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-page .required-note {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.form-page .button-group {
+  display: flex;
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .form-page .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-page .form-footer {
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: stretch;
+  }
+
+  .form-page .required-note {
+    text-align: center;
+  }
+
+  .form-page .button-group {
+    width: 100%;
+  }
+
+  .form-page .button-group button {
+    flex: 1;
+  }
+}
+
+.filters-section {
+  background: var(--surface-card);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+}
+
+.filters-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.filters-title-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--filters-icon-color, var(--app-ref-135fb0));
+  flex-shrink: 0;
+  padding-right: 0.2rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-left: 0.5rem;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 0.625rem 2.15rem 0.625rem 0.875rem;
+  border: 1px solid var(--app-ref-135fb0);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background: var(--surface-card);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23135fb0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--app-ref-135fb0);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--app-ref-135fb0);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  }
+
+  // Calendar icon blue in light mode
+  &[type='date']::-webkit-calendar-picker-indicator,
+  &[type='time']::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1) sepia(1) hue-rotate(153deg) saturate(25) brightness(0.39);
+    cursor: pointer;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.btn-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--border-subtle);
+    border-color: var(--app-ref-9ca3af);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.results-count {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+}
+
+// Dark mode overrides
+.dark-mode {
+  .filter-select {
+    background-color: var(--input-bg) !important;
+    color: #ffffff !important;
+    border-color: var(--app-ref-135fb0);
+    color-scheme: dark;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23135fb0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+    option {
+      background: var(--card-bg);
+      color: #ffffff;
+    }
+  }
+
+  .filter-select[type='date']::-webkit-datetime-edit,
+  .filter-select[type='date']::-webkit-datetime-edit-text,
+  .filter-select[type='date']::-webkit-datetime-edit-month-field,
+  .filter-select[type='date']::-webkit-datetime-edit-day-field,
+  .filter-select[type='date']::-webkit-datetime-edit-year-field {
+    color: #ffffff !important;
+  }
+
+  .filter-select[type='date']::-webkit-calendar-picker-indicator,
+  .filter-select[type='time']::-webkit-calendar-picker-indicator {
+    // brightness(0) → always black first, invert(1) → always white
+    // Avoids the double-inversion bug when color-scheme: dark already made the icon white
+    filter: brightness(0) invert(1) !important;
+    opacity: 1;
+    cursor: pointer;
+  }
+
+  .form-page select.form-input {
+    background-color: var(--input-bg) !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23135fb0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+    option {
+      background: var(--card-bg);
+      color: #ffffff;
+    }
+  }
+
+  .form-page .form-input[type='date']::-webkit-calendar-picker-indicator,
+  .form-page .form-input[type='time']::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.5);
+    opacity: 1;
+    cursor: pointer;
+  }
+}

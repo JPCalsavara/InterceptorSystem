@@ -7,6 +7,8 @@ import { FuncionarioService } from '../../../services/funcionario.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { TagService } from '../../../services/tag.service';
+import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
+import { celularValidator, cpfValidator } from '../../../shared/validators/br-documents.validators';
 import {
   StatusFuncionario,
   TipoFuncionario,
@@ -19,7 +21,7 @@ import {
 @Component({
   selector: 'app-funcionario-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective, TagPickerComponent],
   templateUrl: './funcionario-form.component.html',
   styleUrl: './funcionario-form.component.scss',
 })
@@ -42,8 +44,6 @@ export class FuncionarioFormComponent implements OnInit {
   contratos = signal<Contrato[]>([]);
   tags = signal<Tag[]>([]);
   defaultTag = signal<Tag | null>(null);
-  additionalTags = signal<Tag[]>([]);
-  showPresetSelection = signal(false);
 
   StatusFuncionario = StatusFuncionario;
   TipoFuncionario = TipoFuncionario;
@@ -91,27 +91,14 @@ export class FuncionarioFormComponent implements OnInit {
     this.tagService.getAll().subscribe({
       next: (data) => {
         this.tags.set(data);
-        // Find the default tag (valorDiaria)
+        // Keep "valorDiaria" as locked default when available.
         const defaultTag = data.find((t) => t.nome.toLowerCase() === 'valordiaria');
         this.defaultTag.set(defaultTag || null);
-
-        // Get other tags (excluding default)
-        const others = defaultTag ? data.filter((t) => t.id !== defaultTag.id) : data;
-        this.additionalTags.set(others);
-
-        // Show preset selection only if there are NO additional tags
-        this.showPresetSelection.set(others.length === 0);
-
-        // Keep form validators in sync with async tag-loading rules.
-        this.updateTagValidators();
 
         // Ensure default tag stays selected when available.
         const tagIdsControl = this.form?.get('tagIds');
         if (tagIdsControl && defaultTag) {
-          const currentTagIds: string[] = tagIdsControl.value || [];
-          if (!currentTagIds.includes(defaultTag.id)) {
-            tagIdsControl.setValue([...currentTagIds, defaultTag.id]);
-          }
+          tagIdsControl.setValue(this.withDefaultTag(tagIdsControl.value || []));
         }
       },
       error: (err) => console.error('Erro ao carregar tags:', err),
@@ -148,58 +135,31 @@ export class FuncionarioFormComponent implements OnInit {
   }
 
   buildForm(): void {
-    const tagIdValidators = this.shouldRequireTagSelection() ? [Validators.required] : [];
-
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       contratoId: ['', Validators.required],
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cpf: ['', [Validators.required, this.cpfValidator]],
-      celular: ['', [Validators.required, this.celularValidator]],
+      cpf: ['', [Validators.required, cpfValidator]],
+      celular: ['', [Validators.required, celularValidator]],
       statusFuncionario: [StatusFuncionario.ATIVO, Validators.required],
       tipoFuncionario: [TipoFuncionario.CLT, Validators.required],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
-      tagIds: [this.defaultTag() ? [this.defaultTag()!.id] : [], tagIdValidators],
+      tagIds: [this.defaultTag() ? [this.defaultTag()!.id] : []],
     });
   }
 
-  private shouldRequireTagSelection(): boolean {
-    return this.showPresetSelection() && this.additionalTags().length > 0;
-  }
-
-  private updateTagValidators(): void {
-    const tagIdsControl = this.form?.get('tagIds');
-    if (!tagIdsControl) return;
-
-    if (this.shouldRequireTagSelection()) {
-      tagIdsControl.setValidators([Validators.required]);
-    } else {
-      tagIdsControl.clearValidators();
-    }
-    tagIdsControl.updateValueAndValidity({ emitEvent: false });
-  }
-
-  private cpfValidator(control: any) {
-    if (!control.value) return null;
-    if (control.value.length !== 11) {
-      return { cpfInvalid: true };
-    }
-    return null;
-  }
-
-  private celularValidator(control: any) {
-    if (!control.value) return null;
-    if (control.value.length < 10 || control.value.length > 11) {
-      return { celularInvalid: true };
-    }
-    return null;
+  private withDefaultTag(ids: string[]): string[] {
+    const uniq = [...new Set(ids)];
+    const defaultTagId = this.defaultTag()?.id;
+    if (!defaultTagId) return uniq;
+    return uniq.includes(defaultTagId) ? uniq : [defaultTagId, ...uniq];
   }
 
   loadFuncionario(id: string): void {
     this.loading.set(true);
     this.service.getById(id).subscribe({
       next: (data) => {
-        const tagIds = (data.tags ?? []).map((tag) => tag.id);
+        const tagIds = this.withDefaultTag((data.tags ?? []).map((tag) => tag.id));
         this.form.patchValue({
           ...data,
           tagIds,
@@ -232,14 +192,10 @@ export class FuncionarioFormComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    let formValue = this.form.value;
-
-    // Ensure default tag is always included
-    const currentTagIds = formValue.tagIds || [];
-    const defaultTagId = this.defaultTag()?.id;
-    if (defaultTagId && !currentTagIds.includes(defaultTagId)) {
-      formValue.tagIds = [...currentTagIds, defaultTagId];
-    }
+    const formValue = {
+      ...this.form.value,
+      tagIds: this.withDefaultTag(this.form.value.tagIds || []),
+    };
 
     const request = this.isEdit()
       ? this.service.update(this.funcionarioId()!, formValue)
@@ -294,20 +250,11 @@ export class FuncionarioFormComponent implements OnInit {
     return 'Campo inválido';
   }
 
-  toggleTag(tagId: string): void {
+  onTagSelectionChange(tagIds: string[]): void {
     const tagIdsControl = this.form.get('tagIds');
     if (!tagIdsControl) return;
 
-    const currentTagIds = tagIdsControl.value || [];
-    const index = currentTagIds.indexOf(tagId);
-
-    if (index > -1) {
-      currentTagIds.splice(index, 1);
-    } else {
-      currentTagIds.push(tagId);
-    }
-
-    tagIdsControl.setValue([...currentTagIds]);
+    tagIdsControl.setValue(this.withDefaultTag(tagIds));
     tagIdsControl.markAsTouched();
   }
 }

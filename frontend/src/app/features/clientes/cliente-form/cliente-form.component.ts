@@ -1,9 +1,14 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ClienteService } from '../../../services/cliente.service';
+import {
+  cnpjValidator,
+  telefoneValidator,
+} from '../../../shared/validators/br-documents.validators';
+import { IbgeService } from '../../../services/ibge.service';
 
 @Component({
   selector: 'app-cliente-form',
@@ -17,6 +22,7 @@ export class ClienteFormComponent implements OnInit {
   private service = inject(ClienteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private ibgeService = inject(IbgeService);
 
   form!: FormGroup;
   isEdit = signal(false);
@@ -24,9 +30,14 @@ export class ClienteFormComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
+  estados = signal<string[]>([]);
+  selectedEstado = signal('');
+  cidadesDisponiveis = signal<string[]>([]);
 
   ngOnInit(): void {
     this.buildForm();
+    this.setupLocationWatcher();
+    this.carregarEstados();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -36,22 +47,50 @@ export class ClienteFormComponent implements OnInit {
     }
   }
 
-  buildForm(): void {
-    this.form = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cidade: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
-      emailGestor: ['', [Validators.email]],
-      telefoneEmergencia: ['', [this.telefoneValidator]],
+  carregarEstados(): void {
+    this.ibgeService.getEstados().subscribe((estadosObj) => {
+      this.estados.set(estadosObj.map((e) => e.sigla));
     });
   }
 
-  private telefoneValidator(control: any) {
-    if (!control.value) return null;
-    if (control.value.length < 10 || control.value.length > 11) {
-      return { telefoneInvalid: true };
-    }
-    return null;
+  buildForm(): void {
+    this.form = this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
+      cnpj: ['', [Validators.required, cnpjValidator]],
+      cidade: ['', [Validators.required]],
+      estado: ['', [Validators.required]],
+      emailGestor: ['', [Validators.email]],
+      telefoneEmergencia: ['', [telefoneValidator]],
+    });
+  }
+
+  private setupLocationWatcher(): void {
+    const estadoControl = this.form.get('estado');
+    const cidadeControl = this.form.get('cidade');
+
+    estadoControl?.valueChanges.subscribe((uf: string) => {
+      const estado = String(uf ?? '').toUpperCase();
+      if (estadoControl.value !== estado) {
+        estadoControl.setValue(estado, { emitEvent: false });
+      }
+
+      this.selectedEstado.set(estado);
+
+      if (estado) {
+        this.ibgeService.getMunicipiosPorEstado(estado).subscribe((municipios) => {
+          const cidadesDoEstado = municipios.map((m) => m.nome);
+          this.cidadesDisponiveis.set(cidadesDoEstado);
+
+          const cidadeAtual = String(cidadeControl?.value ?? '');
+          if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
+            cidadeControl?.setValue('');
+          }
+        });
+      } else {
+        this.cidadesDisponiveis.set([]);
+        cidadeControl?.setValue('');
+      }
+    });
   }
 
   loadCliente(id: string): void {
@@ -61,6 +100,7 @@ export class ClienteFormComponent implements OnInit {
       next: (data) => {
         this.form.patchValue({
           nome: data.nome,
+          cnpj: data.cnpj,
           cidade: data.cidade,
           estado: data.estado,
           emailGestor: data.emailGestor,
@@ -102,10 +142,7 @@ export class ClienteFormComponent implements OnInit {
         // Detectar tipo de erro e mostrar mensagem específica
         const errorMessage = err.error?.message || err.message || '';
 
-        if (
-          err.status === 409 ||
-          errorMessage.toLowerCase().includes('duplicate')
-        ) {
+        if (err.status === 409 || errorMessage.toLowerCase().includes('duplicate')) {
           this.error.set('Este cliente já está cadastrado.');
         } else if (err.status === 400) {
           this.error.set('Dados inválidos. Verifique os campos obrigatórios e tente novamente.');

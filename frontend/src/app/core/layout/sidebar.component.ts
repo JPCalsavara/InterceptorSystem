@@ -22,7 +22,11 @@ interface NavItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <aside class="sidebar" [class.open]="layoutState.leftDrawerOpen()">
+    <aside
+      class="sidebar"
+      [class.open]="layoutState.leftDrawerOpen()"
+      [class.collapsed]="layoutState.sidebarCollapsed()"
+    >
       <nav class="nav">
         @for (item of navItems; track item.route) {
           <a
@@ -30,6 +34,7 @@ interface NavItem {
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             class="nav-item"
+            [attr.title]="layoutState.sidebarCollapsed() ? item.label : null"
             (click)="layoutState.leftDrawerOpen.set(false)"
           >
             <span class="icon">
@@ -111,6 +116,26 @@ interface NavItem {
             }
           </a>
         }
+
+        <button
+          type="button"
+          class="collapse-toggle"
+          (click)="layoutState.toggleSidebarCollapsed()"
+          [attr.aria-label]="
+            layoutState.sidebarCollapsed() ? 'Expandir menu lateral' : 'Colapsar menu lateral'
+          "
+          [attr.title]="
+            layoutState.sidebarCollapsed() ? 'Expandir menu lateral' : 'Colapsar menu lateral'
+          "
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            @if (layoutState.sidebarCollapsed()) {
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+            } @else {
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+            }
+          </svg>
+        </button>
       </nav>
     </aside>
   `,
@@ -127,14 +152,20 @@ interface NavItem {
         overflow-y: auto;
         padding: var(--space-6) var(--space-4);
         transition:
+          width 0.25s ease,
           background-color 0.3s ease,
           border-color 0.3s ease;
+      }
+
+      .sidebar.collapsed {
+        width: 88px;
       }
 
       .nav {
         display: flex;
         flex-direction: column;
         gap: var(--space-2);
+        height: 100%;
       }
 
       .nav-item {
@@ -160,6 +191,11 @@ interface NavItem {
         }
       }
 
+      .sidebar.collapsed .nav-item {
+        justify-content: center;
+        padding: var(--space-3);
+      }
+
       .icon {
         font-size: 1.5rem;
         line-height: 1;
@@ -179,6 +215,11 @@ interface NavItem {
         font-size: var(--text-sm);
       }
 
+      .sidebar.collapsed .label,
+      .sidebar.collapsed .nav-badge {
+        display: none;
+      }
+
       .nav-badge {
         margin-left: auto;
         background: var(--bg-tertiary);
@@ -192,6 +233,37 @@ interface NavItem {
       .nav-item.active .nav-badge {
         background: var(--surface-card);
         color: var(--primary-color);
+      }
+
+      .collapse-toggle {
+        margin-top: auto;
+        width: 100%;
+        height: 40px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--bg-tertiary);
+          color: var(--primary-color);
+          border-color: var(--primary-color);
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .sidebar.collapsed .collapse-toggle {
+        width: 48px;
+        align-self: center;
       }
 
       /* Scrollbar customization */
@@ -224,6 +296,25 @@ interface NavItem {
           padding: var(--space-6) var(--space-4);
         }
 
+        .sidebar.collapsed {
+          width: 260px;
+        }
+
+        /* On mobile, always present full drawer content, even if desktop
+           collapsed state is persisted in localStorage. */
+        .sidebar.collapsed .label {
+          display: flex;
+        }
+
+        .sidebar.collapsed .nav-badge {
+          display: inline-flex;
+        }
+
+        .sidebar.collapsed .nav-item {
+          justify-content: flex-start;
+          padding: var(--space-3) var(--space-4);
+        }
+
         .sidebar.open {
           transform: translateX(0);
         }
@@ -232,9 +323,17 @@ interface NavItem {
           display: flex;
         }
 
+        .nav-badge {
+          display: inline-flex;
+        }
+
         .nav-item {
           justify-content: flex-start;
           padding: var(--space-3) var(--space-4);
+        }
+
+        .collapse-toggle {
+          display: none;
         }
       }
     `,
@@ -265,7 +364,7 @@ export class SidebarComponent implements OnInit {
     { label: 'Funcionários', route: '/funcionarios', icon: 'user-group', countKey: 'funcionarios' },
     { label: 'Postos', route: '/postos', icon: 'map-pin', countKey: 'postos' },
     { label: 'Alocações', route: '/alocacoes', icon: 'clock', countKey: 'alocacoes' },
-    { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' }
+    { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' },
   ];
 
   ngOnInit() {

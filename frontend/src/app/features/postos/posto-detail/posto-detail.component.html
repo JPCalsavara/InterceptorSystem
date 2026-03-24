@@ -67,6 +67,20 @@
               </svg>
               {{ totalFuncionarios() }} funcionário(s) participaram
             </span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              {{ posto()!.endereco }}, {{ posto()!.numero }}
+              @if (posto()!.complemento) {
+                - {{ posto()!.complemento }}
+              }
+              | {{ posto()!.cidade }}/{{ posto()!.estado }} | CEP {{ posto()!.cep }}
+            </span>
           </div>
         </div>
       </div>
@@ -79,7 +93,11 @@
         <div class="metric-card highlight">
           <div class="metric-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
             </svg>
           </div>
           <div class="metric-content">
@@ -179,7 +197,10 @@
         @for (aloc of alocacoes(); track aloc.id) {
           <div class="alocacao-card">
             <div class="alocacao-header">
-              <span class="horario">{{ aloc.horarioInicio.substring(0, 5) }} - {{ aloc.horarioFim.substring(0, 5) }}</span>
+              <span class="horario"
+                >{{ aloc.horarioInicio.substring(0, 5) }} -
+                {{ aloc.horarioFim.substring(0, 5) }}</span
+              >
               <span class="escala-badge">{{ aloc.tipoEscala }}</span>
             </div>
             <div class="alocacao-body">

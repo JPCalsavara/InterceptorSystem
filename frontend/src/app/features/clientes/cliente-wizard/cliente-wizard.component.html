@@ -201,7 +201,7 @@
                   [class.error]="hasError('estado')"
                 >
                   <option value="">Selecione o estado</option>
-                  @for (uf of estados; track uf) {
+                  @for (uf of estados(); track uf) {
                     <option [value]="uf">{{ uf }}</option>
                   }
                 </select>

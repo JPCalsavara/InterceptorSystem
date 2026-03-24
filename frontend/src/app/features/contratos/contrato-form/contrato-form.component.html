@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container form-page">
   <div class="page-header">
     <div class="header-content">
       <button class="btn-back" routerLink="/contratos">
@@ -38,9 +38,7 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
     <div class="form-card">
       <div class="form-group">
-        <label for="clienteId" class="form-label">
-          Cliente <span class="required">*</span>
-        </label>
+        <label for="clienteId" class="form-label"> Cliente <span class="required">*</span> </label>
         <select
           id="clienteId"
           formControlName="clienteId"
@@ -75,6 +73,49 @@
           <span class="error-message">{{ getErrorMessage('descricao') }}</span>
         }
       </div>
+
+      <h3 class="section-title">Tags e Precificação por Função</h3>
+
+      <app-tag-picker
+        [tags]="tags()"
+        [selectedIds]="selectedTagIds()"
+        [disabled]="loading()"
+        [label]="'Seleção de tags do contrato'"
+        [helperText]="
+          'Selecione as tags aplicáveis ao contrato e informe o valor da diária específico de cada função.'
+        "
+        (selectionChange)="onContratoTagsChange($event)"
+      />
+
+      @if (selectedTags().length > 0) {
+        <div class="tag-rates-grid">
+          @for (tag of selectedTags(); track tag.id) {
+            <div class="tag-rate-card">
+              <div class="tag-rate-title">
+                <strong>{{ tag.nome }}</strong>
+                @if (tag.descricao) {
+                  <small>{{ tag.descricao }}</small>
+                }
+              </div>
+              <div class="form-group">
+                <label [for]="'tag-rate-' + tag.id" class="form-label"
+                  >Valor Diária da Tag (R$)</label
+                >
+                <input
+                  [id]="'tag-rate-' + tag.id"
+                  type="number"
+                  class="form-input"
+                  [value]="getTagRate(tag.id)"
+                  (input)="onTagRateChange(tag.id, $any($event.target).value)"
+                  min="0"
+                  step="0.01"
+                  [disabled]="loading()"
+                />
+              </div>
+            </div>
+          }
+        </div>
+      }
 
       <h3 class="section-title">Valores Base</h3>
 
@@ -147,10 +188,7 @@
             </span>
           </label>
           <div class="form-input computed-field">
-            {{
-              getQuantidadeFuncionariosTotal(form.value.numeroDePostos) ||
-                '—'
-            }}
+            {{ getQuantidadeFuncionariosTotal(form.value.numeroDePostos) || '—' }}
             <span class="computed-hint">func. necessários</span>
           </div>
         </div>
@@ -404,6 +442,11 @@
             class="form-input"
             [class.error]="hasError('dataInicio')"
           />
+          @if (form.get('dataInicio')?.value) {
+            <small class="field-hint field-hint-date">
+              Formato BR: {{ formatDateForDisplay(form.get('dataInicio')?.value) }}
+            </small>
+          }
           @if (hasError('dataInicio')) {
             <span class="error-message">{{ getErrorMessage('dataInicio') }}</span>
           }
@@ -423,6 +466,11 @@
             class="form-input"
             [class.error]="hasError('dataFim')"
           />
+          @if (form.get('dataFim')?.value) {
+            <small class="field-hint field-hint-date">
+              Formato BR: {{ formatDateForDisplay(form.get('dataFim')?.value) }}
+            </small>
+          }
           @if (hasError('dataFim')) {
             <span class="error-message">{{ getErrorMessage('dataFim') }}</span>
           }
@@ -499,12 +547,7 @@
                   <span class="bk-item-label"
                     >Custo Base (Salários)
                     <span class="bk-formula"
-                      >{{
-                        getQuantidadeFuncionariosTotal(
-                          form.value.numeroDePostos
-                        )
-                      }}
-                      func.</span
+                      >{{ getQuantidadeFuncionariosTotal(form.value.numeroDePostos) }} func.</span
                     >
                   </span>
                   <span class="bk-item-value deduction">{{

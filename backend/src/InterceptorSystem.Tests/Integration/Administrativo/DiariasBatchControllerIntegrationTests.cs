@@ -230,7 +230,10 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
         var input = new CreatePostoInput(
             ClienteId: clienteId,
             Nome: $"Posto Teste {Guid.NewGuid().ToString()[..8]}",
-            Endereco: "Rua Teste, 123",
+            Cep: "01310-100",
+            Endereco: "Rua Teste",
+            Numero: "123",
+            Complemento: null,
             Cidade: "São Paulo",
             Estado: "SP"
         );

@@ -17,7 +17,7 @@
       </svg>
       Tags / Funções
     </h1>
-    <button class="btn-primary" (click)="openCreate()">+ Nova Tag</button>
+    <button class="btn-primary btn-md" (click)="openCreate()">Nova Tag</button>
   </div>
 
   <!-- Mensagens -->
@@ -65,7 +65,7 @@
       </svg>
       <p>Nenhuma tag encontrada.</p>
       @if (!filtroNome()) {
-        <button class="btn-primary" (click)="openCreate()">Criar primeira tag</button>
+        <button class="btn-primary btn-md" (click)="openCreate()">+ Nova Tag</button>
       }
     </div>
   }
@@ -89,7 +89,7 @@
               </td>
               <td class="col-descricao">{{ tag.descricao || '—' }}</td>
               <td class="col-actions">
-                <button class="btn-icon btn-edit" title="Editar" (click)="openEdit(tag)">
+                <button class="action-btn btn-icon btn-edit" title="Editar" (click)="openEdit(tag)">
                   <svg
                     width="16"
                     height="16"
@@ -102,7 +102,11 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button class="btn-icon btn-delete" title="Excluir" (click)="confirmDelete(tag)">
+                <button
+                  class="action-btn btn-icon btn-danger"
+                  title="Excluir"
+                  (click)="confirmDelete(tag)"
+                >
                   <svg
                     width="16"
                     height="16"

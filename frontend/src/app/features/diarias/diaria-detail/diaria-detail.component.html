@@ -236,7 +236,21 @@
               </div>
             </div>
 
-            <!-- CNPJ removido do modelo Cliente -->
+            @if (cliente()!.cnpj) {
+              <div class="info-item">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2H4a1 1 0 110-2V4zm3 1h2v2H7V5zm4 0h2v2h-2V5zM7 9h2v2H7V9zm4 0h2v2h-2V9zM7 13h2v2H7v-2zm4 0h2v2h-2v-2z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <span class="label">CNPJ</span>
+                  <span class="value">{{ cliente()!.cnpj }}</span>
+                </div>
+              </div>
+            }
           </div>
         </div>
       }

@@ -33,6 +33,14 @@ interface MetricaPeriodo {
   icone: string;
 }
 
+interface ClienteTagResumo {
+  tagId: string;
+  tagNome: string;
+  funcionariosComTag: number;
+  contratosComTag: number;
+  maiorValorDiaria: number;
+}
+
 @Component({
   selector: 'app-cliente-detail',
   standalone: true,
@@ -600,5 +608,75 @@ export class ClienteDetailComponent implements OnInit {
 
   diariasCancelamentos = computed(() => {
     return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.CANCELADA).length;
+  });
+
+  tagsConsolidadas = computed<ClienteTagResumo[]>(() => {
+    const porContrato = new Map<
+      string,
+      { tagId: string; tagNome: string; contratosComTag: number; maiorValorDiaria: number }
+    >();
+    const porFuncionario = new Map<
+      string,
+      { tagId: string; tagNome: string; funcionariosComTag: number }
+    >();
+
+    for (const contrato of this.contratos()) {
+      for (const tag of contrato.tags || []) {
+        const atual = porContrato.get(tag.tagId);
+        if (!atual) {
+          porContrato.set(tag.tagId, {
+            tagId: tag.tagId,
+            tagNome: tag.tagNome,
+            contratosComTag: 1,
+            maiorValorDiaria: tag.valorDiaria,
+          });
+          continue;
+        }
+
+        atual.contratosComTag += 1;
+        atual.maiorValorDiaria = Math.max(atual.maiorValorDiaria, tag.valorDiaria);
+      }
+    }
+
+    for (const funcionario of this.funcionarios()) {
+      for (const tag of funcionario.tags || []) {
+        const atual = porFuncionario.get(tag.id);
+        if (!atual) {
+          porFuncionario.set(tag.id, {
+            tagId: tag.id,
+            tagNome: tag.nome,
+            funcionariosComTag: 1,
+          });
+          continue;
+        }
+
+        atual.funcionariosComTag += 1;
+      }
+    }
+
+    const ids = new Set<string>([...porContrato.keys(), ...porFuncionario.keys()]);
+    const consolidado: ClienteTagResumo[] = [];
+
+    for (const id of ids) {
+      const contrato = porContrato.get(id);
+      const funcionario = porFuncionario.get(id);
+      consolidado.push({
+        tagId: id,
+        tagNome: contrato?.tagNome || funcionario?.tagNome || 'Tag sem nome',
+        funcionariosComTag: funcionario?.funcionariosComTag || 0,
+        contratosComTag: contrato?.contratosComTag || 0,
+        maiorValorDiaria: contrato?.maiorValorDiaria || 0,
+      });
+    }
+
+    return consolidado.sort((a, b) => a.tagNome.localeCompare(b.tagNome, 'pt-BR'));
+  });
+
+  totalFuncionariosComTag = computed(() => {
+    return this.tagsConsolidadas().reduce((total, tag) => total + tag.funcionariosComTag, 0);
+  });
+
+  totalContratosComTag = computed(() => {
+    return this.tagsConsolidadas().reduce((total, tag) => total + tag.contratosComTag, 0);
   });
 }

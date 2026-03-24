@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container form-page form-page-wide">
   <div class="page-header">
     <div class="header-content">
       <button class="btn-back" routerLink="/alocacoes">
@@ -32,7 +32,7 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
     <div class="form-card">
       @if (isEditMode()) {
-        <div class="alert alert-info" style="margin-bottom: 1rem">
+        <div class="alert alert-info alert-inline">
           Em modo de edição, cliente, posto e contrato ficam bloqueados. Apenas os dados do turno
           podem ser alterados.
         </div>
@@ -88,31 +88,33 @@
         </div>
       </div>
 
-      <h3 class="section-title" style="margin-top: 2rem">Configuração do Turno</h3>
+      <h3 class="section-title section-title-spaced">Configuracao do Turno</h3>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Horário Início <span class="required">*</span></label>
+          <label class="form-label">Horario Inicio <span class="required">*</span></label>
           <input
             type="time"
             formControlName="horarioInicio"
             class="form-input"
             [class.error]="hasError('horarioInicio')"
           />
+          <small class="field-hint">Formato 24h</small>
           @if (hasError('horarioInicio')) {
-            <span class="error-msg">Obrigatório</span>
+            <span class="error-msg">Obrigatorio</span>
           }
         </div>
 
         <div class="form-group">
-          <label class="form-label">Horário Fim <span class="required">*</span></label>
+          <label class="form-label">Horario Fim <span class="required">*</span></label>
           <input
             type="time"
             formControlName="horarioFim"
             class="form-input"
             [class.error]="hasError('horarioFim')"
           />
+          <small class="field-hint">Formato 24h</small>
           @if (hasError('horarioFim')) {
-            <span class="error-msg">Obrigatório</span>
+            <span class="error-msg">Obrigatorio</span>
           }
         </div>
 
@@ -130,7 +132,7 @@
         </div>
       </div>
 
-      <div class="form-group checkbox-group" style="margin-top: 1.5rem">
+      <div class="form-group checkbox-group checkbox-group-spaced">
         <label class="checkbox-label">
           <input type="checkbox" formControlName="permiteDobrarEscala" />
           Permitir dobra nesta escala (Horas Extras)

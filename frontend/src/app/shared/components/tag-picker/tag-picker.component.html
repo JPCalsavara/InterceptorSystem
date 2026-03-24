@@ -1,0 +1,55 @@
+<div class="tag-picker" [class.disabled]="disabled()">
+  <div class="picker-header">
+    <label class="picker-label">{{ label() }}</label>
+    @if (helperText()) {
+      <p class="helper-text">{{ helperText() }}</p>
+    }
+  </div>
+
+  <input
+    type="text"
+    class="search-input"
+    [placeholder]="searchPlaceholder()"
+    [ngModel]="searchTerm()"
+    (ngModelChange)="searchTerm.set($event)"
+    [disabled]="disabled()"
+  />
+
+  @if (selectedTags().length > 0) {
+    <div class="selected-chips">
+      @for (tag of selectedTags(); track tag.id) {
+        <span class="tag-chip" [class.locked]="isLocked(tag.id)">
+          {{ tag.nome }}
+          @if (isLocked(tag.id)) {
+            <small class="chip-note">fixa</small>
+          }
+        </span>
+      }
+    </div>
+  }
+
+  @if (filteredTags().length === 0) {
+    <div class="empty-state">{{ emptyText() }}</div>
+  } @else {
+    <div class="tag-list">
+      @for (tag of filteredTags(); track tag.id) {
+        <button
+          type="button"
+          class="tag-option"
+          [class.selected]="isSelected(tag.id)"
+          [class.locked]="isLocked(tag.id)"
+          [disabled]="disabled()"
+          (click)="toggle(tag.id)"
+        >
+          <span class="check">{{ isSelected(tag.id) ? '✓' : '' }}</span>
+          <span class="content">
+            <strong>{{ tag.nome }}</strong>
+            @if (tag.descricao) {
+              <small>{{ tag.descricao }}</small>
+            }
+          </span>
+        </button>
+      }
+    </div>
+  }
+</div>

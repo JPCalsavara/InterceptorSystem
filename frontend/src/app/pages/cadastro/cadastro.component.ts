@@ -1,14 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
+import { cnpjValidator } from '../../shared/validators/br-documents.validators';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
   template: `
     <div class="landing-page">
       <!-- Hero Section -->
@@ -116,17 +117,19 @@ import { NgxMaskDirective } from 'ngx-mask';
               <p>Comece em menos de 2 minutos</p>
             </div>
 
-            <form class="register-form" (ngSubmit)="onSubmit()" #form="ngForm">
+            <form class="register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
               <div class="form-group">
                 <label for="nomeEmpresa">Nome da empresa</label>
                 <input
                   id="nomeEmpresa"
                   type="text"
-                  name="nomeEmpresa"
-                  [(ngModel)]="nomeEmpresa"
+                  formControlName="nomeEmpresa"
+                  [class.input-error]="hasError('nomeEmpresa')"
                   placeholder="Gestao Facilities Condominial Ltda"
-                  required
                 />
+                @if (hasError('nomeEmpresa')) {
+                  <span class="field-error">{{ getErrorMessage('nomeEmpresa') }}</span>
+                }
               </div>
 
               <div class="form-group">
@@ -134,11 +137,14 @@ import { NgxMaskDirective } from 'ngx-mask';
                 <input
                   id="cnpj"
                   type="text"
-                  name="cnpj"
-                  [(ngModel)]="cnpj"
+                  formControlName="cnpj"
+                  [class.input-error]="hasError('cnpj')"
                   placeholder="00.000.000/0001-00"
                   mask="00.000.000/0000-00"
                 />
+                @if (hasError('cnpj')) {
+                  <span class="field-error">{{ getErrorMessage('cnpj') }}</span>
+                }
               </div>
 
               <div class="form-group">
@@ -146,12 +152,14 @@ import { NgxMaskDirective } from 'ngx-mask';
                 <input
                   id="email"
                   type="email"
-                  name="email"
-                  [(ngModel)]="email"
+                  formControlName="email"
+                  [class.input-error]="hasError('email')"
                   placeholder="contato@empresa.com"
-                  required
                   autocomplete="email"
                 />
+                @if (hasError('email')) {
+                  <span class="field-error">{{ getErrorMessage('email') }}</span>
+                }
               </div>
 
               <div class="form-group">
@@ -160,13 +168,9 @@ import { NgxMaskDirective } from 'ngx-mask';
                   <input
                     id="senha"
                     [type]="mostrarSenha() ? 'text' : 'password'"
-                    name="senha"
-                    [(ngModel)]="senha"
+                    formControlName="senha"
+                    [class.input-error]="hasError('senha')"
                     placeholder="8+ carac., 1 maiúscula, 1 num."
-                    required
-                    minlength="8"
-                    pattern="^(?=.*[A-Z])(?=.*\\d).{8,}$"
-                    title="A senha deve conter pelo menos 8 caracteres, 1 letra maiúscula e 1 número."
                     autocomplete="new-password"
                   />
                   <button
@@ -213,6 +217,9 @@ import { NgxMaskDirective } from 'ngx-mask';
                     }
                   </button>
                 </div>
+                @if (hasError('senha')) {
+                  <span class="field-error">{{ getErrorMessage('senha') }}</span>
+                }
               </div>
 
               @if (erro()) {
@@ -441,7 +448,21 @@ import { NgxMaskDirective } from 'ngx-mask';
             color: var(--text-tertiary);
             opacity: 0.7;
           }
+
+          &.input-error {
+            border-color: #dc2626;
+
+            &:focus {
+              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+            }
+          }
         }
+      }
+
+      .field-error {
+        font-size: var(--text-xs);
+        color: #dc2626;
+        font-weight: var(--fw-medium);
       }
 
       .input-password-wrapper {
@@ -540,10 +561,8 @@ import { NgxMaskDirective } from 'ngx-mask';
   ],
 })
 export class CadastroComponent {
-  nomeEmpresa = '';
-  cnpj = '';
-  email = '';
-  senha = '';
+  private fb = new FormBuilder();
+  form: FormGroup;
   erro = signal<string | null>(null);
   carregando = signal(false);
   mostrarSenha = signal(false);
@@ -551,20 +570,55 @@ export class CadastroComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) {
+    this.form = this.fb.group({
+      nomeEmpresa: ['', [Validators.required, Validators.minLength(3)]],
+      cnpj: ['', [cnpjValidator]],
+      email: ['', [Validators.required, Validators.email]],
+      senha: [
+        '',
+        [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)],
+      ],
+    });
+  }
+
+  hasError(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!field && field.invalid && field.touched;
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    const errors = field.errors;
+
+    if (errors['required']) return 'Este campo é obrigatório';
+    if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
+    if (errors['email']) return 'E-mail inválido';
+    if (errors['cnpjInvalid']) return 'CNPJ inválido (ex: 12.345.678/0001-90)';
+    if (errors['pattern']) return 'A senha deve conter pelo menos 8 caracteres, 1 maiúscula e 1 número';
+
+    return 'Campo inválido';
+  }
 
   onSubmit(): void {
-    if (!this.nomeEmpresa || !this.email || !this.senha) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.erro.set(null);
     this.carregando.set(true);
 
+    const { nomeEmpresa, cnpj, email, senha } = this.form.value;
+
     this.authService
       .registrar({
-        nomeEmpresa: this.nomeEmpresa,
-        cnpj: this.cnpj || undefined,
-        email: this.email,
-        senha: this.senha,
+        nomeEmpresa,
+        cnpj: cnpj || undefined,
+        email,
+        senha,
       })
       .subscribe({
         next: () => this.router.navigate(['/dashboard']),

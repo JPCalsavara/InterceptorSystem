@@ -8,7 +8,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
-          style="color: var(--primary-color); width: 1em; height: 1em"
+          class="page-title-icon"
         >
           <path
             stroke-linecap="round"
@@ -116,117 +116,131 @@
   <!-- Filtros (apenas para diário) -->
   @if (viewMode() === 'daily') {
     <div class="filters-section">
-      <div class="filter-group">
-        <label>Data Início:</label>
-        <input
-          type="date"
-          [ngModel]="filtroDataInicio()"
-          (ngModelChange)="filtroDataInicio.set($event)"
-          class="form-control"
-        />
-      </div>
-
-      <div class="filter-group">
-        <label>Data Fim:</label>
-        <input
-          type="date"
-          [ngModel]="filtroDataFim()"
-          (ngModelChange)="filtroDataFim.set($event)"
-          class="form-control"
-        />
-      </div>
-
-      @if (!clienteIdFixed()) {
+      <h3 class="filters-title">
+        <svg class="filters-title-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Filtros
+      </h3>
+      <div class="filters-grid diaria-filters-grid">
         <div class="filter-group">
-          <label>Cliente:</label>
+          <label class="filter-label">Data Início:</label>
+          <input
+            type="date"
+            [ngModel]="filtroDataInicio()"
+            (ngModelChange)="filtroDataInicio.set($event)"
+            class="filter-select"
+          />
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Data Fim:</label>
+          <input
+            type="date"
+            [ngModel]="filtroDataFim()"
+            (ngModelChange)="filtroDataFim.set($event)"
+            class="filter-select"
+          />
+        </div>
+
+        @if (!clienteIdFixed()) {
+          <div class="filter-group">
+            <label class="filter-label">Cliente:</label>
+            <select
+              [ngModel]="filtroClienteId()"
+              (ngModelChange)="filtroClienteId.set($event)"
+              class="filter-select"
+            >
+              <option value="">Todos</option>
+              @for (cond of clientes(); track cond.id) {
+                <option [value]="cond.id">{{ cond.nome }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <div class="filter-group">
+          <label class="filter-label">Funcionário:</label>
           <select
-            [ngModel]="filtroClienteId()"
-            (ngModelChange)="filtroClienteId.set($event)"
-            class="form-control"
+            [ngModel]="filtroFuncionarioId()"
+            (ngModelChange)="filtroFuncionarioId.set($event)"
+            class="filter-select"
           >
             <option value="">Todos</option>
-            @for (cond of clientes(); track cond.id) {
-              <option [value]="cond.id">{{ cond.nome }}</option>
+            @for (func of funcionarios(); track func.id) {
+              <option [value]="func.id">{{ func.nome }}</option>
             }
           </select>
         </div>
-      }
 
-      <div class="filter-group">
-        <label>Funcionário:</label>
-        <select
-          [ngModel]="filtroFuncionarioId()"
-          (ngModelChange)="filtroFuncionarioId.set($event)"
-          class="form-control"
-        >
-          <option value="">Todos</option>
-          @for (func of funcionarios(); track func.id) {
-            <option [value]="func.id">{{ func.nome }}</option>
-          }
-        </select>
-      </div>
+        <div class="filter-group">
+          <label class="filter-label">Status:</label>
+          <select
+            [ngModel]="filtroStatus()"
+            (ngModelChange)="filtroStatus.set($event)"
+            class="filter-select"
+          >
+            <option value="">Todos</option>
+            <option value="CONFIRMADA">Confirmada</option>
+            <option value="CANCELADA">Cancelamento</option>
+            <option value="FALTA_REGISTRADA">Falta</option>
+          </select>
+        </div>
 
-      <div class="filter-group">
-        <label>Status:</label>
-        <select
-          [ngModel]="filtroStatus()"
-          (ngModelChange)="filtroStatus.set($event)"
-          class="form-control"
-        >
-          <option value="">Todos</option>
-          <option value="CONFIRMADA">Confirmada</option>
-          <option value="CANCELADA">Cancelamento</option>
-          <option value="FALTA_REGISTRADA">Falta</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label>Tipo:</label>
-        <select
-          [ngModel]="filtroTipo()"
-          (ngModelChange)="filtroTipo.set($event)"
-          class="form-control"
-        >
-          <option value="">Todos</option>
-          <option value="REGULAR">Regular</option>
-          <option value="DOBRA_PROGRAMADA">Diária Extra</option>
-          <option value="SUBSTITUICAO">Substituição</option>
-        </select>
+        <div class="filter-group">
+          <label class="filter-label">Tipo:</label>
+          <select
+            [ngModel]="filtroTipo()"
+            (ngModelChange)="filtroTipo.set($event)"
+            class="filter-select"
+          >
+            <option value="">Todos</option>
+            <option value="REGULAR">Regular</option>
+            <option value="DOBRA_PROGRAMADA">Diária Extra</option>
+            <option value="SUBSTITUICAO">Substituição</option>
+          </select>
+        </div>
       </div>
     </div>
   }
 
   <!-- Filtros simplificados (para semanal e mensal) -->
   @if (viewMode() !== 'daily') {
-    <div class="filters-section-simple">
-      @if (!clienteIdFixed()) {
+    <div class="filters-section">
+      <div class="filters-grid diaria-filters-grid-simple">
+        @if (!clienteIdFixed()) {
+          <div class="filter-group">
+            <label class="filter-label">Cliente:</label>
+            <select
+              [ngModel]="filtroClienteId()"
+              (ngModelChange)="filtroClienteId.set($event)"
+              class="filter-select"
+            >
+              <option value="">Todos</option>
+              @for (cond of clientes(); track cond.id) {
+                <option [value]="cond.id">{{ cond.nome }}</option>
+              }
+            </select>
+          </div>
+        }
+
         <div class="filter-group">
-          <label>Cliente:</label>
+          <label class="filter-label">Status:</label>
           <select
-            [ngModel]="filtroClienteId()"
-            (ngModelChange)="filtroClienteId.set($event)"
-            class="form-control"
+            [ngModel]="filtroStatus()"
+            (ngModelChange)="filtroStatus.set($event)"
+            class="filter-select"
           >
             <option value="">Todos</option>
-            @for (cond of clientes(); track cond.id) {
-              <option [value]="cond.id">{{ cond.nome }}</option>
-            }
+            <option value="CONFIRMADA">Confirmada</option>
+            <option value="CANCELADA">Cancelamento</option>
+            <option value="FALTA_REGISTRADA">Falta</option>
           </select>
         </div>
-      }
-
-      <div class="filter-group">
-        <label>Status:</label>
-        <select
-          [ngModel]="filtroStatus()"
-          (ngModelChange)="filtroStatus.set($event)"
-          class="form-control"
-        >
-          <option value="">Todos</option>
-          <option value="CONFIRMADA">Confirmada</option>
-          <option value="CANCELADA">Cancelamento</option>
-          <option value="FALTA_REGISTRADA">Falta</option>
-        </select>
       </div>
     </div>
   }
@@ -245,7 +259,6 @@
       <button class="alert-close" (click)="dismissSuccess()">×</button>
     </div>
   }
-
   <!-- Error Message -->
   @if (error()) {
     <div class="alert alert-error">
@@ -283,7 +296,16 @@
         </svg>
         <h3>Nenhuma diária encontrada</h3>
         <p>Não há diárias cadastradas para os filtros selecionados.</p>
-        <button class="btn-primary" [routerLink]="[baseRoute(), 'novo']">Nova Diária</button>
+        <button class="btn-primary btn-md" [routerLink]="[baseRoute(), 'novo']">
+          <svg viewBox="0 0 20 20" fill="currentColor" style="width: 1em; height: 1em">
+            <path
+              fill-rule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Nova Diária
+        </button>
       </div>
     }
 

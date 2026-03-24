@@ -1,42 +1,9 @@
-.page-container {
-  padding: 2rem;
-  padding-top: calc(2rem + var(--space-6));
-  max-width: 1600px;
-  margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: var(--space-4);
-    padding-top: calc(var(--space-4) + var(--space-6));
-  }
-}
-
-.page-header {
-  margin-bottom: var(--space-8);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  h1 {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    font-size: var(--text-3xl);
-    font-weight: var(--fw-bold);
-    color: var(--text-primary);
-    margin: 0;
-  }
-
-  .subtitle {
-    color: var(--text-secondary);
-    margin-top: var(--space-1);
-  }
-}
+/* Shared page-container, page-header and header-content live in src/styles/_shared-pages.scss */
 
 .header-actions {
   display: flex;
   gap: 1rem;
   align-items: center;
-  padding-top: 1rem;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -124,28 +91,8 @@
   gap: var(--space-2);
 }
 
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-card);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    color: var(--error-color);
-    background: var(--error-bg);
-    border-color: var(--error-color);
-  }
-}
-
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -158,9 +105,18 @@
   text-align: center;
   padding: var(--space-12);
 
-  h3 { color: var(--text-primary); margin: 0; }
-  p { color: var(--text-secondary); margin: 0; }
-  span { font-size: var(--text-xs); color: var(--text-tertiary); }
+  h3 {
+    color: var(--text-primary);
+    margin: 0;
+  }
+  p {
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  span {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+  }
 }
 
 .spinner {
@@ -173,5 +129,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
