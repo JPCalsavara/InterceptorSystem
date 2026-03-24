@@ -207,37 +207,37 @@
         </button>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="save()" class="modal-form">
+      <form [formGroup]="form" (ngSubmit)="save()" class="modal-form form-page">
         <div class="form-group">
-          <label for="nome">Nome <span class="required">*</span></label>
+          <label for="nome" class="form-label">Nome <span class="required">*</span></label>
           <input
             id="nome"
             type="text"
             formControlName="nome"
             placeholder="Ex: PM, Vigia Avulso, Supervisor..."
             class="form-input"
-            [class.is-invalid]="form.controls.nome.invalid && form.controls.nome.touched"
+            [class.error]="form.controls.nome.invalid && form.controls.nome.touched"
           />
           @if (form.controls.nome.errors?.['required'] && form.controls.nome.touched) {
-            <span class="field-error">Nome é obrigatório.</span>
+            <span class="error-message">Nome é obrigatório.</span>
           }
           @if (form.controls.nome.errors?.['maxlength'] && form.controls.nome.touched) {
-            <span class="field-error">Máximo 100 caracteres.</span>
+            <span class="error-message">Máximo 100 caracteres.</span>
           }
         </div>
 
         <div class="form-group">
-          <label for="descricao">Descrição</label>
+          <label for="descricao" class="form-label">Descrição</label>
           <textarea
             id="descricao"
             formControlName="descricao"
             rows="3"
             placeholder="Descreva a função ou característica desta tag (opcional)"
             class="form-input"
-            [class.is-invalid]="form.controls.descricao.invalid && form.controls.descricao.touched"
+            [class.error]="form.controls.descricao.invalid && form.controls.descricao.touched"
           ></textarea>
           @if (form.controls.descricao.errors?.['maxlength'] && form.controls.descricao.touched) {
-            <span class="field-error">Máximo 500 caracteres.</span>
+            <span class="error-message">Máximo 500 caracteres.</span>
           }
         </div>
 
