@@ -685,18 +685,24 @@ POST   /api/contrato-calculos/calcular-valor-total
 ## ⏭️ Próximos Passos
 
 ### 🎨 Padronização de UI e Design System
-- [ ] Implementar as 8 Fases do `REFACTORING_PLAN.md` (Sidebars, Navbar, Dashboards)
-- [ ] Aplicar tokens semânticos rigorosos (cores, tipografia, espaçamentos) em todos os forms e details
-- [ ] Padronizar tratamento de erros e SVGs inline (`REVIEW_A1_ANGULAR_COMPONENTS.md`)
-- [ ] Garantir responsividade fluida via mixins/breakpoints em telas de detalhes (Mobile/Tablet)
+- [x] Implementar as 8 Fases do `REFACTORING_PLAN.md` (Sidebars, Navbar, Dashboards)
+- [x] Aplicar tokens semânticos rigorosos (cores, tipografia, espaçamentos) em todos os forms e details
+- [x] Padronizar tratamento de erros e SVGs inline (`REVIEW_A1_ANGULAR_COMPONENTS.md`)
+- [x] Garantir responsividade fluida via mixins/breakpoints em telas de detalhes (Mobile/Tablet)
 
 ### 🔧 Dívida Técnica / Refatoração
-- [ ] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (em todo o sistema)
-- [ ] Endpoint de Interesse (`InterestController` + Sender de E-mail) — backend restante da Phase 5
-- [ ] Domain Events na infraestrutura usando MediatR (`docs/refactory/logic-refactory.md`)
+- [x] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (em todo o sistema)
+- [x] Endpoint de Interesse (`InterestController` + Sender de E-mail) — backend restante da Phase 5
+- [x] Domain Events na infraestrutura usando MediatR (`docs/refactory/logic-refactory.md`)
 - [ ] CQRS para relatórios financeiros pesados
 - [x] Cache Coordenador no frontend c/ invalidação por dependência (Concluído)
 - [x] Refatoração de Domínio (Turnos Flexíveis, Alocações, Entidade Tag) (Concluído)
+
+### 💼 UX & Business Logic
+- [ ] UX Form Contratos: layout aprimorado para adicionar múltiplas ContratoTags rapidamente
+- [ ] Contratos: Exibição de totais mensais dinâmicos ao invés de anual
+- [ ] Dashboard Super-Admin: Gráficos de receita consolidada, margens e saving do cliente
+- [ ] Preview de escalonamento mensal de diárias baseadas no calendário do funcionário
 
 ### 🧪 Qualidade
 - [ ] Testes E2E com Playwright
@@ -723,11 +729,7 @@ POST   /api/contrato-calculos/calcular-valor-total
 - [ ] Analytics: Diárias agendadas vs Ponto executado
 - [ ] Score de assiduidade de colaboradores
 
-### 💼 UX & Business Logic
-- [ ] UX Form Contratos: layout aprimorado para adicionar múltiplas ContratoTags rapidamente
-- [ ] Contratos: Exibição de totais mensais dinâmicos ao invés de anual
-- [ ] Dashboard Super-Admin: Gráficos de receita consolidada, margens e saving do cliente
-- [ ] Preview de escalonamento mensal de diárias baseadas no calendário do funcionário
+
 
 ---
 
