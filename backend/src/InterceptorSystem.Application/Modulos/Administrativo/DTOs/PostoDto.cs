@@ -46,7 +46,7 @@ public record PostoDto(
             posto.Id,
             posto.ClienteId,
             posto.Nome,
-            posto.Cep,
+            posto.Cep.Valor,
             posto.Endereco,
             posto.Numero,
             posto.Complemento,

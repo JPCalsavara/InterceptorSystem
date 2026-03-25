@@ -1,5 +1,6 @@
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Domain.Common.ValueObjects;
 using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
@@ -8,7 +9,7 @@ public class Posto : Entity, IAggregateRoot
 {
     public Guid ClienteId { get; private set; }
     public string Nome { get; private set; } = null!;
-    public string Cep { get; private set; } = null!;
+    public Cep Cep { get; private set; } = null!;
     public string Endereco { get; private set; } = null!;
     public string Numero { get; private set; } = null!;
     public string? Complemento { get; private set; }
@@ -33,22 +34,19 @@ public class Posto : Entity, IAggregateRoot
         string cidade,
         string estado)
     {
-        CheckRule(clienteId == Guid.Empty, "O Posto deve pertencer a um Cliente.");
-        CheckRule(empresaId == Guid.Empty, "O Posto deve pertencer a uma Empresa.");
-        CheckRule(string.IsNullOrWhiteSpace(nome), "Nome é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(cep), "CEP é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(endereco), "Endereço é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(numero), "Número é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(cidade), "Cidade é obrigatória.");
-        CheckRule(string.IsNullOrWhiteSpace(estado), "Estado é obrigatório.");
-
-        var normalizedCep = NormalizeCep(cep);
-        CheckRule(normalizedCep.Length != 8, "CEP deve conter 8 dígitos.");
+        Enforce(clienteId != Guid.Empty, "O Posto deve pertencer a um Cliente.");
+        Enforce(empresaId != Guid.Empty, "O Posto deve pertencer a uma Empresa.");
+        Enforce(!string.IsNullOrWhiteSpace(nome), "Nome é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(cep), "CEP é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(endereco), "Endereço é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(numero), "Número é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(cidade), "Cidade é obrigatória.");
+        Enforce(!string.IsNullOrWhiteSpace(estado), "Estado é obrigatório.");
 
         ClienteId = clienteId;
         EmpresaId = empresaId;
         Nome = nome.Trim();
-        Cep = normalizedCep;
+        Cep = Cep.Criar(cep);
         Endereco = endereco.Trim();
         Numero = numero.Trim();
         Complemento = string.IsNullOrWhiteSpace(complemento) ? null : complemento.Trim();
@@ -68,18 +66,15 @@ public class Posto : Entity, IAggregateRoot
         string cidade,
         string estado)
     {
-        CheckRule(string.IsNullOrWhiteSpace(nome), "Nome é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(cep), "CEP é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(endereco), "Endereço é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(numero), "Número é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(cidade), "Cidade é obrigatória.");
-        CheckRule(string.IsNullOrWhiteSpace(estado), "Estado é obrigatório.");
-
-        var normalizedCep = NormalizeCep(cep);
-        CheckRule(normalizedCep.Length != 8, "CEP deve conter 8 dígitos.");
+        Enforce(!string.IsNullOrWhiteSpace(nome), "Nome é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(cep), "CEP é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(endereco), "Endereço é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(numero), "Número é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(cidade), "Cidade é obrigatória.");
+        Enforce(!string.IsNullOrWhiteSpace(estado), "Estado é obrigatório.");
 
         Nome = nome.Trim();
-        Cep = normalizedCep;
+        Cep = Cep.Criar(cep);
         Endereco = endereco.Trim();
         Numero = numero.Trim();
         Complemento = string.IsNullOrWhiteSpace(complemento) ? null : complemento.Trim();
@@ -102,10 +97,5 @@ public class Posto : Entity, IAggregateRoot
             Tags.Add(tag);
 
         AddDomainEvent(new PostoUpdatedEvent(EmpresaId, Id, ClienteId));
-    }
-
-    private static string NormalizeCep(string cep)
-    {
-        return new string(cep.Where(char.IsDigit).ToArray());
     }
 }

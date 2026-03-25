@@ -1,4 +1,5 @@
 using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Domain.Common.ValueObjects;
 using InterceptorSystem.Domain.Modulos.Auth.Enums;
 
 namespace InterceptorSystem.Domain.Modulos.Auth.Entidades;
@@ -11,7 +12,7 @@ namespace InterceptorSystem.Domain.Modulos.Auth.Entidades;
 public class Conta : IAggregateRoot
 {
     public Guid Id { get; private set; }
-    public string Email { get; private set; } = null!;
+    public Email Email { get; private set; } = null!;
     public string SenhaHash { get; private set; } = null!;
     public string NomeEmpresa { get; private set; } = null!;
     public string? Cnpj { get; private set; }
@@ -28,17 +29,13 @@ public class Conta : IAggregateRoot
 
     public Conta(string email, string senhaHash, string nomeEmpresa, string? cnpj = null)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new InvalidOperationException("O e-mail é obrigatório.");
-        if (!ValidarFormatoEmail(email))
-            throw new InvalidOperationException("O formato do e-mail é inválido.");
         if (string.IsNullOrWhiteSpace(senhaHash))
             throw new InvalidOperationException("A senha é obrigatória.");
         if (string.IsNullOrWhiteSpace(nomeEmpresa))
             throw new InvalidOperationException("O nome da empresa é obrigatório.");
 
         Id = Guid.NewGuid();
-        Email = email.ToLower().Trim();
+        Email = Email.Criar(email);
         SenhaHash = senhaHash;
         NomeEmpresa = nomeEmpresa;
         Cnpj = cnpj;
@@ -59,11 +56,7 @@ public class Conta : IAggregateRoot
 
     public void AtualizarEmail(string novoEmail)
     {
-        if (string.IsNullOrWhiteSpace(novoEmail))
-            throw new InvalidOperationException("O e-mail é obrigatório.");
-        if (!ValidarFormatoEmail(novoEmail))
-            throw new InvalidOperationException("O formato do e-mail é inválido.");
-        Email = novoEmail.ToLower().Trim();
+        Email = Email.Criar(novoEmail);
     }
 
     public void AtualizarSenha(string novaSenhaHash)
@@ -97,18 +90,14 @@ public class Conta : IAggregateRoot
 
     public void IniciarAlteracaoEmail(string novoEmail)
     {
-        if (string.IsNullOrWhiteSpace(novoEmail))
-            throw new InvalidOperationException("O e-mail é obrigatório.");
-        if (!ValidarFormatoEmail(novoEmail))
-            throw new InvalidOperationException("O formato do e-mail é inválido.");
-        EmailPendente = novoEmail.ToLower().Trim();
+        EmailPendente = Email.Criar(novoEmail).Valor;
     }
 
     public void ConfirmarAlteracaoEmail()
     {
         if (string.IsNullOrWhiteSpace(EmailPendente))
             throw new InvalidOperationException("Não há alteração de e-mail pendente.");
-        Email = EmailPendente;
+        Email = Email.Criar(EmailPendente);
         EmailPendente = null;
         EmailVerificado = true;
     }
@@ -126,21 +115,5 @@ public class Conta : IAggregateRoot
         if (string.IsNullOrWhiteSpace(Telefone))
             throw new InvalidOperationException("Nenhum telefone cadastrado para verificar.");
         TelefoneVerificado = true;
-    }
-
-    /// <summary>
-    /// Valida formato básico de e-mail usando System.Net.Mail.MailAddress.
-    /// </summary>
-    private static bool ValidarFormatoEmail(string email)
-    {
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address == email.Trim();
-        }
-        catch
-        {
-            return false;
-        }
     }
 }

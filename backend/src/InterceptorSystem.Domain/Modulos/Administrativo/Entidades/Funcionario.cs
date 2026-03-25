@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Domain.Common.ValueObjects;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
 using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
@@ -11,8 +12,8 @@ public class Funcionario : Entity, IAggregateRoot
     public Guid? ClienteId { get; private set; }
     public Guid ContratoId { get; private set; }
     public string Nome { get; private set; } = null!;
-    public string Cpf { get; private set; } = null!;
-    public string Celular { get; private set; } = null!;
+    public Cpf Cpf { get; private set; } = null!;
+    public Telefone Celular { get; private set; } = null!;
     public StatusFuncionario StatusFuncionario { get; private set; }
     public TipoEscala TipoEscala { get; private set; }
     public TipoFuncionario TipoFuncionario { get; private set; }
@@ -84,22 +85,21 @@ public class Funcionario : Entity, IAggregateRoot
         TipoEscala tipoEscala,
         TipoFuncionario tipoFuncionario)
     {
-        CheckRule(empresaId == Guid.Empty, "O funcionário deve pertencer a uma empresa.");
-        CheckRule(contratoId == Guid.Empty, "O funcionário deve estar vinculado a um contrato.");
-        CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
-        CheckRule(!ValidarFormatoCpf(cpf), "CPF deve conter exatamente 11 dígitos numéricos.");
-        CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
-        CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
+        Enforce(empresaId != Guid.Empty, "O funcionário deve pertencer a uma empresa.");
+        Enforce(contratoId != Guid.Empty, "O funcionário deve estar vinculado a um contrato.");
+        Enforce(!string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
+        Enforce(Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
+        Enforce(Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
+        Enforce(Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
 
         EmpresaId = empresaId;
         ClienteId = clienteId;
         ContratoId = contratoId;
         Nome = nome;
-        Cpf = ExtrairDigitos(cpf);
-        Celular = celular;
+        Cpf = Cpf.Criar(cpf);
+        Celular = Telefone.Criar(celular);
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
@@ -114,14 +114,14 @@ public class Funcionario : Entity, IAggregateRoot
         TipoEscala tipoEscala,
         TipoFuncionario tipoFuncionario)
     {
-        CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
-        CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
+        Enforce(Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
+        Enforce(Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
+        Enforce(Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
 
         Nome = nome;
-        Celular = celular;
+        Celular = Telefone.Criar(celular);
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
@@ -146,21 +146,4 @@ public class Funcionario : Entity, IAggregateRoot
         AddDomainEvent(new FuncionarioDeletedEvent(EmpresaId, Id, ClienteId));
     }
 
-    /// <summary>
-    /// Valida o formato do CPF (11 dígitos numéricos após remoção de máscara).
-    /// </summary>
-    private static bool ValidarFormatoCpf(string cpf)
-    {
-        if (string.IsNullOrWhiteSpace(cpf)) return false;
-        var digitos = ExtrairDigitos(cpf);
-        return digitos.Length == 11;
-    }
-
-    /// <summary>
-    /// Extrai apenas os dígitos numéricos de uma string (remove pontos, traços, barras).
-    /// </summary>
-    private static string ExtrairDigitos(string valor)
-    {
-        return new string(valor.Where(char.IsDigit).ToArray());
-    }
 }

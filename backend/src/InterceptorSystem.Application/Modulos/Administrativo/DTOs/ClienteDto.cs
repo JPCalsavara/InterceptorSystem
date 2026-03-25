@@ -44,13 +44,13 @@ public record ClienteDtoOutput(
         return new ClienteDtoOutput(
             entity.Id, 
             entity.Nome, 
-            entity.Cnpj,
+            entity.Cnpj.Valor,
             entity.Cidade, 
             entity.Estado, 
             entity.Ativo,
             entity.QuantidadeIdealPorTurno,
             entity.HorarioTrocaTurno.ToString("HH:mm:ss"),
-            entity.EmailGestor,
-            entity.TelefoneEmergencia);
+            entity.EmailGestor?.Valor,
+            entity.TelefoneEmergencia?.Valor);
     }
 }

@@ -58,10 +58,10 @@ public class AuthAppService : IAuthAppService
         await _tokenRepository.CommitAsync();
 
         var link = ConstruirLink("verificar-email", tokenStr);
-        await _emailService.EnviarVerificacaoEmailAsync(conta.Email, conta.NomeEmpresa, link);
+        await _emailService.EnviarVerificacaoEmailAsync(conta.Email.Valor, conta.NomeEmpresa, link);
 
         var jwtToken = _jwtTokenService.GerarToken(conta);
-        return new AuthResultDtoOutput(conta.Id, conta.NomeEmpresa, conta.Email, conta.Plano, jwtToken, conta.EmailVerificado);
+        return new AuthResultDtoOutput(conta.Id, conta.NomeEmpresa, conta.Email.Valor, conta.Plano, jwtToken, conta.EmailVerificado);
     }
 
     public async Task<AuthResultDtoOutput> LoginAsync(LoginDtoInput input)
@@ -74,7 +74,7 @@ public class AuthAppService : IAuthAppService
             throw new UnauthorizedAccessException("Esta conta está desativada.");
 
         var token = _jwtTokenService.GerarToken(conta);
-        return new AuthResultDtoOutput(conta.Id, conta.NomeEmpresa, conta.Email, conta.Plano, token, conta.EmailVerificado);
+        return new AuthResultDtoOutput(conta.Id, conta.NomeEmpresa, conta.Email.Valor, conta.Plano, token, conta.EmailVerificado);
     }
 
     public async Task<ContaPerfilDtoOutput> GetContaAsync(Guid empresaId)
@@ -85,7 +85,7 @@ public class AuthAppService : IAuthAppService
         return new ContaPerfilDtoOutput(
             conta.Id,
             conta.NomeEmpresa,
-            conta.Email,
+            conta.Email.Valor,
             conta.Cnpj,
             conta.Plano.ToString(),
             conta.CreatedAt
@@ -122,7 +122,7 @@ public class AuthAppService : IAuthAppService
         return new ContaPerfilDtoOutput(
             conta.Id,
             conta.NomeEmpresa,
-            conta.Email,
+            conta.Email.Valor,
             conta.Cnpj,
             conta.Plano.ToString(),
             conta.CreatedAt
@@ -163,7 +163,7 @@ public class AuthAppService : IAuthAppService
         await _tokenRepository.CommitAsync();
 
         var link = ConstruirLink("verificar-email", tokenStr);
-        await _emailService.EnviarVerificacaoEmailAsync(conta.Email, conta.NomeEmpresa, link);
+        await _emailService.EnviarVerificacaoEmailAsync(conta.Email.Valor, conta.NomeEmpresa, link);
     }
 
     public async Task SolicitarResetSenhaAsync(SolicitarResetSenhaDtoInput input)
@@ -180,7 +180,7 @@ public class AuthAppService : IAuthAppService
         await _tokenRepository.CommitAsync();
 
         var link = ConstruirLink("nova-senha", tokenStr);
-        await _emailService.EnviarResetSenhaAsync(conta.Email, conta.NomeEmpresa, link);
+        await _emailService.EnviarResetSenhaAsync(conta.Email.Valor, conta.NomeEmpresa, link);
     }
 
     public async Task ConfirmarResetSenhaAsync(ConfirmarResetSenhaDtoInput input)

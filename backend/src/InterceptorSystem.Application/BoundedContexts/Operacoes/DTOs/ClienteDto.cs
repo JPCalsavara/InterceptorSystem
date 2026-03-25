@@ -1,0 +1,56 @@
+namespace InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+
+public record UpdateClienteDtoInput(
+    string Nome, 
+    string Cnpj,
+    string Cidade,
+    string Estado,
+    int QuantidadeIdealPorTurno = 2,
+    string HorarioTrocaTurno = "06:00:00",
+    string? EmailGestor = null,
+    string? TelefoneEmergencia = null);
+
+public record CreateClienteDtoInput(
+    string Nome, 
+    string Cnpj,
+    string Cidade,
+    string Estado,
+    int QuantidadeIdealPorTurno = 2,
+    string HorarioTrocaTurno = "06:00:00",
+    string? EmailGestor = null,
+    string? TelefoneEmergencia = null);
+
+public record ClienteDtoOutput(
+    Guid Id, 
+    string Nome, 
+    string Cnpj,
+    string Cidade, 
+    string Estado, 
+    bool Ativo,
+    int QuantidadeIdealPorTurno,
+    string HorarioTrocaTurno,
+    string? EmailGestor,
+    string? TelefoneEmergencia)
+{
+    // SIMULAÇÃO AUTOMAPPER (Manual Mapping)
+    // Método estático factory para converter Entidade -> DTO
+    public static ClienteDtoOutput? FromEntity(Domain.BoundedContexts.Operacoes.Aggregates.Cliente? entity)
+    {
+        if (entity == null)
+        {
+            return null;
+        }
+
+        return new ClienteDtoOutput(
+            entity.Id, 
+            entity.Nome, 
+            entity.Cnpj.Valor,
+            entity.Cidade, 
+            entity.Estado, 
+            entity.Ativo,
+            entity.QuantidadeIdealPorTurno,
+            entity.HorarioTrocaTurno.ToString("HH:mm:ss"),
+            entity.EmailGestor?.Valor,
+            entity.TelefoneEmergencia?.Valor);
+    }
+}
