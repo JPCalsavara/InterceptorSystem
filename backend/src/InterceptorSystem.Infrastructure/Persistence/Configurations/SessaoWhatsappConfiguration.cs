@@ -1,5 +1,5 @@
-using InterceptorSystem.Domain.Modulos.Whatsapp.Entidades;
-using InterceptorSystem.Domain.Modulos.Whatsapp.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,5 +1,5 @@
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using InterceptorSystem.Domain.Modulos.Auth.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,11 +13,15 @@ public class ContaConfiguration : IEntityTypeConfiguration<Conta>
 
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Email)
-            .IsRequired()
-            .HasMaxLength(255);
+        builder.OwnsOne(c => c.Email, email =>
+        {
+            email.Property(e => e.Valor)
+                .HasColumnName("Email")
+                .IsRequired()
+                .HasMaxLength(255);
+        });
 
-        builder.HasIndex(c => c.Email).IsUnique();
+        // TODO: Reintroduzir indice unico de email via migration SQL para owned type.
 
         builder.Property(c => c.SenhaHash)
             .IsRequired()

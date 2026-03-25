@@ -1,4 +1,4 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,9 +17,13 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
             .IsRequired()
             .HasMaxLength(150);
 
-        builder.Property(c => c.Cnpj)
-            .IsRequired()
-            .HasMaxLength(14); // Exactly 14 for numbers only, but let's just make it 14
+        builder.OwnsOne(c => c.Cnpj, cnpj =>
+        {
+            cnpj.Property(v => v.Valor)
+                .HasColumnName("Cnpj")
+                .IsRequired()
+                .HasMaxLength(14);
+        });
 
         builder.Property(c => c.Cidade)
             .IsRequired()
@@ -32,11 +36,21 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
         // Configuração do Multi-tenancy (EmpresaId é obrigatório)
         builder.Property(c => c.EmpresaId).IsRequired();
         
-        builder.Property(c => c.EmailGestor)
-            .HasMaxLength(100);
-        
-        builder.Property(c => c.TelefoneEmergencia)
-            .HasMaxLength(20);
+        builder.OwnsOne(c => c.EmailGestor, email =>
+        {
+            email.Property(v => v.Valor)
+                .HasColumnName("EmailGestor")
+                .HasMaxLength(255)
+                .IsRequired(false);
+        });
+
+        builder.OwnsOne(c => c.TelefoneEmergencia, telefone =>
+        {
+            telefone.Property(v => v.Valor)
+                .HasColumnName("TelefoneEmergencia")
+                .HasMaxLength(11)
+                .IsRequired(false);
+        });
         
         builder.Property(c => c.QuantidadeIdealPorTurno)
             .IsRequired()
@@ -48,8 +62,8 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
         
         builder.HasIndex(c => c.Nome);
         builder.HasIndex(c => c.EmpresaId);
-        
-        // Cnpj Único por Empresa
-        builder.HasIndex(c => new { c.EmpresaId, c.Cnpj }).IsUnique();
+
+        // TODO: Reintroduzir indice unico de CNPJ por empresa via migration SQL
+        // quando o mapeamento de owned type suportar composite index de forma consistente.
     }
 }

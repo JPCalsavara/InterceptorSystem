@@ -1,5 +1,5 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,10 +13,18 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.HasKey(f => f.Id);
 
         builder.Property(f => f.Nome).IsRequired().HasMaxLength(250);
-        builder.Property(f => f.Cpf).IsRequired().HasMaxLength(14);
-        builder.HasIndex(f => f.Cpf).IsUnique();
 
-        builder.Property(f => f.Celular).IsRequired().HasMaxLength(30);
+        builder.OwnsOne(f => f.Cpf, cpf =>
+        {
+            cpf.Property(c => c.Valor).HasColumnName("Cpf").IsRequired().HasMaxLength(11);
+        });
+
+        builder.OwnsOne(f => f.Celular, tel =>
+        {
+            tel.Property(t => t.Valor).HasColumnName("Celular").IsRequired().HasMaxLength(11);
+        });
+
+        // TODO: Reintroduzir indice unico de CPF via migration SQL para owned type.
 
         builder.Property(f => f.StatusFuncionario)
             .IsRequired()

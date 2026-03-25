@@ -1,4 +1,4 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,7 +12,12 @@ public class PostoConfiguration : IEntityTypeConfiguration<Posto>
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Nome).IsRequired().HasMaxLength(150);
-        builder.Property(p => p.Cep).IsRequired().HasMaxLength(8);
+
+        builder.OwnsOne(p => p.Cep, cep =>
+        {
+            cep.Property(c => c.Valor).HasColumnName("Cep").IsRequired().HasMaxLength(8);
+        });
+
         builder.Property(p => p.Endereco).IsRequired().HasMaxLength(250);
         builder.Property(p => p.Numero).IsRequired().HasMaxLength(20);
         builder.Property(p => p.Complemento).HasMaxLength(120);

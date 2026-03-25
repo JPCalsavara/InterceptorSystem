@@ -1,4 +1,4 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

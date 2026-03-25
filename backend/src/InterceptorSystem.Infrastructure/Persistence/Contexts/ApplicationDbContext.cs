@@ -1,10 +1,11 @@
 using System.Reflection;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Domain.Common;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using InterceptorSystem.Domain.Modulos.Whatsapp.Entidades;
+using InterceptorSystem.Domain.SharedKernel;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Aggregates;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -75,7 +76,7 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     }
 
     // --- Interceptação do SaveChanges (Regras de Escrita) ---
-    public async Task<bool> CommitAsync()
+    public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
     {
         // Antes de salvar no banco, injetamos regras automáticas
         foreach (var entry in ChangeTracker.Entries<Entity>())
@@ -103,7 +104,15 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
             .ToList();
 
         // Persiste no banco
-        var result = await base.SaveChangesAsync();
+        int result;
+        try
+        {
+            result = await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (IsForeignKeyViolation(ex))
+        {
+            throw new EntityInUseException("Não é possível remover a entidade pois está vinculada a outros registros.", ex);
+        }
         
         // Dispara os eventos de domínio via MediatR
         if (entitiesWithEvents.Any())
@@ -117,7 +126,7 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
 
             foreach (var domainEvent in events)
             {
-                await _mediator.Publish(domainEvent);
+                await _mediator.Publish(domainEvent, cancellationToken);
             }
         }
 
@@ -126,24 +135,38 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
 
     // --- Suporte a Transações Explícitas (BL-9) ---
     
-    public async Task BeginTransactionAsync()
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
         if (Database.CurrentTransaction != null) return; // Já dentro de transação
-        await Database.BeginTransactionAsync();
+        await Database.BeginTransactionAsync(cancellationToken);
     }
 
-    public async Task CommitTransactionAsync()
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
         if (Database.CurrentTransaction == null) return;
-        await Database.CommitTransactionAsync();
+        await Database.CommitTransactionAsync(cancellationToken);
     }
 
-    public async Task RollbackTransactionAsync()
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory") return;
         if (Database.CurrentTransaction == null) return;
-        await Database.RollbackTransactionAsync();
+        await Database.RollbackTransactionAsync(cancellationToken);
+    }
+
+    private static bool IsForeignKeyViolation(DbUpdateException ex)
+    {
+        var current = ex.InnerException as Exception;
+        while (current != null)
+        {
+            if (current.Message.Contains("23503") ||
+                current.Message.Contains("FOREIGN KEY") ||
+                current.Message.Contains("FK_"))
+                return true;
+            current = current.InnerException;
+        }
+        return false;
     }
 }

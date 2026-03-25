@@ -25,7 +25,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,7 +65,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Alocacoes", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Cliente", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,7 +130,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Clientes", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -197,7 +197,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Contratos", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Diaria", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Diaria", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -238,7 +238,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Diarias", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Funcionario", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -300,7 +300,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Funcionarios", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Posto", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -345,7 +345,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Postos", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.Conta", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -408,7 +408,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("Contas", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.TokenVerificacao", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.TokenVerificacao", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -449,7 +449,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("TokensVerificacao", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Whatsapp.Entidades.SessaoWhatsapp", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Whatsapp.Aggregates.SessaoWhatsapp", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -499,15 +499,15 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("SessoesWhatsapp", (string)null);
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", "Contrato")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", "Contrato")
                         .WithMany("Alocacoes")
                         .HasForeignKey("ContratoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", "Posto")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Posto", "Posto")
                         .WithMany("Alocacoes")
                         .HasForeignKey("PostoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -518,9 +518,9 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Posto");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Cliente", "Cliente")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", "Cliente")
                         .WithMany("Contratos")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -529,15 +529,15 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Cliente");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Diaria", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Diaria", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", "Alocacao")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", "Alocacao")
                         .WithMany("Diarias")
                         .HasForeignKey("AlocacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", "Funcionario")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Funcionario", "Funcionario")
                         .WithMany("Diarias")
                         .HasForeignKey("FuncionarioId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -548,14 +548,14 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Funcionario");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Funcionario", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Cliente", "Cliente")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", "Cliente")
                         .WithMany("Funcionarios")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", "Contrato")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", "Contrato")
                         .WithMany("Funcionarios")
                         .HasForeignKey("ContratoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -566,9 +566,9 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Contrato");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Posto", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Cliente", "Cliente")
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", "Cliente")
                         .WithMany("Postos")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -577,21 +577,21 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Cliente");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Auth.Entidades.TokenVerificacao", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.TokenVerificacao", b =>
                 {
-                    b.HasOne("InterceptorSystem.Domain.Modulos.Auth.Entidades.Conta", null)
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", null)
                         .WithMany()
                         .HasForeignKey("ContaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Alocacao", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", b =>
                 {
                     b.Navigation("Diarias");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Cliente", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", b =>
                 {
                     b.Navigation("Contratos");
 
@@ -600,19 +600,19 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Postos");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Contrato", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", b =>
                 {
                     b.Navigation("Alocacoes");
 
                     b.Navigation("Funcionarios");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Funcionario", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Funcionario", b =>
                 {
                     b.Navigation("Diarias");
                 });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.Modulos.Administrativo.Entidades.Posto", b =>
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Posto", b =>
                 {
                     b.Navigation("Alocacoes");
                 });
