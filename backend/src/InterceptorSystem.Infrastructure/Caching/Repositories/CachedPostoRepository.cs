@@ -1,7 +1,8 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Infrastructure.Caching.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Infrastructure.Caching.Repositories;
@@ -30,17 +31,35 @@ public class CachedPostoRepository : IPostoRepository
 
     public void Remove(Posto entity) => _decorated.Remove(entity);
 
-    public Task<Posto?> GetByIdAsync(Guid id) => _decorated.GetByIdAsync(id);
+    public async Task<Posto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
+        var cacheKey = $"Posto_{empresaId}_{id}";
 
-    public async Task<IEnumerable<Posto>> GetAllAsync()
+        if (!_cache.TryGetValue(cacheKey, out Posto? cached))
+        {
+            cached = await _decorated.GetByIdAsync(id, cancellationToken);
+            if (cached != null)
+            {
+                _cache.Set(cacheKey, cached, CacheConfiguration.GetCacheOptions(CacheVolatility.Moderate));
+            }
+        }
+
+        return cached;
+    }
+
+    public Task<IPagedResult<Posto>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        => _decorated.GetPagedAsync(page, pageSize, cancellationToken);
+
+    public async Task<IEnumerable<Posto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Postos_{empresaId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Posto>? cachedList))
         {
-            cachedList = await _decorated.GetAllAsync();
-            _cache.Set(cacheKey, cachedList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
+            cachedList = await _decorated.GetAllAsync(cancellationToken);
+            _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Moderate));
         }
 
         return cachedList ?? Enumerable.Empty<Posto>();
@@ -54,7 +73,7 @@ public class CachedPostoRepository : IPostoRepository
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Posto>? cachedList))
         {
             cachedList = await _decorated.GetByClienteIdAsync(clienteId);
-            _cache.Set(cacheKey, cachedList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
+            _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Moderate));
         }
 
         return cachedList ?? Enumerable.Empty<Posto>();

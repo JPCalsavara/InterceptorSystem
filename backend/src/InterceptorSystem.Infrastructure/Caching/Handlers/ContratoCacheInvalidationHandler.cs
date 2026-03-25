@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using InterceptorSystem.Domain.Modulos.Administrativo.Events;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Events;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 

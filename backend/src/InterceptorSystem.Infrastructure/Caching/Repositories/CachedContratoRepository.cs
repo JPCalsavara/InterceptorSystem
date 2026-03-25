@@ -1,7 +1,7 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace InterceptorSystem.Infrastructure.Caching.Repositories;
@@ -30,19 +30,22 @@ public class CachedContratoRepository : IContratoRepository
 
     public void Remove(Contrato entity) => _decorated.Remove(entity);
 
-    public Task<Contrato?> GetByIdAsync(Guid id) => _decorated.GetByIdAsync(id);
+    public Task<Contrato?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) => _decorated.GetByIdAsync(id, cancellationToken);
+
+    public Task<IPagedResult<Contrato>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        => _decorated.GetPagedAsync(page, pageSize, cancellationToken);
 
     public Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null) 
         => _decorated.ExisteContratoVigenteAsync(clienteId, contratoIdIgnorado);
 
-    public async Task<IEnumerable<Contrato>> GetAllAsync()
+    public async Task<IEnumerable<Contrato>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Contratos_{empresaId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Contrato>? cachedList))
         {
-            cachedList = await _decorated.GetAllAsync();
+            cachedList = await _decorated.GetAllAsync(cancellationToken);
             _cache.Set(cacheKey, cachedList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
         }
 
