@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces;
 using Microsoft.Extensions.Configuration;
 
-namespace InterceptorSystem.Infrastructure.Whatsapp;
+namespace InterceptorSystem.Infrastructure.Adapters.Whatsapp;
 
 /// <summary>
 /// Implementação do IWhatsappMessageSender usando a Meta Cloud API (WhatsApp Business).

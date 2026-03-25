@@ -1,9 +1,9 @@
-using InterceptorSystem.Domain.Modulos.Whatsapp.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace InterceptorSystem.Infrastructure.Whatsapp.BackgroundServices;
+namespace InterceptorSystem.Infrastructure.Adapters.Whatsapp.BackgroundServices;
 
 /// <summary>
 /// Serviço de background que remove sessões WhatsApp expiradas a cada 5 minutos.

@@ -1,6 +1,6 @@
 using InterceptorSystem.Application.Common.Interfaces;
 
-namespace InterceptorSystem.Infrastructure.Auth;
+namespace InterceptorSystem.Infrastructure.Adapters.Auth;
 
 public class BCryptPasswordHasher : IPasswordHasher
 {

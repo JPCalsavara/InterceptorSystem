@@ -1,13 +1,13 @@
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.Common.Settings;
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace InterceptorSystem.Infrastructure.Auth;
+namespace InterceptorSystem.Infrastructure.Adapters.Auth;
 
 public class JwtTokenService : IJwtTokenService
 {

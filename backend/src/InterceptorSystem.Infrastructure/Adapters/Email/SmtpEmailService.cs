@@ -5,7 +5,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace InterceptorSystem.Infrastructure.Email;
+namespace InterceptorSystem.Infrastructure.Adapters.Email;
 
 public class SmtpEmailService : IEmailService
 {
