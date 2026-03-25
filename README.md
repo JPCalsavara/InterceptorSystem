@@ -1,10 +1,12 @@
 # InterceptorSystem
 
-## **Status:** ✅ Backend | ✅ Frontend | ✅ Docker Compose | ✅ CI/CD | ✅ Auth & SaaS | ✅ WhatsApp Bot
+## **Status:** ✅ Backend | ✅ Frontend | ✅ Docker Compose | ✅ CI/CD | ✅ Auth & SaaS | ✅ WhatsApp Bot | ✅ DDD Refactoring
 
 ## 📋 Sobre o Projeto
 
-**InterceptorSystem** é uma plataforma SaaS de gestão de segurança patrimonial para clientes, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **clientes, funcionários, postos de trabalho, diárias e contratos** com regras de negócio robustas em Clean Architecture. Inclui **autenticação JWT**, **gestão de contas e assinaturas** (FREE/BASIC/PRO), **notificações por e-mail** (SMTP) e **integração WhatsApp** para substituição de diárias via chatbot.
+**InterceptorSystem** é uma plataforma SaaS de gestão de segurança patrimonial para clientes, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **clientes, funcionários, postos de trabalho, diárias e contratos** com regras de negócio robustas em **Clean Architecture + DDD** com 3 Bounded Contexts (Operações, Auth e Whatsapp).
+
+Inclui **autenticação JWT**, **gestão de contas e assinaturas** (FREE/BASIC/PRO), **notificações por e-mail** (SMTP), **integração WhatsApp** para substituição de diárias via chatbot e um **sistema de cache event-driven** com invalidação automática via Domain Events (MediatR).
 
 ## 🚀 Quick Start
 
@@ -327,23 +329,83 @@ POST /api/clientes-completos
 
 ## 🏛️ Arquitetura
 
-### Backend (Clean Architecture + DDD)
+### Backend (Clean Architecture + DDD — 3 Bounded Contexts)
+
+O backend foi refatorado em **6 fases** seguindo DDD estrito com separação por Bounded Contexts:
 
 ```
-InterceptorSystem.Domain/         → Entidades, Enums, Interfaces de Repositório
-InterceptorSystem.Application/    → DTOs, AppServices, Interfaces de Serviço
-InterceptorSystem.Infrastructure/ → DbContext, Configurations, Repositórios, Email, WhatsApp
-InterceptorSystem.Api/            → Controllers, Program, Middlewares
-InterceptorSystem.Tests/          → Unity + Integration tests
+InterceptorSystem.Domain/
+  SharedKernel/             → Entity, IDomainEvent, IUnitOfWork, DomainException
+    ValueObjects/           → Cpf, Cnpj, Email, Telefone, Cep
+    Interfaces/             → IRepository<T>, IAggregateRoot, IPagedResult<T>
+  BoundedContexts/
+    Operacoes/              → Cliente, Contrato, Funcionario, Posto, Alocacao, Diaria, Tag
+    Auth/                   → Conta, TokenVerificacao
+    Whatsapp/               → SessaoWhatsapp + ACL Ports
+
+InterceptorSystem.Application/
+  BoundedContexts/
+    Operacoes/              → AppServices, DTOs, Interfaces
+    Auth/                   → AuthAppService
+    Whatsapp/               → WhatsappBotService (usa ACL Ports)
+  Ports/Outbound/           → IEmailPort, IJwtTokenPort, IPasswordHasherPort
+
+InterceptorSystem.Infrastructure/
+  Adapters/                 → Auth/, Email/, Whatsapp/ (ACL Adapters)
+  Caching/
+    Repositories/           → CachedCliente, CachedContrato, CachedPosto,
+                              CachedFuncionario, CachedAlocacao, CachedDiaria
+    Handlers/               → Event-driven cache invalidation (MediatR)
+    Configuration/          → CacheConfiguration (TTL centralizado)
+  Persistence/              → DbContext, Configurations, Repositories
+
+InterceptorSystem.Api/      → Controllers, Middlewares
+InterceptorSystem.Tests/    → 204 testes (Unit + Integration)
 ```
+
+### Context Map — 3 Bounded Contexts
+
+```
+┌─────────────────────────────────────────┐
+│  Shared Kernel                          │
+│  Entity · IDomainEvent · IUnitOfWork    │
+│  Value Objects: Cpf · Cnpj · Email      │
+│               Telefone · Cep            │
+└─────────────────────────────────────────┘
+
+BC: Auth          BC: Operações (core domain)
+  Conta             Cliente → Contrato
+  TokenVerificacao  Cliente → Posto → Alocacao → Diaria
+                    Funcionario → Diaria
+
+BC: Whatsapp
+  SessaoWhatsapp
+  IOperacoesQueryPort ──(ACL)──→ Operações
+  IContaLookupPort    ──(ACL)──→ Auth
+```
+
+**Anti-Corruption Layer (ACL):** `WhatsappBotService` nunca injeta repositórios de outros BCs diretamente. Usa os ports `IContaLookupPort` e `IOperacoesQueryPort`, implementados por adapters em Infrastructure.
 
 ### Módulos de Domínio
 
-| Módulo            | Descrição                                                    |
-| ----------------- | ------------------------------------------------------------ |
-| `Administrativo`  | Cliente, Funcionario, Posto, Alocacao, Diaria, Contrato, Tag |
-| `Auth`            | Conta (SaaS), TokenVerificacao, PlanoAssinatura              |
-| `Whatsapp`        | SessaoWhatsapp, EstadoConversa                               |
+| BC | Entidades | Descrição |
+| -- | --------- | --------- |
+| `Operacoes` | Cliente, Contrato, Funcionario, Posto, Alocacao, Diaria, Tag | Domínio core de segurança patrimonial |
+| `Auth` | Conta, TokenVerificacao | SaaS multi-tenant — `Conta.Id = EmpresaId` |
+| `Whatsapp` | SessaoWhatsapp | Chatbot conversacional de substituição |
+
+### Sistema de Cache (Event-Driven)
+
+| Repositório | Decorator | TTL | Invalidação |
+| ----------- | --------- | --- | ----------- |
+| Cliente | ✅ Cached (GetAll + GetById) | 20 min | `ClienteCreated/Updated/Deleted` |
+| Contrato | ✅ Cached (GetAll + GetById + ByCliente) | 20 min | `ContratoCreated/Updated/Deleted` |
+| Posto | ✅ Cached (GetAll + GetById + ByCliente) | 10 min | `PostoCreated/Updated/Deleted` |
+| Funcionario | ✅ Cached (GetAll + GetById + ByCliente + ByCpf) | 10 min | `FuncionarioCreated/Updated/Deleted` |
+| Alocacao | ✅ Cached (GetAll + ByCliente + ByPosto) | 60 seg | `AlocacaoCreated/Updated/Deleted` |
+| Diaria | ✅ Cached (GetAll + ByCliente + ByFuncionario + ByAlocacao) | 60 seg | `DiariaCreated/Updated/Deleted` |
+
+**Flow:** `Domain Event → SaveChangesAsync → MediatR.Publish → CacheInvalidationHandler → _cache.Remove(...)`
 
 ### Enums
 
@@ -534,38 +596,39 @@ InterceptorSystem/
 ├── backend/
 │   └── src/
 │       ├── InterceptorSystem.Api/
-│       │   └── Controllers/
-│       │       ├── AuthController.cs
-│       │       ├── ContaController.cs
-│       │       ├── WhatsappWebhookController.cs
-│       │       ├── ClienteController.cs
-│       │       ├── ClientesCompletosController.cs
-│       │       ├── ContratosController.cs
-│       │       ├── ContratoCalculosController.cs
-│       │       ├── FuncionariosController.cs
-│       │       ├── PostosController.cs
-│       │       └── DiariasController.cs
+│       │   └── Controllers/          → AuthController, ContaController,
+│       │                               ClienteController, PostosController,
+│       │                               FuncionariosController, ContratosController,
+│       │                               DiariasController, AlocacaoController,
+│       │                               TagsController, WhatsappWebhookController
 │       ├── InterceptorSystem.Application/
-│       │   └── Modulos/
-│       │       ├── Administrativo/    → Services, DTOs, Interfaces
-│       │       ├── Auth/              → AuthAppService, AuthDto
-│       │       └── Whatsapp/          → WhatsappBotService, DTOs
+│       │   ├── BoundedContexts/
+│       │   │   ├── Operacoes/         → Services, DTOs, Interfaces (domínio principal)
+│       │   │   ├── Auth/              → AuthAppService, AuthDto
+│       │   │   └── Whatsapp/          → WhatsappBotService + Interfaces
+│       │   └── Ports/Outbound/        → IEmailPort, IJwtTokenPort, IPasswordHasherPort
 │       ├── InterceptorSystem.Domain/
-│       │   └── Modulos/
-│       │       ├── Administrativo/    → Entities, Enums, Interfaces
-│       │       ├── Auth/              → Conta, TokenVerificacao, PlanoAssinatura
-│       │       └── Whatsapp/          → SessaoWhatsapp, EstadoConversa
+│       │   ├── SharedKernel/          → Entity, IDomainEvent, IUnitOfWork, DomainException
+│       │   │   ├── ValueObjects/      → Cpf, Cnpj, Email, Telefone, Cep
+│       │   │   └── Interfaces/        → IRepository<T>, IPagedResult<T>, IAggregateRoot
+│       │   └── BoundedContexts/
+│       │       ├── Operacoes/         → Aggregates, Events, Interfaces, Enums
+│       │       ├── Auth/              → Conta, TokenVerificacao, Enums, Interfaces
+│       │       └── Whatsapp/          → SessaoWhatsapp + ACL Ports
 │       ├── InterceptorSystem.Infrastructure/
-│       │   ├── Auth/                  → JwtTokenService
-│       │   ├── Email/                 → SmtpEmailService
-│       │   ├── Whatsapp/              → MetaWhatsappMessageSender
-│       │   └── Persistence/           → DbContext, Configurations, Repositories
-│       ├── InterceptorSystem.Tests/
-│       │   ├── Unity/                 → Testes unitários
-│       │   └── Integration/           → Testes de integração (incl. Auth/)
-│       ├── compose.yml
-│       ├── compose.override.yml
-│       └── nginx.conf
+│       │   ├── Adapters/
+│       │   │   ├── Auth/              → JwtTokenAdapter, BCryptPasswordHasherAdapter
+│       │   │   ├── Email/             → SmtpEmailAdapter
+│       │   │   └── Whatsapp/          → MetaWhatsappNotificationAdapter,
+│       │   │                            OperacoesQueryAdapter, ContaLookupAdapter
+│       │   ├── Caching/
+│       │   │   ├── Configuration/     → CacheConfiguration (TTL centralizado)
+│       │   │   ├── Handlers/          → *CacheInvalidationHandler (1 por agregado)
+│       │   │   └── Repositories/      → Cached* (6 repositórios decorados)
+│       │   └── Persistence/           → DbContext, Configurations, Repositories, Migrations
+│       └── InterceptorSystem.Tests/
+│           ├── Unity/                 → Testes unitários por serviço
+│           └── Integration/           → WebApplicationFactory + PostgreSQL
 │
 ├── frontend/
 │   ├── src/app/
@@ -574,8 +637,9 @@ InterceptorSystem/
 │   │   │   └── interceptors/         → auth.interceptor.ts
 │   │   ├── features/                 → clientes, contratos, funcionarios,
 │   │   │                               postos, alocacoes, diarias, tags
-│   │   ├── services/                 → auth.service.ts + outros
-│   │   ├── models/                   → interfaces TypeScript
+│   │   ├── services/                 → *service.ts com Signal-based cache
+│   │   │                               + EntityCacheCoordinatorService
+│   │   ├── models/                   → interfaces TypeScript (alinhados com DTOs)
 │   │   ├── shared/                   → navbar, sidebar, layout
 │   │   └── pages/                    → landing, login, cadastro, esqueci-senha,
 │   │                                   nova-senha, verificar-email, dashboard,
@@ -584,11 +648,14 @@ InterceptorSystem/
 │   ├── angular.json
 │   └── package.json
 │
+├── .agents/
+│   ├── skills/                       → SKILL.md por domínio
+│   └── analysis/                     → Análises arquiteturais geradas
+│
 ├── docs/
 │   ├── design-system/
 │   ├── guias/
-│   ├── refactory/
-│   ├── reviews/
+│   ├── refactory/                    → ddd-refactory.md (plano de 6 fases)
 │   └── INDEX.md
 │
 ├── .env.example
@@ -623,7 +690,10 @@ dotnet test --filter "Category=Integration"
 | Criação Cascata   | ✅               | ✅                   |
 | Autenticação      | ✅               | ✅                   |
 
-## **Total: 167+ testes automatizados**
+| Alocação          | ✅               | ✅                   |
+| WhatsApp Bot      | ✅               | ✅                   |
+
+## **Total: 204 testes automatizados (100% passando)**
 
 ---
 
@@ -684,19 +754,13 @@ POST   /api/contrato-calculos/calcular-valor-total
 
 ## ⏭️ Próximos Passos
 
-### 🎨 Padronização de UI e Design System
-- [x] Implementar as 8 Fases do `REFACTORING_PLAN.md` (Sidebars, Navbar, Dashboards)
-- [x] Aplicar tokens semânticos rigorosos (cores, tipografia, espaçamentos) em todos os forms e details
-- [x] Padronizar tratamento de erros e SVGs inline (`REVIEW_A1_ANGULAR_COMPONENTS.md`)
-- [x] Garantir responsividade fluida via mixins/breakpoints em telas de detalhes (Mobile/Tablet)
-
-### 🔧 Dívida Técnica / Refatoração
-- [x] Rename completo `PercentualImpostos` → `PercentualEncargosProvisoes` (em todo o sistema)
-- [x] Endpoint de Interesse (`InterestController` + Sender de E-mail) — backend restante da Phase 5
-- [x] Domain Events na infraestrutura usando MediatR (`docs/refactory/logic-refactory.md`)
-- [ ] CQRS para relatórios financeiros pesados
-- [x] Cache Coordenador no frontend c/ invalidação por dependência (Concluído)
-- [x] Refatoração de Domínio (Turnos Flexíveis, Alocações, Entidade Tag) (Concluído)
+### ✅ Refatoração DDD — Concluída (6 Fases)
+- [x] **Fase 1:** Shared Kernel — `Entity`, `IDomainEvent`, `IUnitOfWork`, `DomainException`, semântica `Enforce()`
+- [x] **Fase 2:** Value Objects — `Cpf`, `Cnpj`, `Email`, `Telefone`, `Cep` com mapeamentos `OwnsOne` no EF Core
+- [x] **Fase 3:** Reorganização de namespaces — `Modulos/` → `BoundedContexts/` + `SharedKernel/` (3 BCs: Operacoes, Auth, Whatsapp)
+- [x] **Fase 4:** Clean Architecture + ACL — Ports/Adapters para Whatsapp BC, remoção de erro PostgreSQL FK da Application, transações explícitas
+- [x] **Fase 5:** Paginação — `IPagedResult<T>` + `GetPagedAsync` em todos os 7 repositórios + 4 decoradores de cache
+- [x] **Cache Improvements:** `CachedAlocacaoRepository`, `CachedDiariaRepository`, `GetByIdAsync` cacheado, `CacheConfiguration` centralizado (TTL por volatilidade)
 
 ### 💼 UX & Business Logic
 - [ ] UX Form Contratos: layout aprimorado para adicionar múltiplas ContratoTags rapidamente
