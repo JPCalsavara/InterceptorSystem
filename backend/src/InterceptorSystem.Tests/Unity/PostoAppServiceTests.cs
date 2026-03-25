@@ -1,9 +1,9 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Application.Modulos.Administrativo.Services;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
@@ -47,7 +47,7 @@ public class PostoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
-        var cliente = new Cliente(empresaId, "Cliente Teste", "00000000000000", "São Paulo", "SP");
+        var cliente = new Cliente(empresaId, "Cliente Teste", "11222333000181", "São Paulo", "SP");
         var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua das Flores", "123", null, "São Paulo", "SP");
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);

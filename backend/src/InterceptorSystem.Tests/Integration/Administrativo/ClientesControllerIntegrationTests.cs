@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -26,7 +26,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
     {
         var input = new CreateClienteDtoInput(
             Nome: $"Cliente Teste {DateTime.Now.Ticks}",
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "São Paulo",
             Estado: "SP",
             EmailGestor: "gestor@teste.com.br",
@@ -49,7 +49,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
         // Arrange
         var input = new CreateClienteDtoInput(
             Nome: "Cliente Teste", 
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "São Paulo", 
             Estado: "SP",
             EmailGestor: "gestor@solar.com.br",
@@ -84,7 +84,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
         var inputInvalido = new
         {
             nome = "",
-            cnpj = "00000000000000", // Added CNPJ
+            cnpj = "11222333000181", // Added CNPJ
             cidade = "São Paulo",
             estado = "SP"
         };
@@ -208,7 +208,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
 
         var updateInput = new UpdateClienteDtoInput(
             Nome: "Cliente Atualizado",
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "Campinas",
             Estado: "RJ",
             EmailGestor: "novogestor@atualizado.com.br",
@@ -238,7 +238,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
         var idInexistente = Guid.NewGuid();
         var updateInput = new UpdateClienteDtoInput(
             Nome: "Cliente Inicial", 
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "São Paulo", 
             Estado: "SP"
         );
@@ -308,7 +308,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
         // 1. CREATE
         var createInput = new CreateClienteDtoInput(
             Nome: "Cliente Fluxo Completo",
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "Campinas",
             Estado: "SP"
         );
@@ -326,7 +326,7 @@ public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplica
         // 3. UPDATE
         var updateInput = new UpdateClienteDtoInput(
             Nome: "Cliente Fluxo Atualizado",
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "Santos",
             Estado: "SP"
         );

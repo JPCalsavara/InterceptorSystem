@@ -1,15 +1,15 @@
 using System.Reflection;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
-using InterceptorSystem.Domain.Modulos.Whatsapp.Interfaces;
-using InterceptorSystem.Infrastructure.Auth;
-using InterceptorSystem.Infrastructure.Email;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Interfaces;
+using InterceptorSystem.Infrastructure.Adapters.Auth;
+using InterceptorSystem.Infrastructure.Adapters.Email;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
-using InterceptorSystem.Infrastructure.Whatsapp;
-using InterceptorSystem.Infrastructure.Whatsapp.BackgroundServices;
+using InterceptorSystem.Infrastructure.Adapters.Whatsapp;
+using InterceptorSystem.Infrastructure.Adapters.Whatsapp.BackgroundServices;
 using InterceptorSystem.Infrastructure.Caching.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -32,10 +32,8 @@ public static class DependencyInjection
         services.AddScoped<ContratoRepository>();
         services.AddScoped<FuncionarioRepository>();
         services.AddScoped<PostoRepository>();
-        
-        // 2.1 Repositórios Sem Cache
-        services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
-        services.AddScoped<IDiariaRepository, DiariaRepository>();
+        services.AddScoped<AlocacaoRepository>();
+        services.AddScoped<DiariaRepository>();
         
         // 2.2 Registro dos Decorators de Cache (Implementam a interface e envelopam a base)
         services.AddScoped<IClienteRepository>(provider => 
@@ -61,9 +59,22 @@ public static class DependencyInjection
                 provider.GetRequiredService<PostoRepository>(),
                 provider.GetRequiredService<IMemoryCache>(),
                 provider.GetRequiredService<ICurrentTenantService>()));
+
+        services.AddScoped<IAlocacaoRepository>(provider =>
+            new CachedAlocacaoRepository(
+                provider.GetRequiredService<AlocacaoRepository>(),
+                provider.GetRequiredService<IMemoryCache>(),
+                provider.GetRequiredService<ICurrentTenantService>()));
+
+        services.AddScoped<IDiariaRepository>(provider =>
+            new CachedDiariaRepository(
+                provider.GetRequiredService<DiariaRepository>(),
+                provider.GetRequiredService<IMemoryCache>(),
+                provider.GetRequiredService<ICurrentTenantService>()));
+
         services.AddScoped<IContaRepository, ContaRepository>();
         services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
-        services.AddScoped<ITagRepository, TagRepository>(); // Phase 4
+        services.AddScoped<ITagRepository, TagRepository>();
 
         // 3. Auth Services
         services.AddScoped<IJwtTokenService, JwtTokenService>();
@@ -74,6 +85,8 @@ public static class DependencyInjection
 
         // 5. WhatsApp Bot
         services.AddScoped<ISessaoWhatsappRepository, SessaoWhatsappRepository>();
+        services.AddScoped<IContaLookupPort, ContaLookupAdapter>();
+        services.AddScoped<IOperacoesQueryPort, OperacoesQueryAdapter>();
         services.AddScoped<IWhatsappMessageSender, MetaWhatsappMessageSender>();
         services.AddHttpClient<MetaWhatsappMessageSender>();
         services.AddHostedService<SessaoExpiradaCleanupService>();

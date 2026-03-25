@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -28,7 +28,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
         var input = new CreateClienteCompletoDtoInput(
             Cliente: new CreateClienteDtoInput(
                 Nome: $"Residencial Integração {Guid.NewGuid()}",
-                Cnpj: "00000000000000",
+                Cnpj: "11222333000181",
                 Cidade: "São Paulo",
                 Estado: "SP",
                 EmailGestor: "integracao@test.com",
@@ -79,7 +79,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
         var input = new CreateClienteCompletoDtoInput(
             Cliente: new CreateClienteDtoInput(
                 Nome: "Condomínio Residencial Parque das Flores",
-                Cnpj: "00000000000000",
+                Cnpj: "11222333000181",
                 Cidade: "Campinas",
                 Estado: "SP",
                 EmailGestor: "validacao@test.com",
@@ -116,7 +116,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
         var input = new CreateClienteCompletoDtoInput(
             Cliente: new CreateClienteDtoInput(
                 "Condomínio Exemplo",
-                "00000000000000",
+                "11222333000181",
                 "São Paulo",
                 "SP"
             ),
@@ -151,7 +151,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
         var input = new CreateClienteCompletoDtoInput(
             Cliente: new CreateClienteDtoInput(
                 Nome: "Residencial Postos Inválidos",
-                Cnpj: "00000000000000",
+                Cnpj: "11222333000181",
                 Cidade: "São Paulo",
                 Estado: "SP",
                 EmailGestor: "teste@postos.com",
@@ -188,7 +188,7 @@ public class ClientesCompletosControllerIntegrationTests : IClassFixture<CustomW
         var input = new CreateClienteCompletoDtoInput(
             Cliente: new CreateClienteDtoInput(
                 Nome: $"Residencial Horários {Guid.NewGuid()}",
-                Cnpj: "00000000000000",
+                Cnpj: "11222333000181",
                 Cidade: "São Paulo",
                 Estado: "SP",
                 EmailGestor: "horarios@test.com",

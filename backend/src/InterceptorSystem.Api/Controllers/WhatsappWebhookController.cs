@@ -1,5 +1,5 @@
-using InterceptorSystem.Application.Modulos.Whatsapp.DTOs;
-using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

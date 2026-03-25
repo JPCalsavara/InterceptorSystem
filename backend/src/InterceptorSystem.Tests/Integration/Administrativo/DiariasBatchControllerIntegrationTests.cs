@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -182,7 +182,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
     {
         var input = new CreateClienteDtoInput(
             Nome: $"Cliente Teste {Guid.NewGuid().ToString()[..8]}",
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "São Paulo",
             Estado: "SP",
             EmailGestor: "gestor@test.com",
@@ -268,7 +268,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
             ClienteId: clienteId,
             ContratoId: contratoId,
             Nome: $"Funcionário Teste {Guid.NewGuid().ToString()[..8]}",
-            Cpf: cpf ?? Random.Shared.Next(10000000, 99999999).ToString().PadLeft(11, '0'),
+            Cpf: cpf ?? GerarCpfValido(),
             Celular: "11987654321",
             StatusFuncionario: StatusFuncionario.ATIVO,
             TipoEscala: TipoEscala.DOZE_POR_TRINTA_SEIS,
@@ -279,5 +279,25 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
         response.EnsureSuccessStatusCode();
         var result = await ReadAsAsync<FuncionarioDtoOutput>(response);
         return result!.Id;
+    }
+
+    private static string GerarCpfValido()
+    {
+        var baseDigits = $"{DateTime.UtcNow.Ticks % 1000000000:000000000}";
+        var d1 = CalcularDigitoCpf(baseDigits, new[] { 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        var d2 = CalcularDigitoCpf(baseDigits + d1, new[] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        return baseDigits + d1 + d2;
+    }
+
+    private static int CalcularDigitoCpf(string input, IReadOnlyList<int> pesos)
+    {
+        var soma = 0;
+        for (var i = 0; i < input.Length; i++)
+        {
+            soma += (input[i] - '0') * pesos[i];
+        }
+
+        var resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
     }
 }

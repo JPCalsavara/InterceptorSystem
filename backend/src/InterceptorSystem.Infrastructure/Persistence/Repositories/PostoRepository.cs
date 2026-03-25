@@ -1,6 +1,6 @@
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,23 +18,45 @@ public class PostoRepository : IPostoRepository
     public IUnitOfWork UnitOfWork => _context;
 
     // FASE 4: Eager loading do Cliente necessário para QuantidadeIdealFuncionarios (vem de Cliente.QuantidadeIdealPorTurno)
-    public async Task<Posto?> GetByIdAsync(Guid id)
+    public async Task<Posto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Postos
             .Include(p => p.Cliente)
             .Include(p => p.Tags)
                 .ThenInclude(pt => pt.Tag)
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Posto>> GetAllAsync()
+    public async Task<IEnumerable<Posto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Postos
             .Include(p => p.Cliente)
             .Include(p => p.Tags)
                 .ThenInclude(pt => pt.Tag)
             .Where(p => p.Ativo)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IPagedResult<Posto>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var normalizedPage = page < 1 ? 1 : page;
+        var normalizedPageSize = pageSize < 1 ? 10 : pageSize;
+
+        var query = _context.Postos
+            .Include(p => p.Cliente)
+            .Include(p => p.Tags)
+                .ThenInclude(pt => pt.Tag)
+            .Where(p => p.Ativo)
+            .OrderBy(p => p.CreatedAt)
+            .ThenBy(p => p.Id);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((normalizedPage - 1) * normalizedPageSize)
+            .Take(normalizedPageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Posto>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
     public async Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId)

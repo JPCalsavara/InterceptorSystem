@@ -1,6 +1,6 @@
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,14 +17,29 @@ public class ClienteRepository : IClienteRepository
 
     public IUnitOfWork UnitOfWork => _context;
     
-    public async Task<Cliente?> GetByIdAsync(Guid id)
+    public async Task<Cliente?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Clientes.FirstOrDefaultAsync(c => c.Id == id);
+        return await _context.Clientes.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Cliente>> GetAllAsync()
+    public async Task<IEnumerable<Cliente>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Clientes.ToListAsync();
+        return await _context.Clientes.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IPagedResult<Cliente>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var normalizedPage = page < 1 ? 1 : page;
+        var normalizedPageSize = pageSize < 1 ? 10 : pageSize;
+
+        var query = _context.Clientes.OrderBy(c => c.CreatedAt).ThenBy(c => c.Id);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((normalizedPage - 1) * normalizedPageSize)
+            .Take(normalizedPageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Cliente>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
     public void Add(Cliente entity) => _context.Clientes.Add(entity);

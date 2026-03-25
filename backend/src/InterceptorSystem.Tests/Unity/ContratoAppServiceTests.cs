@@ -1,10 +1,11 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Application.Modulos.Administrativo.Services;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
@@ -52,12 +53,12 @@ public class ContratoAppServiceTests
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _clienteRepo.Setup(r => r.GetByIdAsync(clienteId))
-            .ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
+            .ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
         
         Contrato? savedContrato = null;
         _contratoRepo.Setup(r => r.Add(It.IsAny<Contrato>())).Callback<Contrato>(c => 
         {
-            typeof(Contrato).GetProperty("Cliente")!.SetValue(c, new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
+            typeof(Contrato).GetProperty("Cliente")!.SetValue(c, new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
             savedContrato = c;
         });
         _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Guid id) => savedContrato?.Id == id ? savedContrato : null);
@@ -142,9 +143,9 @@ public class ContratoAppServiceTests
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
         _clienteRepo.Setup(r => r.GetByIdAsync(clienteId))
-            .ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
+            .ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        await Assert.ThrowsAsync<DomainException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
     }
 
@@ -167,7 +168,7 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.PENDENTE);
 
-        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, new Cliente(Guid.NewGuid(), "Cond", "00000000000000", "São Paulo", "SP"));
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, new Cliente(Guid.NewGuid(), "Cond", "11222333000181", "São Paulo", "SP"));
 
         var input = new UpdateContratoDtoInput(
             "Novo",
@@ -235,7 +236,7 @@ public class ContratoAppServiceTests
 
         _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(contrato.Id, input));
+        await Assert.ThrowsAsync<DomainException>(() => _service.UpdateAsync(contrato.Id, input));
     }
 
     [Fact]
@@ -279,7 +280,7 @@ public class ContratoAppServiceTests
     {
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
-        var cliente = new Cliente(empresaId, "Teste", "00000000000000", "São Paulo", "SP");
+        var cliente = new Cliente(empresaId, "Teste", "11222333000181", "São Paulo", "SP");
         
         var input = new CreateContratoDtoInput(
             clienteId,
@@ -367,7 +368,7 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(10)),
             StatusContrato.FINALIZADO);
 
-        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
 
         var input = new UpdateContratoDtoInput(
             "Contrato ativado",

@@ -1,5 +1,5 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Unity;
 
@@ -14,13 +14,34 @@ public class ContratoCalculosTests
         var empresaId = contrato.EmpresaId;
         for (int i = 0; i < quantidade; i++)
         {
+            var cpf = GerarCpfValido(i);
             var func = new Funcionario(
                 empresaId, Guid.NewGuid(), contrato.Id,
-                $"Func {i}", $"{i:00000000000}", "11999999999",
+                $"Func {i}", cpf, "11999999999",
                 StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
             typeof(Funcionario).GetProperty("Contrato")!.SetValue(func, contrato);
             contrato.Funcionarios.Add(func);
         }
+    }
+
+    private static string GerarCpfValido(int seed)
+    {
+        var baseDigits = $"{(123456789 + seed) % 1000000000:000000000}";
+        var d1 = CalcularDigitoCpf(baseDigits, new[] { 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        var d2 = CalcularDigitoCpf(baseDigits + d1, new[] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        return baseDigits + d1 + d2;
+    }
+
+    private static int CalcularDigitoCpf(string input, IReadOnlyList<int> pesos)
+    {
+        var soma = 0;
+        for (var i = 0; i < input.Length; i++)
+        {
+            soma += (input[i] - '0') * pesos[i];
+        }
+
+        var resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
     }
 
     [Fact]
@@ -64,7 +85,7 @@ public class ContratoCalculosTests
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
         
-        var cliente = new Cliente(empresaId, "Residencial Teste", "00000000000000", "São Paulo", "SP");
+        var cliente = new Cliente(empresaId, "Residencial Teste", "11222333000181", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,

@@ -1,6 +1,6 @@
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Application.Modulos.Auth.Interfaces;
-using InterceptorSystem.Application.Modulos.Whatsapp.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.DTOs;
 using InterceptorSystem.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

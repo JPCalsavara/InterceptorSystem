@@ -1,5 +1,5 @@
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,14 +14,15 @@ public class ContaRepository : IContaRepository
         _context = context;
     }
 
-    public async Task<Conta?> GetByIdAsync(Guid id)
+    public async Task<Conta?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Contas.FirstOrDefaultAsync(c => c.Id == id);
+        return await _context.Contas.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
     }
 
     public async Task<Conta?> GetByEmailAsync(string email)
     {
-        return await _context.Contas.FirstOrDefaultAsync(c => c.Email == email.ToLower().Trim());
+        var normalizedEmail = (email ?? string.Empty).Trim().ToLowerInvariant();
+        return await _context.Contas.FirstOrDefaultAsync(c => c.Email.Valor == normalizedEmail);
     }
 
     public async Task<Conta?> GetByTelefoneVerificadoAsync(string telefone)
@@ -35,8 +36,8 @@ public class ContaRepository : IContaRepository
         _context.Contas.Add(conta);
     }
 
-    public async Task<bool> CommitAsync()
+    public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync() > 0;
+        return await _context.CommitAsync(cancellationToken);
     }
 }

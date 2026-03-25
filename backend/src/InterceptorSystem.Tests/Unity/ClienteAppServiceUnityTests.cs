@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Application.Modulos.Administrativo.Services;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using Moq;
 using Microsoft.Extensions.Caching.Memory;
 namespace InterceptorSystem.Tests.Unity;
@@ -42,7 +43,7 @@ public class ClienteAppServiceTests
         var empresaId = Guid.NewGuid();
         var input = new CreateClienteDtoInput(
             Nome: "Cliente Solar", 
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "São Paulo",
             Estado: "SP",
             EmailGestor: "gestor@solar.com.br",
@@ -79,7 +80,7 @@ public class ClienteAppServiceTests
         // --- ARRANGE ---
         var input = new CreateClienteDtoInput(
             "Cliente Teste", 
-            "00000000000000",
+            "11222333000181",
             "São Paulo",
             "SP"
         );
@@ -107,14 +108,14 @@ public class ClienteAppServiceTests
         var clienteExistente = new Cliente(
             empresaId, 
             "Nome Antigo", 
-            "00000000000000",
+            "11222333000181",
             "Cidade Antiga",
             "SP"
         );
         
         var input = new UpdateClienteDtoInput(
             Nome: "Nome Atualizado", 
-            Cnpj: "00000000000000",
+            Cnpj: "11222333000181",
             Cidade: "Nova Cidade",
             Estado: "RJ",
             EmailGestor: "novo@email.com",
@@ -150,7 +151,7 @@ public class ClienteAppServiceTests
         var clienteId = Guid.NewGuid();
         var input = new UpdateClienteDtoInput(
             "Nome", 
-            "00000000000000",
+            "11222333000181",
             "Cidade",
             "SP"
         );
@@ -173,14 +174,14 @@ public class ClienteAppServiceTests
         var clienteExistente = new Cliente(
             empresaId, 
             "Nome Original", 
-            "00000000000000",
+            "11222333000181",
             "Cidade",
             "SP"
         );
         
         var input = new UpdateClienteDtoInput(
             "", 
-            "00000000000000",
+            "11222333000181",
             "Cidade válida",
             "SP"
         );
@@ -188,7 +189,7 @@ public class ClienteAppServiceTests
         _mockRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(clienteExistente);
 
         // --- ACT & ASSERT ---
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(clienteId, input));
+        var exception = await Assert.ThrowsAsync<DomainException>(() => _service.UpdateAsync(clienteId, input));
         Assert.Contains("Nome é obrigatório", exception.Message);
 
         _mockRepo.Verify(r => r.Update(It.IsAny<Cliente>()), Times.Never);
@@ -207,7 +208,7 @@ public class ClienteAppServiceTests
         var cliente = new Cliente(
             empresaId, 
             "Cliente a Deletar", 
-            "00000000000000",
+            "11222333000181",
             "São Paulo",
             "SP"
         );
@@ -260,7 +261,7 @@ public class ClienteAppServiceTests
         var cliente = new Cliente(
             empresaId,
             "Cliente com Vinculo",
-            "00000000000000",
+            "11222333000181",
             "São Paulo",
             "SP"
         );
@@ -269,7 +270,7 @@ public class ClienteAppServiceTests
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockUow
             .Setup(u => u.CommitAsync())
-            .ThrowsAsync(new Exception("23503: update or delete on table \"Clientes\" violates foreign key constraint \"FK_Contratos_Clientes_ClienteId\""));
+            .ThrowsAsync(new EntityInUseException("Cliente"));
 
         // --- ACT ---
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteAsync(clienteId));
@@ -292,7 +293,7 @@ public class ClienteAppServiceTests
         var cliente = new Cliente(
             empresaId, 
             "Cliente Teste", 
-            "00000000000000",
+            "11222333000181",
             "Campinas",
             "SP"
         );
@@ -351,9 +352,9 @@ public class ClienteAppServiceTests
         var empresaId = Guid.NewGuid();
         var clientes = new List<Cliente>
         {
-            new Cliente(empresaId, "Cliente A", "00000000000000", "São Paulo", "SP"),
-            new Cliente(empresaId, "Cliente B", "11111111111111", "Rio de Janeiro", "RJ"),
-            new Cliente(empresaId, "Cliente C", "22222222222222", "Belo Horizonte", "MG")
+            new Cliente(empresaId, "Cliente A", "11222333000181", "São Paulo", "SP"),
+            new Cliente(empresaId, "Cliente B", "22333444000181", "Rio de Janeiro", "RJ"),
+            new Cliente(empresaId, "Cliente C", "12345678000195", "Belo Horizonte", "MG")
         };
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
@@ -391,8 +392,8 @@ public class ClienteAppServiceTests
     {
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
-        var cliente1 = new Cliente(empresaId, "Ativo", "00000000000000", "São Paulo", "SP");
-        var cliente2 = new Cliente(empresaId, "Inativo", "11111111111111", "Rio de Janeiro", "RJ");
+        var cliente1 = new Cliente(empresaId, "Ativo", "11222333000181", "São Paulo", "SP");
+        var cliente2 = new Cliente(empresaId, "Inativo", "22333444000181", "Rio de Janeiro", "RJ");
         cliente2.Desativar();
 
         var clientes = new List<Cliente> { cliente1, cliente2 };

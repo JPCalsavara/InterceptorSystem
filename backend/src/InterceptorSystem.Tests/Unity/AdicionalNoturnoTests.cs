@@ -1,5 +1,6 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
 
 namespace InterceptorSystem.Tests.Unity;
 
@@ -108,7 +109,7 @@ public class AdicionalNoturnoTests
     public void Alocacao_DeveFalhar_QuandoDuracaoInvalida()
     {
         // Arrange & Act & Assert — 2 horas
-        Assert.Throws<InvalidOperationException>(() => new Alocacao(
+        Assert.Throws<DomainException>(() => new Alocacao(
             _postoId, _contratoId, _empresaId,
             new TimeSpan(8, 0, 0), new TimeSpan(10, 0, 0),
             TipoEscala.DOZE_POR_TRINTA_SEIS, false

@@ -4,11 +4,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using InterceptorSystem.Domain.Modulos.Auth.Enums;
-using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
-using InterceptorSystem.Infrastructure.Auth;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
+using InterceptorSystem.Infrastructure.Adapters.Auth;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Hosting;
@@ -86,7 +86,7 @@ public class AuthWebApplicationFactory : WebApplicationFactory<Program>
 
             // E-mail no-op para testes
             services.AddScoped<IEmailService, NoOpEmailService>();
-            services.AddScoped<InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
+            services.AddScoped<InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
 
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -15,7 +15,7 @@ public class ContratosControllerIntegrationTests : IntegrationTestBase
     {
         var input = new CreateClienteDtoInput(
             $"Cliente Contrato {DateTime.Now.Ticks}",
-            "00000000000000",
+            "11222333000181",
             "São Paulo",
             "SP"
         );

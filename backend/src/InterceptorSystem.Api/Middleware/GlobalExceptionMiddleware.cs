@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
 
 namespace InterceptorSystem.Api.Middleware;
 
@@ -34,6 +35,7 @@ public class GlobalExceptionMiddleware
     {
         var (statusCode, message) = exception switch
         {
+            DomainException ex => (HttpStatusCode.BadRequest, ex.Message),
             InvalidOperationException ex => (HttpStatusCode.BadRequest, ex.Message),
             KeyNotFoundException ex => (HttpStatusCode.NotFound, ex.Message),
             UnauthorizedAccessException ex => (HttpStatusCode.Unauthorized, ex.Message),

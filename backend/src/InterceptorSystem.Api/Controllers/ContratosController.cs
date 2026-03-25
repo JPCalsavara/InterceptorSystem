@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Application.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterceptorSystem.Api.Controllers;

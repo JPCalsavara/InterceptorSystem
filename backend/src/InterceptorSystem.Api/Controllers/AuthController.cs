@@ -1,6 +1,6 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Application.Modulos.Auth.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

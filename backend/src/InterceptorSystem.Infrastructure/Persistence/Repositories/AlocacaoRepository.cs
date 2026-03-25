@@ -1,6 +1,6 @@
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,14 +17,29 @@ public class AlocacaoRepository : IAlocacaoRepository
 
     public IUnitOfWork UnitOfWork => _context;
 
-    public async Task<Alocacao?> GetByIdAsync(Guid id)
+    public async Task<Alocacao?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Alocacoes.FirstOrDefaultAsync(a => a.Id == id);
+        return await _context.Alocacoes.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Alocacao>> GetAllAsync()
+    public async Task<IEnumerable<Alocacao>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Alocacoes.ToListAsync();
+        return await _context.Alocacoes.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IPagedResult<Alocacao>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var normalizedPage = page < 1 ? 1 : page;
+        var normalizedPageSize = pageSize < 1 ? 10 : pageSize;
+
+        var query = _context.Alocacoes.OrderBy(a => a.CreatedAt).ThenBy(a => a.Id);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((normalizedPage - 1) * normalizedPageSize)
+            .Take(normalizedPageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Alocacao>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
     public async Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId)

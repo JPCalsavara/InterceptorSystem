@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Domain.Modulos.Auth.Enums;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Enums;
 
 namespace InterceptorSystem.Tests.Integration.Auth;
 

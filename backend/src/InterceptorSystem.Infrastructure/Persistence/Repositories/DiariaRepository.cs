@@ -1,6 +1,6 @@
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,11 +17,26 @@ public class DiariaRepository : IDiariaRepository
 
     public IUnitOfWork UnitOfWork => _context;
 
-    public async Task<Diaria?> GetByIdAsync(Guid id)
-        => await _context.Diarias.FirstOrDefaultAsync(a => a.Id == id);
+    public async Task<Diaria?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        => await _context.Diarias.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
-    public async Task<IEnumerable<Diaria>> GetAllAsync()
-        => await _context.Diarias.ToListAsync();
+    public async Task<IEnumerable<Diaria>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await _context.Diarias.ToListAsync(cancellationToken);
+
+    public async Task<IPagedResult<Diaria>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var normalizedPage = page < 1 ? 1 : page;
+        var normalizedPageSize = pageSize < 1 ? 10 : pageSize;
+
+        var query = _context.Diarias.OrderBy(d => d.CreatedAt).ThenBy(d => d.Id);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((normalizedPage - 1) * normalizedPageSize)
+            .Take(normalizedPageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Diaria>(items, totalCount, normalizedPage, normalizedPageSize);
+    }
 
     public async Task<IEnumerable<Diaria>> GetByClienteIdAsync(Guid clienteId)
         => await _context.Diarias

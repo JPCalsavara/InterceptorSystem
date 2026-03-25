@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Application.Modulos.Administrativo.Services;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 using Moq;
 
 namespace InterceptorSystem.Tests.Unity;
@@ -40,7 +40,7 @@ public class DiariaAppServiceTests
         TipoDiaria.REGULAR);
 
     private static Funcionario CriarFuncionario(Guid empresaId, Guid clienteId) =>
-        new(empresaId, clienteId, Guid.NewGuid(), "João", "11111111111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+        new(empresaId, clienteId, Guid.NewGuid(), "João", "12345678909", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
     private static Alocacao CriarAlocacao(Guid postoId, Guid contratoId, Guid empresaId) =>
         new(postoId, contratoId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), TipoEscala.DOZE_POR_TRINTA_SEIS, true);

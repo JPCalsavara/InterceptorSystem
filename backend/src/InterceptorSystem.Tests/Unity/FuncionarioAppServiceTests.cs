@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Application.Modulos.Administrativo.Services;
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
@@ -23,7 +23,7 @@ public class FuncionarioAppServiceTests
     private readonly Mock<IUnitOfWork> _uow = new();
     private readonly FuncionarioAppService _service;
 
-    private const string CpfValido = "12345678901";
+    private const string CpfValido = "52998224725";
 
     // FASE 3: Sem parâmetros de salário (calculados automaticamente)
     private static CreateFuncionarioDtoInput CriarInputValido(Guid clienteId, Guid contratoId) => new(
@@ -36,11 +36,11 @@ public class FuncionarioAppServiceTests
         TipoEscala.DOZE_POR_TRINTA_SEIS,
         TipoFuncionario.CLT);
 
-    private static Cliente CriarCliente(Guid empresaId) => new(empresaId, "Cond", "00000000000000", "São Paulo", "SP");
+    private static Cliente CriarCliente(Guid empresaId) => new(empresaId, "Cond", "11222333000181", "São Paulo", "SP");
 
     // FASE 3: Sem parâmetros de salário (calculados automaticamente)
     private static Funcionario CriarFuncionario(Guid empresaId, Guid clienteId, Guid contratoId) =>
-        new(empresaId, clienteId, contratoId, "João", "12345678900", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+        new(empresaId, clienteId, contratoId, "João", "98765432100", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
     public FuncionarioAppServiceTests()
     {
@@ -50,7 +50,7 @@ public class FuncionarioAppServiceTests
             _funcionarioRepo.Object,
             _clienteRepo.Object,
             _contratoRepo.Object,
-            new Mock<InterceptorSystem.Domain.Modulos.Administrativo.Interfaces.ITagRepository>().Object,
+            new Mock<InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces.ITagRepository>().Object,
             _tenantService.Object); // Phase 4: ITagRepository
     }
 
@@ -64,14 +64,14 @@ public class FuncionarioAppServiceTests
         var input = new CreateFuncionarioDtoInput(clienteId,
             contratoId,
             "João",
-            "11111111111",
+            "12345678909",
             "+5511999999999",
             StatusFuncionario.ATIVO,
             TipoEscala.DOZE_POR_TRINTA_SEIS,
             TipoFuncionario.CLT);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(input.ClienteId.Value)).ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
+        _clienteRepo.Setup(r => r.GetByIdAsync(input.ClienteId.Value)).ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
@@ -120,7 +120,7 @@ public class FuncionarioAppServiceTests
         var input = CriarInputValido(clienteId, contratoId);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(new Cliente(empresaId, "Cond", "00000000000000", "São Paulo", "SP"));
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
@@ -212,8 +212,8 @@ public class FuncionarioAppServiceTests
         // FASE 3: Sem parâmetros de salário
         var lista = new List<Funcionario>
         {
-            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "11111111111", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT),
-            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "11111111111", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO)
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "12345678909", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT),
+            new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "12345678909", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO)
         };
         _funcionarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
 

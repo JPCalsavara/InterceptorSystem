@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -30,7 +30,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
     {
         var input = new CreateClienteDtoInput(
             "Cliente Aloc", 
-            "00000000000000",
+            "11222333000181",
             "São Paulo",
             "SP"
         );

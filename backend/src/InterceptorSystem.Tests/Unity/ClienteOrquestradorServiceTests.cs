@@ -1,3 +1,3 @@
 using InterceptorSystem.Application.Common.Interfaces;
 
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;

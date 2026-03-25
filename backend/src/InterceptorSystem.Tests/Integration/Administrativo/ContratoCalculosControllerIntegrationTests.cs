@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 

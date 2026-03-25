@@ -1,5 +1,5 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Contato.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Contato.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterceptorSystem.Api.Controllers;

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -163,7 +163,7 @@ public class ClienteScopedEndpointsIntegrationTests : IntegrationTestBase
     {
         var input = new CreateClienteDtoInput(
             $"Cliente {Guid.NewGuid().ToString()[..8]}",
-            "00000000000000",
+            "11222333000181",
             "São Paulo",
             "SP");
 
@@ -262,5 +262,23 @@ public class ClienteScopedEndpointsIntegrationTests : IntegrationTestBase
         response.EnsureSuccessStatusCode();
     }
 
-    private static string GerarCpfFake() => $"{DateTime.Now.Ticks % 100000000000:00000000000}";
+    private static string GerarCpfFake()
+    {
+        var baseDigits = $"{DateTime.UtcNow.Ticks % 1000000000:000000000}";
+        var d1 = CalcularDigitoCpf(baseDigits, new[] { 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        var d2 = CalcularDigitoCpf(baseDigits + d1, new[] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        return baseDigits + d1 + d2;
+    }
+
+    private static int CalcularDigitoCpf(string input, IReadOnlyList<int> pesos)
+    {
+        var soma = 0;
+        for (var i = 0; i < input.Length; i++)
+        {
+            soma += (input[i] - '0') * pesos[i];
+        }
+
+        var resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    }
 }

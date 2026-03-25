@@ -1,10 +1,10 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Application.Modulos.Auth.Services;
-using InterceptorSystem.Application.Modulos.Whatsapp.Interfaces;
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using InterceptorSystem.Domain.Modulos.Auth.Enums;
-using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.Services;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
