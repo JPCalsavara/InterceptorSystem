@@ -180,14 +180,12 @@
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
-                  <span class="metric-label">Valor Mensal</span>
+                  <span class="metric-label">Faturamento</span>
                   <span class="metric-value">{{ getValorMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
-                  <span class="metric-label">Custo</span>
-                  <span class="metric-value">{{
-                    getContratoCusto(contrato) | currency: 'BRL'
-                  }}</span>
+                  <span class="metric-label">Custo Real</span>
+                  <span class="metric-value">{{ getCustoMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
                   <span class="metric-label">Lucro</span>
@@ -195,10 +193,6 @@
                     getContratoLucro(contrato) | currency: 'BRL'
                   }}</span>
                 </div>
-              </div>
-              <div class="card-tags-preview">
-                <span class="tag-label">Tags / diária</span>
-                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
               </div>
               <div class="card-info">
                 <span class="badge" [ngClass]="getStatusClass(contrato.status)">
@@ -267,14 +261,12 @@
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
-                  <span class="metric-label">Valor Mensal</span>
+                  <span class="metric-label">Faturamento</span>
                   <span class="metric-value">{{ getValorMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
-                  <span class="metric-label">Custo</span>
-                  <span class="metric-value">{{
-                    getContratoCusto(contrato) | currency: 'BRL'
-                  }}</span>
+                  <span class="metric-label">Custo Real</span>
+                  <span class="metric-value">{{ getCustoMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
                   <span class="metric-label">Lucro</span>
@@ -282,10 +274,6 @@
                     getContratoLucro(contrato) | currency: 'BRL'
                   }}</span>
                 </div>
-              </div>
-              <div class="card-tags-preview">
-                <span class="tag-label">Tags / diária</span>
-                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
               </div>
               <div class="card-info">
                 <span class="card-date"
@@ -354,14 +342,12 @@
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
-                  <span class="metric-label">Valor Mensal</span>
+                  <span class="metric-label">Faturamento</span>
                   <span class="metric-value">{{ getValorMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
-                  <span class="metric-label">Custo</span>
-                  <span class="metric-value">{{
-                    getContratoCusto(contrato) | currency: 'BRL'
-                  }}</span>
+                  <span class="metric-label">Custo Real</span>
+                  <span class="metric-value">{{ getCustoMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
                   <span class="metric-label">Lucro</span>
@@ -369,10 +355,6 @@
                     getContratoLucro(contrato) | currency: 'BRL'
                   }}</span>
                 </div>
-              </div>
-              <div class="card-tags-preview">
-                <span class="tag-label">Tags / diária</span>
-                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
               </div>
               <div class="card-info">
                 <span class="card-date"
@@ -441,14 +423,12 @@
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
-                  <span class="metric-label">Valor Mensal</span>
+                  <span class="metric-label">Faturamento</span>
                   <span class="metric-value">{{ getValorMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
-                  <span class="metric-label">Custo</span>
-                  <span class="metric-value">{{
-                    getContratoCusto(contrato) | currency: 'BRL'
-                  }}</span>
+                  <span class="metric-label">Custo Real</span>
+                  <span class="metric-value">{{ getCustoMensal(contrato) | currency: 'BRL' }}</span>
                 </div>
                 <div class="metric">
                   <span class="metric-label">Lucro</span>
@@ -456,10 +436,6 @@
                     getContratoLucro(contrato) | currency: 'BRL'
                   }}</span>
                 </div>
-              </div>
-              <div class="card-tags-preview">
-                <span class="tag-label">Tags / diária</span>
-                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
               </div>
               <div class="card-info">
                 <span class="card-date"
@@ -518,7 +494,7 @@
       <!-- Coluna Azul (Finalizados) -->
       <div class="kanban-column kanban-blue">
         <div class="column-header">
-          <h3>Finalizados</h3>
+          <h3>Concluídos</h3>
           <span class="column-count">{{ contratosFinalizados().length }}</span>
         </div>
         <div class="column-content">
@@ -528,7 +504,7 @@
               <p class="card-description">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
-                  <span class="metric-label">Valor Mensal</span>
+                  <span class="metric-label">Faturamento</span>
                   <span class="metric-value">{{
                     contrato.valorTotalMensal | currency: 'BRL'
                   }}</span>
@@ -541,12 +517,8 @@
                   >
                 </div>
               </div>
-              <div class="card-tags-preview">
-                <span class="tag-label">Tags / diária</span>
-                <span class="tag-value">{{ getTagRatesPreview(contrato) }}</span>
-              </div>
               <div class="card-info">
-                <span class="badge badge-neutral"> Finalizado </span>
+                <span class="badge badge-neutral"> Concluído </span>
               </div>
               <div class="card-actions">
                 <button
@@ -580,7 +552,7 @@
             </div>
           } @empty {
             <div class="empty-column">
-              <p>Nenhum contrato finalizado</p>
+              <p>Nenhum contrato concluído</p>
             </div>
           }
         </div>

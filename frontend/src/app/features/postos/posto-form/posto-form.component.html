@@ -78,49 +78,6 @@
         <div class="form-group"></div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Tags do Contrato</label>
-
-        @if (!form.get('clienteId')?.value) {
-          <span class="help-text">Selecione um cliente para carregar as tags disponíveis.</span>
-        } @else if (loadingTags()) {
-          <span class="help-text">Carregando tags do contrato...</span>
-        } @else if (contratoTags().length === 0) {
-          <span class="help-text">Nenhuma tag disponível nos contratos ativos deste cliente.</span>
-        } @else {
-          @if (hasMultipleTags()) {
-            <label class="checkbox-label select-all-tags">
-              <input
-                type="checkbox"
-                [checked]="areAllTagsSelected()"
-                (change)="onToggleAllTags($any($event.target).checked)"
-              />
-              <span>Selecionar todas as tags</span>
-            </label>
-          }
-
-          <div class="tags-grid" [class.locked]="isSingleTagLocked()">
-            @for (tag of contratoTags(); track tag.id) {
-              <label class="checkbox-label tag-checkbox" [class.locked]="isSingleTagLocked()">
-                <input
-                  type="checkbox"
-                  [checked]="isTagSelected(tag.id)"
-                  [disabled]="isSingleTagLocked()"
-                  (change)="onToggleTag(tag.id, $any($event.target).checked)"
-                />
-                <span>{{ tag.nome }}</span>
-              </label>
-            }
-          </div>
-
-          @if (isSingleTagLocked()) {
-            <span class="help-text"
-              >Somente uma tag disponível no contrato. Ela fica selecionada automaticamente.</span
-            >
-          }
-        }
-      </div>
-
       <div class="form-row">
         <div class="form-group">
           <label for="cep" class="form-label">CEP <span class="required">*</span></label>

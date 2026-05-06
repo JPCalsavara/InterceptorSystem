@@ -2,6 +2,46 @@
    Shared Pages (Lists/Details)
    ========================================================================== */
 
+$bp-desk: 1200px;
+$bp-tab-lg: 1100px;
+$bp-tab: 900px;
+$bp-mob: 768px;
+$bp-mob-sm: 480px;
+$bp-mob-xs: 600px;
+
+@mixin responsive-grid($cols, $gap: var(--space-4), $desk-col: 2, $mob-col: 1) {
+  display: grid;
+  gap: $gap;
+
+  @if $cols == 4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    @media (max-width: $bp-desk) { grid-template-columns: repeat($desk-col, minmax(0, 1fr)); }
+    @media (max-width: $bp-mob) { grid-template-columns: repeat($mob-col, minmax(0, 1fr)); }
+  } @else if $cols == 3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    @media (max-width: $bp-desk) { grid-template-columns: repeat($desk-col, minmax(0, 1fr)); }
+    @media (max-width: $bp-mob) { grid-template-columns: repeat($mob-col, minmax(0, 1fr)); }
+  } @else if $cols == 2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    @media (max-width: $bp-mob) { grid-template-columns: repeat($mob-col, minmax(0, 1fr)); }
+  } @else if $cols == 'auto-fit' {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    @media (max-width: $bp-mob) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (max-width: $bp-mob-sm) { grid-template-columns: 1fr; }
+  }
+}
+
+@mixin responsive-grid-asymmetric($left: 1fr, $right: 2fr, $gap: 1.5rem) {
+  display: grid;
+  grid-template-columns: $left $right;
+  gap: $gap;
+
+  @media (max-width: $bp-mob) {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .page-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -430,49 +470,10 @@
 }
 
 /* ==========================================================================
-   Responsive Mixins & Helper Classes
+   Helper Classes
    ========================================================================== */
-
-$bp-desk: 1200px;
-$bp-tab-lg: 1100px;
-$bp-tab: 900px;
-$bp-mob: 768px;
-$bp-mob-sm: 480px;
-$bp-mob-xs: 600px;
-
-@mixin responsive-grid($cols, $gap: var(--space-4), $desk-col: 2, $mob-col: 1) {
-  display: grid;
-  gap: $gap;
-
-  @if $cols == 4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    @media (max-width: $bp-desk) { grid-template-columns: repeat($desk-col, minmax(0, 1fr)); }
-    @media (max-width: $bp-mob) { grid-template-columns: repeat($mob-col, minmax(0, 1fr)); }
-  } @else if $cols == 3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    @media (max-width: $bp-desk) { grid-template-columns: repeat($desk-col, minmax(0, 1fr)); }
-    @media (max-width: $bp-mob) { grid-template-columns: repeat($mob-col, minmax(0, 1fr)); }
-  } @else if $cols == 2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    @media (max-width: $bp-mob) { grid-template-columns: repeat($mob-col, minmax(0, 1fr)); }
-  } @else if $cols == 'auto-fit' {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    @media (max-width: $bp-mob) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    @media (max-width: $bp-mob-sm) { grid-template-columns: 1fr; }
-  }
-}
 
 .detail-grid--responsive {
   @include responsive-grid(3, var(--space-6));
-}
-
-@mixin responsive-grid-asymmetric($left: 1fr, $right: 2fr, $gap: 1.5rem) {
-  display: grid;
-  grid-template-columns: $left $right;
-  gap: $gap;
-
-  @media (max-width: $bp-mob) {
-    grid-template-columns: 1fr;
-  }
 }
 

@@ -1,11 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { switchMap, catchError, of, forkJoin } from 'rxjs';
 import { ClienteService } from '../../services/cliente.service';
 import { FuncionarioService } from '../../services/funcionario.service';
 import { PostoService } from '../../services/posto.service';
 import { DiariaService } from '../../services/diaria.service';
 import { ContratoService } from '../../services/contrato.service';
+import { ContratoFinanceiroUiService } from '../../services/contrato-financeiro-ui.service';
 import {
   Cliente,
   Funcionario,
@@ -15,6 +17,8 @@ import {
   StatusContrato,
   StatusDiaria,
   StatusFuncionario,
+  ContratoResumoFinanceiro,
+  CalculoValorTotalOutput,
 } from '../../models/index';
 
 interface DashboardCard {
@@ -97,12 +101,15 @@ export class DashboardComponent implements OnInit {
   private postoService = inject(PostoService);
   private diariaService = inject(DiariaService);
   private contratoService = inject(ContratoService);
+  private financeiroUiService = inject(ContratoFinanceiroUiService);
 
   clientes = signal<Cliente[]>([]);
   funcionarios = signal<Funcionario[]>([]);
   postos = signal<Posto[]>([]);
   diarias = signal<Diaria[]>([]);
   contratos = signal<Contrato[]>([]);
+  calculosDetalhados = signal<Map<string, unknown>>(new Map());
+  resumosFinanceiros = signal<Map<string, ContratoResumoFinanceiro>>(new Map());
 
   loading = signal(true);
 
@@ -120,17 +127,15 @@ export class DashboardComponent implements OnInit {
       (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
     );
 
-    const faturamentoBruto = contratosVigentes.reduce((sum, c) => sum + c.valorTotalMensal, 0);
-
-    const lucroProjetado = contratosVigentes.reduce(
-      (sum, c) => sum + c.valorTotalMensal * c.margemLucroPercentual,
+    const faturamentoBruto = contratosVigentes.reduce(
+      (sum, c) => sum + this.getFaturamentoDetalhado(c),
       0,
     );
 
+    const lucroProjetado = contratosVigentes.reduce((sum, c) => sum + this.getLucroDetalhado(c), 0);
+
     const custoOperacional = contratosVigentes.reduce(
-      (sum, c) =>
-        sum +
-        c.valorTotalMensal * (1 - c.margemLucroPercentual - c.margemCoberturaFaltasPercentual),
+      (sum, c) => sum + this.getCustoDetalhado(c),
       0,
     );
 
@@ -192,14 +197,9 @@ export class DashboardComponent implements OnInit {
 
         // Custo e lucro derivados diretamente das margens do contrato (top-down)
         // Evita replicar a fórmula do backend; usa os percentuais já calculados
-        const custoEstimado = contrato
-          ? contrato.valorTotalMensal *
-            (1 - contrato.margemLucroPercentual - contrato.margemCoberturaFaltasPercentual)
-          : 0;
+        const custoEstimado = contrato ? this.getCustoDetalhado(contrato) : 0;
 
-        const lucroEstimado = contrato
-          ? contrato.valorTotalMensal * contrato.margemLucroPercentual
-          : 0;
+        const lucroEstimado = contrato ? this.getLucroDetalhado(contrato) : 0;
 
         // margemLucroPercentual vem em 0-1 do backend; getLucroClass() espera 0-100
         const margemLucro = contrato ? contrato.margemLucroPercentual * 100 : 0;
@@ -210,7 +210,7 @@ export class DashboardComponent implements OnInit {
           cidade: cond.cidade,
           estado: cond.estado,
           ativo: cond.ativo,
-          faturamentoMensal: contrato?.valorTotalMensal ?? 0,
+          faturamentoMensal: contrato ? this.getFaturamentoDetalhado(contrato) : 0,
           custoEstimado,
           lucroEstimado,
           margemLucro,
@@ -290,7 +290,7 @@ export class DashboardComponent implements OnInit {
           clienteNome: cliente?.nome || 'Desconhecido',
           dataFim: c.dataFim,
           diasRestantes,
-          valorTotalMensal: c.valorTotalMensal,
+          valorTotalMensal: this.getFaturamentoDetalhado(c),
         };
       })
       .filter((c) => c.diasRestantes <= 30 && c.diasRestantes > 0)
@@ -314,17 +314,15 @@ export class DashboardComponent implements OnInit {
         (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
       );
 
-      const faturamento = contratosVigentes.reduce((sum, c) => sum + c.valorTotalMensal, 0);
+      const faturamento = contratosVigentes.reduce(
+        (sum, c) => sum + this.getFaturamentoDetalhado(c),
+        0,
+      );
       const custoOperacional = contratosVigentes.reduce(
-        (sum, c) =>
-          sum +
-          c.valorTotalMensal * (1 - c.margemLucroPercentual - c.margemCoberturaFaltasPercentual),
+        (sum, c) => sum + this.getCustoDetalhado(c),
         0,
       );
-      const lucro = contratosVigentes.reduce(
-        (sum, c) => sum + c.valorTotalMensal * c.margemLucroPercentual,
-        0,
-      );
+      const lucro = contratosVigentes.reduce((sum, c) => sum + this.getLucroDetalhado(c), 0);
 
       resultado.push({
         mes: mesNome.charAt(0).toUpperCase() + mesNome.slice(1),
@@ -416,6 +414,7 @@ export class DashboardComponent implements OnInit {
       this.contratoService.getAll().subscribe({
         next: (data) => {
           this.contratos.set(data);
+          this.loadResumosFinanceiros();
           resolve();
         },
         error: () => resolve(),
@@ -423,10 +422,88 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  loadResumosFinanceiros(): void {
+    const contratosVigentes = this.contratos().filter(
+      (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+    );
+
+    if (contratosVigentes.length === 0) {
+      this.resumosFinanceiros.set(new Map());
+      this.loadCalculosDetalhados();
+      return;
+    }
+
+    const { inicio, fim } = this.mesAtual;
+    const ano = inicio.getFullYear();
+    const mes = fim.getMonth() + 1;
+
+    const requests = contratosVigentes.map((contrato) =>
+      this.diariaService
+        .getResumoFinanceiroByContrato(contrato.id, ano, mes)
+        .pipe(catchError(() => of(null))),
+    );
+
+    forkJoin(requests).subscribe((resultados) => {
+      const novoMapa = new Map<string, ContratoResumoFinanceiro>();
+      resultados.forEach((resultado, index) => {
+        if (resultado !== null) {
+          novoMapa.set(contratosVigentes[index].id, resultado);
+        }
+      });
+      this.resumosFinanceiros.set(novoMapa);
+      this.loadCalculosDetalhados();
+    });
+  }
+
+  loadCalculosDetalhados(): void {
+    const contratosVigentes = this.contratos().filter(
+      (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+    );
+
+    if (contratosVigentes.length === 0) {
+      this.calculosDetalhados.set(new Map());
+      return;
+    }
+
+    this.financeiroUiService
+      .carregarCalculosDetalhados$(contratosVigentes, this.resumosFinanceiros())
+      .subscribe({
+        next: (mapa) => this.calculosDetalhados.set(mapa),
+        error: () => this.calculosDetalhados.set(new Map()),
+      });
+  }
+
   getTendenciaIcon(tendencia: string): string {
     if (tendencia === 'up') return '↗';
     if (tendencia === 'down') return '↘';
     return '→';
+  }
+
+  private getFaturamentoDetalhado(contrato: Contrato): number {
+    return this.financeiroUiService.getFaturamentoDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  private getCustoDetalhado(contrato: Contrato): number {
+    return this.financeiroUiService.getCustoDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  private getLucroDetalhado(contrato: Contrato): number {
+    return this.financeiroUiService.getLucroDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  private normalizarPercentualContrato(valor: number | null | undefined): number {
+    const safe = Number(valor ?? 0);
+    if (!Number.isFinite(safe) || safe < 0) return 0;
+    return safe > 1 ? safe / 100 : safe;
   }
 
   getMesAtualLabel(): string {

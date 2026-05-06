@@ -38,6 +38,7 @@ export class TagListComponent implements OnInit {
 
   form = this.fb.group({
     nome: ['', [Validators.required, Validators.maxLength(100)]],
+    valor: [0, [Validators.required, Validators.min(0)]],
     descricao: ['', Validators.maxLength(500)],
   });
 
@@ -73,7 +74,7 @@ export class TagListComponent implements OnInit {
 
   openEdit(tag: Tag): void {
     this.editingTag.set(tag);
-    this.form.setValue({ nome: tag.nome, descricao: tag.descricao ?? '' });
+    this.form.setValue({ nome: tag.nome, valor: tag.valor, descricao: tag.descricao ?? '' });
     this.showModal.set(true);
   }
 
@@ -89,7 +90,11 @@ export class TagListComponent implements OnInit {
       return;
     }
     const val = this.form.value;
-    const dto = { nome: val.nome!, descricao: val.descricao || undefined };
+    const dto = {
+      nome: val.nome!,
+      valor: Number(val.valor ?? 0),
+      descricao: val.descricao || undefined,
+    };
     this.saving.set(true);
     const editing = this.editingTag();
 

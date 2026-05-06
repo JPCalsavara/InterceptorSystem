@@ -1,4 +1,4 @@
-@import '../../../../styles/shared-pages';
+@use '../../../../styles/shared-pages' as *;
 
 .detail-container {
   max-width: 1400px;
@@ -728,3 +728,68 @@
     }
   }
 }
+
+/* -------------------------------------------------
+   Alocações Section (list of allocations / shifts)
+   ------------------------------------------------- */
+.alocacoes-section {
+  margin-bottom: 2rem;
+
+  .section-header {
+    margin-bottom: 1rem;
+  }
+
+  .alocacoes-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .alocacao-card {
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .alocacao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .alocacao-body {
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+
+        .label {
+          font-weight: 500;
+        }
+        .value {
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    @extend .empty-state; // reuse existing empty‑state styling
+    text-align: center;
+    font-style: italic;
+  }
+}
+

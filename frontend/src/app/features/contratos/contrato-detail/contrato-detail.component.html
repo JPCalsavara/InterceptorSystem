@@ -1,12 +1,16 @@
 <div class="detail-page">
   @if (loading()) {
     <div class="loading-state">Carregando contrato...</div>
-  } @else if (erro()) {
+  }
+
+  @if (!loading() && erro()) {
     <div class="error-state">
       <p>{{ erro() }}</p>
       <a routerLink="/contratos" class="btn-back">Voltar para contratos</a>
     </div>
-  } @else if (contrato()) {
+  }
+
+  <div *ngIf="!loading() && !erro() && contrato()">
     <!-- Header -->
     <div class="page-header">
       <div class="breadcrumb">
@@ -29,8 +33,8 @@
     </div>
 
     <div class="cards-grid">
-      <!-- COL 1, ROW 1: Informações Gerais -->
-      <div class="card card-col1-row1">
+      <!-- COL 1: Informações Gerais + Indicadores -->
+      <div class="card card-col1-rows12">
         <h2 class="card-title">Informações Gerais</h2>
         <div class="info-list">
           <div class="info-item">
@@ -78,212 +82,474 @@
             </div>
           }
         </div>
+
+        <div class="contract-tags-panel">
+          <div class="tags-panel-header">
+            <h3>Indicadores do Contrato</h3>
+          </div>
+
+          <div class="indicadores-list">
+            <div class="indicador-item">
+              <div class="indicador-label">Encargos e Provisões</div>
+              <div class="indicador-pct">{{ percentualEncargosPercent() | number: '1.0-2' }}%</div>
+              <div class="indicador-valor">= {{ impostosMensal() | currency: 'BRL' }}</div>
+            </div>
+
+            <div class="indicador-item">
+              <div class="indicador-label">Margem de Lucro</div>
+              <div class="indicador-pct">
+                {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%
+              </div>
+              <div class="indicador-valor">= {{ margemLucroValor() | currency: 'BRL' }}</div>
+            </div>
+
+            <div class="indicador-item">
+              <div class="indicador-label">Margem de Risco</div>
+              <div class="indicador-pct">
+                {{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%
+              </div>
+              <div class="indicador-valor">
+                = {{ riscoCoberturaValor() | currency: 'BRL' }} (sobre faturamento simulado)
+              </div>
+            </div>
+
+            <div class="indicador-item">
+              <div class="indicador-label">Adic. Noturno / FDS</div>
+              <div class="indicador-pct">
+                {{ contrato()!.percentualAdicionalNoturno * 100 | number: '1.0-2' }}% /
+                {{ contrato()!.percentualAdicionalFimSemana * 100 | number: '1.0-2' }}%
+              </div>
+              <div class="indicador-valor">Add. p/ diárias específicas</div>
+            </div>
+
+            <div class="indicador-item indicador-highlight">
+              <div class="indicador-label">Diária Cobrada</div>
+              <div class="indicador-pct">
+                {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}
+              </div>
+              <div class="indicador-valor">por turno / funcionário</div>
+            </div>
+
+            <div class="indicador-item indicador-highlight">
+              <div class="indicador-label">Benefícios / Func.</div>
+              <div class="indicador-pct">
+                {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}
+              </div>
+              <div class="indicador-valor">por funcionário / mês</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- COL 2, ROWS 1-2: Indicadores com % e valor em BRL -->
+      <!-- COL 2: Relatório Simulado -->
       <div class="card card-col2-rows12">
-        <h2 class="card-title">Indicadores do Contrato</h2>
-        <div class="indicadores-list">
-          <div class="indicador-item">
-            <div class="indicador-label">Encargos e Provisões</div>
-            <div class="indicador-pct">
-              {{ contrato()!.percentualImpostos * 100 | number: '1.0-2' }}%
-            </div>
-            <div class="indicador-valor">= {{ impostosMensal() | currency: 'BRL' }}</div>
-          </div>
+        <h2 class="card-title">Relatório Simulado</h2>
+        <p class="card-hint">Diária {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</p>
 
-          <div class="indicador-item">
-            <div class="indicador-label">Margem de Lucro</div>
-            <div class="indicador-pct">
-              {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%
+        @if (simulacaoBreakdown() && !calculando() && !erroCalculo()) {
+          <div class="bk-group">
+            <div class="bk-group-header bk-custo">
+              <span class="bk-group-label">Etapa 1: Operação (Diárias)</span>
+              <span class="bk-group-total">{{
+                simulacaoBreakdown()!.diariasTotaisMes | number: '1.0-0'
+              }}</span>
             </div>
-            <div class="indicador-valor">
-              =
-              {{
-                contrato()!.valorTotalMensal * contrato()!.margemLucroPercentual | currency: 'BRL'
-              }}
-            </div>
-          </div>
-
-          <div class="indicador-item">
-            <div class="indicador-label">Margem Cobertura Faltas</div>
-            <div class="indicador-pct">
-              {{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%
-            </div>
-            <div class="indicador-valor">
-              =
-              {{
-                contrato()!.valorTotalMensal * contrato()!.margemCoberturaFaltasPercentual
-                  | currency: 'BRL'
-              }}
-            </div>
-          </div>
-
-          <div class="indicador-item">
-            <div class="indicador-label">Adicional Noturno</div>
-            <div class="indicador-pct">
-              {{ contrato()!.percentualAdicionalNoturno * 100 | number: '1.0-2' }}%
-            </div>
-            <div class="indicador-valor">
-              =
-              {{
-                contrato()!.valorDiariaCobrada * contrato()!.percentualAdicionalNoturno
-                  | currency: 'BRL'
-              }}/diária
-            </div>
-          </div>
-
-          <div class="indicador-item indicador-highlight">
-            <div class="indicador-label">Diária Cobrada</div>
-            <div class="indicador-pct">{{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</div>
-            <div class="indicador-valor">por turno / funcionário</div>
-          </div>
-
-          <div class="indicador-item indicador-highlight">
-            <div class="indicador-label">Benefícios / Func.</div>
-            <div class="indicador-pct">
-              {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}
-            </div>
-            <div class="indicador-valor">por funcionário / mês</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- COL 3, ROWS 1-2: Breakdown Financeiro (valores absolutos) -->
-      <div class="card card-col3-rows12">
-        <h2 class="card-title">Breakdown Financeiro Mensal</h2>
-
-        <!-- FATURAMENTO -->
-        <div class="bk-group">
-          <div class="bk-group-header bk-receita">
-            <span class="bk-group-label">Faturamento</span>
-            <span class="bk-group-total">{{ contrato()!.valorTotalMensal | currency: 'BRL' }}</span>
-          </div>
-        </div>
-
-        <!-- CUSTO -->
-        <div class="bk-group">
-          <div class="bk-group-header bk-custo">
-            <span class="bk-group-label">Custo</span>
-            <span class="bk-group-total">- {{ custoTotal() | currency: 'BRL' }}</span>
-          </div>
-          <div class="bk-items">
-            <div class="bk-item">
-              <span class="bk-item-label"
-                >Encargos e Provisões
-                <span class="bk-formula">~65% ref. Trabalhista</span>
-              </span>
-              <span class="bk-item-value deduction"
-                >- {{ impostosMensal() | currency: 'BRL' }}</span
-              >
-            </div>
-
-            <div class="bk-item">
-              <span class="bk-item-label">
-                Benefícios / Extras
-                @if (custoFuncionariosDetalhado().length > 0) {
+            <div class="bk-items">
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label"
+                  >Quantidade por Dia
                   <span class="bk-formula"
-                    >{{ custoFuncionariosDetalhado().length }} func. ×
-                    {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+                    >{{ simulacaoInputAtual()?.numeroDePostos || 0 }} postos ×
+                    {{ simulacaoInputAtual()?.alocacoesPorPosto || 0 }} alocações ×
+                    {{ simulacaoInputAtual()?.funcionariosPorAlocacao || 0 }} func/aloc</span
                   >
-                } @else {
-                  <span class="bk-formula"
-                    >{{ contrato()!.quantidadeFuncionarios }} × 2 ×
-                    {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
-                  >
-                }
-              </span>
-              <span class="bk-item-value deduction"
-                >- {{ beneficiosTotais() | currency: 'BRL' }}</span
-              >
-            </div>
-
-            @if (totalCustoFuncionarios() > 0) {
-              <div class="bk-item">
-                <span class="bk-item-label">Custo Base (Salários)</span>
-                <span class="bk-item-value deduction"
-                  >- {{ totalCustoFuncionarios() | currency: 'BRL' }}</span
+                </span>
+                <span class="bk-item-value"
+                  >{{ simulacaoBreakdown()!.diariasPorDia | number: '1.0-0' }} diárias/dia</span
                 >
               </div>
-              @for (item of custoFuncionariosDetalhado(); track item.funcionario.id) {
-                <div class="bk-sub-item">
-                  <span class="bk-sub-label">
-                    {{ item.funcionario.nome }}
-                    <span class="func-escala-badge">{{ item.escala }}</span>
-                  </span>
-                  <span class="bk-sub-value">{{ item.custo | currency: 'BRL' }}</span>
-                </div>
-              }
-            }
-          </div>
-        </div>
 
-        <!-- LUCRO ESTIMADO -->
-        <div class="bk-group">
-          <div class="bk-group-header bk-lucro" [class.bk-prejuizo]="lucro() < 0">
-            <span class="bk-group-label">Lucro Estimado</span>
-            <span class="bk-group-total">{{ lucro() | currency: 'BRL' }}</span>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Diárias em Dias Úteis/Mês
+                  <span class="bk-formula"
+                    >considerando {{ diasUteisMesSimulado() }} dias úteis</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  simulacaoBreakdown()!.diariasUteisMes | number: '1.0-0'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Diárias em Fim de Semana/Mês
+                  <span class="bk-formula"
+                    >considerando {{ diasFimSemanaMesSimulado() }} dias de fim de semana</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  simulacaoBreakdown()!.diariasFimSemanaMes | number: '1.0-0'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label">Diárias Noturnas/Dia</span>
+                <span class="bk-item-value">{{
+                  simulacaoBreakdown()!.diariasNoturnasPorDia | number: '1.0-0'
+                }}</span>
+              </div>
+            </div>
           </div>
-          <div class="bk-items">
-            <div class="bk-item">
-              <span class="bk-item-label"
-                >Margem de Lucro
-                <span class="bk-formula"
-                  >{{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%</span
+
+          <div class="bk-group">
+            <div class="bk-group-header bk-custo bk-emphasis">
+              <span class="bk-group-label">Projeção de Funcionários</span>
+              <span class="bk-group-total">{{ funcionariosProjetados() }}</span>
+            </div>
+            <div class="bk-items">
+              <div class="bk-item">
+                <span class="bk-item-label">Total Diárias/Mês (sem feriados)</span>
+                <span class="bk-item-value">{{
+                  simulacaoBreakdown()!.diariasTotaisMes | number: '1.0-0'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label">Diárias/Dia</span>
+                <span class="bk-item-value">{{
+                  simulacaoBreakdown()!.diariasPorDia | number: '1.0-0'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Funcionários Projetados
+                  <span class="bk-formula"
+                    >{{ simulacaoBreakdown()!.diariasTotaisMes | number: '1.0-0' }} ÷
+                    {{ simulacaoInputAtual()?.diasTrabalhadosPorFuncionarioMes || 15 }} =
+                    {{ funcionariosProjetados() }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{ funcionariosProjetados() }} funcionários</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bk-group">
+            <div class="bk-group-header bk-custo">
+              <span class="bk-group-label">Etapa 2: Custo Bruto</span>
+              <span class="bk-group-total">{{ custoBrutoSimulado() | currency: 'BRL' }}</span>
+            </div>
+            <div class="bk-items">
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Custo Diárias Normais
+                  <span class="bk-formula"
+                    >{{ diariasDiurnasUteisMes() | number: '1.0-0' }} ×
+                    {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  custoDiariasNormaisSimulado() | currency: 'BRL'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Custo Diárias Fim de Semana
+                  <span class="bk-formula"
+                    >{{ simulacaoBreakdown()!.diariasFimSemanaMes | number: '1.0-0' }} ×
+                    {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }} +
+                    {{ simulacaoBreakdown()!.diariasFimSemanaMes | number: '1.0-0' }} ×
+                    {{
+                      contrato()!.valorDiariaCobrada *
+                        (contrato()!.percentualAdicionalFimSemana! > 1
+                          ? contrato()!.percentualAdicionalFimSemana! / 100
+                          : contrato()!.percentualAdicionalFimSemana!) | currency: 'BRL'
+                    }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  custoDiariasFimSemanaSimulado() | currency: 'BRL'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Adicional Noturno
+                  <span class="bk-formula"
+                    >({{ diariasNoturnasUteisMes() | number: '1.0-0' }} ×
+                    {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}) *
+                    {{
+                      1 +
+                        (contrato()!.percentualAdicionalNoturno! > 1
+                          ? contrato()!.percentualAdicionalNoturno! / 100
+                          : contrato()!.percentualAdicionalNoturno!) | number: '1.1-2'
+                    }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  custoAdicionalNoturnoComBaseSimulado() | currency: 'BRL'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Custo Total de Benefícios
+                  <span class="bk-formula"
+                    >{{ funcionariosProjetados() }} funcionários ×
+                    {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{ custoTotalBeneficios() | currency: 'BRL' }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Encargos e Provisões (Impostos)
+                  <span class="bk-formula"
+                    >({{ custoTotalEtapa2Simulado() | currency: 'BRL' }}) ×
+                    {{
+                      contrato()!.percentualEncargosProvisoes! > 1
+                        ? contrato()!.percentualEncargosProvisoes! / 100
+                        : (contrato()!.percentualEncargosProvisoes! | percent: '1.0-2')
+                    }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{ valorImpostosSimulado() | currency: 'BRL' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bk-group">
+            <div class="bk-group-header bk-receita bk-emphasis">
+              <span class="bk-group-label">Etapa 3: Faturamento Simulado</span>
+              <span class="bk-group-total">{{ faturamentoSimulado() | currency: 'BRL' }}</span>
+            </div>
+            <div class="bk-items">
+              <div class="bk-item">
+                <span class="bk-item-label">Custo Base Mensal (Com Impostos)</span>
+                <span class="bk-item-value">{{ custoTotalFinalSimulado() | currency: 'BRL' }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Margem de Lucro
+                  <span class="bk-formula"
+                    >({{ custoTotalFinalSimulado() | currency: 'BRL' }}) ×
+                    {{
+                      contrato()!.margemLucroPercentual! > 1
+                        ? contrato()!.margemLucroPercentual! / 100
+                        : (contrato()!.margemLucroPercentual! | percent: '1.0-2')
+                    }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  valorMargemLucroSimulado() | currency: 'BRL'
+                }}</span>
+              </div>
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Margem de Risco (Faltas)
+                  <span class="bk-formula"
+                    >({{ faturamentoSimulado() | currency: 'BRL' }}) ×
+                    {{
+                      contrato()!.margemCoberturaFaltasPercentual! > 1
+                        ? contrato()!.margemCoberturaFaltasPercentual! / 100
+                        : (contrato()!.margemCoberturaFaltasPercentual! | percent: '1.0-2')
+                    }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  valorMargemFaltasSimulado() | currency: 'BRL'
+                }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- COL 3: Relatório Real -->
+      <div class="card card-col3-rows12">
+        <h2 class="card-title">Relatório Real</h2>
+
+        <!-- Loading State -->
+        @if (calculando()) {
+          <div class="loading-state">
+            <span class="spinner"></span>
+            <span>Calculando valores...</span>
+          </div>
+        }
+
+        <!-- Error State -->
+        @if (erroCalculo() && !calculando()) {
+          <div class="alert alert-error">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <div>
+              <div class="error-title">Erro ao calcular valores</div>
+              <div class="error-message">{{ erroCalculo() }}</div>
+              <button type="button" class="btn-secondary" (click)="retryCalculo()">
+                Tentar novamente
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Breakdown Grid (only show when successful) -->
+        @if (breakdown() && !calculando() && !erroCalculo()) {
+          <!-- ETAPA 3: FATURAMENTO REAL -->
+          <div class="bk-group">
+            <div class="bk-group-header bk-receita bk-emphasis">
+              <span class="bk-group-label">Etapa 3: Faturamento Real</span>
+              <span class="bk-group-total">{{
+                breakdown()!.valorTotalMensal | currency: 'BRL'
+              }}</span>
+            </div>
+          </div>
+
+          <!-- ETAPA 1: CUSTO DIRETO -->
+          <div class="bk-group">
+            <div class="bk-group-header bk-custo bk-emphasis">
+              <span class="bk-group-label">Etapa 1: Custo Direto</span>
+              <span class="bk-group-total">- {{ breakdown()!.custoDireto | currency: 'BRL' }}</span>
+            </div>
+            <div class="bk-items">
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Custo Diárias Normais
+                  <span class="bk-formula"
+                    >{{ diariasNormaisReal() | number: '1.0-0' }} diárias úteis</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  breakdown()!.custoDiariasNormais | currency: 'BRL'
+                }}</span>
+              </div>
+
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Adicional Noturno
+                  <span class="bk-formula"
+                    >{{ breakdown()!.diariasNoturnasMes | number: '1.0-0' }} diárias noturnas</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  breakdown()!.custoAdicionalNoturno | currency: 'BRL'
+                }}</span>
+              </div>
+
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Custo Diárias Fim de Semana
+                  <span class="bk-formula"
+                    >{{ breakdown()!.diariasFdsMes | number: '1.0-0' }} diárias de FDS</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  breakdown()!.custoDiariasFimSemana | currency: 'BRL'
+                }}</span>
+              </div>
+
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Benefícios / Extras
+                  <span class="bk-formula"
+                    >{{ getFuncionariosCliente() }} func. ×
+                    {{ contrato()!.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  getBeneficiosTotaisReais() | currency: 'BRL'
+                }}</span>
+              </div>
+
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Funcionários do Cliente</span>
+                <span class="bk-item-value">{{ getFuncionariosCliente() }}</span>
+              </div>
+
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Encargos e Provisões
+                  <span class="bk-formula"
+                    >{{ contrato()!.percentualEncargosProvisoes * 100 | number: '1.0-2' }}% sobre
+                    custo direto</span
+                  >
+                </span>
+                <span class="bk-item-value">{{
+                  breakdown()!.valorImpostos | currency: 'BRL'
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ETAPA 2: MARGENS E PROVISÕES -->
+          <div class="bk-group">
+            <div class="bk-group-header bk-lucro bk-emphasis">
+              <span class="bk-group-label">Etapa 2: Margens e Provisões</span>
+              <span class="bk-group-total">{{ lucroEsperadoMinimo() | currency: 'BRL' }}</span>
+            </div>
+            <div class="bk-items">
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Margem de Lucro
+                  <span class="bk-formula"
+                    >lucro = custo base ×
+                    {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%</span
+                  >
+                </span>
+                <span class="bk-item-value positive">{{
+                  margemLucroValor() | currency: 'BRL'
+                }}</span>
+              </div>
+
+              <div class="bk-item">
+                <span class="bk-item-label"
+                  >Risco (Cobertura de Faltas)
+                  <span class="bk-formula"
+                    >{{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%
+                    sobre custo base</span
+                  >
+                </span>
+                <span class="bk-item-value">{{ riscoCoberturaValor() | currency: 'BRL' }}</span>
+              </div>
+
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Total Margens (Lucro + Risco)</span>
+                <span
+                  [class]="
+                    'bk-item-value ' + (lucroEsperadoMinimo() >= 0 ? 'positive' : 'negative')
+                  "
                 >
-              </span>
-              <span class="bk-item-value positive">{{ margemLucroValor() | currency: 'BRL' }}</span>
-            </div>
+                  {{ lucroEsperadoMinimo() | currency: 'BRL' }}
+                </span>
+              </div>
 
-            <div class="bk-item bk-item-summary">
-              <span class="bk-item-label">Esperado Mínimo</span>
-              <span
-                [class]="'bk-item-value ' + (margemLucroValor() >= 0 ? 'positive' : 'negative')"
-              >
-                {{ margemLucroValor() | currency: 'BRL' }}
-              </span>
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Lucro Real</span>
+                <span class="bk-item-value positive">
+                  <span class="bk-formula"
+                    >{{ faturamentoSimulado() | currency: 'BRL' }} -
+                    {{ breakdown()!.custoBaseMensal | currency: 'BRL' }}</span
+                  >
+                  {{ lucroCalculadoPorDiferenca() | currency: 'BRL' }}
+                </span>
+              </div>
+
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Lucro Ideal</span>
+                <span class="bk-item-value positive">
+                  <span class="bk-formula"
+                    >{{ faturamentoSimulado() | currency: 'BRL' }} -
+                    {{ custoTotalFinalSimulado() | currency: 'BRL' }}</span
+                  >
+                  {{ lucroIdeal() | currency: 'BRL' }}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        }
       </div>
 
-      <!-- COL 1, ROW 2: Custo Estimado por Escala -->
-      <div class="card card-col1-row2">
-        <h2 class="card-title">Custo por Escala / Mês</h2>
-        <p class="card-hint">Diária {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</p>
-        <div class="escala-cards">
-          <div class="escala-card">
-            <div class="escala-icon">
-              <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-              </svg>
-            </div>
-            <div class="escala-info">
-              <span class="escala-label">12×36</span>
-              <span class="escala-desc">~15 dias/mês</span>
-              <span class="escala-valor">{{ custoFuncionario12x36() | currency: 'BRL' }}</span>
-            </div>
-          </div>
-          <div class="escala-card">
-            <div class="escala-icon">
-              <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-            <div class="escala-info">
-              <span class="escala-label">5×2</span>
-              <span class="escala-desc">~22 dias/mês</span>
-              <span class="escala-valor">{{ custoFuncionario5x2() | currency: 'BRL' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ROW 3, COLS 1-2: Postos de Trabalho -->
+      <!-- ROW 3: Postos de Trabalho -->
       <div class="card card-postos">
         <h2 class="card-title">Postos de Trabalho ({{ postos().length }})</h2>
         @if (postos().length === 0) {
@@ -293,7 +559,8 @@
             <table class="postos-table">
               <thead>
                 <tr>
-                  <th>Horário</th>
+                  <th>Posto</th>
+                  <th>Alocações</th>
                   <th>Capacidade Ideal Cliente</th>
                   <th></th>
                 </tr>
@@ -302,6 +569,7 @@
                 @for (posto of postos(); track posto.id) {
                   <tr>
                     <td class="horario">{{ posto.nome }} - {{ posto.cidade }}</td>
+                    <td>{{ getAlocacoesPorPosto(posto.id) }}</td>
                     <td>{{ contrato()!.quantidadeFuncionarios }}</td>
                     <td>
                       <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>
@@ -314,5 +582,5 @@
         }
       </div>
     </div>
-  }
+  </div>
 </div>

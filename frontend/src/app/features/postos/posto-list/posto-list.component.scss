@@ -245,12 +245,11 @@
       min-width: 28px;
       height: 28px;
       padding: 0 8px;
-      background: linear-gradient(135deg, #ffd6d6 0%, var(--error-bg) 100%);
-      color: var(--error-color);
+      color: var(--text-primary);
       border-radius: 14px;
       font-size: 0.813rem;
       font-weight: 700;
-      border: 1px solid var(--error-color);
+      border: 1px solid var(--bg-secondary);
     }
   }
 }

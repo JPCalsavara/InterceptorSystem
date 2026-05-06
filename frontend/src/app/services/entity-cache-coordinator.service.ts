@@ -57,6 +57,16 @@ export class EntityCacheCoordinatorService {
     }
   }
 
+  /**
+   * Safety reset used after delete flows to avoid stale data in screens
+   * that depend on multiple cached entities.
+   */
+  invalidateAll(): void {
+    for (const key of ENTITY_CACHE_KEYS) {
+      this.invalidate(key);
+    }
+  }
+
   private resolveInvalidationKeys(rootEntityKey: EntityCacheKey): EntityCacheKey[] {
     const visited = new Set<EntityCacheKey>();
     const ordered: EntityCacheKey[] = [];

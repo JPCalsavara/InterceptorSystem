@@ -309,7 +309,7 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="quantidadeIdealPorTurno" class="form-label">
-                  Quantidade Ideal por Turno <span class="required">*</span>
+                  Quantidade Ideal de Funcionários por Turno <span class="required">*</span>
                 </label>
                 <input
                   id="quantidadeIdealPorTurno"
@@ -403,7 +403,7 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="numeroPostos" class="form-label">
-                    Quantidade de Postos Físicos <span class="required">*</span>
+                    Quantidade Base de Tipos de Posto <span class="required">*</span>
                   </label>
                   <input
                     id="numeroPostos"
@@ -423,11 +423,56 @@
                   ) {
                     <span class="error-message">Quantidade de postos é obrigatória</span>
                   }
-                  <span class="help-text"
-                    >Se houver mais de um posto, você configurará cada um individualmente.</span
-                  >
+                  @if (!isModoPersonalizado()) {
+                    <span class="help-text"
+                      >No modo automático, a lista final de postos pode aumentar para respeitar
+                      {{ getQuantidadeIdealPorTurno() }} pessoa(s) por turno.</span
+                    >
+                  } @else {
+                    <span class="help-text"
+                      >No modo personalizado, você controla manualmente a configuração de cada
+                      posto.</span
+                    >
+                  }
                 </div>
               </div>
+
+              <div class="form-group checkbox-group modo-config-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="modoPersonalizado" class="checkbox-input" />
+                  <span class="checkbox-text">Modo personalizado (edição manual)</span>
+                </label>
+                @if (!isModoPersonalizado()) {
+                  <span class="help-text"
+                    >Modo automático ativo: o wizard replica tipos para aproximar a política do
+                    cliente ({{ getQuantidadeIdealPorTurno() }} por turno).</span
+                  >
+                } @else {
+                  <span class="help-text"
+                    >Modo personalizado ativo: divergências com a política serão exibidas como
+                    aviso.</span
+                  >
+                }
+              </div>
+
+              @if (isModoPersonalizado() && getDivergenciasQuantidadeIdeal().length > 0) {
+                <div class="alert alert-warning ideal-warning">
+                  <div>
+                    <div class="error-title">Divergência com quantidade ideal por turno</div>
+                    <div class="error-message">
+                      A política do cliente está em {{ getQuantidadeIdealPorTurno() }} pessoa(s)
+                      por turno, mas há posto(s) configurado(s) com valor diferente.
+                    </div>
+                    <div class="warning-list">
+                      @for (item of getDivergenciasQuantidadeIdeal(); track item.index) {
+                        <div>
+                          Posto {{ item.index + 1 }}: atual {{ item.atual }} / ideal {{ item.ideal }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
 
               <!-- Valores Base -->
               <h3 class="section-title">
@@ -458,35 +503,92 @@
                       Configuração do Posto {{ $index + 1 }}
                     </h4>
 
+                    <div class="form-group">
+                      <label class="form-label"
+                        >Tipo de Posto <span class="required">*</span></label
+                      >
+                      <select formControlName="tipoPosto" class="form-input">
+                        @for (opt of tipoPostoOptions; track opt.value) {
+                          <option [value]="opt.value">{{ opt.label }}</option>
+                        }
+                      </select>
+                      <span class="help-text"
+                        >Selecione a escala para auto-preencher turnos, funcionários e
+                        noturno.</span
+                      >
+                    </div>
+
                     <div class="form-row">
                       <div class="form-group">
                         <label class="form-label">
-                          Qtd. Alocações Est. (Turnos) <span class="required">*</span>
+                          Qtd. Alocações (Turnos) <span class="required">*</span>
                         </label>
-                        <input
-                          type="number"
-                          formControlName="quantidadeAlocacoes"
-                          class="form-input"
-                          placeholder="Ex: 2"
-                          min="1"
-                        />
-                        <span class="help-text">Ex: 2 para posto 12x36 (Diurno e Noturno).</span>
+                        @if (isPostoPersonalizado($index)) {
+                          <input
+                            type="number"
+                            formControlName="quantidadeAlocacoes"
+                            class="form-input"
+                            placeholder="Ex: 2"
+                            min="1"
+                          />
+                        } @else {
+                          <div class="form-input calculated-field">
+                            {{ postoCtrl.get('quantidadeAlocacoes')?.value }}
+                            <span
+                              class="help-text"
+                              style="margin: 0; display: inline; margin-left: 8px"
+                              >travado pelo tipo</span
+                            >
+                          </div>
+                        }
                       </div>
                       <div class="form-group">
                         <label class="form-label">
                           Funcionários por Alocação <span class="required">*</span>
                         </label>
-                        <input
-                          type="number"
-                          formControlName="quantidadeFuncionariosPorAlocacao"
-                          class="form-input"
-                          placeholder="Ex: 1"
-                          min="1"
-                        />
+                        @if (isPostoPersonalizado($index)) {
+                          <input
+                            type="number"
+                            formControlName="quantidadeFuncionariosPorAlocacao"
+                            class="form-input"
+                            placeholder="Ex: 1"
+                            min="1"
+                          />
+                        } @else {
+                          <div class="form-input calculated-field">
+                            {{ postoCtrl.get('quantidadeFuncionariosPorAlocacao')?.value }}
+                            <span
+                              class="help-text"
+                              style="margin: 0; display: inline; margin-left: 8px"
+                              >travado pelo tipo</span
+                            >
+                          </div>
+                        }
                       </div>
                     </div>
 
                     <div class="form-row">
+                      <div class="form-group">
+                        <label class="form-label">Aloc. Noturnas</label>
+                        @if (isPostoPersonalizado($index)) {
+                          <input
+                            type="number"
+                            formControlName="alocacoesNoturnas"
+                            class="form-input"
+                            min="0"
+                          />
+                        } @else {
+                          <div class="form-input calculated-field">
+                            {{ postoCtrl.get('alocacoesNoturnas')?.value }}
+                            <span
+                              class="help-text"
+                              style="margin: 0; display: inline; margin-left: 8px"
+                              >travado pelo tipo</span
+                            >
+                          </div>
+                        }
+                      </div>
+
                       <div class="form-group">
                         <label class="form-label">
                           Valor Diária por Funcionário (R$) <span class="required">*</span>
@@ -515,6 +617,30 @@
                         />
                       </div>
                     </div>
+
+                    <div
+                      style="
+                        margin-top: 8px;
+                        display: flex;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                        font-size: 0.825rem;
+                        color: var(--text-secondary);
+                      "
+                    >
+                      <span>
+                        <strong>{{
+                          (postoCtrl.get('quantidadeAlocacoes')?.value || 0) *
+                            (postoCtrl.get('quantidadeFuncionariosPorAlocacao')?.value || 0)
+                        }}</strong>
+                        funcionários neste posto
+                      </span>
+                      @if ((postoCtrl.get('alocacoesNoturnas')?.value || 0) > 0) {
+                        <span>
+                          🌙 {{ postoCtrl.get('alocacoesNoturnas')?.value }} turno(s) noturno(s)
+                        </span>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -529,9 +655,81 @@
                     readonly
                     disabled
                   />
-                  <span class="help-text"> Calculado baseado nas configurações acima </span>
+                  <span class="help-text"> Calculado: postos × turnos × func/turno </span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Total Alocações Noturnas</label>
+                  <input
+                    type="number"
+                    [value]="totalAlocacoesNoturnas()"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text"> Soma das alocações noturnas de todos os postos </span>
                 </div>
               </div>
+
+              <h3 class="section-title">Tags do Contrato</h3>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 16px;
+                "
+              >
+                <p class="form-label">Gerencie as funções disponíveis para este contrato</p>
+                <button type="button" class="btn-primary btn-sm" (click)="openCreateTag()">
+                  + Nova Tag
+                </button>
+              </div>
+
+              <app-tag-picker
+                [tags]="tags()"
+                [selectedIds]="selectedTagIds()"
+                [disabled]="loading()"
+                [label]="'Seleção de tags do contrato'"
+                [helperText]="
+                  'Selecione as funções que fazem parte do contrato e informe o valor da diária para cada uma.'
+                "
+                (selectionChange)="onContratoTagsChange($event)"
+              />
+
+              @if (selectedTags().length > 0) {
+                <div class="tag-rates-grid">
+                  @for (tag of selectedTags(); track tag.id) {
+                    <div class="tag-rate-card">
+                      <div class="tag-rate-title">
+                        <strong>{{ tag.nome }}</strong>
+                        @if (tag.descricao) {
+                          <small>{{ tag.descricao }}</small>
+                        }
+                        <small>Valor base: {{ tag.valor | currency: 'BRL' }}</small>
+                        @if (getTagPercentualAcima(tag, getTagRate(tag.id))) {
+                          <small>{{ getTagPercentualAcima(tag, getTagRate(tag.id)) }}</small>
+                        }
+                      </div>
+                      <div class="form-group">
+                        <label [for]="'wizard-tag-rate-' + tag.id" class="form-label"
+                          >Valor Diária da Tag (R$)</label
+                        >
+                        <input
+                          [id]="'wizard-tag-rate-' + tag.id"
+                          type="number"
+                          class="form-input"
+                          [value]="getTagRate(tag.id)"
+                          (input)="onTagRateChange(tag.id, $any($event.target).value)"
+                          min="0"
+                          step="0.01"
+                          [disabled]="loading()"
+                        />
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
 
               <!-- Percentuais e Margens -->
               <h3 class="section-title">
@@ -787,6 +985,39 @@
                   Resumo Financeiro Mensal
                 </h3>
 
+                <!-- Loading State -->
+                @if (calculando()) {
+                  <div class="loading-state">
+                    <span class="spinner"></span>
+                    <span>Calculando valores...</span>
+                  </div>
+                }
+
+                <!-- Error State -->
+                @if (erroCalculo()) {
+                  <div class="alert alert-error">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <div>
+                      <div class="error-title">Erro ao calcular valores</div>
+                      <div class="error-message">{{ erroCalculo() }}</div>
+                      <button
+                        class="retry-button"
+                        (click)="formContrato.updateValueAndValidity({ emitEvent: true })"
+                      >
+                        Tentar Novamente
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- Breakdown Grid (only show when successful) -->
+                @if (breakdown() && !calculando() && !erroCalculo()) {
                 <div class="breakdown-grid">
                   <div class="breakdown-card">
                     <div class="breakdown-header">
@@ -807,9 +1038,9 @@
                       </span>
                       <span class="label">Funcionários</span>
                     </div>
-                    <div class="breakdown-value">{{ quantidadeTotalFuncionarios() }}</div>
+                    <div class="breakdown-value">{{ quantidadeTotalFuncionarios() || 0 }}</div>
                     <div class="breakdown-detail">
-                      {{ formCliente.get('numeroPostos')?.value || 0 }} postos (slots)
+                      {{ formContrato.get('numeroPostos')?.value || 0 }} postos físicos configurados
                     </div>
                   </div>
 
@@ -973,6 +1204,7 @@
                     </div>
                   </div>
                 }
+                }
               </div>
 
               <div class="required-note">
@@ -981,6 +1213,128 @@
             }
           </div>
         </form>
+      </div>
+    }
+
+    <!-- Modal de Criação de Tag -->
+    @if (showTagModal()) {
+      <div class="modal-overlay" (click)="closeTagModal()">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Nova Tag / Função</h2>
+            <button type="button" class="modal-close" (click)="closeTagModal()">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          @if (tagFormSuccess()) {
+            <div class="alert alert-success" style="margin: 16px">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              {{ tagFormSuccess() }}
+            </div>
+          }
+
+          @if (tagFormError()) {
+            <div class="alert alert-error" style="margin: 16px">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              {{ tagFormError() }}
+            </div>
+          }
+
+          <form [formGroup]="tagForm" (ngSubmit)="saveTag()" class="modal-body">
+            <div class="form-group">
+              <label for="tag-nome" class="form-label">
+                Nome da Tag <span class="required">*</span>
+              </label>
+              <input
+                id="tag-nome"
+                type="text"
+                formControlName="nome"
+                class="form-input"
+                [class.error]="hasTagError('nome')"
+                placeholder="Ex: Supervisor, Vigilante, Porteiro"
+                [disabled]="savingTag()"
+              />
+              @if (hasTagError('nome')) {
+                <span class="error-message">{{ getTagErrorMessage('nome') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="tag-valor" class="form-label">
+                Valor Base (R$) <span class="required">*</span>
+              </label>
+              <input
+                id="tag-valor"
+                type="number"
+                formControlName="valor"
+                class="form-input"
+                [class.error]="hasTagError('valor')"
+                placeholder="Ex: 120.00"
+                step="0.01"
+                min="0"
+                [disabled]="savingTag()"
+              />
+              @if (hasTagError('valor')) {
+                <span class="error-message">{{ getTagErrorMessage('valor') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="tag-descricao" class="form-label"> Descrição (Opcional) </label>
+              <textarea
+                id="tag-descricao"
+                formControlName="descricao"
+                class="form-input"
+                placeholder="Ex: Supervisor de segurança com experiência em gerenciamento de equipes"
+                rows="3"
+                [disabled]="savingTag()"
+              ></textarea>
+              @if (hasTagError('descricao')) {
+                <span class="error-message">{{ getTagErrorMessage('descricao') }}</span>
+              }
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="closeTagModal()"
+                [disabled]="savingTag()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="tagForm.invalid || savingTag()"
+              >
+                {{ savingTag() ? 'Salvando...' : 'Criar Tag' }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     }
 

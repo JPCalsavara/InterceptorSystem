@@ -8,11 +8,13 @@ import { EntityCacheCoordinatorService } from './entity-cache-coordinator.servic
 
 export interface CreateTagDto {
   nome: string;
+  valor: number;
   descricao?: string;
 }
 
 export interface UpdateTagDto {
   nome: string;
+  valor: number;
   descricao?: string;
 }
 
@@ -59,6 +61,6 @@ export class TagService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('tag')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
   }
 }

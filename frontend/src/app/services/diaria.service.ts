@@ -3,7 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Diaria, CreateDiariaDto, UpdateDiariaDto } from '../models/index';
+import {
+  Diaria,
+  CreateDiariaDto,
+  UpdateDiariaDto,
+  DiariasContratoResumo,
+  ContratoResumoFinanceiro,
+} from '../models/index';
 import { EntityCacheCoordinatorService } from './entity-cache-coordinator.service';
 
 @Injectable({
@@ -63,6 +69,29 @@ export class DiariaService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('diaria')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
+  }
+
+  getResumoByContrato(
+    contratoId: string,
+    ano: number,
+    mes: number,
+  ): Observable<DiariasContratoResumo> {
+    return this.http.get<DiariasContratoResumo>(`${this.apiUrl}/contrato/${contratoId}/resumo`, {
+      params: { ano: ano.toString(), mes: mes.toString() },
+    });
+  }
+
+  getResumoFinanceiroByContrato(
+    contratoId: string,
+    ano: number,
+    mes: number,
+  ): Observable<ContratoResumoFinanceiro> {
+    return this.http.get<ContratoResumoFinanceiro>(
+      `${this.apiUrl}/contrato/${contratoId}/resumo-financeiro`,
+      {
+        params: { ano: ano.toString(), mes: mes.toString() },
+      },
+    );
   }
 }

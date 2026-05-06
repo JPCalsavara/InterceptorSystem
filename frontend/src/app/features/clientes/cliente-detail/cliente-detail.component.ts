@@ -137,17 +137,22 @@ export class ClienteDetailComponent implements OnInit {
   });
 
   custoPeriodo = computed(() => {
-    // Calcula custo baseado no contrato, não nos funcionários individuais
+    // Calcula custo baseado em TODOS os contratos vigentes no período
     const multiplicador = this.getMultiplicadorPeriodo();
-    const contrato = this.contratoAtual();
+    const contratos = this.contratosPeriodo();
 
-    if (!contrato) {
+    if (!contratos || contratos.length === 0) {
       return 0;
     }
 
-    // Custo = valorTotalMensal - margem de lucro
-    const custoMensal = contrato.valorTotalMensal * (1 - contrato.margemLucroPercentual / 100);
-    return custoMensal * multiplicador;
+    // Preferir custo real calculado pelo backend quando disponível,
+    // caso contrário, cair de volta para a derivação existente.
+    const custoTotal = contratos.reduce((sum, c) => {
+      const custoMensal =
+        c.custoRealMensal ?? c.valorTotalMensal * (1 - c.margemLucroPercentual / 100);
+      return sum + custoMensal;
+    }, 0);
+    return custoTotal * multiplicador;
   });
 
   lucroPeriodo = computed(() => {
@@ -179,13 +184,17 @@ export class ClienteDetailComponent implements OnInit {
 
   custoMedioPorFuncionario = computed(() => {
     const total = this.funcionariosPeriodo().length;
-    const contrato = this.contratoAtual();
+    const contratos = this.contratosPeriodo();
 
-    if (total === 0 || !contrato) return 0;
+    if (total === 0 || !contratos || contratos.length === 0) return 0;
 
-    // Custo mensal dividido pela quantidade de funcionários
-    const custoMensal = contrato.valorTotalMensal * (1 - contrato.margemLucroPercentual / 100);
-    return custoMensal / total;
+    // Usa `custoRealMensal` quando disponível; senão, calcula pela margem.
+    const custoTotal = contratos.reduce((sum, c) => {
+      const custoMensal =
+        c.custoRealMensal ?? c.valorTotalMensal * (1 - c.margemLucroPercentual / 100);
+      return sum + custoMensal;
+    }, 0);
+    return custoTotal / total;
   });
 
   // Métricas de contratos

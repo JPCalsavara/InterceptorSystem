@@ -377,7 +377,11 @@
             </div>
 
             <div class="card-actions">
-              <button class="btn-icon" [routerLink]="[baseRoute(), diaria.id]" title="Ver detalhes">
+              <button
+                class="btn-icon btn-view"
+                [routerLink]="[baseRoute(), diaria.id]"
+                title="Ver detalhes"
+              >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                   <path
@@ -387,7 +391,7 @@
                   />
                 </svg>
               </button>
-              <button class="btn-icon" (click)="openEditModal(diaria.id)" title="Editar">
+              <button class="btn-icon btn-edit" (click)="openEditModal(diaria.id)" title="Editar">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"

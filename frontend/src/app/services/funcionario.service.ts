@@ -55,6 +55,6 @@ export class FuncionarioService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('funcionario')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
   }
 }

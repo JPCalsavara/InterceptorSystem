@@ -133,7 +133,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
               </div>
 
               <div class="form-group">
-                <label for="cnpj">CNPJ <span class="optional">(opcional)</span></label>
+                <label for="cnpj">CNPJ</label>
                 <input
                   id="cnpj"
                   type="text"

@@ -6,7 +6,6 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
-import { TagService } from '../../../services/tag.service';
 import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
 import { celularValidator, cpfValidator } from '../../../shared/validators/br-documents.validators';
 import {
@@ -30,7 +29,6 @@ export class FuncionarioFormComponent implements OnInit {
   private service = inject(FuncionarioService);
   private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
-  private tagService = inject(TagService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -43,7 +41,6 @@ export class FuncionarioFormComponent implements OnInit {
   clientes = signal<any[]>([]);
   contratos = signal<Contrato[]>([]);
   tags = signal<Tag[]>([]);
-  defaultTag = signal<Tag | null>(null);
 
   StatusFuncionario = StatusFuncionario;
   TipoFuncionario = TipoFuncionario;
@@ -75,7 +72,6 @@ export class FuncionarioFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadClientes();
-    this.loadTags();
     this.buildForm();
     this.setupClienteChange();
 
@@ -85,24 +81,6 @@ export class FuncionarioFormComponent implements OnInit {
       this.isEdit.set(true);
       this.loadFuncionario(id);
     }
-  }
-
-  loadTags(): void {
-    this.tagService.getAll().subscribe({
-      next: (data) => {
-        this.tags.set(data);
-        // Keep "valorDiaria" as locked default when available.
-        const defaultTag = data.find((t) => t.nome.toLowerCase() === 'valordiaria');
-        this.defaultTag.set(defaultTag || null);
-
-        // Ensure default tag stays selected when available.
-        const tagIdsControl = this.form?.get('tagIds');
-        if (tagIdsControl && defaultTag) {
-          tagIdsControl.setValue(this.withDefaultTag(tagIdsControl.value || []));
-        }
-      },
-      error: (err) => console.error('Erro ao carregar tags:', err),
-    });
   }
 
   loadClientes(): void {
@@ -115,20 +93,40 @@ export class FuncionarioFormComponent implements OnInit {
   setupClienteChange(): void {
     this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
       if (clienteId) {
-        this.loadContratos(clienteId);
+        this.loadContratoTags(clienteId);
       } else {
         this.contratos.set([]);
+        this.tags.set([]);
+        this.form.get('tagIds')?.setValue([]);
       }
     });
   }
 
-  loadContratos(clienteId: string): void {
+  loadContratoTags(clienteId: string): void {
     this.contratoService.getAll().subscribe({
       next: (data) => {
         const contratosDoCliente = data.filter(
           (c) => c.clienteId === clienteId && c.status !== StatusContrato.FINALIZADO,
         );
         this.contratos.set(contratosDoCliente);
+
+        const tags = contratosDoCliente
+          .flatMap((c) => c.tags ?? [])
+          .reduce((acc, ct) => {
+            if (!acc.some((tag) => tag.id === ct.tagId)) {
+              acc.push({ id: ct.tagId, nome: ct.tagNome, valor: 0 });
+            }
+            return acc;
+          }, [] as Tag[]);
+
+        const allowedIds = new Set(tags.map((tag) => tag.id));
+        const selectedIds = Array.isArray(this.form.get('tagIds')?.value)
+          ? this.form.get('tagIds')?.value
+          : [];
+        const filteredIds = selectedIds.filter((id: string) => allowedIds.has(id));
+
+        this.tags.set(tags);
+        this.form.get('tagIds')?.setValue(filteredIds);
       },
       error: (err) => console.error('Erro ao carregar contratos:', err),
     });
@@ -144,22 +142,15 @@ export class FuncionarioFormComponent implements OnInit {
       statusFuncionario: [StatusFuncionario.ATIVO, Validators.required],
       tipoFuncionario: [TipoFuncionario.CLT, Validators.required],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
-      tagIds: [this.defaultTag() ? [this.defaultTag()!.id] : []],
+      tagIds: [[]],
     });
-  }
-
-  private withDefaultTag(ids: string[]): string[] {
-    const uniq = [...new Set(ids)];
-    const defaultTagId = this.defaultTag()?.id;
-    if (!defaultTagId) return uniq;
-    return uniq.includes(defaultTagId) ? uniq : [defaultTagId, ...uniq];
   }
 
   loadFuncionario(id: string): void {
     this.loading.set(true);
     this.service.getById(id).subscribe({
       next: (data) => {
-        const tagIds = this.withDefaultTag((data.tags ?? []).map((tag) => tag.id));
+        const tagIds = (data.tags ?? []).map((tag) => tag.id);
         this.form.patchValue({
           ...data,
           tagIds,
@@ -192,10 +183,7 @@ export class FuncionarioFormComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    const formValue = {
-      ...this.form.value,
-      tagIds: this.withDefaultTag(this.form.value.tagIds || []),
-    };
+    const formValue = this.form.value;
 
     const request = this.isEdit()
       ? this.service.update(this.funcionarioId()!, formValue)
@@ -254,7 +242,7 @@ export class FuncionarioFormComponent implements OnInit {
     const tagIdsControl = this.form.get('tagIds');
     if (!tagIdsControl) return;
 
-    tagIdsControl.setValue(this.withDefaultTag(tagIds));
+    tagIdsControl.setValue(tagIds);
     tagIdsControl.markAsTouched();
   }
 }

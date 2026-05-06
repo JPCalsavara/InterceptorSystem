@@ -208,13 +208,10 @@
         <app-tag-picker
           [tags]="tags()"
           [selectedIds]="form.get('tagIds')?.value || []"
-          [lockedIds]="defaultTag() ? [defaultTag()!.id] : []"
           [disabled]="loading()"
           [label]="'Seleção de funções'"
           [helperText]="
-            defaultTag()
-              ? 'Função padrão ' + defaultTag()!.nome + ' é fixa e sempre será enviada.'
-              : 'Selecione uma ou mais funções para o funcionário.'
+            'Selecione uma ou mais funções disponíveis nos contratos ativos do cliente.'
           "
           (selectionChange)="onTagSelectionChange($event)"
         />

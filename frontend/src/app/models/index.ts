@@ -79,6 +79,7 @@ export interface UpdateClienteDto {
 export interface Tag {
   id: string;
   nome: string;
+  valor: number;
   descricao?: string;
 }
 
@@ -101,17 +102,21 @@ export interface Contrato {
   valorTotalMensal: number;
   valorDiariaCobrada: number;
   percentualAdicionalNoturno: number;
+  percentualAdicionalFimSemana: number;
   valorBeneficiosExtrasMensal: number;
-  percentualImpostos: number;
-  numeroDePostos: number;
+  percentualEncargosProvisoes: number;
   quantidadeFuncionarios: number;
+  numeroDePostos: number;
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
   dataInicio: string;
   dataFim: string;
   status: StatusContrato;
-  tags?: ContratoTagRate[];
-  valorDiariaVigilante?: number | null;
+  tags: ContratoTagRate[];
+  valorDiariaVigilante?: number;
+  // Campos calculados pelo backend
+  custoRealMensal?: number;
+  lucroRealMensal?: number;
 }
 
 export interface CreateContratoDto {
@@ -120,8 +125,9 @@ export interface CreateContratoDto {
   valorTotalMensal: number;
   valorDiariaCobrada: number;
   percentualAdicionalNoturno: number;
+  percentualAdicionalFimSemana: number;
   valorBeneficiosExtrasMensal: number;
-  percentualImpostos: number;
+  percentualEncargosProvisoes: number;
   numeroDePostos: number;
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
@@ -137,8 +143,9 @@ export interface UpdateContratoDto {
   valorTotalMensal: number;
   valorDiariaCobrada: number;
   percentualAdicionalNoturno: number;
+  percentualAdicionalFimSemana: number;
   valorBeneficiosExtrasMensal: number;
-  percentualImpostos: number;
+  percentualEncargosProvisoes: number;
   numeroDePostos: number;
   margemLucroPercentual: number;
   margemCoberturaFaltasPercentual: number;
@@ -195,6 +202,7 @@ export interface Alocacao {
   horarioFim: string; // format "HH:mm:ss"
   tipoEscala: TipoEscala;
   permiteDobrarEscala: boolean;
+  quantidadeFuncionarios: number;
   temHorarioNoturno: boolean;
 }
 
@@ -205,6 +213,7 @@ export interface CreateAlocacaoDto {
   horarioFim: string;
   tipoEscala: TipoEscala;
   permiteDobrarEscala: boolean;
+  quantidadeFuncionarios?: number;
 }
 
 export interface UpdateAlocacaoDto {
@@ -212,6 +221,7 @@ export interface UpdateAlocacaoDto {
   horarioFim: string;
   tipoEscala: TipoEscala;
   permiteDobrarEscala: boolean;
+  quantidadeFuncionarios?: number;
 }
 
 // Posto - FASE 2B
@@ -219,7 +229,6 @@ export interface Posto {
   id: string;
   clienteId: string;
   nome: string;
-  tags?: Tag[];
   cep: string;
   endereco: string;
   numero: string;
@@ -233,7 +242,6 @@ export interface Posto {
 export interface CreatePostoDto {
   clienteId: string;
   nome: string;
-  tagIds?: string[];
   cep: string;
   endereco: string;
   numero: string;
@@ -244,7 +252,6 @@ export interface CreatePostoDto {
 
 export interface UpdatePostoDto {
   nome: string;
-  tagIds?: string[];
   cep: string;
   endereco: string;
   numero: string;
@@ -260,10 +267,72 @@ export interface Diaria {
   alocacaoId: string;
   data: string; // formato "yyyy-MM-dd"
   valorDiaria: number;
+  tagId?: string | null;
   statusDiaria: StatusDiaria;
   tipoDiaria: TipoDiaria;
   funcionario?: Funcionario;
   alocacao?: Alocacao;
+}
+
+export interface DiariaTagResumo {
+  tagId: string | null;
+  tagNome: string;
+  quantidadeDiarias: number;
+  totalValor: number;
+}
+
+export interface DiariasContratoResumo {
+  contratoId: string;
+  ano: number;
+  mes: number;
+  totalDiarias: number;
+  totalValorDiarias: number;
+  totalConfirmadas: number;
+  totalFaltas: number;
+  totalCanceladas: number;
+  resumoByTag: DiariaTagResumo[];
+}
+
+export interface ContratoResumoFinanceiroPosto {
+  postoId: string;
+  postoNome: string;
+  totalDiarias: number;
+  custoTotal: number;
+  diariasNormais: number;
+  diariasExtras: number;
+}
+
+export interface ContratoResumoFinanceiroAlocacao {
+  alocacaoId: string;
+  tipoEscala: TipoEscala;
+  temHorarioNoturno: boolean;
+  totalDiarias: number;
+  custoTotal: number;
+  diariasNormais: number;
+  diariasExtras: number;
+}
+
+export interface ContratoResumoFinanceiroFuncionario {
+  funcionarioId: string;
+  funcionarioNome: string;
+  totalDiarias: number;
+  custoTotal: number;
+  diariasNormais: number;
+  diariasExtras: number;
+}
+
+export interface ContratoResumoFinanceiro {
+  contratoId: string;
+  ano: number;
+  mes: number;
+  custoRealDiariasNormais: number;
+  custoRealDiariasExtras: number;
+  custoRealTotal: number;
+  totalDiariasNormais: number;
+  totalDiariasExtras: number;
+  projecaoCustoPorPosto: ContratoResumoFinanceiroPosto[];
+  projecaoCustoPorAlocacao: ContratoResumoFinanceiroAlocacao[];
+  projecaoCustoPorFuncionario: ContratoResumoFinanceiroFuncionario[];
 }
 
 export interface CreateDiariaDto {

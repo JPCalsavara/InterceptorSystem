@@ -2,30 +2,78 @@
 
 export interface CalculoValorTotalInput {
   valorDiariaCobrada: number;
-  quantidadeFuncionarios: number;
-  numeroDePostos: number; // Quantidade de turnos (ex: 2 = 12x36)
-  numeroDePostosNoturnos: number; // Quantos desses postos são noturnos (CLT Art. 73)
+  diariasTotaisMes: number;
+  diariasNoturnasMes: number;
+  diariasFdsMes: number; // Separado: FDS (não inclusos no custo)
+  diariasFeriadosMes: number; // Separado: Feriados (não inclusos no custo)
+  funcionariosEstimados: number;
   valorBeneficiosExtrasMensal: number;
-  percentualImpostos: number; // 0.15 = 15%
-  percentualAdicionalNoturno: number; // 0.20 = 20%
-  margemLucroPercentual: number; // 0.15 = 15%
-  margemCoberturaFaltasPercentual: number; // 0.10 = 10%
+  percentualEncargosProvisoes: number;
+  percentualAdicionalNoturno: number;
+  percentualAdicionalFimSemana: number;
+  margemLucroPercentual: number;
+  margemCoberturaFaltasPercentual: number;
 }
 
 export interface CalculoValorTotalOutput {
-  valorTotalMensal: number; // R$ 12.583,33
-  custoBaseMensal: number; // R$  7.550,00
-  valorAdicionalNoturno: number; // R$  1.200,00
-  valorImpostos: number; // R$  1.887,50
-  valorMargemLucro: number; // R$  1.887,50
-  valorMargemFaltas: number; // R$  1.258,33
-  valorBeneficios: number; // R$    350,00
-  valorEncargosTrabalhistas: number; // R$ 4.680,00
-  baseParaSalarios: number; // R$  7.200,00 (salários + adicional noturno)
-  // Breakdown por turno/posto
-  numeroDePostos: number; // 2 postos
-  numeroDePostosNoturnos: number; // 1 posto noturno
-  funcionariosPorPosto: number; // 1 funcionário/posto
-  custoPorPostoDiario: number; // R$ 100,00/dia
-  custoPorPostoMensal: number; // R$ 3.000,00/mês
+  valorTotalMensal: number;
+  custoBaseMensal: number;
+  custoDiariasNormais: number;
+  custoAdicionalNoturno: number;
+  custoDiariasFimSemana: number;
+  valorImpostos: number;
+  valorMargemLucro: number;
+  valorMargemFaltas: number;
+  valorBeneficios: number;
+  custoDireto: number;
+  diariasTotaisMes: number;
+  diariasNoturnasMes: number;
+  diariasFdsMes: number; // Novo: Separado como RISCO
+  diariasFeriadosMes: number; // Novo: Separado como RISCO
+  funcionariosEstimados: number;
+  funcionariosProjetados: number; // Novo
+  custoTotalBeneficios: number; // Novo
+  quantidadeFuncionarios?: number;
+  quantidadeDiarias?: number;
+}
+
+export interface SimulacaoFinanceiraMensalInput {
+  valorDiaria: number;
+  numeroDePostos: number;
+  percentualAdicionalNoturno: number;
+  percentualAdicionalFimSemana?: number;
+  alocacoesPorPosto?: number;
+  funcionariosPorAlocacao?: number;
+  diasUteisMes?: number;
+  diasFimSemanaMes?: number;
+  feriadosAno?: number;
+  diasTrabalhadosPorFuncionarioMes?: number;
+  valorBeneficioMensalPorFuncionario?: number;
+  percentualEncargosProvisoes?: number;
+  margemLucroPercentual?: number;
+  margemCoberturaFaltasPercentual?: number;
+}
+
+export interface SimulacaoFinanceiraMensalOutput {
+  numeroDePostos: number;
+  alocacoesTotais: number;
+  alocacoesNoturnas: number;
+  funcionariosPorAlocacao: number;
+  diariasPorDia: number;
+  diariasNoturnasPorDia: number;
+  diariasUteisMes: number;
+  diariasFimSemanaMes: number;
+  diariasFeriadosMes: number; // Separado como RISCO
+  diariasTotaisMes: number;
+  custoDiariasNormais: number;
+  custoAdicionalNoturno: number;
+  custoDiariasFimSemana: number;
+  funcionariosProjetados: number; // Novo: Derivado do cálculo
+  custoTotalBeneficios: number; // Novo: Custo total de benefícios
+  custoTotalMensal: number;
+  valorImpostos: number;
+  custoBaseMensal: number;
+  valorMargemLucro: number;
+  valorMargemFaltas: number;
+  faturamentoSimulado: number;
 }

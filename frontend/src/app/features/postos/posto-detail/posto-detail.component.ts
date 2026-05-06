@@ -214,6 +214,10 @@ export class PostoDetailComponent implements OnInit {
     });
   }
 
+  trackAloc(index: number, aloc: Alocacao): string {
+    return aloc.id;
+  }
+
   diariaRecebeBonus(diaria: Diaria): boolean {
     const alocacao = this.alocacoes().find(a => a.id === diaria.alocacaoId);
     return !!alocacao?.temHorarioNoturno && this.recebeBonusContrato();

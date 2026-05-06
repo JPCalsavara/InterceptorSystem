@@ -22,8 +22,9 @@ export interface CriarClienteCompletoInput {
     valorTotalMensal: number;
     valorDiariaCobrada: number;
     percentualAdicionalNoturno: number; // 0-1 (ex: 0.20 = 20%)
+    percentualAdicionalFimSemana: number; // 0-1
     valorBeneficiosExtrasMensal: number;
-    percentualImpostos: number; // 0-1 (ex: 0.15 = 15%)
+    percentualEncargosProvisoes: number; // 0-1 (ex: 0.15 = 15%)
     margemLucroPercentual: number; // 0-1 (ex: 0.15 = 15%)
     margemCoberturaFaltasPercentual: number; // 0-1 (ex: 0.10 = 10%)
     dataInicio: string; // formato "yyyy-MM-dd"
@@ -32,6 +33,14 @@ export interface CriarClienteCompletoInput {
   };
   criarPostosAutomaticamente?: boolean; // padrão: true
   numeroDePostos?: number; // padrão: 2 (diurno + noturno)
+  postoConfigs?: Array<{
+    tipoPosto: string;
+    quantidadeAlocacoes: number;
+    quantidadeFuncionariosPorAlocacao: number;
+    alocacoesNoturnas: number;
+    valorDiariaCobrada: number;
+    valorBeneficiosExtrasMensal: number;
+  }>;
 }
 
 // Espelha: ClienteCompletoDtoOutput (backend)

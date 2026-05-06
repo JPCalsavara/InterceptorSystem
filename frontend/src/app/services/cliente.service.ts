@@ -56,6 +56,6 @@ export class ClienteService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('cliente')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
   }
 }

@@ -1,4 +1,4 @@
-@import '../../../../styles/shared-pages';
+@use '../../../../styles/shared-pages' as *;
 
 .detail-container {
   max-width: 1400px;

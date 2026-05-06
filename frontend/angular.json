@@ -47,7 +47,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "25kB",
+                  "maximumWarning": "26kB",
                   "maximumError": "32kB"
                 }
               ],
@@ -74,7 +74,13 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": ["src/test-setup.ts"],
+            "coverageInclude": ["src/app/**"],
+            "coverageExclude": ["src/app/models/**", "src/environments/**", "src/**/*.spec.ts"],
+            "coverageReporters": ["text-summary", "html"]
+          }
         }
       }
     }

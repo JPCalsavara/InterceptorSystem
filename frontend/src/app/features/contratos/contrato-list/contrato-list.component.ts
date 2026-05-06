@@ -1,15 +1,21 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { ContratoService } from '../../../services/contrato.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
+import { DiariaService } from '../../../services/diaria.service';
+import { ContratoFinanceiroUiService } from '../../../services/contrato-financeiro-ui.service';
 import {
   Contrato,
   StatusContrato,
   Cliente,
   Funcionario,
   StatusFuncionario,
+  ContratoResumoFinanceiro,
+  DiariasContratoResumo,
 } from '../../../models/index';
 
 @Component({
@@ -23,15 +29,54 @@ export class ContratoListComponent implements OnInit {
   private service = inject(ContratoService);
   private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
+  private diariaService = inject(DiariaService);
+  private financeiroUiService = inject(ContratoFinanceiroUiService);
 
   contratos = signal<Contrato[]>([]);
   clientes = signal<Cliente[]>([]);
   funcionarios = signal<Funcionario[]>([]);
+  resumosFinanceiros = signal<Map<string, ContratoResumoFinanceiro>>(new Map());
+  calculosDetalhados = signal<Map<string, unknown>>(new Map());
   loading = signal(false);
+  loadingResumos = signal(false);
+  loadingCalculos = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
   StatusContrato = StatusContrato;
+
+  // Seletor de período
+  periodoAno = signal<number>(new Date().getFullYear());
+  periodoMes = signal<number>(new Date().getMonth() + 1);
+
+  periodoLabel = computed(() => {
+    return new Date(this.periodoAno(), this.periodoMes() - 1).toLocaleDateString('pt-BR', {
+      month: 'short',
+      year: 'numeric',
+    });
+  });
+
+  periodoAnterior(): void {
+    const mes = this.periodoMes();
+    if (mes === 1) {
+      this.periodoAno.update((a) => a - 1);
+      this.periodoMes.set(12);
+    } else {
+      this.periodoMes.update((m) => m - 1);
+    }
+    this.loadResumosFinanceiros();
+  }
+
+  proximoPeriodo(): void {
+    const mes = this.periodoMes();
+    if (mes === 12) {
+      this.periodoAno.update((a) => a + 1);
+      this.periodoMes.set(1);
+    } else {
+      this.periodoMes.update((m) => m + 1);
+    }
+    this.loadResumosFinanceiros();
+  }
 
   // Computed signals para organização kanban
   contratosPendentes = computed(() =>
@@ -40,25 +85,33 @@ export class ContratoListComponent implements OnInit {
   contratosVerde = computed(() => this.getContratosByDias(90, Infinity));
   contratosAmarelo = computed(() => this.getContratosByDias(30, 90));
   contratosVermelho = computed(() => this.getContratosByDias(0, 30));
-  contratosFinalizados = computed(() =>
-    this.contratos().filter((c) => c.status === StatusContrato.FINALIZADO),
-  );
+  contratosFinalizados = computed(() => this.contratos().filter((c) => this.estaConcluido(c)));
 
   // Métricas mensais
-  totalContratos = computed(
-    () => this.contratos().filter((c) => c.status !== StatusContrato.FINALIZADO).length,
-  );
+  totalContratos = computed(() => this.contratos().filter((c) => !this.estaConcluido(c)).length);
   faturamentoMensal = computed(() =>
     this.contratos()
-      .filter((c) => c.status === StatusContrato.ATIVO)
+      .filter((c) => c.status === StatusContrato.ATIVO && !this.estaConcluido(c))
       .reduce((sum, c) => sum + this.getValorMensal(c), 0),
   );
   custoMensal = computed(() =>
     this.contratos()
-      .filter((c) => c.status === StatusContrato.ATIVO)
-      .reduce((sum, c) => sum + this.getContratoCusto(c), 0),
+      .filter((c) => c.status === StatusContrato.ATIVO && !this.estaConcluido(c))
+      .reduce((sum, c) => sum + this.getCustoMensal(c), 0),
   );
-  lucroMensal = computed(() => this.faturamentoMensal() - this.custoMensal());
+  lucroMensal = computed(() =>
+    this.contratos()
+      .filter((c) => c.status === StatusContrato.ATIVO && !this.estaConcluido(c))
+      .reduce((sum, c) => sum + this.getContratoLucro(c), 0),
+  );
+
+  custoRealMensal = computed(() =>
+    this.contratos()
+      .filter((c) => c.status === StatusContrato.ATIVO && !this.estaConcluido(c))
+      .reduce((sum, c) => sum + this.getCustoMensal(c), 0),
+  );
+
+  lucroRealMensal = computed(() => this.lucroMensal());
 
   ngOnInit(): void {
     this.loadContratos();
@@ -88,6 +141,7 @@ export class ContratoListComponent implements OnInit {
       next: (data) => {
         this.contratos.set(data);
         this.loading.set(false);
+        this.loadResumosFinanceiros();
       },
       error: (err) => {
         this.error.set('Erro ao carregar contratos. Tente novamente.');
@@ -95,6 +149,81 @@ export class ContratoListComponent implements OnInit {
         console.error('Erro:', err);
       },
     });
+  }
+
+  loadResumosFinanceiros(): void {
+    const contratosFiltrados = this.contratos().filter(
+      (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+    );
+
+    if (contratosFiltrados.length === 0) {
+      this.resumosFinanceiros.set(new Map());
+      return;
+    }
+
+    this.loadingResumos.set(true);
+    const ano = this.periodoAno();
+    const mes = this.periodoMes();
+
+    const requests = contratosFiltrados.map((c) =>
+      this.diariaService
+        .getResumoFinanceiroByContrato(c.id, ano, mes)
+        .pipe(catchError(() => of(null))),
+    );
+
+    forkJoin(requests).subscribe((resultados) => {
+      const novoMapa = new Map<string, ContratoResumoFinanceiro>();
+      resultados.forEach((resumo, i) => {
+        if (resumo !== null) {
+          novoMapa.set(contratosFiltrados[i].id, resumo);
+        }
+      });
+      this.resumosFinanceiros.set(novoMapa);
+      this.loadCalculosDetalhados();
+      this.loadingResumos.set(false);
+    });
+  }
+
+  loadCalculosDetalhados(): void {
+    const contratosFiltrados = this.contratos().filter(
+      (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+    );
+
+    if (contratosFiltrados.length === 0) {
+      this.calculosDetalhados.set(new Map());
+      return;
+    }
+
+    this.loadingCalculos.set(true);
+    this.financeiroUiService
+      .carregarCalculosDetalhados$(contratosFiltrados, this.resumosFinanceiros())
+      .subscribe({
+        next: (mapa) => {
+          this.calculosDetalhados.set(mapa);
+          this.loadingCalculos.set(false);
+        },
+        error: () => {
+          this.calculosDetalhados.set(new Map());
+          this.loadingCalculos.set(false);
+        },
+      });
+  }
+
+  getResumoDiarias(contratoId: string): DiariasContratoResumo | undefined {
+    const resumoFinanceiro = this.resumosFinanceiros().get(contratoId);
+    if (!resumoFinanceiro) return undefined;
+
+    return {
+      contratoId: resumoFinanceiro.contratoId,
+      ano: resumoFinanceiro.ano,
+      mes: resumoFinanceiro.mes,
+      totalDiarias: resumoFinanceiro.totalDiariasNormais + resumoFinanceiro.totalDiariasExtras,
+      totalValorDiarias: resumoFinanceiro.custoRealTotal,
+      totalConfirmadas: 0,
+      totalFaltas: 0,
+      totalCanceladas: 0,
+      resumoByTag: [],
+    };
   }
 
   confirmDelete(id: string, descricao: string): void {
@@ -135,7 +264,7 @@ export class ContratoListComponent implements OnInit {
       case StatusContrato.PENDENTE:
         return 'Pendente';
       case StatusContrato.FINALIZADO:
-        return 'Finalizado';
+        return 'Concluído';
       default:
         return 'Desconhecido';
     }
@@ -157,12 +286,17 @@ export class ContratoListComponent implements OnInit {
   getContratosByDias(min: number, max: number): Contrato[] {
     const now = new Date();
     return this.contratos().filter((c) => {
-      if (c.status !== StatusContrato.ATIVO) return false;
+      if (c.status !== StatusContrato.ATIVO || this.estaConcluido(c)) return false;
       const dataFim = new Date(c.dataFim);
       const diff = dataFim.getTime() - now.getTime();
       const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
       return dias >= min && dias < max;
     });
+  }
+
+  private estaConcluido(contrato: Contrato): boolean {
+    if (contrato.status === StatusContrato.FINALIZADO) return true;
+    return this.getDiasParaVencimento(contrato.dataFim) < 0;
   }
 
   getDiasParaVencimento(dataFim: string): number {
@@ -178,39 +312,21 @@ export class ContratoListComponent implements OnInit {
   }
 
   getContratoLucro(contrato: Contrato): number {
-    return this.getValorMensal(contrato) - this.getContratoCusto(contrato);
-  }
-
-  getContratoCusto(contrato: Contrato): number {
-    const valorTotal = contrato.valorTotalMensal || 0;
-    const diaria = contrato.valorDiariaCobrada || 0;
-    const beneficioUnit = contrato.valorBeneficiosExtrasMensal || 0;
-
-    // Impostos: percentualImpostos já é decimal (0.15 = 15%)
-    const impostos = valorTotal * (contrato.percentualImpostos || 0);
-
-    // Funcionários ativos deste cliente
-    const ativos = this.funcionarios().filter(
-      (f) => f.clienteId === contrato.clienteId && f.statusFuncionario === StatusFuncionario.ATIVO,
-    );
-
-    // Benefícios: se há ativos reais, usa qtd real; senao usa estimativa do contrato
-    const qtdBeneficios =
-      ativos.length > 0 ? ativos.length : (contrato.quantidadeFuncionarios || 0) * 2;
-    const beneficios = qtdBeneficios * beneficioUnit;
-
-    // Custo por funcionário (diaria × dias de escala)
-    const custoFuncionarios = ativos.reduce((sum, f) => {
-      // Sem TipoEscala disponível aqui — usar 15 dias como padrão (12×36)
-      const dias = 15;
-      return sum + dias * diaria + beneficioUnit;
-    }, 0);
-
-    return impostos + beneficios + custoFuncionarios;
+    return this.getValorMensal(contrato) - this.getCustoMensal(contrato);
   }
 
   getValorMensal(contrato: Contrato): number {
-    return contrato.valorTotalMensal || 0;
+    return this.financeiroUiService.getFaturamentoDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  getCustoMensal(contrato: Contrato): number {
+    return this.financeiroUiService.getCustoDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
   }
 
   getTagRatesPreview(contrato: Contrato): string {

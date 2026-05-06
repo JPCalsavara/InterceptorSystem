@@ -5,9 +5,8 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PostoService } from '../../../services/posto.service';
 import { ClienteService } from '../../../services/cliente.service';
-import { ContratoService } from '../../../services/contrato.service';
 import { CepService } from '../../../services/cep.service';
-import { Cliente, Posto, StatusContrato, Tag } from '../../../models/index';
+import { Cliente, Posto } from '../../../models/index';
 
 @Component({
   selector: 'app-posto-form',
@@ -20,7 +19,6 @@ export class PostoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(PostoService);
   private clienteService = inject(ClienteService);
-  private contratoService = inject(ContratoService);
   private cepService = inject(CepService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -29,12 +27,10 @@ export class PostoFormComponent implements OnInit {
   clientes = signal<Cliente[]>([]);
   loading = signal(false);
   loadingCep = signal(false);
-  loadingTags = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
   isEditMode = signal(false);
   postoId: string | null = null;
-  contratoTags = signal<Tag[]>([]);
 
   ngOnInit(): void {
     this.postoId = this.route.snapshot.paramMap.get('id');
@@ -43,7 +39,6 @@ export class PostoFormComponent implements OnInit {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       nome: ['', [Validators.required, Validators.maxLength(150)]],
-      tagIds: [[] as string[]],
       cep: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
       endereco: ['', [Validators.required, Validators.maxLength(250)]],
       numero: ['', [Validators.required, Validators.maxLength(20)]],
@@ -71,104 +66,9 @@ export class PostoFormComponent implements OnInit {
   private setupClienteChange(): void {
     this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
       if (!clienteId) {
-        this.contratoTags.set([]);
-        this.applyTagSelectionRules([]);
         return;
       }
-
-      this.loadContratoTags(clienteId);
     });
-  }
-
-  private loadContratoTags(clienteId: string): void {
-    this.loadingTags.set(true);
-
-    this.contratoService
-      .getByClienteId(clienteId)
-      .pipe(finalize(() => this.loadingTags.set(false)))
-      .subscribe({
-        next: (contratos) => {
-          const tags = contratos
-            .filter((contrato) => contrato.status !== StatusContrato.FINALIZADO)
-            .flatMap((contrato) => contrato.tags ?? [])
-            .reduce((acc, current) => {
-              if (!acc.some((item) => item.id === current.tagId)) {
-                acc.push({ id: current.tagId, nome: current.tagNome });
-              }
-              return acc;
-            }, [] as Tag[]);
-
-          this.contratoTags.set(tags);
-          this.applyTagSelectionRules(tags);
-        },
-        error: (err) => {
-          this.contratoTags.set([]);
-          this.applyTagSelectionRules([]);
-          console.error('Erro ao carregar tags por contrato:', err);
-        },
-      });
-  }
-
-  private applyTagSelectionRules(tags: Tag[]): void {
-    const tagControl = this.form.get('tagIds');
-    if (!tagControl) return;
-
-    const availableTagIds = new Set(tags.map((tag) => tag.id));
-    const currentIds = Array.isArray(tagControl.value) ? tagControl.value : [];
-    const sanitizedCurrentIds = currentIds.filter((id: string) => availableTagIds.has(id));
-
-    if (tags.length === 1) {
-      tagControl.setValue([tags[0].id], { emitEvent: false });
-      tagControl.disable({ emitEvent: false });
-      return;
-    }
-
-    tagControl.enable({ emitEvent: false });
-    tagControl.setValue(sanitizedCurrentIds, { emitEvent: false });
-  }
-
-  selectedTagIds(): string[] {
-    const tagControl = this.form.get('tagIds');
-    return Array.isArray(tagControl?.value) ? tagControl?.value : [];
-  }
-
-  isTagSelected(tagId: string): boolean {
-    return this.selectedTagIds().includes(tagId);
-  }
-
-  isSingleTagLocked(): boolean {
-    return this.contratoTags().length === 1;
-  }
-
-  hasMultipleTags(): boolean {
-    return this.contratoTags().length > 1;
-  }
-
-  areAllTagsSelected(): boolean {
-    const tags = this.contratoTags();
-    if (tags.length === 0) return false;
-    return this.selectedTagIds().length === tags.length;
-  }
-
-  onToggleTag(tagId: string, checked: boolean): void {
-    const tagControl = this.form.get('tagIds');
-    if (!tagControl || tagControl.disabled) return;
-
-    const currentIds = this.selectedTagIds();
-    const nextIds = checked
-      ? [...new Set([...currentIds, tagId])]
-      : currentIds.filter((id) => id !== tagId);
-
-    tagControl.setValue(nextIds);
-    tagControl.markAsTouched();
-  }
-
-  onToggleAllTags(checked: boolean): void {
-    const tagControl = this.form.get('tagIds');
-    if (!tagControl || tagControl.disabled) return;
-
-    tagControl.setValue(checked ? this.contratoTags().map((tag) => tag.id) : []);
-    tagControl.markAsTouched();
   }
 
   loadClientes(): void {
@@ -188,7 +88,6 @@ export class PostoFormComponent implements OnInit {
         this.form.patchValue({
           clienteId: data.clienteId,
           nome: data.nome,
-          tagIds: (data.tags ?? []).map((tag) => tag.id),
           cep: this.cepService.formatCep(data.cep),
           endereco: data.endereco,
           numero: data.numero,
@@ -196,7 +95,6 @@ export class PostoFormComponent implements OnInit {
           cidade: data.cidade,
           estado: data.estado,
         });
-        this.loadContratoTags(data.clienteId);
         this.form.get('clienteId')?.disable();
         this.loading.set(false);
       },
@@ -223,7 +121,6 @@ export class PostoFormComponent implements OnInit {
     const cepNormalizado = this.cepService.onlyDigits(formValue.cep);
     const payload = {
       nome: (formValue.nome || '').trim(),
-      tagIds: formValue.tagIds || [],
       cep: cepNormalizado,
       endereco: (formValue.endereco || '').trim(),
       numero: (formValue.numero || '').trim(),

@@ -49,4 +49,22 @@ describe('EntityCacheCoordinatorService', () => {
     expect(calls).toContain('diaria');
     expect(new Set(calls).size).toBe(4);
   });
+
+  it('invalidates all registered entities with invalidateAll', () => {
+    const calls: string[] = [];
+
+    service.registerInvalidator('cliente', () => calls.push('cliente'));
+    service.registerInvalidator('posto', () => calls.push('posto'));
+    service.registerInvalidator('alocacao', () => calls.push('alocacao'));
+    service.registerInvalidator('diaria', () => calls.push('diaria'));
+    service.registerInvalidator('contrato', () => calls.push('contrato'));
+    service.registerInvalidator('funcionario', () => calls.push('funcionario'));
+    service.registerInvalidator('tag', () => calls.push('tag'));
+
+    service.invalidateAll();
+
+    expect(new Set(calls)).toEqual(
+      new Set(['cliente', 'posto', 'alocacao', 'diaria', 'contrato', 'funcionario', 'tag']),
+    );
+  });
 });

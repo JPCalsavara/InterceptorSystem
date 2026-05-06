@@ -19,9 +19,14 @@
         </svg>
         Tags / Funções
       </h1>
-      <p class="subtitle">Gerencie as funções disponíveis</p>
+      <p class="subtitle">Gerencie as funções disponíveis para contratos e postos</p>
     </div>
-    <button class="btn-primary btn-md" (click)="openCreate()">+ Nova Tag</button>
+    <button class="btn-primary btn-md" (click)="openCreate()">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Nova Tag
+    </button>
   </div>
 
   <!-- Mensagens -->
@@ -62,21 +67,20 @@
       </svg>
       Filtros
     </h3>
-    <div class="filters-grid">
+    <div class="filters-grid tag-filters-grid">
       <div class="filter-group">
-        <!-- We use an input-text for the filter but style it nicely within filter-group -->
-        <label for="filtroNome" class="filter-label">Buscar nome/descrição</label>
+        <label for="filtroNome" class="filter-label">Buscar nome / descrição</label>
         <input
           id="filtroNome"
           type="text"
-          placeholder="Ex: Supervisor..."
+          placeholder="Ex: Supervisor, PM, Vigia..."
           class="filter-select"
-          style="background-image: none; padding-right: 0.875rem;"
+          style="background-image: none; padding-right: 0.875rem"
           [ngModel]="filtroNome()"
           (ngModelChange)="filtroNome.set($event)"
         />
       </div>
-      <div class="filter-actions" style="justify-content: flex-end; flex: 1;">
+      <div class="filter-actions">
         <button class="btn-clear-filters" (click)="limparFiltros()">
           <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -85,20 +89,18 @@
               clip-rule="evenodd"
             />
           </svg>
-          Limpar Filtro
+          Limpar
         </button>
       </div>
     </div>
     <div class="results-count">
-      <p>
-        Mostrando {{ tagsFiltradas().length }} de {{ tags().length }} tag(s)
-      </p>
+      <p>Mostrando <strong>{{ tagsFiltradas().length }}</strong> de <strong>{{ tags().length }}</strong> tag(s)</p>
     </div>
   </div>
 
   <!-- Loading -->
   @if (loading()) {
-    <div class="loading-state">
+    <div class="loading-container">
       <div class="spinner"></div>
       <p>Carregando tags...</p>
     </div>
@@ -108,80 +110,84 @@
   @if (!loading() && tagsFiltradas().length === 0 && !error()) {
     <div class="empty-state">
       <svg
-        width="48"
-        height="48"
+        width="56"
+        height="56"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
-        opacity="0.4"
       >
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
         <line x1="7" y1="7" x2="7.01" y2="7" />
       </svg>
-      <p>Nenhuma tag encontrada.</p>
+      <h3>Nenhuma tag encontrada</h3>
+      <p>
+        @if (filtroNome()) {
+          Nenhum resultado para "<strong>{{ filtroNome() }}</strong>". Tente outro termo.
+        } @else {
+          Crie a primeira tag para começar.
+        }
+      </p>
       @if (!filtroNome()) {
-        <button class="btn-primary btn-md" (click)="openCreate()">+ Nova Tag</button>
+        <button class="btn-primary btn-md" (click)="openCreate()">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Nova Tag
+        </button>
       }
     </div>
   }
 
-  <!-- Tabela -->
+  <!-- Cards Grid -->
   @if (!loading() && tagsFiltradas().length > 0) {
-    <div class="table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th class="col-actions">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (tag of tagsFiltradas(); track tag.id) {
-            <tr>
-              <td>
-                <span class="tag-badge">{{ tag.nome }}</span>
-              </td>
-              <td class="col-descricao">{{ tag.descricao || '—' }}</td>
-              <td class="col-actions">
-                <button class="action-btn btn-icon btn-edit" title="Editar" (click)="openEdit(tag)">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </button>
-                <button
-                  class="action-btn btn-icon btn-danger"
-                  title="Excluir"
-                  (click)="confirmDelete(tag)"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                    <path d="M10 11v6M14 11v6" />
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <div class="tags-grid">
+      @for (tag of tagsFiltradas(); track tag.id) {
+        <div class="tag-card">
+          <div class="tag-card-header">
+            <div class="tag-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
+            </div>
+            <div class="tag-header-info">
+              <span class="tag-name">{{ tag.nome }}</span>
+            </div>
+          </div>
+
+          <div class="tag-card-body">
+            <div class="tag-valor-row">
+              <span class="tag-valor-label">Valor base</span>
+              <span class="tag-valor-amount">{{ tag.valor | currency: 'BRL' }}</span>
+            </div>
+            <div class="tag-descricao">
+              @if (tag.descricao) {
+                <p>{{ tag.descricao }}</p>
+              } @else {
+                <p class="no-descricao">Sem descrição cadastrada.</p>
+              }
+            </div>
+          </div>
+
+          <div class="tag-card-footer">
+            <button class="action-btn btn-icon btn-edit" title="Editar" (click)="openEdit(tag)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
+            <button class="action-btn btn-icon btn-danger" title="Excluir" (click)="confirmDelete(tag)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
     </div>
   }
 </div>
@@ -193,14 +199,7 @@
       <div class="modal-header">
         <h2>{{ editingTag() ? 'Editar Tag' : 'Nova Tag' }}</h2>
         <button class="modal-close" (click)="closeModal()">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -223,6 +222,25 @@
           }
           @if (form.controls.nome.errors?.['maxlength'] && form.controls.nome.touched) {
             <span class="error-message">Máximo 100 caracteres.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="valor" class="form-label">Valor base (R$) <span class="required">*</span></label>
+          <input
+            id="valor"
+            type="number"
+            formControlName="valor"
+            class="form-input"
+            min="0"
+            step="0.01"
+            [class.error]="form.controls.valor.invalid && form.controls.valor.touched"
+          />
+          @if (form.controls.valor.errors?.['required'] && form.controls.valor.touched) {
+            <span class="error-message">Valor base é obrigatório.</span>
+          }
+          @if (form.controls.valor.errors?.['min'] && form.controls.valor.touched) {
+            <span class="error-message">Valor base não pode ser negativo.</span>
           }
         </div>
 
@@ -263,8 +281,7 @@
       </div>
       <div class="modal-body">
         <p>
-          Deseja excluir a tag <strong>{{ deleteTarget()!.nome }}</strong
-          >?
+          Deseja excluir a tag <strong>{{ deleteTarget()!.nome }}</strong>?
         </p>
         <p class="warning-text">
           Esta ação removerá a tag de todos os contratos e funcionários associados.

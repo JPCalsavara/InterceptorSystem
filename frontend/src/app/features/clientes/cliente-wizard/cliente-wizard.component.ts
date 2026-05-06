@@ -10,22 +10,36 @@ import { ClienteService } from '../../../services/cliente.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { IbgeService } from '../../../services/ibge.service';
+import { TagService } from '../../../services/tag.service';
 import {
   cnpjValidator,
   cpfValidator,
   telefoneValidator,
 } from '../../../shared/validators/br-documents.validators';
+import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
+import {
+  buildCalculoValorTotalInput,
+  computePostosByQuantidadeIdeal,
+  PostoConfigAutoGerado,
+  PostoCalculoInput,
+} from '../../../shared/helpers/contrato-calculo.helper';
 import {
   StatusContrato,
   StatusFuncionario,
   TipoFuncionario,
   TipoEscala,
+  Tag,
 } from '../../../models/index';
+import {
+  TipoPosto,
+  TIPO_POSTO_CONFIGS,
+  TIPO_POSTO_OPTIONS,
+} from '../../contratos/contrato-form/contrato-form.component';
 
 @Component({
   selector: 'app-cliente-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, TagPickerComponent],
   templateUrl: './cliente-wizard.component.html',
   styleUrls: ['./cliente-wizard.component.scss'],
 })
@@ -35,6 +49,7 @@ export class ClienteWizardComponent implements OnInit {
   private calculoService = inject(ContratoCalculoService);
   private funcionarioService = inject(FuncionarioService);
   private ibgeService = inject(IbgeService);
+  private tagService = inject(TagService);
   private router = inject(Router);
 
   // Controle do wizard
@@ -50,6 +65,26 @@ export class ClienteWizardComponent implements OnInit {
 
   estados = signal<string[]>([]);
   cidadesDisponiveis = signal<string[]>([]);
+  tags = signal<Tag[]>([]);
+  selectedTagIds = signal<string[]>([]);
+  tagRateById = signal<Record<string, number>>({});
+
+  selectedTags = computed(() => {
+    const selected = new Set(this.selectedTagIds());
+    return this.tags().filter((tag) => selected.has(tag.id));
+  });
+
+  // Controle do modal de criação de tags
+  showTagModal = signal(false);
+  savingTag = signal(false);
+  tagFormError = signal<string | null>(null);
+  tagFormSuccess = signal<string | null>(null);
+
+  tagForm = this.fb.group({
+    nome: ['', [Validators.required, Validators.maxLength(100)]],
+    valor: [0, [Validators.required, Validators.min(0)]],
+    descricao: ['', Validators.maxLength(500)],
+  });
 
   // Labels dos steps
   steps = [
@@ -71,12 +106,18 @@ export class ClienteWizardComponent implements OnInit {
     return false;
   }
 
+  // Enum de tipos de posto
+  TipoPosto = TipoPosto;
+  tipoPostoOptions = TIPO_POSTO_OPTIONS;
+
   canGoBack = computed(() => this.currentStep() > 1);
   isLastStep = computed(() => this.currentStep() === this.totalSteps);
 
   // Breakdown do contrato (resultado da API)
   breakdown = signal<any>(null);
   calculando = signal(false);
+  erroCalculo = signal<string | null>(null);
+  private syncingPostos = false;
 
   // Cálculos simplificados para exibição (usam dados do breakdown quando disponível)
   custoOperacional = computed(() => {
@@ -121,10 +162,186 @@ export class ClienteWizardComponent implements OnInit {
     return total;
   }
 
+  totalAlocacoesNoturnas(): number {
+    const postos = this.formContrato?.get('postosConfig')?.value || [];
+    let total = 0;
+    for (const posto of postos) {
+      total += (posto.alocacoesNoturnas || 0);
+    }
+    return total;
+  }
+
+  /** Verifica se o posto está em modo personalizado (edição livre) */
+  isPostoPersonalizado(index: number): boolean {
+    if (this.isModoPersonalizado()) {
+      return true;
+    }
+    return this.postosConfig.at(index)?.get('tipoPosto')?.value === TipoPosto.PERSONALIZADO;
+  }
+
+  isModoPersonalizado(): boolean {
+    return Boolean(this.formContrato?.get('modoPersonalizado')?.value);
+  }
+
+  getQuantidadeIdealPorTurno(): number {
+    const ideal = Number(this.formCliente?.get('quantidadeIdealPorTurno')?.value ?? 1);
+    return Number.isFinite(ideal) && ideal > 0 ? Math.floor(ideal) : 1;
+  }
+
+  getDivergenciasQuantidadeIdeal(): Array<{ index: number; ideal: number; atual: number }> {
+    const ideal = this.getQuantidadeIdealPorTurno();
+    return this.postosConfig.controls
+      .map((ctrl, index) => {
+        const atual = Number(ctrl.get('quantidadeFuncionariosPorAlocacao')?.value ?? 0);
+        return { index, ideal, atual };
+      })
+      .filter((item) => item.atual !== item.ideal);
+  }
+
+  private recomputarPostosAutomatico(): void {
+    if (this.syncingPostos || this.isModoPersonalizado()) {
+      return;
+    }
+
+    const numeroBase = Math.max(1, Number(this.formContrato.get('numeroPostos')?.value ?? 1));
+    const ideal = this.getQuantidadeIdealPorTurno();
+
+    const tiposSelecionados = Array.from({ length: numeroBase }, (_, index) => {
+      const tipoAtual = this.postosConfig.at(index)?.get('tipoPosto')?.value as TipoPosto | undefined;
+      return tipoAtual ?? TipoPosto.ESCALA_12X36;
+    });
+
+    const baseValorDiaria =
+      Number(this.postosConfig.at(0)?.get('valorDiariaCobrada')?.value ?? 100) || 100;
+    const baseBeneficios =
+      Number(this.postosConfig.at(0)?.get('valorBeneficiosExtrasMensal')?.value ?? 350) || 350;
+
+    const autoConfigs = computePostosByQuantidadeIdeal(
+      ideal,
+      tiposSelecionados,
+      TIPO_POSTO_CONFIGS,
+    );
+
+    this.syncingPostos = true;
+    this.postosConfig.clear({ emitEvent: false });
+
+    autoConfigs.forEach((cfg) => {
+      this.postosConfig.push(
+        this.createPostoConfigGroup(cfg.tipoPosto as TipoPosto, {
+          ...cfg,
+          valorDiariaCobrada: baseValorDiaria,
+          valorBeneficiosExtrasMensal: baseBeneficios,
+        }),
+        { emitEvent: false },
+      );
+    });
+
+    this.formContrato.get('numeroPostos')?.setValue(this.postosConfig.length, { emitEvent: false });
+    this.syncingPostos = false;
+  }
+
+  /** Aplica as configurações do TipoPosto no FormGroup do posto */
+  applyTipoPostoConfig(group: FormGroup, tipo: TipoPosto | string): void {
+    let cleanTipo = String(tipo);
+    if (cleanTipo.includes(': ')) {
+      cleanTipo = cleanTipo.split(': ').slice(1).join(': ').trim();
+    }
+    
+    if (cleanTipo === TipoPosto.PERSONALIZADO) return; // modo livre
+    
+    const cfg = TIPO_POSTO_CONFIGS[cleanTipo as TipoPosto];
+    if (!cfg) return;
+
+    group.patchValue({
+      quantidadeAlocacoes: cfg.alocacoes,
+      quantidadeFuncionariosPorAlocacao: cfg.funcionariosPorAlocacao,
+      alocacoesNoturnas: cfg.alocacoesNoturnas,
+    }, { emitEvent: true });
+  }
+
   ngOnInit(): void {
     this.buildForms();
+    this.setupQuantidadeIdealRespect();
     this.setupAutoCalculo();
     this.carregarEstados();
+    this.loadTags();
+  }
+
+  loadTags(): void {
+    this.tagService.getAll().subscribe({
+      next: (data) => this.tags.set(data),
+      error: (err) => console.error('Erro ao carregar tags:', err),
+    });
+  }
+
+  openCreateTag(): void {
+    this.tagForm.reset();
+    this.tagFormError.set(null);
+    this.tagFormSuccess.set(null);
+    this.showTagModal.set(true);
+  }
+
+  closeTagModal(): void {
+    this.showTagModal.set(false);
+    this.tagForm.reset();
+    this.tagFormError.set(null);
+    this.tagFormSuccess.set(null);
+  }
+
+  saveTag(): void {
+    if (this.tagForm.invalid) {
+      this.tagForm.markAllAsTouched();
+      return;
+    }
+
+    const val = this.tagForm.value;
+    const dto = {
+      nome: val.nome!,
+      valor: Number(val.valor ?? 0),
+      descricao: val.descricao || undefined,
+    };
+
+    this.savingTag.set(true);
+    this.tagFormError.set(null);
+
+    this.tagService.create(dto).subscribe({
+      next: () => {
+        this.tagFormSuccess.set('Tag criada com sucesso!');
+        setTimeout(() => {
+          this.closeTagModal();
+          this.loadTags();
+          this.tagFormSuccess.set(null);
+        }, 1500);
+      },
+      error: (err) => {
+        this.tagFormError.set(err?.error?.error ?? 'Erro ao criar tag.');
+        this.savingTag.set(false);
+      },
+      complete: () => {
+        this.savingTag.set(false);
+      },
+    });
+  }
+
+  getTagErrorMessage(fieldName: string): string {
+    const field = this.tagForm.get(fieldName);
+    if (!field || !field.errors || !field.touched) {
+      return '';
+    }
+
+    const errors = field.errors;
+
+    if (errors['required']) return 'Este campo é obrigatório';
+    if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
+    if (errors['min']) return `Valor mínimo: ${errors['min'].min}`;
+
+    return 'Campo inválido';
+  }
+
+  hasTagError(fieldName: string): boolean {
+    const field = this.tagForm.get(fieldName);
+    if (!field) return false;
+    return field.invalid && field.touched;
   }
 
   carregarEstados(): void {
@@ -151,23 +368,21 @@ export class ClienteWizardComponent implements OnInit {
 
           // Build input for each posto
           const requests = postos.map((posto: any) => {
-            const qtdeFuncionarios =
-              (posto.quantidadeAlocacoes || 1) * (posto.quantidadeFuncionariosPorAlocacao || 1);
-            const input = {
+            const input = buildCalculoValorTotalInput({
+              postos: [posto as PostoCalculoInput],
               valorDiariaCobrada: posto.valorDiariaCobrada || 0,
-              quantidadeFuncionarios: qtdeFuncionarios,
-              numeroDePostos: posto.quantidadeAlocacoes || 1,
-              numeroDePostosNoturnos: Math.floor((posto.quantidadeAlocacoes || 1) / 2),
               valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal || 0,
-              percentualImpostos: (valores.percentualImpostos || 0) / 100,
+              percentualEncargosProvisoes: (valores.percentualImpostos || 0) / 100,
               percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
+              percentualAdicionalFimSemana: (valores.percentualAdicionalFimSemana || 100) / 100,
               margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
               margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,
-            };
+            }, TIPO_POSTO_CONFIGS);
             return this.calculoService.calcularValorTotal(input);
           });
 
           this.calculando.set(true);
+          this.erroCalculo.set(null);
           return forkJoin(requests);
         }),
       )
@@ -180,6 +395,8 @@ export class ClienteWizardComponent implements OnInit {
               custoBaseMensal: 0,
               valorMargemLucro: 0,
               valorMargemFaltas: 0,
+              custoDiariasFimSemana: 0,
+              custoAdicionalNoturno: 0,
             };
             resultados.forEach((res: any) => {
               if (res) {
@@ -187,6 +404,8 @@ export class ClienteWizardComponent implements OnInit {
                 combined.custoBaseMensal += res.custoBaseMensal || 0;
                 combined.valorMargemLucro += res.valorMargemLucro || 0;
                 combined.valorMargemFaltas += res.valorMargemFaltas || 0;
+                combined.custoDiariasFimSemana += res.custoDiariasFimSemana || 0;
+                combined.custoAdicionalNoturno += res.custoAdicionalNoturno || 0;
               }
             });
             this.breakdown.set(combined);
@@ -196,7 +415,7 @@ export class ClienteWizardComponent implements OnInit {
         },
         error: (err) => {
           this.calculando.set(false);
-          console.error('Erro ao calcular valores:', err);
+          this.erroCalculo.set(err.error?.error || 'Erro ao calcular valores');
           this.breakdown.set(null);
         },
       });
@@ -230,6 +449,7 @@ export class ClienteWizardComponent implements OnInit {
     // Etapa 2: Contrato (opcional)
     this.formContrato = this.fb.group({
       criarContrato: [false], // Checkbox para habilitar
+      modoPersonalizado: [false],
       descricao: ['Contrato de prestação de serviços de vigilância', []],
       numeroPostos: [1, [Validators.required, Validators.min(1)]],
       postosConfig: this.fb.array([this.createPostoConfigGroup()]),
@@ -237,6 +457,10 @@ export class ClienteWizardComponent implements OnInit {
       percentualImpostos: [15, [Validators.required, Validators.min(0), Validators.max(100)]],
       percentualAdicionalNoturno: [
         20,
+        [Validators.required, Validators.min(0), Validators.max(100)],
+      ],
+      percentualAdicionalFimSemana: [
+        100,
         [Validators.required, Validators.min(0), Validators.max(100)],
       ],
       percentualMargemLucro: [15, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -281,17 +505,46 @@ export class ClienteWizardComponent implements OnInit {
     });
   }
 
-  createPostoConfigGroup(): FormGroup {
-    return this.fb.group({
-      quantidadeAlocacoes: [2, [Validators.required, Validators.min(1)]],
-      quantidadeFuncionariosPorAlocacao: [1, [Validators.required, Validators.min(1)]],
-      valorDiariaCobrada: [100, [Validators.required, Validators.min(0.01)]],
-      valorBeneficiosExtrasMensal: [350, [Validators.required, Validators.min(0)]],
+  createPostoConfigGroup(
+    tipo: TipoPosto | string = TipoPosto.ESCALA_12X36,
+    overrides?: Partial<PostoConfigAutoGerado & { valorDiariaCobrada: number; valorBeneficiosExtrasMensal: number }>,
+  ): FormGroup {
+    let cleanTipo = String(tipo);
+    if (cleanTipo.includes(': ')) {
+      cleanTipo = cleanTipo.split(': ').slice(1).join(': ').trim();
+    }
+    const cfg = TIPO_POSTO_CONFIGS[cleanTipo as TipoPosto] || TIPO_POSTO_CONFIGS[TipoPosto.PERSONALIZADO];
+    const group = this.fb.group({
+      tipoPosto: [overrides?.tipoPosto ?? cleanTipo, Validators.required],
+      quantidadeAlocacoes: [overrides?.quantidadeAlocacoes ?? cfg.alocacoes, [Validators.required, Validators.min(1)]],
+      quantidadeFuncionariosPorAlocacao: [overrides?.quantidadeFuncionariosPorAlocacao ?? cfg.funcionariosPorAlocacao, [Validators.required, Validators.min(1)]],
+      alocacoesNoturnas: [overrides?.alocacoesNoturnas ?? cfg.alocacoesNoturnas, [Validators.required, Validators.min(0)]],
+      valorDiariaCobrada: [overrides?.valorDiariaCobrada ?? 100, [Validators.required, Validators.min(0.01)]],
+      valorBeneficiosExtrasMensal: [overrides?.valorBeneficiosExtrasMensal ?? 350, [Validators.required, Validators.min(0)]],
     });
+
+    // Auto-preencher quando o tipo mudar
+    group.get('tipoPosto')?.valueChanges.subscribe((newTipo) => {
+      if (newTipo) {
+        this.applyTipoPostoConfig(group, newTipo as TipoPosto);
+        this.recomputarPostosAutomatico();
+      }
+    });
+
+    return group;
   }
 
   setupPostosConfigWatcher() {
     this.formContrato.get('numeroPostos')?.valueChanges.subscribe((num) => {
+      if (this.syncingPostos) {
+        return;
+      }
+
+      if (!this.isModoPersonalizado()) {
+        this.recomputarPostosAutomatico();
+        return;
+      }
+
       const currentLen = this.postosConfig.length;
       if (num > currentLen && num <= 20) {
         for (let i = currentLen; i < num; i++) {
@@ -303,6 +556,24 @@ export class ClienteWizardComponent implements OnInit {
         }
       }
     });
+  }
+
+  private setupQuantidadeIdealRespect(): void {
+    this.formCliente
+      .get('quantidadeIdealPorTurno')
+      ?.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.recomputarPostosAutomatico();
+      });
+
+    this.formContrato
+      .get('modoPersonalizado')
+      ?.valueChanges.pipe(distinctUntilChanged())
+      .subscribe((modoPersonalizado) => {
+        if (!modoPersonalizado) {
+          this.recomputarPostosAutomatico();
+        }
+      });
   }
 
   // Getters para FormArrays
@@ -595,17 +866,67 @@ export class ClienteWizardComponent implements OnInit {
         valorTotalMensal: this.faturamentoMensal(),
         valorDiariaCobrada: firstConfig.valorDiariaCobrada || 0,
         percentualAdicionalNoturno: (formContratoValue.percentualAdicionalNoturno || 0) / 100,
+        percentualAdicionalFimSemana: (formContratoValue.percentualAdicionalFimSemana || 100) / 100,
         valorBeneficiosExtrasMensal: firstConfig.valorBeneficiosExtrasMensal || 0,
-        percentualImpostos: (formContratoValue.percentualImpostos || 0) / 100,
+        percentualEncargosProvisoes: (formContratoValue.percentualImpostos || 0) / 100,
         margemLucroPercentual: (formContratoValue.percentualMargemLucro || 0) / 100,
         margemCoberturaFaltasPercentual: (formContratoValue.percentualMargemFaltas || 0) / 100,
         dataInicio: formContratoValue.dataInicio,
         dataFim: dataFim,
         status: 'ATIVO', // Status inicial sempre ATIVO
+        tags: this.selectedTagIds().map((tagId) => ({
+          tagId,
+          valorDiaria: this.getTagRate(tagId),
+        })),
       },
       criarPostosAutomaticamente: true,
       numeroDePostos: numeroPostos,
+      postoConfigs: postosConfigValues.map((posto: any) => ({
+        tipoPosto: posto.tipoPosto,
+        quantidadeAlocacoes: posto.quantidadeAlocacoes,
+        quantidadeFuncionariosPorAlocacao: posto.quantidadeFuncionariosPorAlocacao,
+        alocacoesNoturnas: posto.alocacoesNoturnas,
+        valorDiariaCobrada: posto.valorDiariaCobrada,
+        valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal,
+      })),
     };
+  }
+
+  onContratoTagsChange(tagIds: string[]): void {
+    const currentRates = this.tagRateById();
+    const defaultRate =
+      Number(this.formContrato?.value?.postosConfig?.[0]?.valorDiariaCobrada) || 0;
+    const nextRates: Record<string, number> = {};
+
+    for (const tagId of tagIds) {
+      nextRates[tagId] = currentRates[tagId] ?? defaultRate;
+    }
+
+    this.selectedTagIds.set([...new Set(tagIds)]);
+    this.tagRateById.set(nextRates);
+  }
+
+  onTagRateChange(tagId: string, value: string): void {
+    const parsed = Number(value);
+    const safeValue = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+
+    this.tagRateById.update((current) => ({
+      ...current,
+      [tagId]: safeValue,
+    }));
+  }
+
+  getTagRate(tagId: string): number {
+    const value = this.tagRateById()[tagId];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    return Number(this.formContrato?.value?.postosConfig?.[0]?.valorDiariaCobrada) || 0;
+  }
+
+  getTagPercentualAcima(tag: Tag, rate: number): string {
+    if (!tag.valor || tag.valor === 0) return '';
+    const pct = ((rate - tag.valor) / tag.valor) * 100;
+    const sign = pct >= 0 ? '+' : '';
+    return `${sign}${pct.toFixed(0)}% do valor base`;
   }
 
   private async criarCliente(): Promise<string> {

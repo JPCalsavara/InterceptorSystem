@@ -61,6 +61,6 @@ export class AlocacaoService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('alocacao')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
   }
 }

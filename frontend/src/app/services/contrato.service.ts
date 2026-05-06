@@ -54,7 +54,7 @@ export class ContratoService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('contrato')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
   }
 
   /**

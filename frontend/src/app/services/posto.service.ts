@@ -53,6 +53,6 @@ export class PostoService {
   delete(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(tap(() => this.cacheCoordinator.invalidateWithDependencies('posto')));
+      .pipe(tap(() => this.cacheCoordinator.invalidateAll()));
   }
 }

@@ -96,6 +96,10 @@
                 @if (tag.descricao) {
                   <small>{{ tag.descricao }}</small>
                 }
+                <small>Valor base: {{ tag.valor | currency: 'BRL' }}</small>
+                @if (getTagPercentualAcima(tag, getTagRate(tag.id))) {
+                  <small>{{ getTagPercentualAcima(tag, getTagRate(tag.id)) }}</small>
+                }
               </div>
               <div class="form-group">
                 <label [for]="'tag-rate-' + tag.id" class="form-label"
@@ -117,66 +121,15 @@
         </div>
       }
 
-      <h3 class="section-title">Valores Base</h3>
+      <h3 class="section-title">Estrutura do Contrato (Postos e Alocações)</h3>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="valorDiariaCobrada" class="form-label">
-            Valor Diária por Funcionário (R$) <span class="required">*</span>
-            <span class="info-tooltip-wrapper">
-              <button
-                type="button"
-                class="info-tooltip-button"
-                (click)="toggleTooltip('valorDiaria')"
-                [attr.aria-label]="'Informações sobre Valor da Diária'"
-                [attr.aria-expanded]="activeTooltip() === 'valorDiaria'"
-              >
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-              @if (activeTooltip() === 'valorDiaria') {
-                <div class="tooltip-content" role="tooltip">
-                  <button
-                    type="button"
-                    class="tooltip-close"
-                    (click)="toggleTooltip('valorDiaria')"
-                    aria-label="Fechar"
-                  >
-                    ×
-                  </button>
-                  <p><strong>Valor da Diária por Funcionário</strong></p>
-                  <p>Valor cobrado por dia de trabalho de cada funcionário.</p>
-                  <p><strong>Mercado:</strong> R$ 80-150</p>
-                  <p><strong>Recomendado:</strong> R$ 100 (média nacional para portaria)</p>
-                </div>
-              }
-            </span>
-          </label>
-          <input
-            id="valorDiariaCobrada"
-            type="number"
-            formControlName="valorDiariaCobrada"
-            class="form-input"
-            [class.error]="hasError('valorDiariaCobrada')"
-            placeholder="Ex: 100.00"
-            step="0.01"
-          />
-          @if (hasError('valorDiariaCobrada')) {
-            <span class="error-message">{{ getErrorMessage('valorDiariaCobrada') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label class="form-label"
-            >Funcionários Estimados
+          <label for="numeroPostosFisicos" class="form-label">
+            Quantidade de Postos Físicos (Locais) <span class="required">*</span>
             <span
               class="info-tooltip"
-              title="Calculado automaticamente: Quantidade Ideal por Turno do cliente × Número de Postos"
+              title="Quantidade de locais físicos diferentes onde o serviço será prestado."
             >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                 <path
@@ -187,109 +140,131 @@
               </svg>
             </span>
           </label>
+          <input
+            id="numeroPostosFisicos"
+            type="number"
+            formControlName="numeroPostosFisicos"
+            class="form-input"
+            [class.error]="hasError('numeroPostosFisicos')"
+            placeholder="Ex: 1"
+            min="1"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Total de Funcionários Estimados</label>
           <div class="form-input computed-field">
-            {{ getQuantidadeFuncionariosTotal(form.value.numeroDePostos) || '—' }}
-            <span class="computed-hint">func. necessários</span>
+            {{ funcionariosEstimados() || '—' }}
+            <span class="computed-hint">cobertura total no mês (diárias ÷ 15)</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="numeroDePostos" class="form-label">
-            Número de Postos de Trabalho <span class="required">*</span>
-            <span
-              class="info-tooltip"
-              title="Quantidade de turnos/postos diferentes. Exemplos: 2 postos = turnos de 12h (diurno/noturno), 3 postos = turnos de 8h, 4 postos = turnos de 6h. Padrão recomendado: 2 postos (escala 12x36)."
-            >
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </span>
-          </label>
-          <input
-            id="numeroDePostos"
-            type="number"
-            formControlName="numeroDePostos"
-            class="form-input"
-            [class.error]="hasError('numeroDePostos')"
-            placeholder="Ex: 2 (padrão 12x36)"
-            step="1"
-            min="1"
-            max="6"
-          />
-          @if (hasError('numeroDePostos')) {
-            <span class="error-message">{{ getErrorMessage('numeroDePostos') }}</span>
-          }
-          <small class="field-hint">
-            2 postos = 12h cada (padrão) | 3 postos = 8h cada | 4 postos = 6h cada
-          </small>
+          <label class="form-label">Alocações c/ Adicional Noturno</label>
+          <div class="form-input computed-field">
+            {{ alocacoesNoturnas() || 0 }}
+            <span class="computed-hint">calculado dos postos</span>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="numeroDePostosNoturnos" class="form-label">
-            Postos com Horário Noturno
-            <span
-              class="info-tooltip"
-              title="Quantos dos postos acima têm horário noturno (CLT Art. 73: 22h–5h). Usado para calcular o adicional noturno proporcional. Ex: contrato 12x36 com 1 turno noturno = 1 de 2 postos."
-            >
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
+      </div>
+
+      <div formArrayName="postosConfig" class="postos-list">
+        @for (postoCtrl of postosConfig.controls; track $index) {
+          <div [formGroupName]="$index" class="posto-config-card">
+            <h4 class="posto-title">Configuração do Posto {{ $index + 1 }}</h4>
+            
+            <div class="form-group">
+              <label class="form-label">Tipo de Posto <span class="required">*</span></label>
+              <select
+                formControlName="tipoPosto"
+                class="form-input"
+              >
+                @for (opt of tipoPostoOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+              <small class="field-hint">Selecione a escala para preencher automaticamente turnos, funcionários e noturno.</small>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Qtd. Alocações (Turnos)</label>
+                @if (isPostoPersonalizado($index)) {
+                  <input
+                    type="number"
+                    formControlName="quantidadeAlocacoes"
+                    class="form-input"
+                    min="1"
+                  />
+                } @else {
+                  <div class="form-input computed-field">
+                    {{ postoCtrl.get('quantidadeAlocacoes')?.value }}
+                    <span class="computed-hint">travado pelo tipo</span>
+                  </div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Func. por Alocação</label>
+                <input
+                  type="number"
+                  formControlName="quantidadeFuncionariosPorAlocacao"
+                  class="form-input"
+                  min="1"
                 />
-              </svg>
-            </span>
-          </label>
-          <input
-            id="numeroDePostosNoturnos"
-            type="number"
-            formControlName="numeroDePostosNoturnos"
-            class="form-input"
-            [class.error]="hasError('numeroDePostosNoturnos')"
-            placeholder="Ex: 1"
-            step="1"
-            min="0"
-            [max]="form.value.numeroDePostos || 6"
-          />
-          @if (hasError('numeroDePostosNoturnos')) {
-            <span class="error-message">{{ getErrorMessage('numeroDePostosNoturnos') }}</span>
-          }
-          <small class="field-hint">
-            CLT Art. 73 — adicional noturno aplicado proporcionalmente aos postos noturnos
-          </small>
-        </div>
-        <div class="form-group">
-          <label for="valorBeneficiosExtrasMensal" class="form-label">
-            Benefícios Extras Mensais (R$) <span class="required">*</span>
-            <span
-              class="info-tooltip"
-              title="Valor total mensal de benefícios como vale-transporte, vale-alimentação, plano de saúde, etc. Valor recomendado: R$ 350-500/funcionário."
-            >
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
+                <small class="field-hint">Quantidade de funcionários por turno (editável)</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Aloc. Noturnas</label>
+                @if (isPostoPersonalizado($index)) {
+                  <input
+                    type="number"
+                    formControlName="alocacoesNoturnas"
+                    class="form-input"
+                    min="0"
+                  />
+                } @else {
+                  <div class="form-input computed-field">
+                    {{ postoCtrl.get('alocacoesNoturnas')?.value }}
+                    <span class="computed-hint">travado pelo tipo</span>
+                  </div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Valor Diária (R$)</label>
+                <input
+                  type="number"
+                  formControlName="valorDiariaCobrada"
+                  class="form-input"
+                  step="0.01"
                 />
-              </svg>
-            </span>
-          </label>
-          <input
-            id="valorBeneficiosExtrasMensal"
-            type="number"
-            formControlName="valorBeneficiosExtrasMensal"
-            class="form-input"
-            [class.error]="hasError('valorBeneficiosExtrasMensal')"
-            placeholder="Ex: 350.00"
-            step="0.01"
-          />
-          @if (hasError('valorBeneficiosExtrasMensal')) {
-            <span class="error-message">{{ getErrorMessage('valorBeneficiosExtrasMensal') }}</span>
-          }
-        </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Benefícios Mês (R$)</label>
+                <input
+                  type="number"
+                  formControlName="valorBeneficiosExtrasMensal"
+                  class="form-input"
+                  step="0.01"
+                />
+              </div>
+            </div>
+
+            <div class="posto-summary">
+              <span class="posto-summary-item">
+                <strong>{{ (postoCtrl.get('quantidadeAlocacoes')?.value || 0) * (postoCtrl.get('quantidadeFuncionariosPorAlocacao')?.value || 0) }}</strong> funcionários neste posto
+              </span>
+              @if ((postoCtrl.get('alocacoesNoturnas')?.value || 0) > 0) {
+                <span class="posto-summary-item noturno">
+                  🌙 {{ postoCtrl.get('alocacoesNoturnas')?.value }} turno(s) noturno(s)
+                </span>
+              }
+            </div>
+          </div>
+        }
       </div>
 
       <h3 class="section-title">Percentuais e Margens</h3>
@@ -324,6 +299,38 @@
           />
           @if (hasError('percentualAdicionalNoturno')) {
             <span class="error-message">{{ getErrorMessage('percentualAdicionalNoturno') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="percentualAdicionalFimSemana" class="form-label">
+            Adicional Finais de Semana e Feriados (%) <span class="required">*</span>
+            <span
+              class="info-tooltip"
+              title="Adicional para domingos e feriados trabalhados. Geralmente 100% de acordo com a CLT."
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </span>
+          </label>
+          <input
+            id="percentualAdicionalFimSemana"
+            type="number"
+            formControlName="percentualAdicionalFimSemana"
+            class="form-input"
+            [class.error]="hasError('percentualAdicionalFimSemana')"
+            placeholder="Ex: 100.00"
+            step="0.01"
+            min="0"
+            max="200"
+          />
+          @if (hasError('percentualAdicionalFimSemana')) {
+            <span class="error-message">{{ getErrorMessage('percentualAdicionalFimSemana') }}</span>
           }
         </div>
 
@@ -494,10 +501,10 @@
         }
       </div>
 
-      <!-- Breakdown de Custos -->
-      @if (temBreakdown || calculando()) {
+      <!-- Relatório Mensal -->
+      @if (temBreakdown || calculando() || erroCalculo()) {
         <div class="breakdown-section">
-          <h3 class="section-title">Breakdown de Custos</h3>
+          <h3 class="section-title">Relatório Mensal</h3>
 
           <!-- Loading -->
           @if (calculando()) {
@@ -521,109 +528,152 @@
             </div>
           }
 
-          <!-- Breakdown -->
+          <!-- Relatório completo -->
           @if (breakdown() && !calculando()) {
+            <!-- FATURAMENTO -->
             <div class="bk-group">
               <div class="bk-group-header bk-receita">
                 <span class="bk-group-label">Faturamento</span>
                 <span class="bk-group-total">{{
-                  breakdown()!.valorTotalMensal | currency: 'BRL'
+                  valorTotalCalculado | currency: 'BRL'
                 }}</span>
               </div>
             </div>
 
+            <!-- CUSTO -->
             <div class="bk-group">
               <div class="bk-group-header bk-custo">
-                <span class="bk-group-label">Custo Operacional</span>
-                <span class="bk-group-total">{{
-                  breakdown()!.baseParaSalarios +
-                    breakdown()!.valorEncargosTrabalhistas +
-                    breakdown()!.valorImpostos +
-                    breakdown()!.valorBeneficios | currency: 'BRL'
-                }}</span>
+                <span class="bk-group-label">Custo</span>
+                <span class="bk-group-total">- {{ custoTotalForm() | currency: 'BRL' }}</span>
               </div>
               <div class="bk-items">
                 <div class="bk-item">
                   <span class="bk-item-label"
-                    >Custo Base (Salários)
-                    <span class="bk-formula"
-                      >{{ getQuantidadeFuncionariosTotal(form.value.numeroDePostos) }} func.</span
-                    >
+                    >Posto de Trabalho
+                    <span class="bk-formula">{{ postosOperacionais }} posto(s) operacional(is)</span>
                   </span>
-                  <span class="bk-item-value deduction">{{
-                    breakdown()!.baseParaSalarios | currency: 'BRL'
-                  }}</span>
+                  <span class="bk-item-value">{{ postosOperacionais }}</span>
                 </div>
-                @if (breakdown()!.valorAdicionalNoturno > 0) {
-                  <div class="bk-item bk-item-sub">
-                    <span class="bk-item-label">
-                      Adicional Noturno
-                      <span class="bk-formula">
-                        {{ breakdown()!.numeroDePostosNoturnos }}/{{
-                          breakdown()!.numeroDePostos
-                        }}
-                        postos · {{ form.value.percentualAdicionalNoturno }}%
-                      </span>
-                    </span>
-                    <span class="bk-item-value deduction">{{
-                      breakdown()!.valorAdicionalNoturno | currency: 'BRL'
-                    }}</span>
-                  </div>
-                }
+
                 <div class="bk-item">
                   <span class="bk-item-label"
-                    >Encargos/Provisões
-                    <span class="bk-formula">~65% ref. Trabalhista</span>
+                    >Alocação
+                    <span class="bk-formula"
+                      >{{ alocacoesTotais() }} por dia ({{ alocacoesNoturnas() }} noturna(s))</span
+                    >
                   </span>
-                  <span class="bk-item-value deduction">{{
-                    breakdown()!.valorEncargosTrabalhistas | currency: 'BRL'
-                  }}</span>
+                  <span class="bk-item-value">{{ alocacoesTotais() }}</span>
                 </div>
+
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Diárias
+                    <span class="bk-formula"
+                      >{{ diariasPorDia() }} / dia ({{ diariasNoturnasPorDia() }} noturnas) •
+                      {{ diariasUteisMes() }} úteis + {{ diariasFimSemanaMes() }} fim de semana</span
+                    >
+                  </span>
+                  <span class="bk-item-value">{{ diariasTotaisMes() }}</span>
+                </div>
+
                 <div class="bk-item">
                   <span class="bk-item-label"
                     >Encargos e Provisões
-                    <span class="bk-formula">{{ form.value.percentualImpostos }}%</span>
+                    <span class="bk-formula"
+                      >{{ form.value.percentualImpostos }}% sobre custo direto</span
+                    >
                   </span>
-                  <span class="bk-item-value deduction">{{
-                    breakdown()!.valorImpostos | currency: 'BRL'
-                  }}</span>
+                  <span class="bk-item-value deduction"
+                    >- {{ encargosProvisoes() | currency: 'BRL' }}</span
+                  >
                 </div>
+
                 <div class="bk-item">
-                  <span class="bk-item-label">Benefícios Mês</span>
-                  <span class="bk-item-value deduction">{{
-                    breakdown()!.valorBeneficios | currency: 'BRL'
-                  }}</span>
+                  <span class="bk-item-label">
+                    Benefícios / Extras
+                    <span class="bk-formula"
+                      >{{ funcionariosEstimados() }} func. estimados ({{ diariasTotaisMes() }}
+                      diárias ÷ 15) ×
+                      {{ form.value.valorBeneficiosExtrasMensal | currency: 'BRL' }}</span
+                    >
+                  </span>
+                  <span class="bk-item-value deduction"
+                    >- {{ beneficiosTotais() | currency: 'BRL' }}</span
+                  >
+                </div>
+
+                <div class="bk-item">
+                  <span class="bk-item-label">
+                    Custo Base de Diárias
+                    <span class="bk-formula"
+                      >{{ diariasUteisMes() }} diárias úteis (diurnas) × {{ valorDiariaForm | currency: 'BRL' }}</span
+                    >
+                  </span>
+                  <span class="bk-item-value deduction"
+                    >- {{ custoBaseDiarias() | currency: 'BRL' }}</span
+                  >
+                </div>
+
+                <div class="bk-item">
+                  <span class="bk-item-label">
+                    Adicional Noturno
+                    <span class="bk-formula"
+                      >{{ diariasNoturnasMes() }} ×
+                      {{ form.value.percentualAdicionalNoturno }}%</span
+                    >
+                  </span>
+                  <span class="bk-item-value deduction"
+                    >- {{ adicionalNoturnoTotal() | currency: 'BRL' }}</span
+                  >
+                </div>
+
+                <div class="bk-item">
+                  <span class="bk-item-label">
+                    Adicional Finais de Semana / Feriados
+                    <span class="bk-formula"
+                      >{{ diariasFimSemanaMes() }} ×
+                      {{ form.value.percentualAdicionalFimSemana }}%</span
+                    >
+                  </span>
+                  <span class="bk-item-value deduction"
+                    >- {{ adicionalFimSemanaTotal() | currency: 'BRL' }}</span
+                  >
                 </div>
               </div>
             </div>
 
+            <!-- LUCRO ESTIMADO -->
             <div class="bk-group">
-              <div class="bk-group-header bk-lucro">
-                <span class="bk-group-label">Lucro Esperado (Sobra)</span>
-                <span class="bk-group-total">{{
-                  breakdown()!.valorMargemLucro | currency: 'BRL'
-                }}</span>
+              <div class="bk-group-header bk-lucro" [class.bk-prejuizo]="lucroEstimado() < 0">
+                <span class="bk-group-label">Lucro Estimado</span>
+                <span class="bk-group-total">{{ lucroEstimado() | currency: 'BRL' }}</span>
               </div>
               <div class="bk-items">
                 <div class="bk-item">
                   <span class="bk-item-label"
-                    >Margem de Lucro Bruto
-                    <span class="bk-formula">{{ form.value.margemLucroPercentual }}%</span>
-                  </span>
-                  <span class="bk-item-value positive">{{
-                    breakdown()!.valorMargemLucro | currency: 'BRL'
-                  }}</span>
-                </div>
-                <div class="bk-item">
-                  <span class="bk-item-label"
-                    >Margem Custo C/ Faltas
+                    >Margem de Lucro
                     <span class="bk-formula"
-                      >{{ form.value.margemCoberturaFaltasPercentual }}%</span
+                      >{{ form.value.margemLucroPercentual }}% sobre custo</span
                     >
                   </span>
-                  <span class="bk-item-value positive">{{
-                    breakdown()!.valorMargemFaltas | currency: 'BRL'
-                  }}</span>
+                  <span class="bk-item-value positive">{{ margemLucroValor() | currency: 'BRL' }}</span>
+                </div>
+
+                <div class="bk-item">
+                  <span class="bk-item-label"
+                    >Risco (Cobertura de Faltas)
+                    <span class="bk-formula"
+                      >{{ form.value.margemCoberturaFaltasPercentual }}% sobre custo</span
+                    >
+                  </span>
+                  <span class="bk-item-value">{{ riscoCoberturaValor() | currency: 'BRL' }}</span>
+                </div>
+
+                <div class="bk-item bk-item-summary">
+                  <span class="bk-item-label">Esperado Mínimo</span>
+                  <span [class]="'bk-item-value ' + (lucroEsperadoMinimo() >= 0 ? 'positive' : 'negative')">
+                    {{ lucroEsperadoMinimo() | currency: 'BRL' }}
+                  </span>
                 </div>
               </div>
             </div>

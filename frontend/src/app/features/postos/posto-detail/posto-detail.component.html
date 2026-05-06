@@ -189,38 +189,31 @@
     </section>
 
     <!-- Lista de Alocações -->
-    <section class="alocacoes-section">
+    <section class="alocacoes-section" aria-labelledby="alocacoes-title">
       <div class="section-header">
-        <h2 class="section-title">Turnos (Alocações)</h2>
+        <h2 id="alocacoes-title" class="section-title">Turnos (Alocações)</h2>
       </div>
-      <div class="alocacoes-grid">
-        @for (aloc of alocacoes(); track aloc.id) {
-          <div class="alocacao-card">
-            <div class="alocacao-header">
-              <span class="horario"
-                >{{ aloc.horarioInicio.substring(0, 5) }} -
-                {{ aloc.horarioFim.substring(0, 5) }}</span
-              >
-              <span class="escala-badge">{{ aloc.tipoEscala }}</span>
+      <ul class="alocacoes-grid" role="list">
+        <li *ngFor="let aloc of alocacoes(); trackBy: trackAloc" class="alocacao-card" role="listitem">
+          <header class="alocacao-header">
+            <span class="horario" aria-label="Horário">{{ aloc.horarioInicio.substring(0,5) }} - {{ aloc.horarioFim.substring(0,5) }}</span>
+            <span class="escala-badge" aria-label="Tipo de escala">{{ aloc.tipoEscala }}</span>
+          </header>
+          <div class="alocacao-body">
+            <div class="info-item">
+              <span class="label">Noturno:</span>
+              <span class="value" aria-label="Horário noturno">{{ aloc.temHorarioNoturno ? 'Sim' : 'Não' }}</span>
             </div>
-            <div class="alocacao-body">
-              <div class="info-item">
-                <span class="label">Noturno:</span>
-                <span class="value">{{ aloc.temHorarioNoturno ? 'Sim' : 'Não' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Permite Dobra:</span>
-                <span class="value">{{ aloc.permiteDobrarEscala ? 'Sim' : 'Não' }}</span>
-              </div>
+            <div class="info-item">
+              <span class="label">Permite Dobra:</span>
+              <span class="value" aria-label="Permite dobrar escala">{{ aloc.permiteDobrarEscala ? 'Sim' : 'Não' }}</span>
             </div>
           </div>
-        }
-        @if (alocacoes().length === 0) {
-          <div class="empty-state">
-            <p>Nenhuma alocação (turno) cadastrada para este posto.</p>
-          </div>
-        }
-      </div>
+        </li>
+        <li *ngIf="alocacoes().length === 0" class="empty-state" role="listitem">
+          <p>Nenhuma alocação (turno) cadastrada para este posto.</p>
+        </li>
+      </ul>
     </section>
 
     <!-- Diárias por Tipo -->
