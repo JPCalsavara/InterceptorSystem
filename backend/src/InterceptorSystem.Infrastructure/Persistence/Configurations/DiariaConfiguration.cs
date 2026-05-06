@@ -14,8 +14,15 @@ public class DiariaConfiguration : IEntityTypeConfiguration<Diaria>
         builder.Property(d => d.EmpresaId).IsRequired();
         builder.Property(d => d.Data).IsRequired();
         builder.Property(d => d.ValorDiaria).IsRequired();
+        builder.Property(d => d.TagId).IsRequired(false);
         builder.Property(d => d.StatusDiaria).IsRequired().HasConversion<string>();
         builder.Property(d => d.TipoDiaria).IsRequired().HasConversion<string>();
+
+        builder.HasOne<Tag>()
+            .WithMany()
+            .HasForeignKey(d => d.TagId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasOne(d => d.Alocacao)
             .WithMany(a => a.Diarias)

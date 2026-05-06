@@ -58,6 +58,7 @@ public class ContratoCalculosTests
             valorTotalMensal: 10000m,
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,      // 30%
+            percentualAdicionalFimSemana: 1.0m,
             valorBeneficiosExtrasMensal: 1000m,
             percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,                      // Número de postos/turnos
@@ -94,6 +95,7 @@ public class ContratoCalculosTests
             valorTotalMensal: 10000m,
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,
+            percentualAdicionalFimSemana: 1.0m,
             valorBeneficiosExtrasMensal: 3600m,     // Total
             percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,                      // Número de postos/turnos (12 funcionários)
@@ -128,6 +130,7 @@ public class ContratoCalculosTests
             valorTotalMensal: 72000m,
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,
+            percentualAdicionalFimSemana: 1.0m,
             valorBeneficiosExtrasMensal: 3600m,
             percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,
@@ -141,8 +144,8 @@ public class ContratoCalculosTests
         PopularFuncionarios(contrato, 12);
         var funcionario = contrato.Funcionarios.First();
 
-        var tagBasica = new Tag(empresaId, "Vigia");
-        var tagPremium = new Tag(empresaId, "PM");
+        var tagBasica = new Tag(empresaId, "Vigia", 250m);
+        var tagPremium = new Tag(empresaId, "PM", 400m);
 
         contrato.DefinirTags(new[]
         {

@@ -18,4 +18,10 @@ public interface IDiariaAppService
 
     /// <summary>Atualiza apenas o status de uma diária (ex: CANCELADA para substituição via bot).</summary>
     Task UpdateStatusAsync(Guid id, StatusDiaria novoStatus);
+
+    /// <summary>Retorna resumo agregado das diárias de um contrato em um período (mês/ano), agrupado por tag.</summary>
+    Task<DiariasContratoResumoDto> GetResumoByContratoAsync(Guid contratoId, int ano, int mes);
+
+    /// <summary>Retorna resumo financeiro real de diárias confirmadas de um contrato em um período (mês/ano).</summary>
+    Task<ContratoResumoFinanceiroDto> GetResumoFinanceiroContratoAsync(Guid contratoId, int ano, int mes);
 }

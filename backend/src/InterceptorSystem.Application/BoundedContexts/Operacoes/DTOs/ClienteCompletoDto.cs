@@ -9,7 +9,25 @@ public record CreateClienteCompletoDtoInput(
     CreateClienteDtoInput Cliente,
     CreateContratoCompletoDtoInput Contrato,
     bool CriarPostosAutomaticamente = true,
-    int NumeroDePostos = 2  // Padrão: 2 turnos (diurno e noturno)
+    int NumeroDePostos = 2,  // Padrão: 2 turnos (diurno e noturno)
+    IReadOnlyList<CreatePostoConfigInput>? PostoConfigs = null
+);
+
+public record CreatePostoConfigInput(
+    string TipoPosto,
+    int QuantidadeAlocacoes,
+    int QuantidadeFuncionariosPorAlocacao,
+    int AlocacoesNoturnas,
+    decimal ValorDiariaCobrada,
+    decimal ValorBeneficiosExtrasMensal,
+    IReadOnlyList<CreateAlocacaoHorarioInput>? Horarios = null
+);
+
+public record CreateAlocacaoHorarioInput(
+    string Nome,
+    TimeSpan HorarioInicio,
+    TimeSpan HorarioFim,
+    bool IsNoturna
 );
 
 /// <summary>
@@ -21,6 +39,7 @@ public record CreateContratoCompletoDtoInput(
     decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
+    decimal PercentualAdicionalFimSemana,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualEncargosProvisoes,
     decimal MargemLucroPercentual,
@@ -28,6 +47,7 @@ public record CreateContratoCompletoDtoInput(
     DateOnly DataInicio,
     DateOnly DataFim,
     StatusContrato Status,
+    IReadOnlyList<ContratoTagInput>? Tags = null,
     decimal? ValorDiariaVigilante = null
 );
 

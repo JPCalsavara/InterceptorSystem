@@ -8,8 +8,7 @@ public record CreatePostoInput(
     string Numero,
     string? Complemento,
     string Cidade,
-    string Estado,
-    IReadOnlyList<Guid>? TagIds = null);
+    string Estado);
 
 public record UpdatePostoInput(
     string Nome,
@@ -18,8 +17,7 @@ public record UpdatePostoInput(
     string Numero,
     string? Complemento,
     string Cidade,
-    string Estado,
-    IReadOnlyList<Guid>? TagIds = null);
+    string Estado);
 
 public record PostoDto(
     Guid Id,
@@ -31,17 +29,10 @@ public record PostoDto(
     string? Complemento,
     string Cidade,
     string Estado,
-    IReadOnlyList<TagDtoOutput> Tags,
     bool Ativo)
 {
     public static PostoDto FromEntity(Domain.BoundedContexts.Operacoes.Aggregates.Posto posto)
     {
-        var tags = posto.Tags
-            .Select(pt => TagDtoOutput.FromEntity(pt.Tag))
-            .Where(tag => tag != null)
-            .Select(tag => tag!)
-            .ToList();
-
         return new PostoDto(
             posto.Id,
             posto.ClienteId,
@@ -52,7 +43,6 @@ public record PostoDto(
             posto.Complemento,
             posto.Cidade,
             posto.Estado,
-            tags,
             posto.Ativo
         );
     }

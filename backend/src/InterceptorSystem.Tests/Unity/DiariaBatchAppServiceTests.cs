@@ -22,6 +22,7 @@ public class DiariaBatchAppServiceTests
     private readonly Mock<IAlocacaoRepository> _mockAlocacaoRepository;
     private readonly Mock<ICurrentTenantService> _mockTenantService;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IContratoRepository> _mockContratoRepository;
     private readonly DiariaAppService _service;
 
     public DiariaBatchAppServiceTests()
@@ -31,6 +32,7 @@ public class DiariaBatchAppServiceTests
         _mockAlocacaoRepository = new Mock<IAlocacaoRepository>();
         _mockTenantService = new Mock<ICurrentTenantService>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockContratoRepository = new Mock<IContratoRepository>();
 
         _mockRepository.Setup(r => r.UnitOfWork).Returns(_mockUnitOfWork.Object);
         _mockTenantService.Setup(t => t.EmpresaId).Returns(Guid.NewGuid());
@@ -39,8 +41,48 @@ public class DiariaBatchAppServiceTests
             _mockRepository.Object,
             _mockFuncionarioRepository.Object,
             _mockAlocacaoRepository.Object,
+            _mockContratoRepository.Object,
             _mockTenantService.Object
         );
+    }
+
+    private void ConfigurarRepositoriosParaBatch(Guid funcionarioId, Guid alocacaoId)
+    {
+        var empresaId = _mockTenantService.Object.EmpresaId ?? Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var contratoId = Guid.NewGuid();
+
+        var funcionario = new Funcionario(
+            empresaId,
+            clienteId,
+            contratoId,
+            "Funcionario Teste",
+            "12345678909",
+            "+5511999999999",
+            StatusFuncionario.ATIVO,
+            TipoEscala.DOZE_POR_TRINTA_SEIS,
+            TipoFuncionario.CLT);
+
+        var alocacao = new Alocacao(
+            Guid.NewGuid(),
+            contratoId,
+            empresaId,
+            TimeSpan.FromHours(6),
+            TimeSpan.FromHours(18),
+            TipoEscala.DOZE_POR_TRINTA_SEIS,
+            true);
+
+        _mockFuncionarioRepository
+            .Setup(r => r.GetByIdAsync(funcionarioId))
+            .ReturnsAsync(funcionario);
+
+        _mockAlocacaoRepository
+            .Setup(r => r.GetByIdAsync(alocacaoId))
+            .ReturnsAsync(alocacao);
+
+        _mockContratoRepository
+            .Setup(r => r.GetByIdAsync(contratoId))
+            .ReturnsAsync((Contrato?)null);
     }
 
     [Fact]
@@ -60,6 +102,7 @@ public class DiariaBatchAppServiceTests
         var batch = new CreateDiariasBatchDtoInput(diarias);
 
         _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
         var result = await _service.CreateBatchAsync(batch);
@@ -101,6 +144,7 @@ public class DiariaBatchAppServiceTests
             _mockRepository.Object,
             _mockFuncionarioRepository.Object,
             _mockAlocacaoRepository.Object,
+            _mockContratoRepository.Object,
             _mockTenantService.Object
         );
 
@@ -141,6 +185,7 @@ public class DiariaBatchAppServiceTests
         var batch = new CreateDiariasBatchDtoInput(diarias);
 
         _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
         var result = await _service.CreateBatchAsync(batch);
@@ -182,6 +227,7 @@ public class DiariaBatchAppServiceTests
         var batch = new CreateDiariasBatchDtoInput(diarias);
 
         _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
         var result = await _service.CreateBatchAsync(batch);
@@ -213,6 +259,7 @@ public class DiariaBatchAppServiceTests
 
         var batch = new CreateDiariasBatchDtoInput(diarias);
         _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
         var result = await _service.CreateBatchAsync(batch);

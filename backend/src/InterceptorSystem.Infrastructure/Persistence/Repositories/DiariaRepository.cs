@@ -1,6 +1,7 @@
 using InterceptorSystem.Domain.SharedKernel.Interfaces;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,12 +64,42 @@ public class DiariaRepository : IDiariaRepository
     public async Task<IEnumerable<Diaria>> GetByAlocacaoEDataAsync(Guid alocacaoId, DateOnly data)
         => await _context.Diarias.Where(a => a.AlocacaoId == alocacaoId && a.Data == data).ToListAsync();
 
+    public async Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim)
+        => await _context.Diarias
+            .Include(d => d.Alocacao)
+            .Where(d => d.Alocacao!.ContratoId == contratoId
+                     && d.Data >= inicio && d.Data <= fim)
+            .ToListAsync();
+
+    public async Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes)
+    {
+        var inicio = new DateOnly(ano, mes, 1);
+        var fim = inicio.AddMonths(1).AddDays(-1);
+
+        return await _context.Diarias
+            .Include(d => d.Funcionario)
+            .Include(d => d.Alocacao)
+            .ThenInclude(a => a!.Posto)
+            .Where(d => d.Alocacao!.ContratoId == contratoId
+                        && d.StatusDiaria == StatusDiaria.CONFIRMADA
+                        && d.Data >= inicio
+                        && d.Data <= fim)
+            .ToListAsync();
+    }
+
     public async Task<bool> ExisteDiariaNaDataAsync(Guid funcionarioId, DateOnly data, Guid? diariaIdIgnorada = null)
         => await _context.Diarias
             .Where(a => a.FuncionarioId == funcionarioId && 
                        a.Data == data &&
                        (diariaIdIgnorada == null || a.Id != diariaIdIgnorada))
             .AnyAsync();
+
+    public async Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds)
+    {
+        return await _context.Diarias
+            .Where(d => alocacaoIds.Contains(d.AlocacaoId))
+            .ToListAsync();
+    }
 
     public void Add(Diaria entity) => _context.Diarias.Add(entity);
     public void Update(Diaria entity) => _context.Diarias.Update(entity);

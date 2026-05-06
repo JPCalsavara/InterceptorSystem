@@ -40,7 +40,6 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
     public DbSet<Tag> Tags { get; set; }
     public DbSet<FuncionarioTag> FuncionarioTags { get; set; }
     public DbSet<ContratoTag> ContratoTags { get; set; }
-    public DbSet<PostoTag> PostoTags { get; set; }
 
     // --- Configuração do Modelo (Filtros de Leitura) ---
     protected override void OnModelCreating(ModelBuilder builder)

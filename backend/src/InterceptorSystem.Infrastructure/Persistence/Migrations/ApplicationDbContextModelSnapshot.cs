@@ -22,6 +22,102 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Cnpj")
+                        .HasMaxLength(18)
+                        .HasColumnType("character varying(18)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmailPendente")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("EmailVerificado")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NomeEmpresa")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Plano")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SenhaHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Telefone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("TelefoneVerificado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Telefone")
+                        .IsUnique()
+                        .HasFilter("\"Telefone\" IS NOT NULL");
+
+                    b.ToTable("Contas", (string)null);
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.TokenVerificacao", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ContaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DadosAdicionais")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<bool>("Usado")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("ContaId", "Tipo", "Usado");
+
+                    b.ToTable("TokensVerificacao", (string)null);
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", b =>
                 {
                     b.Property<Guid>("Id")
@@ -48,6 +144,11 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("PostoId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("QuantidadeFuncionarios")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.Property<string>("TipoEscala")
                         .IsRequired()
@@ -76,17 +177,8 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("Cnpj")
-                        .IsRequired()
-                        .HasMaxLength(14)
-                        .HasColumnType("character varying(14)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("EmailGestor")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid");
@@ -111,18 +203,11 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(2);
 
-                    b.Property<string>("TelefoneEmergencia")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EmpresaId");
 
                     b.HasIndex("Nome");
-
-                    b.HasIndex("EmpresaId", "Cnpj")
-                        .IsUnique();
 
                     b.ToTable("Clientes", (string)null);
                 });
@@ -161,6 +246,9 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("NumeroDePostos")
                         .HasColumnType("integer");
+
+                    b.Property<decimal>("PercentualAdicionalFimSemana")
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("PercentualAdicionalNoturno")
                         .HasColumnType("decimal(5,4)");
@@ -252,6 +340,9 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("TagId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TipoDiaria")
                         .IsRequired()
                         .HasColumnType("text");
@@ -265,6 +356,8 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("FuncionarioId");
 
+                    b.HasIndex("TagId");
+
                     b.ToTable("Diarias", (string)null);
                 });
 
@@ -274,21 +367,11 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Celular")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
                     b.Property<Guid?>("ClienteId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ContratoId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Cpf")
-                        .IsRequired()
-                        .HasMaxLength(14)
-                        .HasColumnType("character varying(14)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -321,9 +404,6 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.HasIndex("ClienteId");
 
                     b.HasIndex("ContratoId");
-
-                    b.HasIndex("Cpf")
-                        .IsUnique();
 
                     b.HasIndex("EmpresaId");
 
@@ -369,11 +449,6 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Cep")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
-
                     b.Property<string>("Cidade")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -385,6 +460,9 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Property<string>("Complemento")
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
+
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -416,37 +494,9 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ClienteId");
 
+                    b.HasIndex("ContratoId");
+
                     b.ToTable("Postos", (string)null);
-                });
-
-            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.PostoTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("EmpresaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("PostoId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TagId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmpresaId");
-
-                    b.HasIndex("TagId");
-
-                    b.HasIndex("PostoId", "TagId")
-                        .IsUnique();
-
-                    b.ToTable("PostoTags", (string)null);
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Tag", b =>
@@ -470,116 +520,15 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("decimal(12,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EmpresaId", "Nome")
                         .IsUnique();
 
                     b.ToTable("Tags", (string)null);
-                });
-
-            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Cnpj")
-                        .HasMaxLength(18)
-                        .HasColumnType("character varying(18)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("EmailPendente")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<bool>("EmailVerificado")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("NomeEmpresa")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Plano")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SenhaHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Telefone")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<bool>("TelefoneVerificado")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("Telefone")
-                        .IsUnique()
-                        .HasFilter("\"Telefone\" IS NOT NULL");
-
-                    b.ToTable("Contas", (string)null);
-                });
-
-            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.TokenVerificacao", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ContaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DadosAdicionais")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.Property<bool>("Usado")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.HasIndex("ContaId", "Tipo", "Usado");
-
-                    b.ToTable("TokensVerificacao", (string)null);
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Whatsapp.Aggregates.SessaoWhatsapp", b =>
@@ -632,6 +581,40 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("SessoesWhatsapp", (string)null);
                 });
 
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", b =>
+                {
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Email", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("ContaId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("Email");
+
+                            b1.HasKey("ContaId");
+
+                            b1.ToTable("Contas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ContaId");
+                        });
+
+                    b.Navigation("Email")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.TokenVerificacao", b =>
+                {
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", null)
+                        .WithMany()
+                        .HasForeignKey("ContaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", b =>
                 {
                     b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", "Contrato")
@@ -649,6 +632,71 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Navigation("Contrato");
 
                     b.Navigation("Posto");
+                });
+
+            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", b =>
+                {
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Email", "EmailGestor", b1 =>
+                        {
+                            b1.Property<Guid>("ClienteId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("EmailGestor");
+
+                            b1.HasKey("ClienteId");
+
+                            b1.ToTable("Clientes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ClienteId");
+                        });
+
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Telefone", "TelefoneEmergencia", b1 =>
+                        {
+                            b1.Property<Guid>("ClienteId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .HasMaxLength(11)
+                                .HasColumnType("character varying(11)")
+                                .HasColumnName("TelefoneEmergencia");
+
+                            b1.HasKey("ClienteId");
+
+                            b1.ToTable("Clientes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ClienteId");
+                        });
+
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Cnpj", "Cnpj", b1 =>
+                        {
+                            b1.Property<Guid>("ClienteId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(14)
+                                .HasColumnType("character varying(14)")
+                                .HasColumnName("Cnpj");
+
+                            b1.HasKey("ClienteId");
+
+                            b1.ToTable("Clientes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ClienteId");
+                        });
+
+                    b.Navigation("Cnpj")
+                        .IsRequired();
+
+                    b.Navigation("EmailGestor");
+
+                    b.Navigation("TelefoneEmergencia");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", b =>
@@ -695,6 +743,11 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Alocacao");
 
                     b.Navigation("Funcionario");
@@ -713,9 +766,53 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Telefone", "Celular", b1 =>
+                        {
+                            b1.Property<Guid>("FuncionarioId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(11)
+                                .HasColumnType("character varying(11)")
+                                .HasColumnName("Celular");
+
+                            b1.HasKey("FuncionarioId");
+
+                            b1.ToTable("Funcionarios");
+
+                            b1.WithOwner()
+                                .HasForeignKey("FuncionarioId");
+                        });
+
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Cpf", "Cpf", b1 =>
+                        {
+                            b1.Property<Guid>("FuncionarioId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(11)
+                                .HasColumnType("character varying(11)")
+                                .HasColumnName("Cpf");
+
+                            b1.HasKey("FuncionarioId");
+
+                            b1.ToTable("Funcionarios");
+
+                            b1.WithOwner()
+                                .HasForeignKey("FuncionarioId");
+                        });
+
+                    b.Navigation("Celular")
+                        .IsRequired();
+
                     b.Navigation("Cliente");
 
                     b.Navigation("Contrato");
+
+                    b.Navigation("Cpf")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.FuncionarioTag", b =>
@@ -745,35 +842,37 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", "Contrato")
+                        .WithMany()
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Cep", "Cep", b1 =>
+                        {
+                            b1.Property<Guid>("PostoId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(8)
+                                .HasColumnType("character varying(8)")
+                                .HasColumnName("Cep");
+
+                            b1.HasKey("PostoId");
+
+                            b1.ToTable("Postos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PostoId");
+                        });
+
+                    b.Navigation("Cep")
+                        .IsRequired();
+
                     b.Navigation("Cliente");
-                });
 
-            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.PostoTag", b =>
-                {
-                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Posto", "Posto")
-                        .WithMany("Tags")
-                        .HasForeignKey("PostoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Tag", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Posto");
-
-                    b.Navigation("Tag");
-                });
-
-            modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.TokenVerificacao", b =>
-                {
-                    b.HasOne("InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates.Conta", null)
-                        .WithMany()
-                        .HasForeignKey("ContaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Contrato");
                 });
 
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Alocacao", b =>
@@ -809,8 +908,6 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Posto", b =>
                 {
                     b.Navigation("Alocacoes");
-
-                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

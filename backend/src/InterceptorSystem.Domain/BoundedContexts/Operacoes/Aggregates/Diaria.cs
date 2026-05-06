@@ -11,6 +11,7 @@ public class Diaria : Entity, IAggregateRoot
     public Guid AlocacaoId { get; private set; }
     public DateOnly Data { get; private set; }
     public decimal ValorDiaria { get; private set; }
+    public Guid? TagId { get; private set; }
     public StatusDiaria StatusDiaria { get; private set; }
     public TipoDiaria TipoDiaria { get; private set; }
 
@@ -26,7 +27,8 @@ public class Diaria : Entity, IAggregateRoot
         DateOnly data,
         decimal valorDiaria,
         StatusDiaria statusDiaria,
-        TipoDiaria tipoDiaria)
+        TipoDiaria tipoDiaria,
+        Guid? tagId = null)
     {
         Enforce(empresaId != Guid.Empty, "A diária deve pertencer a uma empresa.");
         Enforce(funcionarioId != Guid.Empty, "A diária deve referenciar um funcionário.");
@@ -40,6 +42,7 @@ public class Diaria : Entity, IAggregateRoot
         AlocacaoId = alocacaoId;
         Data = data;
         ValorDiaria = valorDiaria;
+        TagId = tagId;
         StatusDiaria = statusDiaria;
         TipoDiaria = tipoDiaria;
 

@@ -74,8 +74,8 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
         Assert.Contains("Diarias", errorContent, StringComparison.OrdinalIgnoreCase);
     }
 
-    [Fact(DisplayName = "POST /api/diarias/batch - Deve retornar 400 quando item possui funcionário inválido")]
-    public async Task CreateBatch_DeveFalhar400_QuandoItemComFuncionarioInvalido()
+    [Fact(DisplayName = "POST /api/diarias/batch - Deve retornar 404 quando item possui funcionário inválido")]
+    public async Task CreateBatch_DeveFalhar404_QuandoItemComFuncionarioInvalido()
     {
         var (_, _, alocacaoId, _) = await CriarDadosCompletosAsync();
         var batch = new CreateDiariasBatchDtoInput(new List<CreateDiariaDtoInput>
@@ -85,7 +85,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
 
         var response = await Client.PostAsJsonAsync("/api/diarias/batch", batch);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact(DisplayName = "POST /api/diarias/batch - Deve criar ~91 diárias para escala 12x36 em 6 meses")]
@@ -203,6 +203,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
             ValorTotalMensal: 15000m,
             ValorDiariaCobrada: 100m,
             PercentualAdicionalNoturno: 0.20m,
+            PercentualAdicionalFimSemana: 1.0m,
             ValorBeneficiosExtrasMensal: 350m,
             PercentualEncargosProvisoes: 0.085m,
             NumeroDePostos: 2,

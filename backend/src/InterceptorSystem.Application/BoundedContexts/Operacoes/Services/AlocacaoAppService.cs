@@ -42,7 +42,8 @@ public class AlocacaoAppService : IAlocacaoAppService
             input.HorarioInicio,
             input.HorarioFim,
             input.TipoEscala,
-            input.PermiteDobrarEscala
+            input.PermiteDobrarEscala,
+            Math.Max(1, input.QuantidadeFuncionarios)
         );
 
         _repository.Add(alocacao);
@@ -60,7 +61,8 @@ public class AlocacaoAppService : IAlocacaoAppService
             input.HorarioInicio,
             input.HorarioFim,
             input.TipoEscala,
-            input.PermiteDobrarEscala
+            input.PermiteDobrarEscala,
+            Math.Max(1, input.QuantidadeFuncionarios)
         );
 
         _repository.Update(alocacao);

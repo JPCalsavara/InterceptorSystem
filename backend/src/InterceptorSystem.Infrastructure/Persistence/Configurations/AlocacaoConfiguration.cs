@@ -16,6 +16,7 @@ public class AlocacaoConfiguration : IEntityTypeConfiguration<Alocacao>
         builder.Property(a => a.HorarioFim).IsRequired();
         builder.Property(a => a.TipoEscala).IsRequired().HasConversion<string>();
         builder.Property(a => a.PermiteDobrarEscala).IsRequired();
+        builder.Property(a => a.QuantidadeFuncionarios).IsRequired().HasDefaultValue(1);
 
         builder.HasOne(a => a.Posto)
             .WithMany(p => p.Alocacoes)

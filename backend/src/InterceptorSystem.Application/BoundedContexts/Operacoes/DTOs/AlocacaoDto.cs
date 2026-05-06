@@ -12,6 +12,7 @@ public class AlocacaoDto
     public TimeSpan HorarioFim { get; set; }
     public TipoEscala TipoEscala { get; set; }
     public bool PermiteDobrarEscala { get; set; }
+    public int QuantidadeFuncionarios { get; set; }
     public bool TemHorarioNoturno { get; set; }
 
     public static AlocacaoDto FromEntity(Alocacao entity)
@@ -25,6 +26,7 @@ public class AlocacaoDto
             HorarioFim = entity.HorarioFim,
             TipoEscala = entity.TipoEscala,
             PermiteDobrarEscala = entity.PermiteDobrarEscala,
+            QuantidadeFuncionarios = entity.QuantidadeFuncionarios,
             TemHorarioNoturno = entity.TemHorarioNoturno
         };
     }
@@ -38,6 +40,7 @@ public class CreateAlocacaoInput
     public TimeSpan HorarioFim { get; set; }
     public TipoEscala TipoEscala { get; set; }
     public bool PermiteDobrarEscala { get; set; }
+    public int QuantidadeFuncionarios { get; set; } = 1;
 }
 
 public class UpdateAlocacaoInput
@@ -46,4 +49,5 @@ public class UpdateAlocacaoInput
     public TimeSpan HorarioFim { get; set; }
     public TipoEscala TipoEscala { get; set; }
     public bool PermiteDobrarEscala { get; set; }
+    public int QuantidadeFuncionarios { get; set; } = 1;
 }

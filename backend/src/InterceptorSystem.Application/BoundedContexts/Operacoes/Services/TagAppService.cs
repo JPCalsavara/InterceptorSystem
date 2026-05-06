@@ -26,7 +26,7 @@ public class TagAppService : ITagAppService
         if (existente != null)
             throw new InvalidOperationException($"Já existe uma Tag com o nome '{input.Nome}'.");
 
-        var tag = new Tag(empresaId, input.Nome, input.Descricao);
+        var tag = new Tag(empresaId, input.Nome, input.Valor, input.Descricao);
         _repository.Add(tag);
         await _repository.UnitOfWork.CommitAsync();
 
@@ -38,7 +38,7 @@ public class TagAppService : ITagAppService
         var tag = await _repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Tag não encontrada.");
 
-        tag.AtualizarDados(input.Nome, input.Descricao);
+        tag.AtualizarDados(input.Nome, input.Valor, input.Descricao);
         _repository.Update(tag);
         await _repository.UnitOfWork.CommitAsync();
 

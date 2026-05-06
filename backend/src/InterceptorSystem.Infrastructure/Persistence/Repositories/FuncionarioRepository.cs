@@ -21,9 +21,9 @@ public class FuncionarioRepository : IFuncionarioRepository
     public async Task<Funcionario?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Cliente)
+                .ThenInclude(c => c!.Cliente)
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Tags)
+                .ThenInclude(c => c!.Tags)
                     .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)
@@ -34,9 +34,9 @@ public class FuncionarioRepository : IFuncionarioRepository
     public async Task<IEnumerable<Funcionario>> GetAllAsync(CancellationToken cancellationToken = default)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Cliente)
+                .ThenInclude(c => c!.Cliente)
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Tags)
+                .ThenInclude(c => c!.Tags)
                     .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)
@@ -51,9 +51,9 @@ public class FuncionarioRepository : IFuncionarioRepository
 
         var query = _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Cliente)
+                .ThenInclude(c => c!.Cliente)
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Tags)
+                .ThenInclude(c => c!.Tags)
                     .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)
@@ -77,9 +77,9 @@ public class FuncionarioRepository : IFuncionarioRepository
 
         return await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Cliente)
+                .ThenInclude(c => c!.Cliente)
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Tags)
+                .ThenInclude(c => c!.Tags)
                     .ThenInclude(ct => ct.Tag)
             .Include(f => f.Tags)
                 .ThenInclude(ft => ft.Tag)
@@ -89,9 +89,9 @@ public class FuncionarioRepository : IFuncionarioRepository
     public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Cliente)
+                .ThenInclude(c => c!.Cliente)
             .Include(f => f.Contrato)
-                .ThenInclude(c => c.Tags)
+                .ThenInclude(c => c!.Tags)
                     .ThenInclude(ct => ct.Tag)
             .Include(f => f.Diarias)
                 .ThenInclude(a => a.Alocacao)

@@ -22,6 +22,7 @@ public class DiariaAppServiceTests
     private readonly Mock<IDiariaRepository> _diariaRepo = new();
     private readonly Mock<IFuncionarioRepository> _funcionarioRepo = new();
     private readonly Mock<IAlocacaoRepository> _alocacaoRepo = new();
+    private readonly Mock<IContratoRepository> _contratoRepo = new();
     private readonly Mock<ICurrentTenantService> _tenantService = new();
     private readonly Mock<IUnitOfWork> _uow = new();
     private readonly DiariaAppService _service;
@@ -29,7 +30,7 @@ public class DiariaAppServiceTests
     public DiariaAppServiceTests()
     {
         _diariaRepo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-        _service = new DiariaAppService(_diariaRepo.Object, _funcionarioRepo.Object, _alocacaoRepo.Object, _tenantService.Object);
+        _service = new DiariaAppService(_diariaRepo.Object, _funcionarioRepo.Object, _alocacaoRepo.Object, _contratoRepo.Object, _tenantService.Object);
     }
 
     private static CreateDiariaDtoInput CriarInputValido(Guid funcionarioId, Guid alocacaoId) => new(

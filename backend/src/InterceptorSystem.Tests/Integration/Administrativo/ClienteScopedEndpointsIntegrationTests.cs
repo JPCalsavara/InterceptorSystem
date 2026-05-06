@@ -181,6 +181,7 @@ public class ClienteScopedEndpointsIntegrationTests : IntegrationTestBase
             10000m,
             100m,
             0.30m,
+            1.0m,
             500m,
             0.15m,
             2,

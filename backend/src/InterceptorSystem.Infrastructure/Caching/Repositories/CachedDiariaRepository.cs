@@ -117,4 +117,15 @@ public class CachedDiariaRepository : IDiariaRepository
 
         return cachedList ?? Enumerable.Empty<Diaria>();
     }
+
+    public Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim)
+        => _decorated.GetByContratoIdAsync(contratoId, inicio, fim);
+
+    public Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes)
+        => _decorated.GetResumoFinanceiroByContratoAsync(contratoId, ano, mes);
+
+    public Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds)
+    {
+        return _decorated.GetDiariasByAlocacoesIdsAsync(alocacaoIds);
+    }
 }

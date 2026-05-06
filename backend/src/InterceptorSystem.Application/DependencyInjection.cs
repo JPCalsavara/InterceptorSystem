@@ -21,6 +21,8 @@ public static class DependencyInjection
         services.AddScoped<IFuncionarioAppService, FuncionarioAppService>();
         services.AddScoped<IDiariaAppService, DiariaAppService>();
         services.AddScoped<IContratoAppService, ContratoAppService>();
+        services.AddScoped<IContratoCalculoService, ContratoCalculoService>();
+        services.AddScoped<IContratoCustoRealAppService, ContratoCustoRealAppService>();
         services.AddScoped<IAlocacaoAppService, AlocacaoAppService>();
         services.AddScoped<ITagAppService, TagAppService>(); // Phase 4
 

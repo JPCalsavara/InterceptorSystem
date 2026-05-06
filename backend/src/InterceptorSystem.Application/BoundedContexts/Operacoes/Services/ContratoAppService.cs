@@ -14,17 +14,23 @@ public class ContratoAppService : IContratoAppService
     private readonly IClienteRepository _clienteRepository;
     private readonly ITagRepository _tagRepository;
     private readonly ICurrentTenantService _tenantService;
+    private readonly IContratoCalculoService _calculoService;
+    private readonly IDiariaAppService _diariaAppService;
 
     public ContratoAppService(
         IContratoRepository repository,
         IClienteRepository clienteRepository,
         ITagRepository tagRepository,
-        ICurrentTenantService tenantService)
+        ICurrentTenantService tenantService,
+        IContratoCalculoService calculoService,
+        IDiariaAppService diariaAppService)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
         _tagRepository = tagRepository;
         _tenantService = tenantService;
+        _calculoService = calculoService;
+        _diariaAppService = diariaAppService;
     }
 
     public async Task<ContratoDtoOutput> CreateAsync(CreateContratoDtoInput input)
@@ -48,6 +54,7 @@ public class ContratoAppService : IContratoAppService
             input.ValorTotalMensal,
             input.ValorDiariaCobrada,
             input.PercentualAdicionalNoturno,
+            input.PercentualAdicionalFimSemana,
             input.ValorBeneficiosExtrasMensal,
             input.PercentualEncargosProvisoes,
             input.NumeroDePostos,
@@ -106,6 +113,7 @@ public class ContratoAppService : IContratoAppService
             input.ValorTotalMensal,
             input.ValorDiariaCobrada,
             input.PercentualAdicionalNoturno,
+            input.PercentualAdicionalFimSemana,
             input.ValorBeneficiosExtrasMensal,
             input.PercentualEncargosProvisoes,
             input.NumeroDePostos,
@@ -165,7 +173,6 @@ public class ContratoAppService : IContratoAppService
     {
         var contratos = await _repository.GetAllAsync();
         
-        // BL-10: Auto-finalização de contratos vencidos
         var hoje = DateOnly.FromDateTime(DateTime.Today);
         var alterados = false;
         
@@ -184,15 +191,55 @@ public class ContratoAppService : IContratoAppService
             await _repository.UnitOfWork.CommitAsync();
         }
 
-        return contratos
-            .Select(ContratoDtoOutput.FromEntity)
-            .Where(dto => dto != null)
-            .Select(dto => dto!);
+        var dtos = new List<ContratoDtoOutput>();
+        foreach (var contrato in contratos)
+        {
+            var dto = ContratoDtoOutput.FromEntity(contrato);
+            if (dto == null) continue;
+
+            if (contrato.Status == StatusContrato.ATIVO)
+            {
+                var resumo = await _diariaAppService.GetResumoByContratoAsync(contrato.Id, hoje.Year, hoje.Month);
+                
+                var diariasTotais = resumo.TotalDiarias;
+                // TODO: A lógica para diárias noturnas e de fds precisa ser reavaliada,
+                // pois o DTO de resumo não fornece essa granularidade.
+                var diariasNoturnas = 0; 
+                var diariasFds = 0;
+
+                var input = new CalculoValorTotalInput(
+                    DiariasTotaisMes: diariasTotais,
+                    DiariasNoturnasMes: diariasNoturnas,
+                    DiariasFdsMes: diariasFds,
+                    DiariasFeriadosMes: 0,
+                    FuncionariosEstimados: (int)Math.Ceiling(diariasTotais / 15m),
+                    ValorDiariaCobrada: contrato.ValorDiariaCobrada,
+                    PercentualAdicionalNoturno: contrato.PercentualAdicionalNoturno,
+                    PercentualAdicionalFimSemana: contrato.PercentualAdicionalFimSemana,
+                    ValorBeneficiosExtrasMensal: contrato.ValorBeneficiosExtrasMensal,
+                    PercentualEncargosProvisoes: contrato.PercentualEncargosProvisoes,
+                    MargemLucroPercentual: contrato.MargemLucroPercentual,
+                    MargemCoberturaFaltasPercentual: contrato.MargemCoberturaFaltasPercentual
+                );
+
+                var calculo = _calculoService.CalcularValorTotal(input);
+                
+                dto = dto with 
+                { 
+                    CustoRealMensal = calculo.CustoBaseMensal, 
+                    LucroRealMensal = calculo.ValorTotalMensal - calculo.CustoBaseMensal 
+                };
+            }
+            
+            dtos.Add(dto);
+        }
+
+        return dtos;
     }
 
     public async Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId)
     {
-        var contratos = await _repository.GetByClienteIdAsync(clienteId);
+        var contratos = await _repository.GetAtivosByClienteIdAsync(clienteId);
         return contratos
             .Select(ContratoDtoOutput.FromEntity)
             .Where(dto => dto != null)

@@ -14,6 +14,7 @@ public class Alocacao : Entity, IAggregateRoot
     public TimeSpan HorarioFim { get; private set; }
     public TipoEscala TipoEscala { get; private set; }
     public bool PermiteDobrarEscala { get; private set; }
+    public int QuantidadeFuncionarios { get; private set; }
 
     [NotMapped]
     public bool TemHorarioNoturno
@@ -49,7 +50,8 @@ public class Alocacao : Entity, IAggregateRoot
         TimeSpan horarioInicio,
         TimeSpan horarioFim,
         TipoEscala tipoEscala,
-        bool permiteDobrarEscala)
+        bool permiteDobrarEscala,
+        int quantidadeFuncionarios = 1)
     {
         Enforce(postoId != Guid.Empty, "PostoId é obrigatório");
         Enforce(contratoId != Guid.Empty, "ContratoId é obrigatório");
@@ -60,6 +62,7 @@ public class Alocacao : Entity, IAggregateRoot
             : TimeSpan.FromHours(24) - (horarioInicio - horarioFim);
 
         Enforce(duracao >= TimeSpan.FromHours(4) && duracao <= TimeSpan.FromHours(12), "O turno deve ter entre 4 e 12 horas de duração.");
+        Enforce(quantidadeFuncionarios > 0, "Quantidade de funcionários por alocação deve ser maior que zero.");
 
         PostoId = postoId;
         ContratoId = contratoId;
@@ -68,11 +71,12 @@ public class Alocacao : Entity, IAggregateRoot
         HorarioFim = horarioFim;
         TipoEscala = tipoEscala;
         PermiteDobrarEscala = permiteDobrarEscala;
+        QuantidadeFuncionarios = quantidadeFuncionarios;
 
         AddDomainEvent(new AlocacaoCreatedEvent(EmpresaId, Id));
     }
 
-    public void AtualizarHorario(TimeSpan inicio, TimeSpan fim, TipoEscala tipoEscala, bool permiteDobrarEscala)
+    public void AtualizarHorario(TimeSpan inicio, TimeSpan fim, TipoEscala tipoEscala, bool permiteDobrarEscala, int? quantidadeFuncionarios = null)
     {
         var duracao = fim > inicio
             ? fim - inicio
@@ -84,6 +88,11 @@ public class Alocacao : Entity, IAggregateRoot
         HorarioFim = fim;
         TipoEscala = tipoEscala;
         PermiteDobrarEscala = permiteDobrarEscala;
+        if (quantidadeFuncionarios.HasValue)
+        {
+            Enforce(quantidadeFuncionarios.Value > 0, "Quantidade de funcionários por alocação deve ser maior que zero.");
+            QuantidadeFuncionarios = quantidadeFuncionarios.Value;
+        }
 
         AddDomainEvent(new AlocacaoUpdatedEvent(EmpresaId, Id));
     }

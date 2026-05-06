@@ -2,4 +2,4 @@ using InterceptorSystem.Domain.SharedKernel;
 
 namespace InterceptorSystem.Domain.BoundedContexts.Operacoes.Events;
 
-public record PostoDeletedEvent(Guid EmpresaId, Guid PostoId, Guid ClienteId) : DomainEvent;
+public record PostoDeletedEvent(Guid EmpresaId, Guid PostoId, Guid ClienteId, Guid ContratoId) : DomainEvent;

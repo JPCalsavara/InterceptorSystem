@@ -47,6 +47,12 @@ public class Contrato : Entity, IAggregateRoot
     public decimal PercentualAdicionalNoturno { get; private set; }
     
     /// <summary>
+    /// Percentual de adicional para finais de semana e feriados.
+    /// Geralmente 100% conforme a CLT (quando trabalhado em feriados ou domingos sem folga compensatória).
+    /// </summary>
+    public decimal PercentualAdicionalFimSemana { get; private set; }
+    
+    /// <summary>
     /// Valor total mensal de benefícios extras (vale-transporte, alimentação, etc.).
     /// Será dividido igualmente entre todos os funcionários do contrato.
     /// </summary>
@@ -129,6 +135,7 @@ public class Contrato : Entity, IAggregateRoot
         decimal valorTotalMensal,
         decimal valorDiariaCobrada,
         decimal percentualAdicionalNoturno,
+        decimal percentualAdicionalFimSemana,
         decimal valorBeneficiosExtrasMensal,
         decimal percentualEncargosProvisoes,
         int numeroDePostos, // Quantidade de turnos (2=12x36, 3=8h, 4=6h)
@@ -162,6 +169,7 @@ public class Contrato : Entity, IAggregateRoot
         ValorDiariaCobrada = valorDiariaCobrada;
         ValorDiariaVigilante = valorDiariaVigilante;
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
+        PercentualAdicionalFimSemana = percentualAdicionalFimSemana;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
         PercentualEncargosProvisoes = percentualEncargosProvisoes;
         NumeroDePostos = numeroDePostos;
@@ -180,6 +188,7 @@ public class Contrato : Entity, IAggregateRoot
         decimal valorTotalMensal,
         decimal valorDiariaCobrada,
         decimal percentualAdicionalNoturno,
+        decimal percentualAdicionalFimSemana,
         decimal valorBeneficiosExtrasMensal,
         decimal percentualEncargosProvisoes,
         int numeroDePostos,
@@ -206,6 +215,7 @@ public class Contrato : Entity, IAggregateRoot
         ValorTotalMensal = valorTotalMensal;
         ValorDiariaCobrada = valorDiariaCobrada;
         PercentualAdicionalNoturno = percentualAdicionalNoturno;
+        PercentualAdicionalFimSemana = percentualAdicionalFimSemana;
         ValorBeneficiosExtrasMensal = valorBeneficiosExtrasMensal;
         PercentualEncargosProvisoes = percentualEncargosProvisoes;
         NumeroDePostos = numeroDePostos;

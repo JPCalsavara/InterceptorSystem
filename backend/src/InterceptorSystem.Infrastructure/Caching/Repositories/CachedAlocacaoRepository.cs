@@ -59,31 +59,29 @@ public class CachedAlocacaoRepository : IAlocacaoRepository
         return cachedList ?? Enumerable.Empty<Alocacao>();
     }
 
-    public async Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId)
+    public Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId)
     {
-        var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
-        var cacheKey = $"Alocacoes_{empresaId}_Cliente_{clienteId}";
-
-        if (!_cache.TryGetValue(cacheKey, out IEnumerable<Alocacao>? cachedList))
-        {
-            cachedList = await _decorated.GetByClienteIdAsync(clienteId);
-            _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Volatile));
-        }
-
-        return cachedList ?? Enumerable.Empty<Alocacao>();
+        // This method is not cached. It passes through to the decorated repository.
+        return _decorated.GetByClienteIdAsync(clienteId);
     }
 
-    public async Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId)
+    public Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId)
+    {
+        // This method is not cached. It passes through to the decorated repository.
+        return _decorated.GetByPostoIdAsync(postoId);
+    }
+
+    public async Task<List<Alocacao>> GetAlocacoesByClienteIdAsync(Guid clienteId)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
-        var cacheKey = $"Alocacoes_{empresaId}_Posto_{postoId}";
+        var cacheKey = $"Alocacoes_Cliente_{clienteId}_{empresaId}";
 
-        if (!_cache.TryGetValue(cacheKey, out IEnumerable<Alocacao>? cachedList))
+        if (!_cache.TryGetValue(cacheKey, out List<Alocacao>? cachedList))
         {
-            cachedList = await _decorated.GetByPostoIdAsync(postoId);
-            _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Volatile));
+            cachedList = await _decorated.GetAlocacoesByClienteIdAsync(clienteId);
+            _cache.Set(cacheKey, cachedList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
         }
 
-        return cachedList ?? Enumerable.Empty<Alocacao>();
+        return cachedList!;
     }
 }

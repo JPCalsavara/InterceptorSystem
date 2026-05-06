@@ -19,6 +19,8 @@ public record DiariaDtoOutput(
     Guid FuncionarioId,
     Guid AlocacaoId,
     DateOnly Data,
+    decimal ValorDiaria,
+    Guid? TagId,
     StatusDiaria StatusDiaria,
     TipoDiaria TipoDiaria)
 {
@@ -30,6 +32,8 @@ public record DiariaDtoOutput(
             entity.FuncionarioId,
             entity.AlocacaoId,
             entity.Data,
+            entity.ValorDiaria,
+            entity.TagId,
             entity.StatusDiaria,
             entity.TipoDiaria);
     }
@@ -45,3 +49,58 @@ public record DiariaComFuncionarioDto(
     string NomeFuncionario,
     TipoDiaria TipoDiaria,
     StatusDiaria StatusDiaria);
+
+public record DiariaTagResumoDto(
+    Guid? TagId,
+    string TagNome,
+    int QuantidadeDiarias,
+    decimal TotalValor);
+
+public record DiariasContratoResumoDto(
+    Guid ContratoId,
+    int Ano,
+    int Mes,
+    int TotalDiarias,
+    decimal TotalValorDiarias,
+    int TotalConfirmadas,
+    int TotalFaltas,
+    int TotalCanceladas,
+    IReadOnlyList<DiariaTagResumoDto> ResumoByTag);
+
+public record ContratoResumoFinanceiroPostoDto(
+    Guid PostoId,
+    string PostoNome,
+    int TotalDiarias,
+    decimal CustoTotal,
+    int DiariasNormais,
+    int DiariasExtras);
+
+public record ContratoResumoFinanceiroAlocacaoDto(
+    Guid AlocacaoId,
+    TipoEscala TipoEscala,
+    bool TemHorarioNoturno,
+    int TotalDiarias,
+    decimal CustoTotal,
+    int DiariasNormais,
+    int DiariasExtras);
+
+public record ContratoResumoFinanceiroFuncionarioDto(
+    Guid FuncionarioId,
+    string FuncionarioNome,
+    int TotalDiarias,
+    decimal CustoTotal,
+    int DiariasNormais,
+    int DiariasExtras);
+
+public record ContratoResumoFinanceiroDto(
+    Guid ContratoId,
+    int Ano,
+    int Mes,
+    decimal CustoRealDiariasNormais,
+    decimal CustoRealDiariasExtras,
+    decimal CustoRealTotal,
+    int TotalDiariasNormais,
+    int TotalDiariasExtras,
+    IReadOnlyList<ContratoResumoFinanceiroPostoDto> ProjecaoCustoPorPosto,
+    IReadOnlyList<ContratoResumoFinanceiroAlocacaoDto> ProjecaoCustoPorAlocacao,
+    IReadOnlyList<ContratoResumoFinanceiroFuncionarioDto> ProjecaoCustoPorFuncionario);

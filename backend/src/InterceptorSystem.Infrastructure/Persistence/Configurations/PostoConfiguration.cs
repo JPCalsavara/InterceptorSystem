@@ -30,10 +30,5 @@ public class PostoConfiguration : IEntityTypeConfiguration<Posto>
             .WithMany(c => c.Postos)
             .HasForeignKey(p => p.ClienteId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(p => p.Tags)
-            .WithOne(pt => pt.Posto)
-            .HasForeignKey(pt => pt.PostoId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

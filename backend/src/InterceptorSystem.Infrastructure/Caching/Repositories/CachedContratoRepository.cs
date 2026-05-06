@@ -65,4 +65,14 @@ public class CachedContratoRepository : IContratoRepository
 
         return cachedList ?? Enumerable.Empty<Contrato>();
     }
+
+    public Task<IEnumerable<Contrato>> GetAtivosByClienteIdAsync(Guid clienteId)
+    {
+        return _decorated.GetAtivosByClienteIdAsync(clienteId);
+    }
+
+    public Task<Contrato> GetByClienteId(Guid clienteId)
+    {
+        return _decorated.GetByClienteId(clienteId);
+    }
 }

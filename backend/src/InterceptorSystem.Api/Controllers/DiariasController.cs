@@ -116,4 +116,35 @@ public class DiariasController : ControllerBase
             return NotFound();
         }
     }
+
+    [HttpGet("contrato/{contratoId}/resumo")]
+    [ProducesResponseType(typeof(DiariasContratoResumoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetResumoByContrato(
+        Guid contratoId,
+        [FromQuery] int ano = 0,
+        [FromQuery] int mes = 0)
+    {
+        var today = DateTime.Today;
+        if (ano <= 0) ano = today.Year;
+        if (mes <= 0 || mes > 12) mes = today.Month;
+
+        var result = await _service.GetResumoByContratoAsync(contratoId, ano, mes);
+        return Ok(result);
+    }
+
+    [HttpGet("contrato/{contratoId}/resumo-financeiro")]
+    [ProducesResponseType(typeof(ContratoResumoFinanceiroDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetResumoFinanceiroByContrato(
+        Guid contratoId,
+        [FromQuery] int ano = 0,
+        [FromQuery] int mes = 0)
+    {
+        var today = DateTime.Today;
+        if (ano <= 0) ano = today.Year;
+        if (mes <= 0 || mes > 12) mes = today.Month;
+
+        var result = await _service.GetResumoFinanceiroContratoAsync(contratoId, ano, mes);
+        return Ok(result);
+    }
 }

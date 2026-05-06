@@ -57,6 +57,25 @@ public class ContratoRepository : IContratoRepository
         return new PagedResult<Contrato>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
+    public async Task<IEnumerable<Contrato>> GetAtivosByClienteIdAsync(Guid clienteId)
+    {
+        return await _context.Contratos
+            .Include(c => c.Cliente)
+            .Include(c => c.Tags)
+                .ThenInclude(ct => ct.Tag)
+            .Where(c => c.ClienteId == clienteId && c.Status == StatusContrato.ATIVO)
+            .ToListAsync();
+    }
+
+    public async Task<Contrato?> GetByClienteId(Guid clienteId)
+    {
+        return await _context.Contratos
+            .Include(c => c.Cliente)
+            .Include(c => c.Tags)
+                .ThenInclude(ct => ct.Tag)
+            .FirstOrDefaultAsync(c => c.ClienteId == clienteId && c.Status == StatusContrato.ATIVO);
+    }
+
     public async Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId)
     {
         return await _context.Contratos

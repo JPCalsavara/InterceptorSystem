@@ -17,13 +17,10 @@ public class PostoRepository : IPostoRepository
 
     public IUnitOfWork UnitOfWork => _context;
 
-    // FASE 4: Eager loading do Cliente necessário para QuantidadeIdealFuncionarios (vem de Cliente.QuantidadeIdealPorTurno)
     public async Task<Posto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Postos
             .Include(p => p.Cliente)
-            .Include(p => p.Tags)
-                .ThenInclude(pt => pt.Tag)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -31,8 +28,6 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
-            .Include(p => p.Tags)
-                .ThenInclude(pt => pt.Tag)
             .Where(p => p.Ativo)
             .ToListAsync(cancellationToken);
     }
@@ -44,8 +39,6 @@ public class PostoRepository : IPostoRepository
 
         var query = _context.Postos
             .Include(p => p.Cliente)
-            .Include(p => p.Tags)
-                .ThenInclude(pt => pt.Tag)
             .Where(p => p.Ativo)
             .OrderBy(p => p.CreatedAt)
             .ThenBy(p => p.Id);
@@ -63,8 +56,6 @@ public class PostoRepository : IPostoRepository
     {
         return await _context.Postos
             .Include(p => p.Cliente)
-            .Include(p => p.Tags)
-                .ThenInclude(pt => pt.Tag)
             .Where(p => p.ClienteId == clienteId && p.Ativo)
             .ToListAsync();
     }
@@ -75,4 +66,3 @@ public class PostoRepository : IPostoRepository
 
     public void Remove(Posto entity) => _context.Postos.Remove(entity);
 }
-

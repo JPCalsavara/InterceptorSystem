@@ -10,18 +10,15 @@ public class PostoAppService : IPostoAppService
 {
     private readonly IPostoRepository _repository;
     private readonly IClienteRepository _clienteRepository;
-    private readonly ITagRepository _tagRepository;
     private readonly ICurrentTenantService _tenantService;
 
     public PostoAppService(
         IPostoRepository repository,
         IClienteRepository clienteRepository,
-        ITagRepository tagRepository,
         ICurrentTenantService tenantService)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
-        _tagRepository = tagRepository;
         _tenantService = tenantService;
     }
 
@@ -45,25 +42,6 @@ public class PostoAppService : IPostoAppService
             input.Estado
         );
 
-        if (input.TagIds != null && input.TagIds.Count > 0)
-        {
-            foreach (var tagId in input.TagIds)
-            {
-                var tag = await _tagRepository.GetByIdAsync(tagId);
-                if (tag == null)
-                {
-                    throw new KeyNotFoundException($"Tag não encontrada: {tagId}.");
-                }
-            }
-
-            var novasTags = input.TagIds
-                .Distinct()
-                .Select(tagId => new PostoTag(empresaId, posto.Id, tagId))
-                .ToList();
-
-            posto.DefinirTags(novasTags);
-        }
-
         _repository.Add(posto);
         await _repository.UnitOfWork.CommitAsync();
 
@@ -84,27 +62,6 @@ public class PostoAppService : IPostoAppService
             input.Complemento,
             input.Cidade,
             input.Estado);
-
-        if (input.TagIds != null)
-        {
-            var empresaIdForTags = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
-
-            foreach (var tagId in input.TagIds)
-            {
-                var tag = await _tagRepository.GetByIdAsync(tagId);
-                if (tag == null)
-                {
-                    throw new KeyNotFoundException($"Tag não encontrada: {tagId}.");
-                }
-            }
-
-            var novasTags = input.TagIds
-                .Distinct()
-                .Select(tagId => new PostoTag(empresaIdForTags, posto.Id, tagId))
-                .ToList();
-
-            posto.DefinirTags(novasTags);
-        }
 
         _repository.Update(posto);
         await _repository.UnitOfWork.CommitAsync();

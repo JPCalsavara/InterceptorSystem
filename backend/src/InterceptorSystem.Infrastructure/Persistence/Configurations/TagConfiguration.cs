@@ -14,6 +14,7 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         builder.Property(t => t.EmpresaId).IsRequired();
         builder.Property(t => t.Nome).IsRequired().HasMaxLength(100);
         builder.Property(t => t.Descricao).HasMaxLength(500);
+        builder.Property(t => t.Valor).HasColumnType("decimal(12,2)").IsRequired();
 
         builder.HasIndex(t => new { t.EmpresaId, t.Nome }).IsUnique();
     }

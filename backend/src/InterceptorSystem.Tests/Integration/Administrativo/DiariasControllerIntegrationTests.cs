@@ -34,6 +34,7 @@ public class DiariasControllerIntegrationTests : IntegrationTestBase
             10000m,  // ValorTotalMensal
             100m,    // ValorDiariaCobrada
             0.30m,   // PercentualAdicionalNoturno (30% = 0.30)
+            1.0m,
             500m,    // ValorBeneficiosExtrasMensal
             0.15m,   // PercentualEncargosProvisoes (15% = 0.15)
             2,

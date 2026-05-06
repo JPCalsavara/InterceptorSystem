@@ -35,7 +35,6 @@ public class PostoAppServiceTests
         _service = new PostoAppService(
             _mockRepo.Object,
             _mockClienteRepo.Object,
-            new Mock<ITagRepository>().Object,
             _mockTenant.Object);
     }
 

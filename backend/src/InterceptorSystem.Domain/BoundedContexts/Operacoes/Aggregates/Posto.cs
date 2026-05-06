@@ -7,6 +7,7 @@ namespace InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 
 public class Posto : Entity, IAggregateRoot
 {
+    public Guid ContratoId { get; private set; }
     public Guid ClienteId { get; private set; }
     public string Nome { get; private set; } = null!;
     public Cep Cep { get; private set; } = null!;
@@ -18,14 +19,14 @@ public class Posto : Entity, IAggregateRoot
     public bool Ativo { get; private set; }
 
     public Cliente? Cliente { get; private set; }
+    public Contrato? Contrato { get; private set; }
     public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
-    public ICollection<PostoTag> Tags { get; private set; } = new List<PostoTag>();
 
     protected Posto() { }
 
     public Posto(
         Guid clienteId,
-        Guid empresaId,
+        Guid contratoId,
         string nome,
         string cep,
         string endereco,
@@ -35,7 +36,7 @@ public class Posto : Entity, IAggregateRoot
         string estado)
     {
         Enforce(clienteId != Guid.Empty, "O Posto deve pertencer a um Cliente.");
-        Enforce(empresaId != Guid.Empty, "O Posto deve pertencer a uma Empresa.");
+        Enforce(contratoId != Guid.Empty, "O Posto deve pertencer a um Contrato.");
         Enforce(!string.IsNullOrWhiteSpace(nome), "Nome é obrigatório.");
         Enforce(!string.IsNullOrWhiteSpace(cep), "CEP é obrigatório.");
         Enforce(!string.IsNullOrWhiteSpace(endereco), "Endereço é obrigatório.");
@@ -44,7 +45,7 @@ public class Posto : Entity, IAggregateRoot
         Enforce(!string.IsNullOrWhiteSpace(estado), "Estado é obrigatório.");
 
         ClienteId = clienteId;
-        EmpresaId = empresaId;
+        ContratoId = contratoId;
         Nome = nome.Trim();
         Cep = Cep.Criar(cep);
         Endereco = endereco.Trim();
@@ -54,7 +55,7 @@ public class Posto : Entity, IAggregateRoot
         Estado = estado.Trim().ToUpperInvariant();
         Ativo = true;
 
-        AddDomainEvent(new PostoCreatedEvent(EmpresaId, Id, ClienteId));
+        AddDomainEvent(new PostoCreatedEvent(EmpresaId, Id, ClienteId, ContratoId));
     }
 
     public void AtualizarDetalhes(
@@ -81,21 +82,12 @@ public class Posto : Entity, IAggregateRoot
         Cidade = cidade.Trim();
         Estado = estado.Trim().ToUpperInvariant();
 
-        AddDomainEvent(new PostoUpdatedEvent(EmpresaId, Id, ClienteId));
+        AddDomainEvent(new PostoUpdatedEvent(EmpresaId, Id, ClienteId, ContratoId));
     }
 
     public void Desativar()
     {
         Ativo = false;
-        AddDomainEvent(new PostoDeletedEvent(EmpresaId, Id, ClienteId));
-    }
-
-    public void DefinirTags(IEnumerable<PostoTag> novasTags)
-    {
-        Tags.Clear();
-        foreach (var tag in novasTags)
-            Tags.Add(tag);
-
-        AddDomainEvent(new PostoUpdatedEvent(EmpresaId, Id, ClienteId));
+        AddDomainEvent(new PostoDeletedEvent(EmpresaId, Id, ClienteId, ContratoId));
     }
 }

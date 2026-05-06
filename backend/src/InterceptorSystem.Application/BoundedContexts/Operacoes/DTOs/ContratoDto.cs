@@ -9,6 +9,7 @@ public record CreateContratoDtoInput(
     decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
+    decimal PercentualAdicionalFimSemana,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualEncargosProvisoes,
     int NumeroDePostos, // Número de postos/turnos (QuantidadeFuncionarios será calculado automaticamente)
@@ -25,6 +26,7 @@ public record UpdateContratoDtoInput(
     decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
+    decimal PercentualAdicionalFimSemana,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualEncargosProvisoes,
     int NumeroDePostos, // Número de postos/turnos (QuantidadeFuncionarios será calculado automaticamente)
@@ -59,6 +61,7 @@ public record ContratoDtoOutput(
     decimal ValorTotalMensal,
     decimal ValorDiariaCobrada,
     decimal PercentualAdicionalNoturno,
+    decimal PercentualAdicionalFimSemana,
     decimal ValorBeneficiosExtrasMensal,
     decimal PercentualEncargosProvisoes,
     int QuantidadeFuncionarios,
@@ -69,6 +72,8 @@ public record ContratoDtoOutput(
     DateOnly DataFim,
     StatusContrato Status,
     IReadOnlyList<ContratoTagDtoOutput> Tags,
+    decimal CustoRealMensal,
+    decimal LucroRealMensal,
     decimal? ValorDiariaVigilante = null)
 {
     public static ContratoDtoOutput? FromEntity(Contrato? entity)
@@ -86,6 +91,7 @@ public record ContratoDtoOutput(
             entity.ValorTotalMensal,
             entity.ValorDiariaCobrada,
             entity.PercentualAdicionalNoturno,
+            entity.PercentualAdicionalFimSemana,
             entity.ValorBeneficiosExtrasMensal,
             entity.PercentualEncargosProvisoes,
             entity.QuantidadeFuncionarios,
@@ -96,6 +102,9 @@ public record ContratoDtoOutput(
             entity.DataFim,
             entity.Status,
             tags,
-            entity.ValorDiariaVigilante);
+            0, // CustoRealMensal - será calculado no AppService
+            0, // LucroRealMensal - será calculado no AppService
+            entity.ValorDiariaVigilante
+        );
     }
 }
