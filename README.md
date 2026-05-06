@@ -87,46 +87,46 @@ docker compose up -d
 
 ### Sistema de Autenticação (JWT)
 
-| Endpoint                         | Método | Descrição                                   | Autenticado |
-| -------------------------------- | ------ | ------------------------------------------- | ----------- |
-| `/api/auth/registrar`            | POST   | Registro de nova conta (cria tenant/empresa) | ❌          |
-| `/api/auth/login`                | POST   | Login com e-mail e senha → retorna JWT       | ❌          |
-| `/api/auth/email/confirmar`      | POST   | Confirma verificação de e-mail via token     | ❌          |
-| `/api/auth/email/reenviar`       | POST   | Reenvia e-mail de verificação                | ✅          |
-| `/api/auth/senha/solicitar-reset`| POST   | Solicita link de redefinição de senha        | ❌          |
-| `/api/auth/senha/confirmar-reset`| POST   | Confirma nova senha via token                | ❌          |
-| `/api/auth/email/solicitar-alteracao` | POST | Solicita alteração de e-mail            | ✅          |
-| `/api/auth/email/confirmar-alteracao` | POST | Confirma novo e-mail via token           | ❌          |
+| Endpoint                              | Método | Descrição                                    | Autenticado |
+| ------------------------------------- | ------ | -------------------------------------------- | ----------- |
+| `/api/auth/registrar`                 | POST   | Registro de nova conta (cria tenant/empresa) | ❌          |
+| `/api/auth/login`                     | POST   | Login com e-mail e senha → retorna JWT       | ❌          |
+| `/api/auth/email/confirmar`           | POST   | Confirma verificação de e-mail via token     | ❌          |
+| `/api/auth/email/reenviar`            | POST   | Reenvia e-mail de verificação                | ✅          |
+| `/api/auth/senha/solicitar-reset`     | POST   | Solicita link de redefinição de senha        | ❌          |
+| `/api/auth/senha/confirmar-reset`     | POST   | Confirma nova senha via token                | ❌          |
+| `/api/auth/email/solicitar-alteracao` | POST   | Solicita alteração de e-mail                 | ✅          |
+| `/api/auth/email/confirmar-alteracao` | POST   | Confirma novo e-mail via token               | ❌          |
 
 ### Gestão de Conta (SaaS)
 
-| Endpoint                    | Método | Descrição                                    |
-| --------------------------- | ------ | -------------------------------------------- |
-| `/api/conta`                | GET    | Retorna perfil da conta autenticada          |
-| `/api/conta`                | PUT    | Atualiza nome da empresa, e-mail ou senha    |
-| `/api/conta/telefone`       | POST   | Cadastra telefone e envia código via WhatsApp |
-| `/api/conta/telefone/confirmar` | POST | Confirma telefone com token de verificação   |
+| Endpoint                        | Método | Descrição                                     |
+| ------------------------------- | ------ | --------------------------------------------- |
+| `/api/conta`                    | GET    | Retorna perfil da conta autenticada           |
+| `/api/conta`                    | PUT    | Atualiza nome da empresa, e-mail ou senha     |
+| `/api/conta/telefone`           | POST   | Cadastra telefone e envia código via WhatsApp |
+| `/api/conta/telefone/confirmar` | POST   | Confirma telefone com token de verificação    |
 
 ### Planos de Assinatura
 
-| Plano   | Descrição                  |
-| ------- | -------------------------- |
-| `FREE`  | Plano gratuito (padrão)    |
-| `BASIC` | Funcionalidades básicas    |
-| `PRO`   | Funcionalidades completas  |
+| Plano   | Descrição                 |
+| ------- | ------------------------- |
+| `FREE`  | Plano gratuito (padrão)   |
+| `BASIC` | Funcionalidades básicas   |
+| `PRO`   | Funcionalidades completas |
 
 ### Entidades de Autenticação
 
-| Entidade           | Descrição                                                              |
-| ------------------ | ---------------------------------------------------------------------- |
-| `Conta`            | Conta SaaS — o "dono" do tenant. O `Id` é o `EmpresaId` de todo o sistema |
+| Entidade           | Descrição                                                                         |
+| ------------------ | --------------------------------------------------------------------------------- |
+| `Conta`            | Conta SaaS — o "dono" do tenant. O `Id` é o `EmpresaId` de todo o sistema         |
 | `TokenVerificacao` | Token temporário para verificação de e-mail, reset de senha e alteração de e-mail |
 
 ### Enums de Autenticação
 
-| Enum                   | Valores                                                                   |
-| ---------------------- | ------------------------------------------------------------------------- |
-| `PlanoAssinatura`      | `FREE`, `BASIC`, `PRO`                                                    |
+| Enum                   | Valores                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `PlanoAssinatura`      | `FREE`, `BASIC`, `PRO`                                                        |
 | `TipoTokenVerificacao` | `EmailVerificacao`, `AlteracaoSenha`, `AlteracaoEmail`, `VerificacaoTelefone` |
 
 ### Notificações por E-mail (SMTP)
@@ -138,6 +138,7 @@ O sistema envia e-mails transacionais via **MailKit** (SMTP) para:
 - ✅ **Confirmação de alteração de e-mail** para o novo endereço
 
 Configuração via variáveis de ambiente:
+
 ```env
 SMTP__HOST=smtp.example.com
 SMTP__PORT=587
@@ -150,17 +151,17 @@ SMTP__SECURESOCKET=StartTls
 
 ### Frontend — Páginas de Autenticação
 
-| Página             | Rota                | Descrição                            |
-| ------------------ | ------------------- | ------------------------------------ |
-| Landing            | `/`                 | Página pública de apresentação       |
-| Login              | `/login`            | Formulário de login                  |
-| Cadastro           | `/cadastro`         | Registro de nova conta               |
-| Esqueci a Senha    | `/esqueci-senha`    | Solicitar reset de senha             |
-| Nova Senha         | `/nova-senha`       | Redefinir senha via token            |
-| Verificar E-mail   | `/verificar-email`  | Confirmar verificação de e-mail      |
-| Perfil             | `/perfil`           | Visualizar/editar dados da conta     |
-| Conta              | `/conta`            | Configurações da conta               |
-| Plano              | `/plano`            | Seleção/alteração de plano           |
+| Página           | Rota               | Descrição                        |
+| ---------------- | ------------------ | -------------------------------- |
+| Landing          | `/`                | Página pública de apresentação   |
+| Login            | `/login`           | Formulário de login              |
+| Cadastro         | `/cadastro`        | Registro de nova conta           |
+| Esqueci a Senha  | `/esqueci-senha`   | Solicitar reset de senha         |
+| Nova Senha       | `/nova-senha`      | Redefinir senha via token        |
+| Verificar E-mail | `/verificar-email` | Confirmar verificação de e-mail  |
+| Perfil           | `/perfil`          | Visualizar/editar dados da conta |
+| Conta            | `/conta`           | Configurações da conta           |
+| Plano            | `/plano`           | Seleção/alteração de plano       |
 
 ---
 
@@ -170,10 +171,10 @@ SMTP__SECURESOCKET=StartTls
 
 O sistema possui um **chatbot WhatsApp** integrado via **Meta Webhook** para processar substituições de diárias de segurança de forma conversacional.
 
-| Endpoint              | Método | Descrição                                    |
-| --------------------- | ------ | -------------------------------------------- |
-| `/api/whatsapp/webhook` | GET  | Verificação de webhook exigida pela Meta     |
-| `/api/whatsapp/webhook` | POST | Recebe mensagens — processamento em background |
+| Endpoint                | Método | Descrição                                      |
+| ----------------------- | ------ | ---------------------------------------------- |
+| `/api/whatsapp/webhook` | GET    | Verificação de webhook exigida pela Meta       |
+| `/api/whatsapp/webhook` | POST   | Recebe mensagens — processamento em background |
 
 ### Fluxo Conversacional (Estado da Sessão)
 
@@ -216,11 +217,11 @@ META__PHONENUMBERID=seu-phone-number-id
 
 ### Cliente
 
-| Regra                | Descrição                                                                  |
-| -------------------- | -------------------------------------------------------------------------- |
-| CNPJ único           | Não pode haver dois clientes com o mesmo CNPJ na mesma empresa          |
-| Configs Base         | `EmailGestor`, `TelefoneEmergencia` opcionais                              |
-| Localidade base      | Cidade e Estado fornecem configuração inicial para postos de trabalho      |
+| Regra           | Descrição                                                             |
+| --------------- | --------------------------------------------------------------------- |
+| CNPJ único      | Não pode haver dois clientes com o mesmo CNPJ na mesma empresa        |
+| Configs Base    | `EmailGestor`, `TelefoneEmergencia` opcionais                         |
+| Localidade base | Cidade e Estado fornecem configuração inicial para postos de trabalho |
 
 ```
 ✅ Criar cliente (dados básicos) → Status 201
@@ -229,11 +230,11 @@ META__PHONENUMBERID=seu-phone-number-id
 
 ### Posto (Localização Física)
 
-| Regra                  | Descrição                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------- |
-| Representação          | Local físico vinculado a um Cliente (preenchido com Cidade/Estado do Cliente)      |
-| Vinculado ao cliente   | `ClienteId` obrigatório e deve pertencer à mesma empresa                        |
-| Base para alocações    | Contém múltiplas `Alocações` (turnos) para o funcionamento do posto                |
+| Regra                | Descrição                                                                     |
+| -------------------- | ----------------------------------------------------------------------------- |
+| Representação        | Local físico vinculado a um Cliente (preenchido com Cidade/Estado do Cliente) |
+| Vinculado ao cliente | `ClienteId` obrigatório e deve pertencer à mesma empresa                      |
+| Base para alocações  | Contém múltiplas `Alocações` (turnos) para o funcionamento do posto           |
 
 ```
 ✅ Posto "Portaria Principal" atrelado ao Cliente → Criado com sucesso
@@ -255,12 +256,12 @@ META__PHONENUMBERID=seu-phone-number-id
 
 ### Funcionário
 
-| Regra                               | Descrição                                                                                            |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| CPF único                           | Não pode haver dois funcionários com mesmo CPF                                                       |
-| Vínculo Opcional                    | Pode ter `ClienteId` nulo (Terceirizado/Especial) ou vinculado a um Cliente específico               |
-| Tags de Diária                      | Possui relação Many-to-Many com `Tag` (ex: "PM", "Vigia Avulso") determinando seu custo diário       |
-| Custo Real Dinâmico                 | Valores não são mais fixos, cálculo = Σ `ValorDiaria` (do Contrato via Tag) + `Beneficios`           |
+| Regra               | Descrição                                                                                      |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| CPF único           | Não pode haver dois funcionários com mesmo CPF                                                 |
+| Vínculo Opcional    | Pode ter `ClienteId` nulo (Terceirizado/Especial) ou vinculado a um Cliente específico         |
+| Tags de Diária      | Possui relação Many-to-Many com `Tag` (ex: "PM", "Vigia Avulso") determinando seu custo diário |
+| Custo Real Dinâmico | Valores não são mais fixos, cálculo = Σ `ValorDiaria` (do Contrato via Tag) + `Beneficios`     |
 
 ```
 ✅ Funcionário [PM] → Histórico financeiro mensal via soma de Diárias
@@ -269,12 +270,12 @@ META__PHONENUMBERID=seu-phone-number-id
 
 ### Diária (Designação)
 
-| Regra                     | Descrição                                                    |
-| ------------------------- | ------------------------------------------------------------ |
-| Vinculada à Alocação      | Registra a ida do Funcionário a um turno específico (`AlocacaoId`) |
-| Snapshot de Preço         | Recebe `ValorDiaria` no momento da criação com base no acordo/Tag  |
-| Sem dias consecutivos     | Bloqueado exceto para `DOBRA_PROGRAMADA`                     |
-| Descanso pós-dobra        | Após dobra programada, obrigatório descansar no dia seguinte |
+| Regra                 | Descrição                                                          |
+| --------------------- | ------------------------------------------------------------------ |
+| Vinculada à Alocação  | Registra a ida do Funcionário a um turno específico (`AlocacaoId`) |
+| Snapshot de Preço     | Recebe `ValorDiaria` no momento da criação com base no acordo/Tag  |
+| Sem dias consecutivos | Bloqueado exceto para `DOBRA_PROGRAMADA`                           |
+| Descanso pós-dobra    | Após dobra programada, obrigatório descansar no dia seguinte       |
 
 ```
 ✅ Diária REGULAR (ValorDiaria=150) → Criada
@@ -283,11 +284,11 @@ META__PHONENUMBERID=seu-phone-number-id
 
 ### Contrato
 
-| Regra                            | Descrição                                                                                         |
-| -------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Um vigente por cliente        | Máximo 1 contrato `ATIVO` ou `PENDENTE` por cliente                                            |
-| Auto-finalização                 | Contratos com `DataFim` vencida são marcados `FINALIZADO` no GetAll                               |
-| Precificação via Tags            | Define os valores acordados para cada tipo de serviço (Tag) cobrados pelo cliente através de `ContratoTag` |
+| Regra                  | Descrição                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Um vigente por cliente | Máximo 1 contrato `ATIVO` ou `PENDENTE` por cliente                                                        |
+| Auto-finalização       | Contratos com `DataFim` vencida são marcados `FINALIZADO` no GetAll                                        |
+| Precificação via Tags  | Define os valores acordados para cada tipo de serviço (Tag) cobrados pelo cliente através de `ContratoTag` |
 
 ```
 ✅ Contrato com ContratoTags (PM=R$350, Limpeza=R$100) → Criado
@@ -298,10 +299,10 @@ META__PHONENUMBERID=seu-phone-number-id
 
 Cria Cliente + Contrato + Postos + Alocações em **1 único request**.
 
-| Regra            | Descrição                                                       |
-| ---------------- | --------------------------------------------------------------- |
-| Simplicidade     | Permite inicializar a base da associação de forma rápida        |
-| Alocações Autom. | Gera alocações divididas igualmente de acordo com o pedido      |
+| Regra            | Descrição                                                  |
+| ---------------- | ---------------------------------------------------------- |
+| Simplicidade     | Permite inicializar a base da associação de forma rápida   |
+| Alocações Autom. | Gera alocações divididas igualmente de acordo com o pedido |
 
 ```json
 POST /api/clientes-completos
@@ -388,38 +389,38 @@ BC: Whatsapp
 
 ### Módulos de Domínio
 
-| BC | Entidades | Descrição |
-| -- | --------- | --------- |
-| `Operacoes` | Cliente, Contrato, Funcionario, Posto, Alocacao, Diaria, Tag | Domínio core de segurança patrimonial |
-| `Auth` | Conta, TokenVerificacao | SaaS multi-tenant — `Conta.Id = EmpresaId` |
-| `Whatsapp` | SessaoWhatsapp | Chatbot conversacional de substituição |
+| BC          | Entidades                                                    | Descrição                                  |
+| ----------- | ------------------------------------------------------------ | ------------------------------------------ |
+| `Operacoes` | Cliente, Contrato, Funcionario, Posto, Alocacao, Diaria, Tag | Domínio core de segurança patrimonial      |
+| `Auth`      | Conta, TokenVerificacao                                      | SaaS multi-tenant — `Conta.Id = EmpresaId` |
+| `Whatsapp`  | SessaoWhatsapp                                               | Chatbot conversacional de substituição     |
 
 ### Sistema de Cache (Event-Driven)
 
-| Repositório | Decorator | TTL | Invalidação |
-| ----------- | --------- | --- | ----------- |
-| Cliente | ✅ Cached (GetAll + GetById) | 20 min | `ClienteCreated/Updated/Deleted` |
-| Contrato | ✅ Cached (GetAll + GetById + ByCliente) | 20 min | `ContratoCreated/Updated/Deleted` |
-| Posto | ✅ Cached (GetAll + GetById + ByCliente) | 10 min | `PostoCreated/Updated/Deleted` |
-| Funcionario | ✅ Cached (GetAll + GetById + ByCliente + ByCpf) | 10 min | `FuncionarioCreated/Updated/Deleted` |
-| Alocacao | ✅ Cached (GetAll + ByCliente + ByPosto) | 60 seg | `AlocacaoCreated/Updated/Deleted` |
-| Diaria | ✅ Cached (GetAll + ByCliente + ByFuncionario + ByAlocacao) | 60 seg | `DiariaCreated/Updated/Deleted` |
+| Repositório | Decorator                                                   | TTL    | Invalidação                          |
+| ----------- | ----------------------------------------------------------- | ------ | ------------------------------------ |
+| Cliente     | ✅ Cached (GetAll + GetById)                                | 20 min | `ClienteCreated/Updated/Deleted`     |
+| Contrato    | ✅ Cached (GetAll + GetById + ByCliente)                    | 20 min | `ContratoCreated/Updated/Deleted`    |
+| Posto       | ✅ Cached (GetAll + GetById + ByCliente)                    | 10 min | `PostoCreated/Updated/Deleted`       |
+| Funcionario | ✅ Cached (GetAll + GetById + ByCliente + ByCpf)            | 10 min | `FuncionarioCreated/Updated/Deleted` |
+| Alocacao    | ✅ Cached (GetAll + ByCliente + ByPosto)                    | 60 seg | `AlocacaoCreated/Updated/Deleted`    |
+| Diaria      | ✅ Cached (GetAll + ByCliente + ByFuncionario + ByAlocacao) | 60 seg | `DiariaCreated/Updated/Deleted`      |
 
 **Flow:** `Domain Event → SaveChangesAsync → MediatR.Publish → CacheInvalidationHandler → _cache.Remove(...)`
 
 ### Enums
 
-| Enum                  | Valores                                                                   |
-| --------------------- | ------------------------------------------------------------------------- |
-| `StatusContrato`      | `ATIVO`, `PENDENTE`, `FINALIZADO`                                         |
-| `StatusFuncionario`   | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO`                                |
-| `TipoEscala`          | `DOZE_POR_TRINTA_SEIS`, `OITO_HORAS_SEIS_POR_DOIS`, `SEMANAL_COMERCIAL`, `ALCALA_8H`, `FOLGUISTA` |
-| `TipoFuncionario`     | `CLT`, `TERCEIRIZADO`, `FREELANCE`                                        |
-| `StatusDiaria`      | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                             |
-| `TipoDiaria`        | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                             |
-| `PlanoAssinatura`     | `FREE`, `BASIC`, `PRO`                                                    |
-| `TipoTokenVerificacao`| `EmailVerificacao`, `AlteracaoSenha`, `AlteracaoEmail`, `VerificacaoTelefone` |
-| `EstadoConversa`      | `AguardandoCliente`, `AguardandoPosto`, `AguardandoData`, `AguardandoFuncionarioSubstituido`, `AguardandoFuncionarioSubstituto`, `AguardandoConfirmacao`, `Concluida`, `Cancelada` |
+| Enum                   | Valores                                                                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `StatusContrato`       | `ATIVO`, `PENDENTE`, `FINALIZADO`                                                                                                                                                  |
+| `StatusFuncionario`    | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO`                                                                                                                                          |
+| `TipoEscala`           | `DOZE_POR_TRINTA_SEIS`, `OITO_HORAS_SEIS_POR_DOIS`, `SEMANAL_COMERCIAL`, `ALCALA_8H`, `FOLGUISTA`                                                                                  |
+| `TipoFuncionario`      | `CLT`, `TERCEIRIZADO`, `FREELANCE`                                                                                                                                                 |
+| `StatusDiaria`         | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                                                                                                                                      |
+| `TipoDiaria`           | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                                                                                                                                      |
+| `PlanoAssinatura`      | `FREE`, `BASIC`, `PRO`                                                                                                                                                             |
+| `TipoTokenVerificacao` | `EmailVerificacao`, `AlteracaoSenha`, `AlteracaoEmail`, `VerificacaoTelefone`                                                                                                      |
+| `EstadoConversa`       | `AguardandoCliente`, `AguardandoPosto`, `AguardandoData`, `AguardandoFuncionarioSubstituido`, `AguardandoFuncionarioSubstituto`, `AguardandoConfirmacao`, `Concluida`, `Cancelada` |
 
 ### Frontend (Angular 21 Standalone)
 
@@ -489,7 +490,7 @@ META__PHONENUMBERID=seu-phone-id
 
 ### Hot-Reload
 
-**Backend:** `dotnet watch run` — detecta mudanças e recompila automaticamente  
+**Backend:** `dotnet watch run` — detecta mudanças e recompila automaticamente
 **Frontend:** `ng serve --host 0.0.0.0 --poll 1000` — hot module replacement ativo
 
 ---
@@ -498,11 +499,11 @@ META__PHONENUMBERID=seu-phone-id
 
 Pipeline GitHub Actions executado em todo PR para `main`:
 
-| Job         | O que testa                                                      |
-| ----------- | ---------------------------------------------------------------- |
-| **Backend** | Restore → Build → 167 testes (unit + integration) com PostgreSQL |
-| **Frontend**| `npm ci` → Build produção (`--configuration=production`)         |
-| **Docker**  | `docker compose build` valida Dockerfiles                        |
+| Job          | O que testa                                                      |
+| ------------ | ---------------------------------------------------------------- |
+| **Backend**  | Restore → Build → 167 testes (unit + integration) com PostgreSQL |
+| **Frontend** | `npm ci` → Build produção (`--configuration=production`)         |
+| **Docker**   | `docker compose build` valida Dockerfiles                        |
 
 Arquivo: `.github/workflows/ci.yml`
 
@@ -534,12 +535,12 @@ Arquivo: `.github/workflows/ci.yml`
 
 ### Infraestrutura
 
-| Ferramenta         | Uso                         |
-| ------------------ | --------------------------- |
-| Docker Compose 2.x | Orquestração                |
-| Nginx Alpine       | Reverse proxy               |
-| GitHub Actions     | CI/CD                       |
-| Meta WhatsApp API  | Chatbot de substituições    |
+| Ferramenta         | Uso                      |
+| ------------------ | ------------------------ |
+| Docker Compose 2.x | Orquestração             |
+| Nginx Alpine       | Reverse proxy            |
+| GitHub Actions     | CI/CD                    |
+| Meta WhatsApp API  | Chatbot de substituições |
 
 ---
 
@@ -680,18 +681,18 @@ dotnet test --filter "Category=Integration"
 
 | Módulo            | Testes Unitários | Testes de Integração |
 | ----------------- | ---------------- | -------------------- |
-| Cliente        | ✅               | ✅                   |
-| Posto   | ✅               | ✅                   |
+| Cliente           | ✅               | ✅                   |
+| Posto             | ✅               | ✅                   |
 | Funcionário       | ✅               | ✅                   |
-| Diária          | ✅               | ✅                   |
+| Diária            | ✅               | ✅                   |
 | Contrato          | ✅               | ✅                   |
 | Cálculos Contrato | ✅               | ✅                   |
-| Diárias Batch   | ✅               | ✅                   |
+| Diárias Batch     | ✅               | ✅                   |
 | Criação Cascata   | ✅               | ✅                   |
 | Autenticação      | ✅               | ✅                   |
 
-| Alocação          | ✅               | ✅                   |
-| WhatsApp Bot      | ✅               | ✅                   |
+| Alocação | ✅ | ✅ |
+| WhatsApp Bot | ✅ | ✅ |
 
 ## **Total: 204 testes automatizados (100% passando)**
 
@@ -755,6 +756,7 @@ POST   /api/contrato-calculos/calcular-valor-total
 ## ⏭️ Próximos Passos
 
 ### ✅ Refatoração DDD — Concluída (6 Fases)
+
 - [x] **Fase 1:** Shared Kernel — `Entity`, `IDomainEvent`, `IUnitOfWork`, `DomainException`, semântica `Enforce()`
 - [x] **Fase 2:** Value Objects — `Cpf`, `Cnpj`, `Email`, `Telefone`, `Cep` com mapeamentos `OwnsOne` no EF Core
 - [x] **Fase 3:** Reorganização de namespaces — `Modulos/` → `BoundedContexts/` + `SharedKernel/` (3 BCs: Operacoes, Auth, Whatsapp)
@@ -763,37 +765,41 @@ POST   /api/contrato-calculos/calcular-valor-total
 - [x] **Cache Improvements:** `CachedAlocacaoRepository`, `CachedDiariaRepository`, `GetByIdAsync` cacheado, `CacheConfiguration` centralizado (TTL por volatilidade)
 
 ### 💼 UX & Business Logic
+
 - [ ] UX Form Contratos: layout aprimorado para adicionar múltiplas ContratoTags rapidamente
 - [ ] Contratos: Exibição de totais mensais dinâmicos ao invés de anual
 - [ ] Dashboard Super-Admin: Gráficos de receita consolidada, margens e saving do cliente
 - [ ] Preview de escalonamento mensal de diárias baseadas no calendário do funcionário
 
 ### 🧪 Qualidade
+
 - [ ] Testes E2E com Playwright
 - [ ] Observabilidade (logs estruturados + métricas)
 
 ### ☁️ Infraestrutura / DevOps
+
 - [ ] Subir na nuvem (AWS Free Tier / VPS Linux)
 - [ ] Integrar Redis como Cache L2 no backend
 - [ ] Rate limiting (login, API pública)
 - [ ] Migração futura BCrypt → Argon2id (quando houver >= 4GB RAM)
 
 ### 💰 Módulo Financeiro
+
 - [ ] Geração de folha de pagamento baseada no somatório de diárias reais
 - [ ] Relatórios e exportação PDF (escalas, folha)
 - [ ] Integração com gateway de pagamento
 
 ### 🤖 AI & RAG
+
 - [ ] Sistema RAG para WhatsApp (resolução contextual de dúvidas de plantão)
 - [ ] Agente de suporte ao cliente via LLM + RAG
 - [ ] AI Profiler: análise de eficiência por funcionário, detecção de absenteísmo
 
 ### 🔑 Controle de Acesso & Ponto
+
 - [ ] Reconhecimento facial no aplicativo para batida de ponto
 - [ ] Analytics: Diárias agendadas vs Ponto executado
 - [ ] Score de assiduidade de colaboradores
-
-
 
 ---
 
