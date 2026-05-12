@@ -466,11 +466,23 @@ export class DashboardComponent implements OnInit {
     }
 
     this.financeiroUiService
-      .carregarCalculosDetalhados$(contratosVigentes, this.resumosFinanceiros())
+      .carregarCalculosDetalhados$(
+        contratosVigentes,
+        this.resumosFinanceiros(),
+        this.getFuncionariosPorClienteMap(),
+      )
       .subscribe({
         next: (mapa) => this.calculosDetalhados.set(mapa),
         error: () => this.calculosDetalhados.set(new Map()),
       });
+  }
+
+  private getFuncionariosPorClienteMap(): Map<string, number> {
+    const mapa = new Map<string, number>();
+    this.funcionarios().forEach((funcionario) => {
+      mapa.set(funcionario.clienteId, (mapa.get(funcionario.clienteId) ?? 0) + 1);
+    });
+    return mapa;
   }
 
   getTendenciaIcon(tendencia: string): string {

@@ -73,7 +73,8 @@ public record ContratoResumoFinanceiroPostoDto(
     int TotalDiarias,
     decimal CustoTotal,
     int DiariasNormais,
-    int DiariasExtras);
+    int DiariasExtras,
+    int DiariasFimDeSemana);
 
 public record ContratoResumoFinanceiroAlocacaoDto(
     Guid AlocacaoId,
@@ -82,7 +83,8 @@ public record ContratoResumoFinanceiroAlocacaoDto(
     int TotalDiarias,
     decimal CustoTotal,
     int DiariasNormais,
-    int DiariasExtras);
+    int DiariasExtras,
+    int DiariasFimDeSemana);
 
 public record ContratoResumoFinanceiroFuncionarioDto(
     Guid FuncionarioId,
@@ -90,7 +92,8 @@ public record ContratoResumoFinanceiroFuncionarioDto(
     int TotalDiarias,
     decimal CustoTotal,
     int DiariasNormais,
-    int DiariasExtras);
+    int DiariasExtras,
+    int DiariasFimDeSemana);
 
 public record ContratoResumoFinanceiroDto(
     Guid ContratoId,
@@ -101,6 +104,7 @@ public record ContratoResumoFinanceiroDto(
     decimal CustoRealTotal,
     int TotalDiariasNormais,
     int TotalDiariasExtras,
+    int TotalDiariasFimDeSemana,
     IReadOnlyList<ContratoResumoFinanceiroPostoDto> ProjecaoCustoPorPosto,
     IReadOnlyList<ContratoResumoFinanceiroAlocacaoDto> ProjecaoCustoPorAlocacao,
     IReadOnlyList<ContratoResumoFinanceiroFuncionarioDto> ProjecaoCustoPorFuncionario);

@@ -37,6 +37,12 @@ export interface CalculoValorTotalOutput {
   quantidadeDiarias?: number;
 }
 
+export interface CalculoFinanceiroDetalhadoOutput extends CalculoValorTotalOutput {
+  faturamentoSimulado?: number;
+  custoTotalMensalSimulado?: number;
+  simulacao?: SimulacaoFinanceiraMensalOutput | null;
+}
+
 export interface SimulacaoFinanceiraMensalInput {
   valorDiaria: number;
   numeroDePostos: number;

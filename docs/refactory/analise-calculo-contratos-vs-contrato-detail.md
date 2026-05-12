@@ -2,271 +2,391 @@
 
 ## 1. Objetivo
 
-Documentar como o valor financeiro dos contratos esta sendo calculado hoje no frontend e por que os valores exibidos em `contrato-list` e `dashboard` podem divergir do que o `contrato-detail` mostra como ideal.
+Documentar como o valor financeiro dos contratos esta sendo calculado no frontend, rastrear pendencias e registrar planos de implementacao.
+
+## 2. Arquitetura do calculo financeiro
+
+### 2.1 Fluxo do contrato-detail
+
+1. Carrega o contrato
+2. Carrega funcionarios do cliente e resumo financeiro em paralelo
+3. Aguarda ambos completarem (`tentarCarregarCalculo`)
+4. Monta input com `buildCalculoValorTotalInput(...)` e sobrescreve com dados operacionais reais
+5. Envia para `POST /api/contratos/calculos/calcular-valor-total` (calculo real)
+6. Envia para `POST /api/contratos/calculos/simular-sem-alocacoes` (calculo simulado)
+7. Exibe breakdown de ambos + comparativo
+
+### 2.2 Fluxo do contrato-list e dashboard
+
+Usam `ContratoFinanceiroUiService` que:
+
+1. Monta input a partir do contrato + resumo financeiro (se disponivel)
+2. Chama ambos os endpoints (real + simulado) via `forkJoin`
+3. Usa `faturamentoSimulado` como fonte de verdade para faturamento
+
+### 2.3 Fonte de verdade
+
+- **Faturamento:** `faturamentoSimulado` = `custoBaseMensal / (1 - somaMargens)`
+- **Custo:** `custoBaseMensal` (retornado pelo endpoint de calculo real)
+- **Lucro:** `faturamentoSimulado - custoBaseMensal`
+
+### 2.4 Formula de margem (margem real sobre faturamento)
+
+```
+Faturamento = CustoBase / (1 - margemLucro - margemRisco)
+MargemLucro = Faturamento × percentualLucro
+MargemRisco = Faturamento × percentualRisco
+```
+
+Backend (`ContratoCalculoService.cs` L38-41 e L101-104):
+
+```csharp
+var somaMargens = input.MargemLucroPercentual + input.MargemCoberturaFaltasPercentual;
+var valorTotalMensal = somaMargens >= 1m
+    ? custoBaseMensal
+    : Math.Round(custoBaseMensal / (1m - somaMargens), 2);
+var valorMargemLucro = valorTotalMensal * input.MargemLucroPercentual;
+var valorMargemFaltas = valorTotalMensal * input.MargemCoberturaFaltasPercentual;
+```
+
+Frontend: labels usam formula `(custo × %) ÷ divisor` com `divisorMargemPercent` computed signal.
+
+### 2.5 Fluxo comparativo visual
+
+```
+DETAIL / LIST / DASHBOARD:
+  Contrato → Resumo Financeiro → calcular-valor-total (REAL)
+                                 → simular-sem-alocacoes (SIMULADO)
+  Faturamento = simulacaoBreakdown.faturamentoSimulado
+  Custo = breakdown.custoBaseMensal
+  Lucro = faturamentoSimulado - custoBaseMensal
+
+Comparativo: variacao = (real - simulado) / |simulado| × 100
+```
+
+## 3. Dados de referencia (contrato de teste)
+
+### Relatorio Simulado
+
+| Calculo                 | Formula                | Resultado    |
+| ----------------------- | ---------------------- | ------------ |
+| Diarias/dia             | 1 × 2 × 1              | 2            |
+| Diarias uteis/mes       | 2 × 22                 | 44           |
+| Diarias FDS/mes         | 2 × 8                  | 16           |
+| Total diarias/mes       | 44 + 16                | 60           |
+| Funcionarios projetados | ceil(60/15)            | 4            |
+| Custo diarias normais   | 22 × R$ 100            | R$ 2.200     |
+| Custo FDS               | 16 × R$ 100 × 2.0      | R$ 3.200     |
+| Adicional noturno       | 22 × R$ 100 × 1.2      | R$ 2.640     |
+| Beneficios              | 4 × R$ 350             | R$ 1.400     |
+| Custo direto            | soma                   | R$ 9.440     |
+| Encargos                | R$ 9.440 × 50%         | R$ 4.720     |
+| Custo base mensal       | R$ 9.440 + R$ 4.720    | R$ 14.160    |
+| Faturamento simulado    | R$ 14.160 / (1 - 0.30) | R$ 20.228,57 |
+| Margem lucro            | R$ 20.228,57 × 20%     | R$ 4.045,71  |
+| Margem risco            | R$ 20.228,57 × 10%     | R$ 2.022,86  |
+
+### Relatorio Real
+
+| Campo                    | Valor                                  | Rastreamento                            |
+| ------------------------ | -------------------------------------- | --------------------------------------- |
+| Faturamento              | R$ 20.228,57                           | `faturamentoSimulado()` = custoSim/0.70 |
+| Custo Total com Impostos | R$ 15.330,00                           | `custoBaseMensal = custoDireto + enc.`  |
+| Custo Total sem Imposto  | R$ 10.220,00                           | `custoDireto`                           |
+| Diarias Normais          | 11 × R$ 100 = R$ 1.100                 | diariasDiurnasUteis                     |
+| Adicional Noturno        | 31 × R$ 100 × 1.2 = R$ 3.720           | diariasNoturnasUteis                    |
+| Custo FDS                | 20 × R$ 100 × 2.0 = R$ 4.000           | diariasFds (DayOfWeek)                  |
+| Beneficios               | 4 × R$ 350 = R$ 1.400                  | funcEstimados × beneficios              |
+| Encargos                 | R$ 10.220 × 50% = R$ 5.110             | custoDireto × encargos                  |
+| Margem Lucro             | (R$ 15.330 × 20%) ÷ 70% = R$ 4.380     | margem real sobre faturamento           |
+| Risco                    | (R$ 15.330 × 10%) ÷ 70% = R$ 2.190     | margem real sobre faturamento           |
+| Lucro Real               | R$ 20.228,57 - R$ 15.330 = R$ 4.898,57 | faturamentoSim - custoReal              |
+
+## 4. Historico de correcoes (resumo)
+
+| #    | Bug                                                                  | Correcao                                                        |
+| ---- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 15.x | Dupla contagem impostos, func=1, lucro errado, comparativo invertido | Corrigido (6 bugs)                                              |
+| 18.x | Race condition, comparativo com base errada                          | Corrigido (3 bugs)                                              |
+| 22.1 | FDS sempre = 0 (usava TipoDiaria em vez de DayOfWeek)                | Backend: `TotalDiariasFimDeSemana` via `DayOfWeek`              |
+| 5.5  | Labels inconsistentes (6 labels)                                     | Fórmula `(custo × %) ÷ divisor` + `divisorMargemPercent` signal |
+| 5.6  | Markup sobre custo → margem real sobre faturamento                   | `custoBase / (1 - somaMargens)` no backend                      |
 
-Este documento usa o contrato de exemplo informado pelo usuario:
+## 5. Pendencias ativas
 
-- Faturamento ideal no detail: `R$ 13.981,50`
-- Custo real ideal no detail: `R$ 10.755,00`
-- Lucro ideal no detail: `R$ 3.226,50`
-
-Tambem considera os dados de apoio do relatorio simulado e do relatorio real exibidos no detail.
-
-## 2. Resumo executivo
-
-Hoje existem tres caminhos de calculo relevantes no frontend:
-
-1. `contrato-detail` monta um payload mais rico, busca o resumo financeiro operacional do contrato e usa esse resumo para sobrescrever as diarias derivadas antes de chamar a API de calculo.
-2. `contrato-list` e `dashboard` usam um servico compartilhado de calculo, mas dependem da disponibilidade do resumo financeiro para alinhar os numeros com o detail.
-3. Quando o resumo financeiro nao esta sendo usado, os componentes caem para valores de contrato mais genericos ou derivados, o que gera discrepancia.
-
-A diferenca principal nao esta no formato da tela. A diferenca esta na origem dos dados que alimentam o calculo:
-
-- `contract-detail` usa resumo operacional por contrato e periodo.
-- `list/dashboard` historicamente dependeram de dados mais genericos do contrato e de suposicoes padrao.
-
-## 3. Como o contrato-detail calcula
-
-### 3.1 Caminho de calculo do detail
-
-O `contrato-detail` segue este fluxo:
-
-1. Carrega o contrato.
-2. Carrega o resumo financeiro do contrato via `GET /api/diarias/contrato/{id}/resumo-financeiro`.
-3. Monta o input de calculo com `buildCalculoValorTotalInput(...)`.
-4. Sobrescreve o input com os valores operacionais reais quando o resumo financeiro existe.
-5. Envia o payload para `POST /api/contratos/calculos/calcular-valor-total`.
-6. Exibe o breakdown retornado pela API.
-
-### 3.2 O que o detail sobrescreve no payload
-
-O detail nao usa apenas os campos do contrato. Ele ajusta o payload com dados reais do periodo:
-
-- `diariasTotaisMes = totalDiariasNormais + totalDiariasExtras`
-- `diariasNoturnasMes` calculado a partir das alocacoes com horario noturno
-- `diariasFdsMes = totalDiariasExtras`
-- `diariasFeriadosMes = 0`
-- `funcionariosEstimados = quantidadeFuncionarios do contrato`
-
-Esse detalhe e importante: o detail usa o resumo operacional do contrato para aproximar a realidade do periodo em vez de depender apenas da configuracao base do contrato.
-
-### 3.3 Exemplo do detail informado pelo usuario
-
-Para o contrato de teste, o detail mostra:
-
-- Faturamento: `R$ 13.981,50`
-- Custo real: `R$ 10.755,00`
-- Lucro: `R$ 3.226,50`
-
-Isso indica que o detail esta usando uma combinacao de:
-
-- resumo operacional do periodo
-- custo direto de diarias
-- encargos e provisoes
-- margem aplicada sobre a base correta
-
-## 4. Como o contrato-list e o dashboard calculam
-
-### 4.1 Fluxo atual dos cards
-
-Hoje a lista e o dashboard usam o servico compartilhado `ContratoFinanceiroUiService`.
-
-Esse servico monta um `CalculoValorTotalInput` a partir de:
-
-- `numeroDePostos`
-- `quantidadeFuncionarios`
-- `valorDiariaCobrada`
-- `valorBeneficiosExtrasMensal`
-- percentuais do contrato
-
-Quando existe um `ContratoResumoFinanceiro`, o servico tambem pode sobrescrever as diarias derivadas com os totais operacionais do contrato.
-
-### 4.2 Onde os numeros ainda podem divergir
-
-A divergencia costuma acontecer por tres motivos:
-
-1. O card ainda depende de fallback do contrato quando o resumo financeiro nao chega a tempo ou nao existe.
-2. O payload derivado do contrato usa premissas genericas e nao a mesma granularidade operacional do detail.
-3. O resumo financeiro e carregado por periodo e precisa estar sincronizado com o contrato exibido.
-
-### 4.3 Sintoma classico da divergencia
-
-No caso relatado, lista e dashboard mostravam algo como:
-
-- Faturamento: `R$ 8.775,00`
-- Custo real: `R$ 11.925,00`
-- Lucro: `R$ 2.025,00`
-
-Enquanto o detail exibiu:
-
-- Faturamento: `R$ 13.981,50`
-- Custo real: `R$ 10.755,00`
-- Lucro: `R$ 3.226,50`
-
-Esse tipo de diferenca normalmente sinaliza que os cards nao estao consumindo exatamente o mesmo resumo operacional que o detail consumiu, ou que algum fallback ainda esta vencendo o dado real.
-
-## 5. Como o relatorio simulado ajuda a explicar a diferenca
-
-O relatorio simulado do detail mostra a base teorica do calculo.
-
-### 5.1 Operacao estimada
-
-O relatorio informado mostra:
-
-- `1` posto
-- `2` alocacoes
-- `1 func/aloc`
-- `2 diarias/dia`
-- `22` dias uteis
-- `8` dias de fim de semana
-- `1` diaria noturna/dia
-- `4` funcionarios projetados
-- `60` diarias/mensais
-
-### 5.2 Custo mensal simulado
-
-O detail mostra:
-
-- Custo diarias normais: `R$ 2.200,00`
-- Custo diarias fim de semana: `R$ 3.200,00`
-- Adicional noturno: `R$ 2.640,00`
-- Beneficios: `R$ 1.400,00`
-- Encargos e provisoes: `R$ 4.720,00`
-- Custo base mensal: `R$ 14.160,00`
-- Faturamento simulado: `R$ 18.408,00`
-
-Esse bloco e uma simulacao. Ele nao e necessariamente o numero real do periodo, mas mostra a formula base usada para projetar o contrato.
-
-## 6. Como o relatorio real explica o numero final
-
-O relatorio real informado mostra:
-
-- Faturamento real: `R$ 15.541,50`
-- Custo direto: `R$ 7.970,00`
-- Custo diarias normais: `23` diarias uteis = `R$ 2.300,00`
-- Adicional noturno: `31` diarias noturnas = `R$ 3.720,00`
-- Custo diarias fim de semana: `8` diarias = `R$ 1.600,00`
-- Beneficios/extras: `R$ 1.400,00`
-- Funcionarios do cliente: `4`
-- Encargos e provisoes: `R$ 3.985,00`
-- Margens e provisoes: `R$ 3.586,50`
-
-### 6.1 Leitura correta do relatorio real
-
-O relatorio real nao usa apenas uma estimativa simplificada. Ele incorpora a operacao efetivamente executada no periodo, incluindo:
-
-- dias uteis reais do mes
-- diarios noturnos reais
-- dias de fim de semana reais
-- quantidade real de funcionarios atendendo o contrato
-
-Por isso o detail tende a ser o mais confiavel para o valor exibido ao usuario final.
-
-## 7. Porque a lista e o dashboard ficam diferentes do ideal do detail
-
-### 7.1 Uso de fallback do contrato
-
-Quando o resumo operacional nao esta presente, o servico compartilhado cai para os campos do contrato:
-
-- `valorTotalMensal`
-- `custoRealMensal`
-- `lucroRealMensal`
-
-Esses campos podem refletir um estado anterior, uma estimativa ou um calculo mais sintetico do contrato.
-
-### 7.2 Ausencia de contexto operacional completo
-
-O detail trabalha com:
-
-- resumo financeiro por contrato e periodo
-- projecao de custo por alocacao
-- contagem de diarias noturnas
-- ajuste de funcionarios estimados
-
-Os cards de lista/dashboard, se calculados apenas com os dados base do contrato, perdem essa granularidade.
-
-### 7.3 Periodo e sincronizacao
-
-O detail e mais explicito sobre o periodo corrente. Se a lista/dashboard carregarem o resumo fora de sincronia ou sem o mesmo periodo, o resultado pode divergir mesmo com o mesmo contrato.
-
-### 7.4 Mistura de estimativa com dado real
-
-Outro fator comum e a mistura de duas fontes:
-
-- dado real do contrato carregado do resumo operacional
-- dado derivado do cadastro do contrato
-
-Quando os dois sao combinados sem uma regra clara de prioridade, o valor final pode pender para a estimativa em vez do real.
-
-## 8. Principais pontos do contrato de teste
-
-Para o contrato com o funcionario de salario estimado de `R$ 1.850,00`, o problema nao parece ser o salario em si. O problema e o nivel de agregacao usado no calculo.
-
-O detail parte de uma visao operacional mais completa. A lista e o dashboard historicamente ficaram mais proximos de uma visao contratual/estimada.
-
-Em termos simples:
-
-- detail responde: `quanto este contrato realmente custou neste periodo?`
-- list/dashboard tendem a responder: `quanto este contrato parece custar com base no cadastro e nos calculos derivados?`
-
-Essa diferenca explica por que o detail pode chegar a `R$ 13.981,50` de faturamento e os cards ficarem em um numero menor ou diferente.
-
-## 9. Conclusao
-
-A divergencia entre `contrato-detail` e os cards de `contrato-list` / `dashboard` nao e um problema de exibicao. E um problema de fonte de dados e de nivel de detalhe do calculo.
-
-O `contrato-detail` esta mais proximo do valor ideal porque:
-
-- usa resumo financeiro operacional do contrato
-- ajusta o payload antes de chamar a API de calculo
-- exibe o breakdown real/simulado com dados mais completos
-
-Ja lista e dashboard podem divergir quando:
-
-- usam fallback dos campos do contrato
-- nao recebem o resumo financeiro do mesmo periodo
-- dependem de suposicoes genericas para diarias e funcionarios
-
-## 10. Recomendacao pratica
-
-Para manter consistencia entre as telas:
-
-1. Tratar o `faturamento simulado` como a base principal para os calculos de exibicao e consolidacao financeira.
-2. No `contrato-detail`, separar visualmente o fluxo em tres blocos:
-   - custo bruto
-   - impostos / provisoes
-   - custo total consolidado
-3. Reduzir o uso de fallback em `valorTotalMensal`, `custoRealMensal` e `lucroRealMensal` quando o resumo estiver disponivel.
-4. Garantir que detail, list e dashboard usem o mesmo periodo de referencia e a mesma fonte de faturamento base.
-5. Documentar explicitamente a prioridade de dados:
-   - faturamento simulado como base de calculo
-   - resumo operacional do contrato como refinamento do periodo
-   - calculo da API
-   - fallback de contrato apenas como ultimo recurso
-
-## 11. Plano de implementacao sugerido
-
-Se a intencao e alinhar as tres telas com o numero considerado "ideal", vale adotar a seguinte sequencia:
-
-1. Tornar o `faturamento simulado` a base principal dos calculos de exibicao e consolidacao financeira.
-2. No `contrato-detail`, separar o fluxo visual em tres blocos: custo bruto, impostos/provisoes e custo total consolidado.
-3. Fazer `contrato-list` e `dashboard` consumirem a mesma base de faturamento simulado, sem depender do faturamento real consolidado como primeira opcao.
-4. Garantir que detail, list e dashboard usem o mesmo periodo de referencia.
-5. Validar o impacto numerico nos tres pontos com o mesmo contrato de teste.
-
-### Ajustes tecnicos esperados
-
-- `ContratoFinanceiroUiService` passa a tratar o resumo simulado como fonte prioritária para faturamento.
-- `contrato-detail` deixa de misturar os numeros real e simulado no mesmo bloco de faturamento.
-- `contrato-list` e `dashboard` precisam seguir a mesma rega de prioridade para evitar fallback indevido.
-- O custo deve continuar podendo ser exibido em detalhe, mas separado entre bruto, imposto e total.
-
-## 12. Arquivos relacionados
+| #   | Item                                        | Gravidade | Status        | Secao |
+| --- | ------------------------------------------- | --------- | ------------- | ----- |
+| 3   | Salario simulado vs real no contrato-detail | MEDIO     | **PLANEJADO** | 6     |
+| 4   | Calculos financeiros no cliente-detail      | ALTO      | PENDENTE      | 7     |
+| 5   | Funcionarios do contrato vs API real        | MEDIO     | PENDENTE      | —     |
+| 6   | Alocacoes noturnas = 0 sem resumo           | MEDIO     | PENDENTE      | —     |
+| 7   | Fallback para campos legados                | BAIXO     | PENDENTE      | —     |
+| 10  | Tabela comparativa custo/lucro/salario      | MEDIO     | **PLANEJADO** | 6.7   |
+
+### Causas-raiz pendentes
+
+| #   | Causa                                | Status   |
+| --- | ------------------------------------ | -------- |
+| 2   | Funcionarios do contrato vs API real | Pendente |
+| 3   | Alocacoes noturnas = 0 sem resumo    | Pendente |
+| 4   | Fallback para campos legados         | Pendente |
+
+## 6. Plano: Salario simulado vs real no contrato-detail
+
+### 6.1 Objetivo
+
+Adicionar uma tabela "Comparativo Simulado x Real" com colunas para custo, lucro e **salario por funcionario** no `contrato-detail`, diferenciando funcionarios que trabalham a noite dos que nao trabalham.
+
+### 6.2 Dados disponiveis
+
+| Dado                    | Signal                        | Fonte                             |
+| ----------------------- | ----------------------------- | --------------------------------- |
+| Custo simulado          | `custoTotalFinalSimulado()`   | `simulacaoBreakdown()`            |
+| Custo real              | `custoTotalRealComparativo()` | `breakdown()`                     |
+| Lucro simulado          | `valorMargemLucroSimulado()`  | `simulacaoBreakdown()`            |
+| Lucro real              | `lucroTotalRealComparativo()` | `faturamentoSimulado - custoReal` |
+| Funcionarios projetados | `funcionariosProjetados()`    | `simulacaoBreakdown()`            |
+| Funcionarios reais      | `funcionariosCliente()`       | API funcionarios                  |
+
+### 6.3 Formulas de salario
+
+#### Simulado (por funcionario)
+
+```
+diarias/func/mes = diariasTotaisMes / funcionariosProjetados = 60 / 4 = 15
+
+salarioSimDiurno  = 15 × R$100 + R$350 = R$1.850
+salarioSimNoturno = 15 × R$100 × 1.2 + R$350 = R$2.150
+```
+
+#### Real (media por funcionario)
+
+```
+salarioRealMedio = custoTotalSemImpostoReal / funcionariosCliente
+                 = R$10.220 / 4 = R$2.555
+```
+
+### 6.4 Diferenciacao noturno vs diurno (Modelo por Dias Médios da Escala)
+
+Para o simulado, dividimos as diárias do mês pelos funcionários projetados e aplicamos a diária com ou sem adicional noturno:
+
+```typescript
+// Diurno simulado:
+const salarioSimDiurno =
+  diariasPorFunc * contrato.valorDiariaCobrada +
+  contrato.valorBeneficiosExtrasMensal;
+
+// Noturno simulado:
+const salarioSimNoturno =
+  diariasPorFunc *
+    contrato.valorDiariaCobrada *
+    (1 + contrato.percentualAdicionalNoturno) +
+  contrato.valorBeneficiosExtrasMensal;
+```
+
+Para o cálculo real, usamos o mesmo modelo adotado no `funcionario-detail.component.ts`. Lá, o salário real é calculado iterando sobre as diárias e, em casos de estimativa, utilizando um número de `diasMedio` baseado na `tipoEscala` (ex: 15 para 12x36, 26 para 6x2).
+
+Aplicando isso ao nível do contrato:
+No `resumoFinanceiro().projecaoCustoPorAlocacao`, temos o `custoTotal` (soma exata das diárias) e o `totalDiarias` por tipo de alocação (com a flag `temHorarioNoturno`).
+Podemos estimar a "quantidade de funcionários" daquela alocação dividindo `totalDiarias` pelos `diasMedio` esperados daquela escala.
+Dessa forma, o Salário Real Médio (Diurno ou Noturno) torna-se:
+
+```typescript
+// Exemplo para Diurno:
+const alocsDiurnas = projecao.filter((a) => !a.temHorarioNoturno);
+let totalFuncionarios = 0;
+let custoTotal = 0;
+
+for (const a of alocsDiurnas) {
+  const diasMedio = getDiasMedio(a.tipoEscala);
+  totalFuncionarios += a.totalDiarias / diasMedio; // Quantos "funcionários equivalentes"
+  custoTotal += a.custoTotal;
+}
+
+const salarioRealMedioDiurno =
+  custoTotal / totalFuncionarios + contrato.valorBeneficiosExtrasMensal;
+```
+
+Esse cálculo reflete com precisão o peso do valor pago a um funcionário em uma escala sem diluir injustamente em escalas menores.
+
+### 6.5 UI proposta: Layout em Cards/Pills
+
+A interface mantém o padrão original visual (stack layout de cards) mas apresenta o desmembramento:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ Comparativo Simulado x Real            21,08% a mais│
+├─────────────────────────────────────────────────────┤
+│ Salário Diurno/Func                                 │
+│ [Simulado R$ 1.850] [Real (média) R$ 1.950]         │
+│ 5,4% a mais                                         │
+├─────────────────────────────────────────────────────┤
+│ Salário Noturno/Func                                │
+│ [Simulado R$ 2.150] [Real (média) R$ 2.555]         │
+│ 18,8% a mais                                        │
+└─────────────────────────────────────────────────────┘
+```
+
+### 6.6 Computed signals necessarios (Atualizados)
+
+```typescript
+private getDiasMedio(tipoEscala: TipoEscala | string): number {
+  let diasMedio = 22;
+  if (tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
+  else if (tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8;
+  else if (tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) diasMedio = 26;
+  return diasMedio;
+}
+
+salarioRealMedioDiurno = computed(() => {
+  const resumo = this.resumoFinanceiro();
+  if (!resumo || !resumo.projecaoCustoPorAlocacao) return this.salarioRealMedio();
+
+  const alocsDiurnas = resumo.projecaoCustoPorAlocacao.filter(a => !a.temHorarioNoturno);
+  let totalFuncionarios = 0;
+  let custoTotal = 0;
+
+  for (const a of alocsDiurnas) {
+    const diasMedio = this.getDiasMedio(a.tipoEscala);
+    if (diasMedio > 0) {
+      totalFuncionarios += a.totalDiarias / diasMedio;
+      custoTotal += a.custoTotal;
+    }
+  }
+
+  if (totalFuncionarios === 0) return this.salarioRealMedio();
+  const beneficios = this.contrato()?.valorBeneficiosExtrasMensal || 0;
+  return (custoTotal / totalFuncionarios) + beneficios;
+});
+
+// A mesma lógica se aplica para salarioRealMedioNoturno filtrando a.temHorarioNoturno === true
+```
+
+### 6.7 Template HTML
+
+```html
+<div class="comparativo-stack">
+  <div class="comparativo-card">
+    <span class="comparativo-card-label">Salário Diurno/Func</span>
+    <div class="comparativo-row">
+      <div class="comparativo-pill comparativo-pill-simulado">
+        <span>Simulado</span>
+        <strong>{{ salarioSimuladoDiurno() | currency: 'BRL' }}</strong>
+      </div>
+      <div class="comparativo-pill comparativo-pill-real">
+        <span>Real (média)</span>
+        <strong>{{ salarioRealMedioDiurno() | currency: 'BRL' }}</strong>
+      </div>
+    </div>
+    <div class="comparativo-variation">{{ variacaoSalarioDiurnoTexto() }}</div>
+  </div>
+
+  <div class="comparativo-card">
+    <span class="comparativo-card-label">Salário Noturno/Func</span>
+    <div class="comparativo-row">
+      <div class="comparativo-pill comparativo-pill-simulado">
+        <span>Simulado</span>
+        <strong>{{ salarioSimuladoNoturno() | currency: 'BRL' }}</strong>
+      </div>
+      <div class="comparativo-pill comparativo-pill-real">
+        <span>Real (média)</span>
+        <strong>{{ salarioRealMedioNoturno() | currency: 'BRL' }}</strong>
+      </div>
+    </div>
+    <div class="comparativo-variation">{{ variacaoSalarioNoturnoTexto() }}</div>
+  </div>
+</div>
+```
+
+### 6.8 Validacao numerica
+
+```
+Simulado (funcProjetados = 4, diariasTotais = 60):
+  diarias/func = 60 / 4 = 15
+  salarioDiurno  = 15 × R$100 + R$350 = R$1.850
+  salarioNoturno = 15 × R$100 × 1.2 + R$350 = R$2.150
+
+Real (funcCliente = 4, custoDireto = R$10.220):
+  salarioRealMedio = R$10.220 / 4 = R$2.555
+
+Variacao (diurno como base):
+  (2555 - 1850) / 1850 × 100 = 38,11% a mais
+```
+
+### 6.9 Plano de implementacao
+
+| Passo | Arquivo                                    | Mudanca                                            | Esforco     |
+| ----- | ------------------------------------------ | -------------------------------------------------- | ----------- |
+| 1     | `contrato-detail.component.ts`             | Adicionar 5 computed signals (6.6)                 | Baixo       |
+| 2     | `contrato-detail.component.html` L86-122   | Substituir pills por tabela (6.7)                  | Medio       |
+| 3     | `contrato-detail.component.css`            | Estilos para `.comparativo-table`                  | Baixo       |
+| 4     | Validacao visual                           | Verificar valores com contrato de teste            | Verificacao |
+| 5     | `funcionario-list.component.ts` (opcional) | Reutilizar formula para `getSalarioSimuladoMensal` | Baixo       |
+
+## 7. Plano: Calculos financeiros no cliente-detail
+
+### Estado atual
+
+```
+Receita Total: R$ 14.839,50  ← contrato.valorTotalMensal (campo legado)
+Custos Operacionais: R$ 0,00  ← contrato.custoRealMensal (null/undefined)
+Lucro: R$ 14.839,50           ← receita - 0 = receita
+Margem: 100.00%               ← cascata do custo = 0
+```
+
+### Causa-raiz
+
+1. `custoRealMensal` e `undefined` — o backend NAO persiste esse campo, calcula sob demanda
+2. O fallback `valorTotalMensal * (1 - margem/100)` calcula errado porque `margemLucroPercentual` pode estar como decimal (0.20)
+3. `receitaPeriodo` usa `contrato.valorTotalMensal` em vez de `faturamentoSimulado`
+
+### Solucao proposta
+
+Usar `ContratoFinanceiroUiService` (ja funcional) para calcular custos reais:
+
+```typescript
+// cliente-detail.component.ts
+import { ContratoFinanceiroUiService } from '../../../services/contrato-financeiro-ui.service';
+
+private financeiroService = inject(ContratoFinanceiroUiService);
+calculosDetalhados = signal<Map<string, CalculoFinanceiroDetalhadoOutput>>(new Map());
+
+// Apos carregar contratos:
+this.financeiroService.carregarCalculosDetalhados$(contratos).subscribe({
+  next: (mapa) => this.calculosDetalhados.set(mapa),
+});
+
+// Substituir receitaPeriodo e custoPeriodo:
+receitaPeriodo = computed(() => {
+  const calculos = this.calculosDetalhados();
+  return this.contratosPeriodo().reduce((sum, c) =>
+    sum + this.financeiroService.getFaturamentoDetalhado(c, calculos), 0);
+});
+
+custoPeriodo = computed(() => {
+  const calculos = this.calculosDetalhados();
+  return this.contratosPeriodo().reduce((sum, c) =>
+    sum + this.financeiroService.getCustoDetalhado(c, calculos), 0);
+});
+```
+
+### Arquivos impactados
+
+- `frontend/src/app/features/clientes/cliente-detail/cliente-detail.component.ts`
+
+### Esforco: Medio | Prioridade: ALTA (dados completamente errados — custo=0 e margem=100%)
+
+## 8. Arquivos relacionados
 
 - `frontend/src/app/features/contratos/contrato-detail/contrato-detail.component.ts`
+- `frontend/src/app/features/contratos/contrato-detail/contrato-detail.component.html`
 - `frontend/src/app/services/contrato-financeiro-ui.service.ts`
 - `frontend/src/app/features/contratos/contrato-list/contrato-list.component.ts`
 - `frontend/src/app/pages/dashboard/dashboard.component.ts`
-- `frontend/src/app/services/diaria.service.ts`
-- `frontend/src/app/models/contrato-calculo.models.ts`
 - `frontend/src/app/models/index.ts`
+- `frontend/src/app/shared/helpers/contrato-calculo.helper.ts`
+- `frontend/src/app/features/funcionarios/funcionario-list/funcionario-list.component.ts`
+- `frontend/src/app/features/funcionarios/funcionario-detail/funcionario-detail.component.ts`
+- `frontend/src/app/features/clientes/cliente-detail/cliente-detail.component.ts`
+- `backend/src/InterceptorSystem.Application/BoundedContexts/Operacoes/Services/ContratoCalculoService.cs`
+- `backend/src/InterceptorSystem.Application/BoundedContexts/Operacoes/Services/DiariaAppService.cs`

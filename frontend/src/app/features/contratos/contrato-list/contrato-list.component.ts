@@ -196,7 +196,11 @@ export class ContratoListComponent implements OnInit {
 
     this.loadingCalculos.set(true);
     this.financeiroUiService
-      .carregarCalculosDetalhados$(contratosFiltrados, this.resumosFinanceiros())
+      .carregarCalculosDetalhados$(
+        contratosFiltrados,
+        this.resumosFinanceiros(),
+        this.getFuncionariosPorClienteMap(),
+      )
       .subscribe({
         next: (mapa) => {
           this.calculosDetalhados.set(mapa);
@@ -207,6 +211,14 @@ export class ContratoListComponent implements OnInit {
           this.loadingCalculos.set(false);
         },
       });
+  }
+
+  private getFuncionariosPorClienteMap(): Map<string, number> {
+    const mapa = new Map<string, number>();
+    this.funcionarios().forEach((funcionario) => {
+      mapa.set(funcionario.clienteId, (mapa.get(funcionario.clienteId) ?? 0) + 1);
+    });
+    return mapa;
   }
 
   getResumoDiarias(contratoId: string): DiariasContratoResumo | undefined {

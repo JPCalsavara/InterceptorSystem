@@ -300,6 +300,7 @@ export interface ContratoResumoFinanceiroPosto {
   custoTotal: number;
   diariasNormais: number;
   diariasExtras: number;
+  diariasFimDeSemana?: number;
 }
 
 export interface ContratoResumoFinanceiroAlocacao {
@@ -310,6 +311,7 @@ export interface ContratoResumoFinanceiroAlocacao {
   custoTotal: number;
   diariasNormais: number;
   diariasExtras: number;
+  diariasFimDeSemana?: number;
 }
 
 export interface ContratoResumoFinanceiroFuncionario {
@@ -319,6 +321,7 @@ export interface ContratoResumoFinanceiroFuncionario {
   custoTotal: number;
   diariasNormais: number;
   diariasExtras: number;
+  diariasFimDeSemana?: number;
 }
 
 export interface ContratoResumoFinanceiro {
@@ -330,6 +333,7 @@ export interface ContratoResumoFinanceiro {
   custoRealTotal: number;
   totalDiariasNormais: number;
   totalDiariasExtras: number;
+  totalDiariasFimDeSemana?: number;
   projecaoCustoPorPosto: ContratoResumoFinanceiroPosto[];
   projecaoCustoPorAlocacao: ContratoResumoFinanceiroAlocacao[];
   projecaoCustoPorFuncionario: ContratoResumoFinanceiroFuncionario[];

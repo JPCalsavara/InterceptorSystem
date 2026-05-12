@@ -1,3 +1,4 @@
+using System;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Application.Common.Interfaces;
@@ -224,6 +225,7 @@ public class DiariaAppService : IDiariaAppService
 
         var totalDiariasNormais = diarias.Count(d => d.TipoDiaria == TipoDiaria.REGULAR);
         var totalDiariasExtras = diarias.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO);
+        var totalDiariasFimDeSemana = diarias.Count(d => d.Data.DayOfWeek == DayOfWeek.Saturday || d.Data.DayOfWeek == DayOfWeek.Sunday);
         var custoRealDiariasNormais = diarias
             .Where(d => d.TipoDiaria == TipoDiaria.REGULAR)
             .Sum(d => d.ValorDiaria);
@@ -240,7 +242,8 @@ public class DiariaAppService : IDiariaAppService
                 g.Count(),
                 g.Sum(d => d.ValorDiaria),
                 g.Count(d => d.TipoDiaria == TipoDiaria.REGULAR),
-                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO)))
+                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO),
+                g.Count(d => d.Data.DayOfWeek == DayOfWeek.Saturday || d.Data.DayOfWeek == DayOfWeek.Sunday)))
             .OrderByDescending(g => g.CustoTotal)
             .ToList();
 
@@ -254,7 +257,8 @@ public class DiariaAppService : IDiariaAppService
                 g.Count(),
                 g.Sum(d => d.ValorDiaria),
                 g.Count(d => d.TipoDiaria == TipoDiaria.REGULAR),
-                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO)))
+                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO),
+                g.Count(d => d.Data.DayOfWeek == DayOfWeek.Saturday || d.Data.DayOfWeek == DayOfWeek.Sunday)))
             .OrderByDescending(g => g.CustoTotal)
             .ToList();
 
@@ -267,7 +271,8 @@ public class DiariaAppService : IDiariaAppService
                 g.Count(),
                 g.Sum(d => d.ValorDiaria),
                 g.Count(d => d.TipoDiaria == TipoDiaria.REGULAR),
-                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO)))
+                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO),
+                g.Count(d => d.Data.DayOfWeek == DayOfWeek.Saturday || d.Data.DayOfWeek == DayOfWeek.Sunday)))
             .OrderByDescending(g => g.CustoTotal)
             .ToList();
 
@@ -280,6 +285,7 @@ public class DiariaAppService : IDiariaAppService
             diarias.Sum(d => d.ValorDiaria),
             totalDiariasNormais,
             totalDiariasExtras,
+            totalDiariasFimDeSemana,
             projecaoPorPosto,
             projecaoPorAlocacao,
             projecaoPorFuncionario);

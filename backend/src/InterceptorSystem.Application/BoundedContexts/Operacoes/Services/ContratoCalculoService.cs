@@ -36,9 +36,16 @@ public class ContratoCalculoService : IContratoCalculoService
         var custoBaseMensal = custoDireto + valorImpostos;
         
         // ETAPA 3: Faturamento
-        var valorMargemLucro = custoBaseMensal * input.MargemLucroPercentual;
-        var valorMargemFaltas = custoBaseMensal * input.MargemCoberturaFaltasPercentual;
-        var valorTotalMensal = custoBaseMensal + valorMargemLucro + valorMargemFaltas;
+        var somaMargens = input.MargemLucroPercentual + input.MargemCoberturaFaltasPercentual;
+        var valorTotalMensal = somaMargens >= 1m
+            ? custoBaseMensal
+            : custoBaseMensal / (1m - somaMargens);
+        var valorMargemLucro = somaMargens >= 1m
+            ? 0m
+            : valorTotalMensal * input.MargemLucroPercentual;
+        var valorMargemFaltas = somaMargens >= 1m
+            ? 0m
+            : valorTotalMensal * input.MargemCoberturaFaltasPercentual;
         
         return new CalculoValorTotalOutput(
             ValorTotalMensal: Math.Round(valorTotalMensal, 2),
@@ -99,9 +106,16 @@ public class ContratoCalculoService : IContratoCalculoService
         var custoBaseMensal = custoDireto + valorImpostos; // Com impostos
 
         // ETAPA 3: Faturamento
-        var valorMargemLucro = custoBaseMensal * input.MargemLucroPercentual;
-        var valorMargemFaltas = custoBaseMensal * input.MargemCoberturaFaltasPercentual;
-        var faturamentoSimulado = custoBaseMensal + valorMargemLucro + valorMargemFaltas;
+        var somaMargens = input.MargemLucroPercentual + input.MargemCoberturaFaltasPercentual;
+        var faturamentoSimulado = somaMargens >= 1m
+            ? custoBaseMensal
+            : custoBaseMensal / (1m - somaMargens);
+        var valorMargemLucro = somaMargens >= 1m
+            ? 0m
+            : faturamentoSimulado * input.MargemLucroPercentual;
+        var valorMargemFaltas = somaMargens >= 1m
+            ? 0m
+            : faturamentoSimulado * input.MargemCoberturaFaltasPercentual;
 
         return new SimulacaoFinanceiraMensalOutput(
             NumeroDePostos: input.NumeroDePostos,

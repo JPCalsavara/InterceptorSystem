@@ -15,6 +15,7 @@ import {
   CalculoValorTotalOutput,
   SimulacaoFinanceiraMensalInput,
   SimulacaoFinanceiraMensalOutput,
+  TipoEscala,
 } from '../../../models/index';
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { DiariaService } from '../../../services/diaria.service';
@@ -38,6 +39,14 @@ export class ContratoDetailComponent implements OnInit {
     return safe > 1 ? safe / 100 : safe;
   }
 
+  private getDiasMedio(tipoEscala: TipoEscala | string): number {
+    let diasMedio = 22;
+    if (tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
+    else if (tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8;
+    else if (tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) diasMedio = 26;
+    return diasMedio;
+  }
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private contratoService = inject(ContratoService);
@@ -57,6 +66,9 @@ export class ContratoDetailComponent implements OnInit {
   funcionariosCliente = signal<number>(0);
   loading = signal(true);
   erro = signal<string | null>(null);
+  funcionariosCarregados = signal(false);
+  resumoFinanceiroCarregado = signal(false);
+  calculoDisparado = signal(false);
 
   // API-cached breakdown (single source of truth for monetary calculations)
   breakdown = signal<CalculoValorTotalOutput | null>(null);
@@ -90,14 +102,30 @@ export class ContratoDetailComponent implements OnInit {
 
   impostosMensal = computed(() => this.breakdown()?.valorImpostos ?? 0);
 
+  custoTotalSemImpostoReal = computed(() => this.breakdown()?.custoDireto ?? 0);
+
+  custoTotalComImpostoReal = computed(() => this.breakdown()?.custoBaseMensal ?? 0);
+
   lucro = computed(() => {
     const breakdown = this.breakdown();
     return breakdown ? breakdown.valorTotalMensal - breakdown.custoBaseMensal : 0;
   });
 
+  faturamentoRealFechado = computed(() => this.faturamentoSimulado());
+
   margemLucroValor = computed(() => this.breakdown()?.valorMargemLucro ?? 0);
   riscoCoberturaValor = computed(() => this.breakdown()?.valorMargemFaltas ?? 0);
   lucroEsperadoMinimo = computed(() => this.margemLucroValor() + this.riscoCoberturaValor());
+
+  // Divisor para a fórmula de margem real: (1 - somaMargens)
+  // Ex: margemLucro=0.20, margemRisco=0.10 → divisor = 0.70 (70%)
+  divisorMargemPercent = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 1;
+    const lucro = this.normalizarPercentualContrato(contrato.margemLucroPercentual);
+    const risco = this.normalizarPercentualContrato(contrato.margemCoberturaFaltasPercentual);
+    return Math.max(0.01, 1 - lucro - risco);
+  });
 
   custoBaseSimulado = computed(() => this.simulacaoBreakdown()?.custoBaseMensal ?? 0);
   adicionalNoturnoSimulado = computed(() => this.simulacaoBreakdown()?.custoAdicionalNoturno ?? 0);
@@ -169,6 +197,36 @@ export class ContratoDetailComponent implements OnInit {
     return this.custoBrutoSimulado() + this.valorImpostosSimulado();
   });
 
+  lucroTotalFinalSimulado = computed(() => {
+    return this.faturamentoSimulado() - this.custoTotalFinalSimulado();
+  });
+
+  faturamentoRealComparativo = computed(() => this.faturamentoSimulado());
+
+  custoTotalRealComparativo = computed(() => this.custoTotalComImpostoReal());
+
+  lucroTotalRealComparativo = computed(() => {
+    return this.faturamentoRealFechado() - this.custoTotalRealComparativo();
+  });
+
+  variacaoFaturamentoPercent = computed(() =>
+    this.calcularVariacaoPercentual(this.faturamentoSimulado(), this.faturamentoRealComparativo()),
+  );
+
+  variacaoCustoPercent = computed(() =>
+    this.calcularVariacaoPercentual(
+      this.custoTotalFinalSimulado(),
+      this.custoTotalRealComparativo(),
+    ),
+  );
+
+  variacaoLucroPercent = computed(() =>
+    this.calcularVariacaoPercentual(
+      this.valorMargemLucroSimulado(),
+      this.lucroTotalRealComparativo(),
+    ),
+  );
+
   valorMargemLucroSimulado = computed(() => {
     const simulacao = this.simulacaoBreakdown();
     return simulacao?.valorMargemLucro ?? 0;
@@ -192,7 +250,7 @@ export class ContratoDetailComponent implements OnInit {
   lucroCalculadoPorDiferenca = computed(() => {
     const breakdown = this.breakdown();
     if (!breakdown) return 0;
-    return breakdown.valorTotalMensal - breakdown.custoBaseMensal;
+    return this.faturamentoSimulado() - breakdown.custoBaseMensal;
   });
 
   lucroPorPercentualFaturamento = computed(() => {
@@ -219,6 +277,104 @@ export class ContratoDetailComponent implements OnInit {
     const simulacao = this.simulacaoBreakdown();
     return simulacao?.funcionariosProjetados ?? 0;
   });
+
+  // Salário / funcionário (simulado e real)
+  diariasPorFuncSimulado = computed(() => {
+    const sim = this.simulacaoBreakdown();
+    if (!sim || !sim.funcionariosProjetados) return 0;
+    return sim.diariasTotaisMes / sim.funcionariosProjetados;
+  });
+
+  salarioSimuladoDiurno = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+    return (
+      this.diariasPorFuncSimulado() * (contrato.valorDiariaCobrada ?? 0) +
+      (contrato.valorBeneficiosExtrasMensal ?? 0)
+    );
+  });
+
+  salarioSimuladoNoturno = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+    const diaria = contrato.valorDiariaCobrada ?? 0;
+    const adicNot = this.normalizarPercentualContrato(contrato.percentualAdicionalNoturno);
+    return (
+      this.diariasPorFuncSimulado() * diaria * (1 + adicNot) +
+      (contrato.valorBeneficiosExtrasMensal ?? 0)
+    );
+  });
+
+  salarioRealMedio = computed(() => {
+    const funcCount = this.funcionariosCliente();
+    if (!funcCount || funcCount === 0) return 0;
+    return this.custoTotalSemImpostoReal() / funcCount;
+  });
+
+  salarioRealMedioDiurno = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+    
+    const alocsDiurnas = this.alocacoes().filter(a => !a.temHorarioNoturno);
+    if (alocsDiurnas.length === 0) return this.salarioRealMedio(); // fallback
+    
+    let sumSalaries = 0;
+    let countEmployees = 0;
+    
+    for (const a of alocsDiurnas) {
+      const diasMedio = this.getDiasMedio(a.tipoEscala);
+      const salarioBase = diasMedio * (contrato.valorDiariaCobrada || 0);
+      const beneficios = contrato.valorBeneficiosExtrasMensal || 0;
+      
+      const qtd = a.quantidadeFuncionarios || 1;
+      sumSalaries += (salarioBase + beneficios) * qtd;
+      countEmployees += qtd;
+    }
+    
+    if (countEmployees === 0) return this.salarioRealMedio();
+    return sumSalaries / countEmployees;
+  });
+
+  salarioRealMedioNoturno = computed(() => {
+    const contrato = this.contrato();
+    if (!contrato) return 0;
+    
+    const alocsNoturnas = this.alocacoes().filter(a => a.temHorarioNoturno);
+    if (alocsNoturnas.length === 0) return this.salarioRealMedio(); // fallback
+    
+    let sumSalaries = 0;
+    let countEmployees = 0;
+    const adicNoturno = this.normalizarPercentualContrato(contrato.percentualAdicionalNoturno);
+    
+    for (const a of alocsNoturnas) {
+      const diasMedio = this.getDiasMedio(a.tipoEscala);
+      const salarioBase = diasMedio * (contrato.valorDiariaCobrada || 0) * (1 + adicNoturno);
+      const beneficios = contrato.valorBeneficiosExtrasMensal || 0;
+      
+      const qtd = a.quantidadeFuncionarios || 1;
+      sumSalaries += (salarioBase + beneficios) * qtd;
+      countEmployees += qtd;
+    }
+    
+    if (countEmployees === 0) return this.salarioRealMedio();
+    return sumSalaries / countEmployees;
+  });
+
+  variacaoSalarioDiurnoPercent = computed(() =>
+    this.calcularVariacaoPercentual(this.salarioSimuladoDiurno(), this.salarioRealMedioDiurno()),
+  );
+
+  variacaoSalarioNoturnoPercent = computed(() =>
+    this.calcularVariacaoPercentual(this.salarioSimuladoNoturno(), this.salarioRealMedioNoturno()),
+  );
+
+  variacaoSalarioDiurnoTexto(): string {
+    return this.formatarVariacaoPercentualTexto(this.variacaoSalarioDiurnoPercent());
+  }
+
+  variacaoSalarioNoturnoTexto(): string {
+    return this.formatarVariacaoPercentualTexto(this.variacaoSalarioNoturnoPercent());
+  }
 
   custoTotalBeneficios = computed(() => {
     const simulacao = this.simulacaoBreakdown();
@@ -247,14 +403,41 @@ export class ContratoDetailComponent implements OnInit {
   // Lucro real: faturamento SIMULADO menos custo REAL (conforme pedido)
   lucroReal = computed(() => {
     const custoReal = this.breakdown()?.custoBaseMensal ?? 0;
-    return this.faturamentoSimulado() - custoReal;
+    return this.faturamentoRealFechado() - custoReal;
   });
 
   // Lucro ideal: faturamento real projetado (API) menos custo real
   lucroIdeal = computed(() => {
     const custoTotal = this.custoTotalFinalSimulado();
-    return this.faturamentoSimulado() - custoTotal;
+    return this.faturamentoRealFechado() - custoTotal;
   });
+
+  private calcularVariacaoPercentual(valorBase: number, valorComparado: number): number {
+    if (!Number.isFinite(valorBase) || Math.abs(valorBase) < 0.0001) {
+      return 0;
+    }
+
+    return ((valorComparado - valorBase) / Math.abs(valorBase)) * 100;
+  }
+
+  private formatarVariacaoPercentualTexto(percentual: number): string {
+    if (!Number.isFinite(percentual) || Math.abs(percentual) < 0.0001) return '0%';
+    const sinal = percentual > 0 ? 'a mais' : 'a menos';
+    const valor = Math.abs(percentual).toFixed(2).replace('.', ',');
+    return `${valor}% ${sinal}`;
+  }
+
+  variacaoFaturamentoTexto(): string {
+    return this.formatarVariacaoPercentualTexto(this.variacaoFaturamentoPercent());
+  }
+
+  variacaoCustoTexto(): string {
+    return this.formatarVariacaoPercentualTexto(this.variacaoCustoPercent());
+  }
+
+  variacaoLucroTexto(): string {
+    return this.formatarVariacaoPercentualTexto(this.variacaoLucroPercent());
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -267,6 +450,9 @@ export class ContratoDetailComponent implements OnInit {
       next: (contrato) => {
         this.contrato.set(contrato);
         this.loading.set(false);
+        this.funcionariosCarregados.set(false);
+        this.resumoFinanceiroCarregado.set(false);
+        this.calculoDisparado.set(false);
         this.carregarCliente(contrato.clienteId);
         this.carregarFuncionarios(contrato.clienteId);
         this.carregarAlocacoes(id);
@@ -290,8 +476,16 @@ export class ContratoDetailComponent implements OnInit {
 
   private carregarFuncionarios(clienteId: string): void {
     this.funcionarioService.getByClienteId(clienteId).subscribe({
-      next: (funcionarios) => this.funcionariosCliente.set(funcionarios.length),
-      error: () => this.funcionariosCliente.set(0),
+      next: (funcionarios) => {
+        this.funcionariosCliente.set(funcionarios.length);
+        this.funcionariosCarregados.set(true);
+        this.tentarCarregarCalculo();
+      },
+      error: () => {
+        this.funcionariosCliente.set(0);
+        this.funcionariosCarregados.set(true);
+        this.tentarCarregarCalculo();
+      },
     });
   }
 
@@ -318,14 +512,29 @@ export class ContratoDetailComponent implements OnInit {
         next: (resumo) => {
           this.resumoFinanceiro.set(resumo);
           this.loadingResumoFinanceiro.set(false);
-          this.carregarCalculo();
+          this.resumoFinanceiroCarregado.set(true);
+          this.tentarCarregarCalculo();
         },
         error: () => {
           this.resumoFinanceiro.set(null);
           this.loadingResumoFinanceiro.set(false);
-          this.carregarCalculo();
+          this.resumoFinanceiroCarregado.set(true);
+          this.tentarCarregarCalculo();
         },
       });
+  }
+
+  private tentarCarregarCalculo(): void {
+    if (
+      this.calculoDisparado() ||
+      !this.funcionariosCarregados() ||
+      !this.resumoFinanceiroCarregado()
+    ) {
+      return;
+    }
+
+    this.calculoDisparado.set(true);
+    this.carregarCalculo();
   }
 
   private carregarCalculo(): void {
@@ -344,9 +553,9 @@ export class ContratoDetailComponent implements OnInit {
       resumo?.projecaoCustoPorAlocacao
         ?.filter((a) => a.temHorarioNoturno)
         .reduce((acc, item) => acc + (item.totalDiarias || 0), 0) || 0;
-    const diariasFdsMes = Math.max(0, resumo?.totalDiariasExtras || 0);
+    const diariasFdsMes = Math.max(0, resumo?.totalDiariasFimDeSemana || 0);
     const diariasFeriadosMes = 0; // Feriados não são calculados neste fluxo
-    const funcionarios = contrato.quantidadeFuncionarios || 1;
+    const funcionarios = this.funcionariosCliente() || contrato.quantidadeFuncionarios || 1;
 
     // Build calculation input using shared helper with explicit diarias at detail level
     const input = buildCalculoValorTotalInput(
@@ -355,7 +564,7 @@ export class ContratoDetailComponent implements OnInit {
           {
             tipoPosto: 'PERSONALIZADO',
             quantidadeAlocacoes: Math.max(1, contrato.numeroDePostos || 1),
-            quantidadeFuncionariosPorAlocacao: funcionarios,
+            quantidadeFuncionariosPorAlocacao: 1,
             alocacoesNoturnas: 0,
           },
         ],
@@ -377,7 +586,7 @@ export class ContratoDetailComponent implements OnInit {
         PERSONALIZADO: {
           label: 'Personalizado',
           alocacoes: Math.max(1, contrato.numeroDePostos || 1),
-          funcionariosPorAlocacao: funcionarios,
+          funcionariosPorAlocacao: 1,
           alocacoesNoturnas: 0,
           diasTrabalhadosPorFuncMes: this.DIARIAS_POR_FUNCIONARIO_MES_BASE,
           operaFimDeSemana: true,
@@ -386,17 +595,12 @@ export class ContratoDetailComponent implements OnInit {
     );
 
     // Override derived totals with operational data when available
-    if (diariasTotaisMes > 0) {
+    if (resumo) {
       input.diariasTotaisMes = diariasTotaisMes;
       input.funcionariosEstimados = funcionarios;
-    }
-
-    if (diariasNoturnasMes > 0) {
       input.diariasNoturnasMes = diariasNoturnasMes;
-    }
-
-    if (diariasFdsMes > 0) {
       input.diariasFdsMes = diariasFdsMes;
+      input.diariasFeriadosMes = diariasFeriadosMes;
     }
 
     const simulacaoInput = this.buildSimulacaoInput(contrato);

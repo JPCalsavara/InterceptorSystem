@@ -36,7 +36,7 @@
       <!-- COL 1: Informações Gerais + Indicadores -->
       <div class="card card-col1-rows12">
         <h2 class="card-title">Informações Gerais</h2>
-        <div class="info-list">
+        <div class="info-list info-list-compact">
           <div class="info-item">
             <span class="info-label">Cliente</span>
             <span class="info-value">{{ clienteNome() || contrato()!.clienteId }}</span>
@@ -54,7 +54,7 @@
             <span class="info-value">{{ contrato()!.numeroDePostos }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Funcionários Necessários</span>
+            <span class="info-label">Funcionários Por Turno</span>
             <span class="info-value">{{ contrato()!.quantidadeFuncionarios }}</span>
           </div>
         </div>
@@ -62,10 +62,10 @@
         <div class="contract-tags-panel">
           <div class="tags-panel-header">
             <h3>Tags do Contrato</h3>
-            <span class="tags-count">{{ contrato()!.tags?.length || 0 }} selecionada(s)</span>
+            <span class="tags-count">{{ contrato()!.tags.length || 0 }} selecionada(s)</span>
           </div>
 
-          @if ((contrato()!.tags?.length || 0) === 0) {
+          @if ((contrato()!.tags.length || 0) === 0) {
             <p class="tags-empty">Nenhuma tag tarifada cadastrada para este contrato.</p>
           } @else {
             <div class="tags-table">
@@ -83,6 +83,77 @@
           }
         </div>
 
+        <div class="contract-tags-panel contract-comparativo-panel">
+          <div class="tags-panel-header">
+            <h3>Comparativo Simulado x Real</h3>
+            <span class="tags-count">{{ variacaoLucroTexto() }}</span>
+          </div>
+
+          <div class="comparativo-stack">
+            <div class="comparativo-card">
+              <span class="comparativo-card-label">Custo</span>
+              <div class="comparativo-row">
+                <div class="comparativo-pill comparativo-pill-simulado">
+                  <span>Simulado</span>
+                  <strong>{{ custoTotalFinalSimulado() | currency: 'BRL' }}</strong>
+                </div>
+                <div class="comparativo-pill comparativo-pill-real">
+                  <span>Real</span>
+                  <strong>{{ custoTotalRealComparativo() | currency: 'BRL' }}</strong>
+                </div>
+              </div>
+              <div class="comparativo-variation">{{ variacaoCustoTexto() }}</div>
+            </div>
+
+            <div class="comparativo-card">
+              <span class="comparativo-card-label">Lucro</span>
+              <div class="comparativo-row">
+                <div class="comparativo-pill comparativo-pill-simulado">
+                  <span>Simulado</span>
+                  <strong>{{ valorMargemLucroSimulado() | currency: 'BRL' }}</strong>
+                </div>
+                <div class="comparativo-pill comparativo-pill-real">
+                  <span>Real</span>
+                  <strong>{{ lucroTotalRealComparativo() | currency: 'BRL' }}</strong>
+                </div>
+              </div>
+              <div class="comparativo-variation">{{ variacaoLucroTexto() }}</div>
+            </div>
+          </div>
+
+          <div class="comparativo-stack">
+            <div class="comparativo-card">
+              <span class="comparativo-card-label">Salário Diurno/Func</span>
+              <div class="comparativo-row">
+                <div class="comparativo-pill comparativo-pill-simulado">
+                  <span>Simulado</span>
+                  <strong>{{ salarioSimuladoDiurno() | currency: 'BRL' }}</strong>
+                </div>
+                <div class="comparativo-pill comparativo-pill-real">
+                  <span>Real (média)</span>
+                  <strong>{{ salarioRealMedioDiurno() | currency: 'BRL' }}</strong>
+                </div>
+              </div>
+              <div class="comparativo-variation">{{ variacaoSalarioDiurnoTexto() }}</div>
+            </div>
+
+            <div class="comparativo-card">
+              <span class="comparativo-card-label">Salário Noturno/Func</span>
+              <div class="comparativo-row">
+                <div class="comparativo-pill comparativo-pill-simulado">
+                  <span>Simulado</span>
+                  <strong>{{ salarioSimuladoNoturno() | currency: 'BRL' }}</strong>
+                </div>
+                <div class="comparativo-pill comparativo-pill-real">
+                  <span>Real (média)</span>
+                  <strong>{{ salarioRealMedioNoturno() | currency: 'BRL' }}</strong>
+                </div>
+              </div>
+              <div class="comparativo-variation">{{ variacaoSalarioNoturnoTexto() }}</div>
+            </div>
+          </div>
+        </div>
+
         <div class="contract-tags-panel">
           <div class="tags-panel-header">
             <h3>Indicadores do Contrato</h3>
@@ -96,20 +167,22 @@
             </div>
 
             <div class="indicador-item">
-              <div class="indicador-label">Margem de Lucro</div>
+              <div class="indicador-label">Margem de Lucro Simulada</div>
               <div class="indicador-pct">
                 {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%
               </div>
-              <div class="indicador-valor">= {{ margemLucroValor() | currency: 'BRL' }}</div>
+              <div class="indicador-valor">
+                = {{ valorMargemLucroSimulado() | currency: 'BRL' }}
+              </div>
             </div>
 
             <div class="indicador-item">
-              <div class="indicador-label">Margem de Risco</div>
+              <div class="indicador-label">Margem de Risco Simulada</div>
               <div class="indicador-pct">
                 {{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%
               </div>
               <div class="indicador-valor">
-                = {{ riscoCoberturaValor() | currency: 'BRL' }} (sobre faturamento simulado)
+                = {{ valorMargemFaltasSimulado() | currency: 'BRL' }}
               </div>
             </div>
 
@@ -144,8 +217,6 @@
       <!-- COL 2: Relatório Simulado -->
       <div class="card card-col2-rows12">
         <h2 class="card-title">Relatório Simulado</h2>
-        <p class="card-hint">Diária {{ contrato()!.valorDiariaCobrada | currency: 'BRL' }}</p>
-
         @if (simulacaoBreakdown() && !calculando() && !erroCalculo()) {
           <div class="bk-group">
             <div class="bk-group-header bk-custo">
@@ -234,10 +305,14 @@
 
           <div class="bk-group">
             <div class="bk-group-header bk-custo">
-              <span class="bk-group-label">Etapa 2: Custo Bruto</span>
-              <span class="bk-group-total">{{ custoBrutoSimulado() | currency: 'BRL' }}</span>
+              <span class="bk-group-label">Etapa 2: Custo Total</span>
+              <span class="bk-group-total">{{ custoTotalFinalSimulado() | currency: 'BRL' }}</span>
             </div>
             <div class="bk-items">
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Custo Total sem Imposto</span>
+                <span class="bk-item-value">{{ custoBrutoSimulado() | currency: 'BRL' }}</span>
+              </div>
               <div class="bk-item">
                 <span class="bk-item-label"
                   >Custo Diárias Normais
@@ -297,6 +372,7 @@
                 </span>
                 <span class="bk-item-value">{{ custoTotalBeneficios() | currency: 'BRL' }}</span>
               </div>
+
               <div class="bk-item">
                 <span class="bk-item-label"
                   >Encargos e Provisões (Impostos)
@@ -315,25 +391,23 @@
           </div>
 
           <div class="bk-group">
-            <div class="bk-group-header bk-receita bk-emphasis">
-              <span class="bk-group-label">Etapa 3: Faturamento Simulado</span>
-              <span class="bk-group-total">{{ faturamentoSimulado() | currency: 'BRL' }}</span>
-            </div>
             <div class="bk-items">
-              <div class="bk-item">
-                <span class="bk-item-label">Custo Base Mensal (Com Impostos)</span>
-                <span class="bk-item-value">{{ custoTotalFinalSimulado() | currency: 'BRL' }}</span>
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Lucro Total Final</span>
+                <span class="bk-item-value positive">{{
+                  lucroTotalFinalSimulado() | currency: 'BRL'
+                }}</span>
               </div>
               <div class="bk-item">
                 <span class="bk-item-label"
                   >Margem de Lucro
                   <span class="bk-formula"
-                    >({{ custoTotalFinalSimulado() | currency: 'BRL' }}) ×
+                    >({{ custoTotalFinalSimulado() | currency: 'BRL' }} ×
                     {{
                       contrato()!.margemLucroPercentual! > 1
                         ? contrato()!.margemLucroPercentual! / 100
                         : (contrato()!.margemLucroPercentual! | percent: '1.0-2')
-                    }}</span
+                    }}) ÷ {{ divisorMargemPercent() | percent: '1.0-2' }}</span
                   >
                 </span>
                 <span class="bk-item-value">{{
@@ -344,17 +418,22 @@
                 <span class="bk-item-label"
                   >Margem de Risco (Faltas)
                   <span class="bk-formula"
-                    >({{ faturamentoSimulado() | currency: 'BRL' }}) ×
+                    >({{ custoTotalFinalSimulado() | currency: 'BRL' }} ×
                     {{
                       contrato()!.margemCoberturaFaltasPercentual! > 1
                         ? contrato()!.margemCoberturaFaltasPercentual! / 100
                         : (contrato()!.margemCoberturaFaltasPercentual! | percent: '1.0-2')
-                    }}</span
+                    }}) ÷ {{ divisorMargemPercent() | percent: '1.0-2' }}</span
                   >
                 </span>
                 <span class="bk-item-value">{{
                   valorMargemFaltasSimulado() | currency: 'BRL'
                 }}</span>
+              </div>
+
+              <div class="bk-group-header bk-receita bk-emphasis">
+                <span class="bk-group-label">Etapa 3: Faturamento Simulado</span>
+                <span class="bk-group-total">{{ faturamentoSimulado() | currency: 'BRL' }}</span>
               </div>
             </div>
           </div>
@@ -398,20 +477,27 @@
           <!-- ETAPA 3: FATURAMENTO REAL -->
           <div class="bk-group">
             <div class="bk-group-header bk-receita bk-emphasis">
-              <span class="bk-group-label">Etapa 3: Faturamento Real</span>
-              <span class="bk-group-total">{{
-                breakdown()!.valorTotalMensal | currency: 'BRL'
-              }}</span>
+              <span class="bk-group-label"> Faturamento do Contrato</span>
+              <span class="bk-group-total">{{ faturamentoRealFechado() | currency: 'BRL' }}</span>
             </div>
           </div>
 
           <!-- ETAPA 1: CUSTO DIRETO -->
           <div class="bk-group">
             <div class="bk-group-header bk-custo bk-emphasis">
-              <span class="bk-group-label">Etapa 1: Custo Direto</span>
-              <span class="bk-group-total">- {{ breakdown()!.custoDireto | currency: 'BRL' }}</span>
+              <span class="bk-group-label"> Custo Total com Impostos</span>
+              <span class="bk-group-total"
+                >- {{ custoTotalComImpostoReal() | currency: 'BRL' }}</span
+              >
             </div>
             <div class="bk-items">
+              <div class="bk-item bk-item-summary">
+                <span class="bk-item-label">Custo Total sem Imposto</span>
+                <span class="bk-item-value">{{
+                  custoTotalSemImpostoReal() | currency: 'BRL'
+                }}</span>
+              </div>
+
               <div class="bk-item">
                 <span class="bk-item-label"
                   >Custo Diárias Normais
@@ -461,11 +547,6 @@
                 }}</span>
               </div>
 
-              <div class="bk-item bk-item-summary">
-                <span class="bk-item-label">Funcionários do Cliente</span>
-                <span class="bk-item-value">{{ getFuncionariosCliente() }}</span>
-              </div>
-
               <div class="bk-item">
                 <span class="bk-item-label"
                   >Encargos e Provisões
@@ -484,7 +565,7 @@
           <!-- ETAPA 2: MARGENS E PROVISÕES -->
           <div class="bk-group">
             <div class="bk-group-header bk-lucro bk-emphasis">
-              <span class="bk-group-label">Etapa 2: Margens e Provisões</span>
+              <span class="bk-group-label"> Margens e Provisões</span>
               <span class="bk-group-total">{{ lucroEsperadoMinimo() | currency: 'BRL' }}</span>
             </div>
             <div class="bk-items">
@@ -492,8 +573,9 @@
                 <span class="bk-item-label"
                   >Margem de Lucro
                   <span class="bk-formula"
-                    >lucro = custo base ×
-                    {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%</span
+                    >lucro = ({{ custoTotalComImpostoReal() | currency: 'BRL' }} ×
+                    {{ contrato()!.margemLucroPercentual * 100 | number: '1.0-2' }}%) ÷
+                    {{ divisorMargemPercent() | percent: '1.0-2' }}</span
                   >
                 </span>
                 <span class="bk-item-value positive">{{
@@ -505,22 +587,12 @@
                 <span class="bk-item-label"
                   >Risco (Cobertura de Faltas)
                   <span class="bk-formula"
-                    >{{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%
-                    sobre custo base</span
+                    >({{ custoTotalComImpostoReal() | currency: 'BRL' }} ×
+                    {{ contrato()!.margemCoberturaFaltasPercentual * 100 | number: '1.0-2' }}%) ÷
+                    {{ divisorMargemPercent() | percent: '1.0-2' }}</span
                   >
                 </span>
                 <span class="bk-item-value">{{ riscoCoberturaValor() | currency: 'BRL' }}</span>
-              </div>
-
-              <div class="bk-item bk-item-summary">
-                <span class="bk-item-label">Total Margens (Lucro + Risco)</span>
-                <span
-                  [class]="
-                    'bk-item-value ' + (lucroEsperadoMinimo() >= 0 ? 'positive' : 'negative')
-                  "
-                >
-                  {{ lucroEsperadoMinimo() | currency: 'BRL' }}
-                </span>
               </div>
 
               <div class="bk-item bk-item-summary">
@@ -528,14 +600,14 @@
                 <span class="bk-item-value positive">
                   <span class="bk-formula"
                     >{{ faturamentoSimulado() | currency: 'BRL' }} -
-                    {{ breakdown()!.custoBaseMensal | currency: 'BRL' }}</span
+                    {{ custoTotalComImpostoReal() | currency: 'BRL' }}</span
                   >
                   {{ lucroCalculadoPorDiferenca() | currency: 'BRL' }}
                 </span>
               </div>
 
               <div class="bk-item bk-item-summary">
-                <span class="bk-item-label">Lucro Ideal</span>
+                <span class="bk-item-label">Lucro Ideal + Margem</span>
                 <span class="bk-item-value positive">
                   <span class="bk-formula"
                     >{{ faturamentoSimulado() | currency: 'BRL' }} -
