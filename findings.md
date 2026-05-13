@@ -30,6 +30,13 @@
 - The repository used by login (`IContaRepository.GetByEmailAsync(string email)`) also has no cancellation-token overload, so the token is inert in the current login path.
 - Only one `POST /api/auth/login` route exists in the API, so there is no route collision caused by the token parameter.
 
+## Frontend GitHub Actions Review
+
+- The frontend CI workflow does include a frontend job, but its test step was swallowing failures with `|| echo`, which could let broken unit tests pass as green.
+- The frontend deploy workflow was using `push` only, so it did not actually wait for the CI workflow to complete successfully despite the comment saying it did.
+- The deploy workflow also had no `workflow_run` chain and no check for whether the triggering commit touched the frontend.
+- The frontend build output is already laid out as `frontend/dist/frontend/browser/`, so the deploy artifact path is consistent with the local Angular build.
+
 ## Docker Compose Endpoint Routing
 
 - The frontend build was serving static files without any `/api` proxy in [frontend/nginx-frontend.conf](frontend/nginx-frontend.conf).

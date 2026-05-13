@@ -12,3 +12,5 @@
 - Exposed the API on host port 5010 in the development compose override and verified the merged compose config publishes `5010 -> 8080`.
 - Switched the local frontend environment to use the internal `/api` proxy instead of calling `http://localhost:5010` directly.
 - Revalidated the frontend production build after the environment change.
+- Reviewed the GitHub Actions configuration for the frontend and found two issues: the CI test step masked failures, and the deploy workflow was not chained to CI success.
+- Updated the frontend CI test step to fail on test errors and reworked the deploy workflow to trigger from the CI workflow after successful frontend changes only.

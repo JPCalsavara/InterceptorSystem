@@ -65,7 +65,7 @@ jobs:
   # JOB 2: Frontend (Angular)
   # ========================================
   frontend:
-    name: Frontend (Angular 18)
+    name: Frontend (Angular 21)
     runs-on: ubuntu-latest
 
     steps:
@@ -100,7 +100,7 @@ jobs:
       # 6. Testes (se houver)
       - name: Test
         working-directory: frontend
-        run: npm run test:ci --if-present || echo "Testes não configurados, pulando..."
+        run: npm run test:ci
       
       # 7. Upload dos arquivos de build (artefato)
       - name: Upload build artifacts
