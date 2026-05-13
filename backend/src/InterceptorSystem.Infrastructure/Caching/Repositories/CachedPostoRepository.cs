@@ -65,14 +65,14 @@ public class CachedPostoRepository : IPostoRepository
         return cachedList ?? Enumerable.Empty<Posto>();
     }
 
-    public async Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Postos_{empresaId}_Cliente_{clienteId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Posto>? cachedList))
         {
-            cachedList = await _decorated.GetByClienteIdAsync(clienteId);
+            cachedList = await _decorated.GetByClienteIdAsync(clienteId, ct);
             _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Moderate));
         }
 

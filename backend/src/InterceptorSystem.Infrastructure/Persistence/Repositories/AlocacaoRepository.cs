@@ -16,29 +16,29 @@ namespace InterceptorSystem.Infrastructure.Persistence.Repositories
         {
         }
 
-        public async Task<List<Alocacao>> GetAlocacoesByClienteIdAsync(Guid clienteId)
+        public async Task<List<Alocacao>> GetAlocacoesByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
         {
             return await _dbSet
                 .Include(a => a.Posto)
-                    .ThenInclude(p => p.Contrato)
-                .Where(a => a.Posto != null && a.Posto.Contrato != null && a.Posto.Contrato.ClienteId == clienteId)
-                .ToListAsync();
+                .Include(a => a.Contrato)
+                .Where(a => a.Contrato != null && a.Contrato.ClienteId == clienteId)
+                .ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId)
+        public async Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
         {
             return await _dbSet
                 .Include(a => a.Posto)
-                    .ThenInclude(p => p.Contrato)
-                .Where(a => a.Posto != null && a.Posto.Contrato != null && a.Posto.Contrato.ClienteId == clienteId)
-                .ToListAsync();
+                .Include(a => a.Contrato)
+                .Where(a => a.Contrato != null && a.Contrato.ClienteId == clienteId)
+                .ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId)
+        public async Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId, CancellationToken ct = default)
         {
             return await _dbSet
                 .Where(a => a.PostoId == postoId)
-                .ToListAsync();
+                .ToListAsync(ct);
         }
     }
 }

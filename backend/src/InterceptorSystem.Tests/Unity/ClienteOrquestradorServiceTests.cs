@@ -70,13 +70,13 @@ public class ClienteOrquestradorServiceTests
 		var postoId1 = Guid.NewGuid();
 		var postoId2 = Guid.NewGuid();
 		_postoService
-			.SetupSequence(s => s.CreateAsync(It.IsAny<CreatePostoInput>()))
+			.SetupSequence(s => s.CreateAsync(It.IsAny<CreatePostoInput>(), It.IsAny<CancellationToken>()))
 			.ReturnsAsync(new PostoDto(postoId1, _clienteId, "Posto 1 - ESCALA_12X36", "00000000", "End", "S/N", null, "Sao Paulo", "SP", true))
 			.ReturnsAsync(new PostoDto(postoId2, _clienteId, "Posto 2 - ESCALA_5X2", "00000000", "End", "S/N", null, "Sao Paulo", "SP", true));
 
 		_alocacaoService
-			.Setup(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>()))
-			.ReturnsAsync((CreateAlocacaoInput req) => new AlocacaoDto
+			.Setup(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>(), It.IsAny<CancellationToken>()))
+			.ReturnsAsync((CreateAlocacaoInput req, CancellationToken ct) => new AlocacaoDto
 			{
 				Id = Guid.NewGuid(),
 				PostoId = req.PostoId,
@@ -90,11 +90,11 @@ public class ClienteOrquestradorServiceTests
 		var output = await _sut.CriarClienteCompletoAsync(input);
 
 		Assert.Equal(2, output.Postos.Count());
-		_postoService.Verify(s => s.CreateAsync(It.Is<CreatePostoInput>(p => p.Nome.Contains("ESCALA_12X36"))), Times.Once);
-		_postoService.Verify(s => s.CreateAsync(It.Is<CreatePostoInput>(p => p.Nome.Contains("ESCALA_5X2"))), Times.Once);
-		_alocacaoService.Verify(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>()), Times.Exactly(3));
-		_alocacaoService.Verify(s => s.CreateAsync(It.Is<CreateAlocacaoInput>(a => a.TipoEscala == TipoEscala.DOZE_POR_TRINTA_SEIS)), Times.AtLeastOnce);
-		_alocacaoService.Verify(s => s.CreateAsync(It.Is<CreateAlocacaoInput>(a => a.TipoEscala == TipoEscala.SEMANAL_COMERCIAL)), Times.Once);
+		_postoService.Verify(s => s.CreateAsync(It.Is<CreatePostoInput>(p => p.Nome.Contains("ESCALA_12X36")), It.IsAny<CancellationToken>()), Times.Once);
+		_postoService.Verify(s => s.CreateAsync(It.Is<CreatePostoInput>(p => p.Nome.Contains("ESCALA_5X2")), It.IsAny<CancellationToken>()), Times.Once);
+		_alocacaoService.Verify(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+		_alocacaoService.Verify(s => s.CreateAsync(It.Is<CreateAlocacaoInput>(a => a.TipoEscala == TipoEscala.DOZE_POR_TRINTA_SEIS), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+		_alocacaoService.Verify(s => s.CreateAsync(It.Is<CreateAlocacaoInput>(a => a.TipoEscala == TipoEscala.SEMANAL_COMERCIAL), It.IsAny<CancellationToken>()), Times.Once);
 		_unitOfWork.Verify(u => u.BeginTransactionAsync(), Times.Once);
 		_unitOfWork.Verify(u => u.CommitTransactionAsync(), Times.Once);
 	}
@@ -111,12 +111,12 @@ public class ClienteOrquestradorServiceTests
 		SetupHappyPathServices();
 
 		_postoService
-			.Setup(s => s.CreateAsync(It.IsAny<CreatePostoInput>()))
+			.Setup(s => s.CreateAsync(It.IsAny<CreatePostoInput>(), It.IsAny<CancellationToken>()))
 			.ReturnsAsync(new PostoDto(Guid.NewGuid(), _clienteId, "Posto", "00000000", "End", "S/N", null, "Sao Paulo", "SP", true));
 
 		_alocacaoService
-			.Setup(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>()))
-			.ReturnsAsync((CreateAlocacaoInput req) => new AlocacaoDto
+			.Setup(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>(), It.IsAny<CancellationToken>()))
+			.ReturnsAsync((CreateAlocacaoInput req, CancellationToken ct) => new AlocacaoDto
 			{
 				Id = Guid.NewGuid(),
 				PostoId = req.PostoId,
@@ -130,8 +130,8 @@ public class ClienteOrquestradorServiceTests
 		var output = await _sut.CriarClienteCompletoAsync(input);
 
 		Assert.Equal(3, output.Postos.Count());
-		_postoService.Verify(s => s.CreateAsync(It.IsAny<CreatePostoInput>()), Times.Exactly(3));
-		_alocacaoService.Verify(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>()), Times.Exactly(3));
+		_postoService.Verify(s => s.CreateAsync(It.IsAny<CreatePostoInput>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+		_alocacaoService.Verify(s => s.CreateAsync(It.IsAny<CreateAlocacaoInput>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
 	}
 
 	private readonly Guid _clienteId = Guid.NewGuid();
@@ -139,11 +139,11 @@ public class ClienteOrquestradorServiceTests
 	private void SetupHappyPathServices()
 	{
 		_clienteService
-			.Setup(s => s.CreateAsync(It.IsAny<CreateClienteDtoInput>()))
+			.Setup(s => s.CreateAsync(It.IsAny<CreateClienteDtoInput>(), It.IsAny<CancellationToken>()))
 			.ReturnsAsync(new ClienteDtoOutput(_clienteId, "Cliente X", "12345678000199", "Sao Paulo", "SP", true, 2, "06:00:00", null, null));
 
 		_contratoService
-			.Setup(s => s.CreateAsync(It.IsAny<CreateContratoDtoInput>()))
+			.Setup(s => s.CreateAsync(It.IsAny<CreateContratoDtoInput>(), It.IsAny<CancellationToken>()))
 			.ReturnsAsync(new ContratoDtoOutput(
 				Guid.NewGuid(),
 				_clienteId,
@@ -161,7 +161,11 @@ public class ClienteOrquestradorServiceTests
 				DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
 				DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
 				StatusContrato.ATIVO,
-				new List<ContratoTagDtoOutput>()));
+				new List<ContratoTagDtoOutput>(),
+				0m,
+				0m,
+				null));
+
 	}
 
 	private static CreateClienteCompletoDtoInput BuildValidInput()

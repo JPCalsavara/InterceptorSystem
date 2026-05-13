@@ -5,6 +5,6 @@ namespace InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 
 public interface IPostoRepository : IRepository<Posto>
 {
-    Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId);
+    Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default);
 }
 

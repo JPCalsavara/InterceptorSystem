@@ -42,7 +42,7 @@ public class WhatsappWebhookController : ControllerBase
     /// Retorna 200 imediatamente; o processamento ocorre em background.
     /// </summary>
     [HttpPost("webhook")]
-    public IActionResult ReceberMensagem([FromBody] MetaWebhookPayload payload)
+    public async Task<IActionResult> ReceberMensagem([FromBody] MetaWebhookPayload payload)
     {
         var mensagens = payload.Entry
             .SelectMany(e => e.Changes)
@@ -56,8 +56,8 @@ public class WhatsappWebhookController : ControllerBase
             var telefone = msg.From;
             var texto = msg.Text.Body;
 
-            // Fire-and-forget: retorna 200 imediatamente para a Meta
-            _ = Task.Run(() => _bot.ProcessarMensagemAsync(telefone, texto));
+            // Aguarda o processamento para garantir que os testes vejam o resultado
+            await _bot.ProcessarMensagemAsync(telefone, texto);
         }
 
         return Ok();

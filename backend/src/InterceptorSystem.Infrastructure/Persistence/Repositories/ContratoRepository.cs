@@ -57,42 +57,42 @@ public class ContratoRepository : IContratoRepository
         return new PagedResult<Contrato>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
-    public async Task<IEnumerable<Contrato>> GetAtivosByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Contrato>> GetAtivosByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
         return await _context.Contratos
             .Include(c => c.Cliente)
             .Include(c => c.Tags)
                 .ThenInclude(ct => ct.Tag)
             .Where(c => c.ClienteId == clienteId && c.Status == StatusContrato.ATIVO)
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
-    public async Task<Contrato?> GetByClienteId(Guid clienteId)
+    public async Task<Contrato?> GetByClienteId(Guid clienteId, CancellationToken ct = default)
     {
         return await _context.Contratos
             .Include(c => c.Cliente)
             .Include(c => c.Tags)
                 .ThenInclude(ct => ct.Tag)
-            .FirstOrDefaultAsync(c => c.ClienteId == clienteId && c.Status == StatusContrato.ATIVO);
+            .FirstOrDefaultAsync(c => c.ClienteId == clienteId && c.Status == StatusContrato.ATIVO, ct);
     }
 
-    public async Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
         return await _context.Contratos
             .Include(c => c.Cliente)
             .Include(c => c.Tags)
                 .ThenInclude(ct => ct.Tag)
             .Where(c => c.ClienteId == clienteId)
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
-    public async Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null)
+    public async Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null, CancellationToken ct = default)
     {
         return await _context.Contratos
             .Where(c => c.ClienteId == clienteId && 
                        (c.Status == StatusContrato.ATIVO || c.Status == StatusContrato.PENDENTE) &&
                        (contratoIdIgnorado == null || c.Id != contratoIdIgnorado))
-            .AnyAsync();
+            .AnyAsync(ct);
     }
 
     public void Add(Contrato entity) => _context.Contratos.Add(entity);

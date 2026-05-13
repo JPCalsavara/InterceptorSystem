@@ -1,0 +1,5 @@
+src/app/pages/dashboard/dashboard.component.spec.ts(137,5): error TS1109: Expression expected.
+src/app/pages/dashboard/dashboard.component.spec.ts(154,3): error TS1128: Declaration or statement expected.
+src/app/pages/dashboard/dashboard.component.spec.ts(154,4): error TS1128: Declaration or statement expected.
+src/app/pages/dashboard/dashboard.component.spec.ts(517,1): error TS1128: Declaration or statement expected.
+src/app/pages/dashboard/dashboard.component.spec.ts(517,2): error TS1128: Declaration or statement expected.

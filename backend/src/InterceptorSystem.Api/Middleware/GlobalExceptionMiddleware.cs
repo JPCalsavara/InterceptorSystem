@@ -55,12 +55,18 @@ public class GlobalExceptionMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        var response = JsonSerializer.Serialize(new
+        var domainEx = exception as DomainException;
+        var traceId = context.TraceIdentifier;
+        var responseObj = new
         {
             error = message,
+            errorCode = domainEx?.ErrorCode,
+            timestamp = DateTime.UtcNow.ToString("o"),
+            traceId,
             statusCode = (int)statusCode
-        });
+        };
 
+        var response = JsonSerializer.Serialize(responseObj);
         await context.Response.WriteAsync(response);
     }
 }

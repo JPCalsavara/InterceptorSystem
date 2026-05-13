@@ -30,9 +30,10 @@ import { AuthService } from '../../services/auth.service';
               id="email"
               type="email"
               formControlName="email"
+              data-testid="login-email"
               [class.input-error]="hasError('email')"
-              placeholder="sua@empresa.com"
-              autocomplete="email"
+              placeholder="seu@email.com"
+              autocomplete="username"
             />
             @if (hasError('email')) {
               <span class="field-error">{{ getErrorMessage('email') }}</span>
@@ -46,8 +47,9 @@ import { AuthService } from '../../services/auth.service';
                 id="senha"
                 [type]="mostrarSenha() ? 'text' : 'password'"
                 formControlName="senha"
+                data-testid="login-password"
                 [class.input-error]="hasError('senha')"
-                placeholder="••••••••"
+                placeholder="Sua senha segura"
                 autocomplete="current-password"
               />
               <button
@@ -77,7 +79,13 @@ import { AuthService } from '../../services/auth.service';
             <div class="error-message">{{ erro() }}</div>
           }
 
-          <button type="submit" class="btn-primary btn-lg" [disabled]="carregando()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2);">
+          <button
+            type="submit"
+            class="btn-primary btn-lg"
+            data-testid="login-submit"
+            [disabled]="carregando()"
+            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-1);"
+          >
             @if (carregando()) {
               <span class="spinner"></span> Entrando...
             } @else {

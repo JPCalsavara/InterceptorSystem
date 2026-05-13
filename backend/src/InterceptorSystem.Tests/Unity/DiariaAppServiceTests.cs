@@ -52,10 +52,10 @@ public class DiariaAppServiceTests
     private void ConfigurarMocksBasicos(Guid empresaId, Funcionario funcionario, Alocacao alocacao)
     {
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacao.Id)).ReturnsAsync(alocacao);
-        _diariaRepo.Setup(r => r.ExisteDiariaNaDataAsync(funcionario.Id, It.IsAny<DateOnly>(), null)).ReturnsAsync(false);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>())).ReturnsAsync(funcionario);
+        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacao.Id, It.IsAny<CancellationToken>())).ReturnsAsync(alocacao);
+        _diariaRepo.Setup(r => r.ExisteDiariaNaDataAsync(funcionario.Id, It.IsAny<DateOnly>(), null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
     }
 
     [Fact(DisplayName = "CreateAsync - Sucesso quando dados válidos")]
@@ -86,7 +86,7 @@ public class DiariaAppServiceTests
         var alocacaoId = Guid.NewGuid();
         var input = CriarInputValido(funcionarioId, alocacaoId);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionarioId)).ReturnsAsync((Funcionario?)null);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionarioId, It.IsAny<CancellationToken>())).ReturnsAsync((Funcionario?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
     }
@@ -100,8 +100,8 @@ public class DiariaAppServiceTests
         var alocacaoId = Guid.NewGuid();
         var input = CriarInputValido(funcionario.Id, alocacaoId);
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacaoId)).ReturnsAsync((Alocacao?)null);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>())).ReturnsAsync(funcionario);
+        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacaoId, It.IsAny<CancellationToken>())).ReturnsAsync((Alocacao?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
     }
@@ -130,9 +130,9 @@ public class DiariaAppServiceTests
         var input = new CreateDiariaDtoInput(funcionario.Id, alocacao.Id, data, StatusDiaria.CONFIRMADA, TipoDiaria.REGULAR);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacao.Id)).ReturnsAsync(alocacao);
-        _diariaRepo.Setup(r => r.ExisteDiariaNaDataAsync(funcionario.Id, data, null)).ReturnsAsync(true);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>())).ReturnsAsync(funcionario);
+        _alocacaoRepo.Setup(r => r.GetByIdAsync(alocacao.Id, It.IsAny<CancellationToken>())).ReturnsAsync(alocacao);
+        _diariaRepo.Setup(r => r.ExisteDiariaNaDataAsync(funcionario.Id, data, null, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         Assert.Contains("Funcionário já possui diária neste período", exception.Message);
@@ -143,7 +143,7 @@ public class DiariaAppServiceTests
     {
         var id = Guid.NewGuid();
         var input = new UpdateDiariaDtoInput(StatusDiaria.CANCELADA, TipoDiaria.SUBSTITUICAO);
-        _diariaRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Diaria?)null);
+        _diariaRepo.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Diaria?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, input));
     }
@@ -157,8 +157,8 @@ public class DiariaAppServiceTests
         var input = new UpdateDiariaDtoInput(StatusDiaria.CANCELADA, TipoDiaria.SUBSTITUICAO);
         var diariaExistente = new Diaria(Guid.NewGuid(), funcionarioId, alocacaoId, DateOnly.FromDateTime(DateTime.Today), 0m, StatusDiaria.CONFIRMADA, TipoDiaria.REGULAR);
 
-        _diariaRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(diariaExistente);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _diariaRepo.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync(diariaExistente);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.UpdateAsync(id, input);
 
@@ -171,7 +171,7 @@ public class DiariaAppServiceTests
     public async Task DeleteAsync_DeveFalhar_QuandoNaoExiste()
     {
         var id = Guid.NewGuid();
-        _diariaRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Diaria?)null);
+        _diariaRepo.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Diaria?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(id));
     }
@@ -185,9 +185,9 @@ public class DiariaAppServiceTests
             new Diaria(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), 0m, StatusDiaria.CONFIRMADA, TipoDiaria.REGULAR),
             new Diaria(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), 0m, StatusDiaria.CANCELADA, TipoDiaria.SUBSTITUICAO)
         };
-        _diariaRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
+        _diariaRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(lista);
 
-        var result = await _service.GetAllAsync();
+        var result = await _service.GetAllAsync(It.IsAny<CancellationToken>());
 
         Assert.Equal(2, result.Count());
     }
@@ -198,8 +198,8 @@ public class DiariaAppServiceTests
         var empresaId = Guid.NewGuid();
         var diaria = CriarDiaria(empresaId, Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Today), TipoDiaria.REGULAR);
 
-        _diariaRepo.Setup(r => r.GetByIdAsync(diaria.Id)).ReturnsAsync(diaria);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _diariaRepo.Setup(r => r.GetByIdAsync(diaria.Id, It.IsAny<CancellationToken>())).ReturnsAsync(diaria);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         await _service.UpdateStatusAsync(diaria.Id, StatusDiaria.CANCELADA);
 
@@ -210,7 +210,7 @@ public class DiariaAppServiceTests
     public async Task UpdateStatusAsync_DeveFalhar_QuandoNaoExiste()
     {
         var id = Guid.NewGuid();
-        _diariaRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Diaria?)null);
+        _diariaRepo.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Diaria?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateStatusAsync(id, StatusDiaria.CANCELADA));
     }

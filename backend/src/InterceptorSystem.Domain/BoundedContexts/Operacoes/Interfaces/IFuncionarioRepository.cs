@@ -5,7 +5,7 @@ namespace InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 
 public interface IFuncionarioRepository : IRepository<Funcionario>
 {
-    Task<Funcionario?> GetByCpfAsync(string cpf);
-    Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId);
+    Task<Funcionario?> GetByCpfAsync(string cpf, CancellationToken ct = default);
+    Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId, CancellationToken ct = default);
 }
 

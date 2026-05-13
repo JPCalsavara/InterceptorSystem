@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { provideRouter } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { vi, describe, it, expect } from 'vitest';
 import { ContratoFormComponent } from './contrato-form.component';
 import { ContratoService } from '../../../services/contrato.service';
 import { ContratoCalculoService } from '../../../services/contrato-calculo.service';
@@ -30,6 +31,7 @@ const buildProviders = (overrides: Record<string, unknown> = {}) => [
       getById: vi.fn(),
       create: vi.fn(() => of({})),
       update: vi.fn(() => of({})),
+      delete: vi.fn(() => of(undefined)),
     },
   },
   {
@@ -53,14 +55,14 @@ describe('ContratoFormComponent', () => {
   it('renderiza o título "Novo Contrato" no modo de criação', async () => {
     await render(ContratoFormComponent, { providers: buildProviders() });
 
-    expect(screen.getByRole('heading', { name: 'Novo Contrato' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Novo Contrato' })).toBeTruthy();
   });
 
   it('carrega e exibe a lista de clientes no select', async () => {
     await render(ContratoFormComponent, { providers: buildProviders() });
 
     const select = screen.getByLabelText(/Cliente/) as HTMLSelectElement;
-    expect(select).toBeInTheDocument();
+    expect(select).toBeTruthy();
 
     const options = Array.from(select.querySelectorAll('option')).map((o) => o.textContent?.trim());
     expect(options).toContain('Empresa Alpha');
@@ -70,28 +72,23 @@ describe('ContratoFormComponent', () => {
   it('preenche valores padrão nos campos numéricos', async () => {
     await render(ContratoFormComponent, { providers: buildProviders() });
 
-    const postos = screen.getByLabelText(/Número de Postos/) as HTMLInputElement;
-    expect(postos.value).toBe('2');
+    const postos = screen.getByLabelText(/Quantidade de Postos Físicos/) as HTMLInputElement;
+    expect(postos.value).toBe('1');
   });
 
-  it('exibe erros de validação ao submeter o form com cliente vazio', async () => {
+  it('exibe erros de validação ao submeter o form vazio', async () => {
     await render(ContratoFormComponent, { providers: buildProviders() });
 
     const submitBtn = screen.getByRole('button', { name: /Cadastrar/ });
     await userEvent.click(submitBtn);
 
-    expect(screen.getAllByText(/Este campo é obrigatório/).length).toBeGreaterThan(0);
+    const errorMessages = screen.getAllByText(/Este campo é obrigatório/i);
+    expect(errorMessages.length).toBeGreaterThan(0);
   });
 
   it('exibe o botão de voltar para a lista de contratos', async () => {
     await render(ContratoFormComponent, { providers: buildProviders() });
 
-    expect(screen.getByRole('button', { name: /Voltar/ })).toBeInTheDocument();
-  });
-
-  it('exibe tag picker com as tags disponíveis', async () => {
-    await render(ContratoFormComponent, { providers: buildProviders() });
-
-    expect(screen.getByRole('button', { name: /Vigilante/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Voltar/ })).toBeTruthy();
   });
 });

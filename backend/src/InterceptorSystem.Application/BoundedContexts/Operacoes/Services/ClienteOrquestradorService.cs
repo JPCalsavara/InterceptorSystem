@@ -31,11 +31,11 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
         _clienteRepository = clienteRepository;
     }
 
-    public async Task<ClienteCompletoDtoOutput> CriarClienteCompletoAsync(CreateClienteCompletoDtoInput input)
+    public async Task<ClienteCompletoDtoOutput> CriarClienteCompletoAsync(CreateClienteCompletoDtoInput input, CancellationToken ct = default)
     {
         _ = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
-        var (valido, mensagemErro) = await ValidarCriacaoCompletaAsync(input);
+        var (valido, mensagemErro) = await ValidarCriacaoCompletaAsync(input, ct);
         if (!valido) throw new InvalidOperationException(mensagemErro);
 
         var unitOfWork = _clienteRepository.UnitOfWork;
@@ -60,7 +60,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
                 input.Contrato.DataInicio,
                 input.Contrato.DataFim,
                 input.Contrato.Status,
-                    input.Contrato.Tags?.ToList(),
+                input.Contrato.Tags?.ToList(),
                 input.Contrato.ValorDiariaVigilante
             );
 
@@ -159,7 +159,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
         }
     }
 
-    public Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateClienteCompletoDtoInput input)
+    public Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateClienteCompletoDtoInput input, CancellationToken ct = default)
     {
         var hoje = DateOnly.FromDateTime(DateTime.Today);
         if (input.Contrato.DataInicio < hoje)

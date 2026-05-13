@@ -1,0 +1,1441 @@
+
+> frontend@0.0.0 test
+> ng test --watch=false
+
+❯ Building...
+✔ Building...
+Initial chunk files                                                      | Names                                                                 |  Raw size
+spec-app-features-contratos-contrato-detail-contrato-detail.component.js | spec-app-features-contratos-contrato-detail-contrato-detail.component | 175.51 kB | 
+spec-app-features-contratos-contrato-form-contrato-form.component.js     | spec-app-features-contratos-contrato-form-contrato-form.component     | 150.45 kB | 
+spec-app-pages-dashboard-dashboard.component.js                          | spec-app-pages-dashboard-dashboard.component                          | 150.38 kB | 
+spec-app-features-contratos-contrato-list-contrato-list.component.js     | spec-app-features-contratos-contrato-list-contrato-list.component     |  96.74 kB | 
+spec-app-features-tags-tag-list-tag-list.component.js                    | spec-app-features-tags-tag-list-tag-list.component                    |  60.84 kB | 
+styles.css                                                               | styles                                                                |  32.01 kB | 
+chunk-VBNSR6IQ.js                                                        | -                                                                     |  17.59 kB | 
+spec-app-services-auth.service.js                                        | spec-app-services-auth.service                                        |   8.25 kB | 
+chunk-ENZ4CWWK.js                                                        | -                                                                     |   8.07 kB | 
+chunk-YXJMCAYO.js                                                        | -                                                                     |   5.31 kB | 
+chunk-A44TLS2P.js                                                        | -                                                                     |   4.74 kB | 
+spec-app-shared-components-tag-picker-tag-picker.component.js            | spec-app-shared-components-tag-picker-tag-picker.component            |   4.49 kB | 
+spec-app-services-contrato.service.js                                    | spec-app-services-contrato.service                                    |   4.14 kB | 
+spec-app-services-diaria.service.js                                      | spec-app-services-diaria.service                                      |   3.96 kB | 
+spec-app-services-cliente.service.js                                     | spec-app-services-cliente.service                                     |   3.77 kB | 
+spec-app-services-funcionario.service.js                                 | spec-app-services-funcionario.service                                 |   3.48 kB | 
+spec-app-services-posto.service.js                                       | spec-app-services-posto.service                                       |   3.12 kB | 
+spec-app-shared-helpers-contrato-calculo.helper.js                       | spec-app-shared-helpers-contrato-calculo.helper                       |   2.97 kB | 
+spec-app-services-tag.service.js                                         | spec-app-services-tag.service                                         |   2.93 kB | 
+chunk-7FJQOHBQ.js                                                        | -                                                                     |   2.86 kB | 
+spec-app-services-alocacao.service.js                                    | spec-app-services-alocacao.service                                    |   2.83 kB | 
+chunk-ZF5FSE4V.js                                                        | -                                                                     |   2.82 kB | 
+spec-app-services-entity-cache-coordinator.service.js                    | spec-app-services-entity-cache-coordinator.service                    |   2.56 kB | 
+chunk-ZMQ3RWDO.js                                                        | -                                                                     |   2.51 kB | 
+chunk-LLFWUWTB.js                                                        | -                                                                     |   2.37 kB | 
+chunk-CB6DBKXB.js                                                        | -                                                                     |   2.27 kB | 
+chunk-PGPMFGQH.js                                                        | -                                                                     |   2.22 kB | 
+chunk-DM5QS3SY.js                                                        | -                                                                     |   2.13 kB | 
+spec-app-app.js                                                          | spec-app-app                                                          |   2.12 kB | 
+chunk-L2IC2CS6.js                                                        | -                                                                     |   1.99 kB | 
+chunk-4O5EHUEN.js                                                        | -                                                                     |   1.74 kB | 
+chunk-HNP7MONP.js                                                        | -                                                                     |   1.68 kB | 
+init-testbed.js                                                          | init-testbed                                                          |   1.20 kB | 
+chunk-DDE4NLQV.js                                                        | -                                                                     | 178 bytes | 
+
+                                                                         | Initial total                                                         | 770.20 kB
+
+Application bundle generation complete. [9.492 seconds] - 2026-05-13T00:45:57.429Z
+
+
+ RUN  v4.0.16 /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend
+
+ ✓ |frontend| src/app/services/entity-cache-coordinator.service.spec.ts (4 tests) 26ms
+ ✓ |frontend| src/app/services/cliente.service.spec.ts (6 tests) 156ms
+ ✓ |frontend| src/app/services/alocacao.service.spec.ts (3 tests) 148ms
+ ✓ |frontend| src/app/services/contrato.service.spec.ts (6 tests) 211ms
+ ✓ |frontend| src/app/services/posto.service.spec.ts (5 tests) 56ms
+ ✓ |frontend| src/app/services/diaria.service.spec.ts (6 tests) 170ms
+ ✓ |frontend| src/app/app.spec.ts (1 test) 241ms
+ ✓ |frontend| src/app/services/auth.service.spec.ts (10 tests) 157ms
+ ✓ |frontend| src/app/services/tag.service.spec.ts (5 tests) 45ms
+ ✓ |frontend| src/app/services/funcionario.service.spec.ts (5 tests) 108ms
+ ✓ |frontend| src/app/shared/helpers/contrato-calculo.helper.spec.ts (7 tests) 6ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > renderiza o título "Novo Contrato" no modo de criação
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+stderr | src/app/features/tags/tag-list/tag-list.component.spec.ts > TagListComponent > exibe mensagem de erro quando o serviço falha
+Error: Erro de servidor
+    at /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.spec.ts:43:44
+    at Observable.init [as _subscribe] (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/observable/throwError.js:8:64)
+    at Observable._trySubscribe (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:41:25)
+    at /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:35:31
+    at Object.errorContext (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/util/errorContext.js:22:9)
+    at Observable.subscribe (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:26:24)
+    at _TagListComponent.loadTags (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.ts:56:27)
+    at _TagListComponent.ngOnInit (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.ts:46:10)
+    at callHookInternal (file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > carrega e exibe a lista de clientes no select
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts (10 tests | 6 failed) 1311ms
+     × renderiza os botões de seleção para cada tag 284ms
+     × permite buscar tags por nome 49ms
+     × exibe mensagem quando nenhuma tag é encontrada 36ms
+     × abre e fecha o dropdown ao focar/desfocar 33ms
+     × permite selecionar múltiplas tags e exibe-as no input 27ms
+     × permite remover uma tag selecionada ao clicar no "X" 20ms
+     ✓ emite selectionChange removendo ao clicar em tag já selecionada  469ms
+     ✓ não emite selectionChange em tag travada 196ms
+     ✓ não emite selectionChange quando disabled 136ms
+     ✓ usa label customizado quando fornecido 59ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > preenche valores padrão nos campos numéricos
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe erros de validação ao submeter o form com cliente vazio
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts (5 tests | 2 failed) 2506ms
+     ✓ renderiza a lista de tags carregadas  431ms
+     × exibe o contador de resultados correto 127ms
+     ✓ exibe mensagem de erro quando o serviço falha 79ms
+     × abre o modal de criação ao clicar em "+ Nova Tag" 1731ms
+     ✓ chama service.delete ao confirmar exclusão 136ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe o botão de voltar para a lista de contratos
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/features/contratos/contrato-form/contrato-form.component.spec.ts (5 tests | 1 failed) 2854ms
+     ✓ renderiza o título "Novo Contrato" no modo de criação  967ms
+     ✓ carrega e exibe a lista de clientes no select 270ms
+     ✓ preenche valores padrão nos campos numéricos  411ms
+     × exibe erros de validação ao submeter o form com cliente vazio 791ms
+     ✓ exibe o botão de voltar para a lista de contratos  413ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/pages/dashboard/dashboard.component.spec.ts [ src/app/pages/dashboard/dashboard.component.spec.ts ]
+Error: zone-testing.js is needed for the fakeAsync() test helper but could not be found.
+        Please make sure that your environment includes zone.js/testing
+ ❯ withFakeAsyncTestModule node_modules/@angular/core/fesm2022/testing.mjs:297:11
+ ❯ fakeAsync node_modules/@angular/core/fesm2022/testing.mjs:311:10
+ ❯ src/app/pages/dashboard/dashboard.component.spec.ts:163:49
+    161|     });
+    162| 
+    163|     it('deve carregar clientes ao inicializar', fakeAsync(() => {
+       |                                                 ^
+    164|       fixture.detectChanges();
+    165|       tick();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts [ src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts ]
+Error: zone-testing.js is needed for the fakeAsync() test helper but could not be found.
+        Please make sure that your environment includes zone.js/testing
+ ❯ withFakeAsyncTestModule node_modules/@angular/core/fesm2022/testing.mjs:297:11
+ ❯ fakeAsync node_modules/@angular/core/fesm2022/testing.mjs:311:10
+ ❯ src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts:97:34
+     95|   });
+     96| 
+     97|   it('should load data on init', fakeAsync(() => {
+       |                                  ^
+     98|     mockContratoService.delete.and.returnValue(of(undefined));
+     99|     mockContratoService.getById.and.returnValue(of(mockContrato as any…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts [ src/app/features/contratos/contrato-list/contrato-list.component.spec.ts ]
+Error: zone-testing.js is needed for the fakeAsync() test helper but could not be found.
+        Please make sure that your environment includes zone.js/testing
+ ❯ withFakeAsyncTestModule node_modules/@angular/core/fesm2022/testing.mjs:297:11
+ ❯ fakeAsync node_modules/@angular/core/fesm2022/testing.mjs:311:10
+ ❯ src/app/features/contratos/contrato-list/contrato-list.component.spec.ts:111:51
+    109|   });
+    110| 
+    111|   it('should call delete service when confirmed', fakeAsync(() => {
+       |                                                   ^
+    112|     spyOn(window, 'confirm').and.returnValue(true);
+    113|     mockContratoService.delete.and.returnValue(of(undefined));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe erros de validação ao submeter o form com cliente vazio
+TestingLibraryElementError: Unable to find an element with the text: /Selecione o cliente/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c1325333187[39m=[32m""[39m
+    [33mid[39m=[32m"root4"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+      [33mclass[39m=[32m"page-container form-page"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+        [33mclass[39m=[32m"page-header"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+          [33mclass[39m=[32m"header-content"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+            [33mclass[39m=[32m"btn-back"[39m
+            [33mrouterlink[39m=[32m"/contratos"[39m
+            [33mtabindex[39m=[32m"0"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mfill[39m=[32m"currentColor"[39m
+              [33mheight[39m=[32m"20"[39m
+              [33mviewBox[39m=[32m"0 0 20 20"[39m
+              [33mwidth[39m=[32m"20"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+                [33mclip-rule[39m=[32m"evenodd"[39m
+                [33md[39m=[32m"M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"[39m
+                [33mfill-rule[39m=[32m"evenodd"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0m Voltar [0m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+          [36m>[39m
+            [0mNovo Contrato[0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+            [33mclass[39m=[32m"subtitle"[39m
+          [36m>[39m
+            [0m Preencha os dados para cadastrar um novo contrato [0m
+          [36m</p>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<form[39m
+        [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+        [33mclass[39m=[32m"form-container ng-pristine ng-invalid ng-touched ng-submitted"[39m
+        [33mnovalidate[39m=[32m""[39m
+      [36m>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+          [33mclass[39m=[32m"form-card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+            [33mclass[39m=[32m"form-group"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mclass[39m=[32m"form-label"[39m
+              [33mfor[39m=[32m"clienteId"[39m
+            [36m>[39m
+              [0m Cliente [0m
+              [36m<span[39m
+                [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+                [33mclass[39m=[32m"required"[39m
+              [36m>[39m
+                [0m*[0m
+              [36m</span>[39m
+            [36m</label>[39m
+            [36m<select[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mclass[39m=[32m"form-input ng-pristine ng-invalid error ng-touched"[39m
+              [33mdata-testid[39m=[32m"contrato-cliente"[39m
+              [33mformcontrolname[39m=[32m"clienteId"[39m
+              [33mid[39m=[32m"clienteId"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mSelecione um cliente[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+                [33mvalue[39m=[32m"c1"[39m
+              [36m>[39m
+                [0mEmpresa Alpha[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+                [33mvalue[39m=[32m"c2"[39m
+              [36m>[39m
+                [0mEmpresa Beta[0m
+              [36m</option>[39m
+            [36m</select>[39m
+            [36m<span[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mclass[39m=[32m"error-message"[39m
+            [36m>[39m
+              [0mEste campo é obrigatório[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+            [33mclass[39m=[32m"form-group"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mclass[39m=[32m"form-label"[39m
+              [33mfor[39m=[32m"descricao"[39m
+            [36m>[39m
+              [0m Descrição [0m
+              [36m<span[39m
+                [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+                [33mclass[39m=[32m"required"[39m
+              [36m>[39m
+                [0m*[0m
+              [36m</span>[39m
+            [36m</label>[39m
+            [36m<textarea[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mclass[39m=[32m"form-input ng-pristine ng-invalid error ng-touched"[39m
+              [33mdata-testid[39m=[32m"contrato-titulo"[39m
+              [33mformcontrolname[39m=[32m"descricao"[39m
+              [33mid[39m=[32m"descricao"[39m
+              [33mplaceholder[39m=[32m"Ex: Contrato de prestação de serviços de vigilância"[39m
+              [33mrows[39m=[32m"3"[39m
+            [36m>[39m
+              [0m        [0m
+            [36m</textarea>[39m
+            [36m<span[39m
+              [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+              [33mclass[39m=[32m"error-message"[39m
+            [36m>[39m
+              [0mEste campo é obrigatório[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<h3[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+            [33mclass[39m=[32m"section-title"[39m
+          [36m>[39m
+            [0mTags e Precificação por Função[0m
+          [36m</h3>[39m
+          [36m<app-tag-picker[39m
+            [33m_ngcontent-a-c1325333187[39m=[32m""[39m
+            [33m_nghost-a-c3509680523[39m=[32m""[39m
+          [36m>[39m
+            [36m<div[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+              [33mclass[39m=[32m"tag-picker"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+                [33mclass[39m=[32m"picker-header"[39m
+              [36m>[39m
+                [36m<label[39m
+                  [33m_ngcontent-a-c350968052...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/features/contratos/contrato-form/contrato-form.component.spec.ts:86:19
+     84| 
+     85|     // O erro agora é "Selecione o cliente" e "Descrição é obrigatória…
+     86|     expect(screen.getByText(/Selecione o cliente/)).toBeTruthy();
+       |                   ^
+     87|   });
+     88| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts > TagListComponent > exibe o contador de resultados correto
+TestingLibraryElementError: Unable to find an element with the text: /Mostrando 2 de 2 tag/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c1875123719[39m=[32m""[39m
+    [33mid[39m=[32m"root1"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+      [33mclass[39m=[32m"page-container"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+        [33mclass[39m=[32m"page-header"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"header-content"[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"page-title-icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33md[39m=[32m"M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33mx1[39m=[32m"7"[39m
+                [33mx2[39m=[32m"7.01"[39m
+                [33my1[39m=[32m"7"[39m
+                [33my2[39m=[32m"7"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0m Tags / Funções [0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"subtitle"[39m
+          [36m>[39m
+            [0mGerencie as funções disponíveis para contratos e postos[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"btn-primary btn-md"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mviewBox[39m=[32m"0 0 20 20"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclip-rule[39m=[32m"evenodd"[39m
+              [33md[39m=[32m"M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"[39m
+              [33mfill-rule[39m=[32m"evenodd"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m Nova Tag [0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+        [33mclass[39m=[32m"filters-section"[39m
+      [36m>[39m
+        [36m<h3[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"filters-title"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"filters-title-icon"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mviewBox[39m=[32m"0 0 20 20"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclip-rule[39m=[32m"evenodd"[39m
+              [33md[39m=[32m"M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"[39m
+              [33mfill-rule[39m=[32m"evenodd"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m Filtros [0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"filters-grid tag-filters-grid"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"filter-group"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"filter-label"[39m
+              [33mfor[39m=[32m"filtroNome"[39m
+            [36m>[39m
+              [0mBuscar nome / descrição[0m
+            [36m</label>[39m
+            [36m<input[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"filter-select ng-untouched ng-pristine ng-valid"[39m
+              [33mid[39m=[32m"filtroNome"[39m
+              [33mplaceholder[39m=[32m"Ex: Supervisor, PM, Vigia..."[39m
+              [33mstyle[39m=[32m"background-image: none; padding-right: 0.875rem;"[39m
+              [33mtype[39m=[32m"text"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"filter-actions"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"btn-clear-filters"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33mfill[39m=[32m"currentColor"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mviewBox[39m=[32m"0 0 20 20"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                  [33mclip-rule[39m=[32m"evenodd"[39m
+                  [33md[39m=[32m"M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"[39m
+                  [33mfill-rule[39m=[32m"evenodd"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Limpar [0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"results-count"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [36m>[39m
+            [0mMostrando [0m
+            ...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/features/tags/tag-list/tag-list.component.spec.ts:38:19
+     36|   it('exibe o contador de resultados correto', async () => {
+     37|     await setup();
+     38|     expect(screen.getByText(/Mostrando 2 de 2 tag/)).toBeTruthy();
+       |                   ^
+     39|   });
+     40| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts > TagListComponent > abre o modal de criação ao clicar em "+ Nova Tag"
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/\+ Nova Tag/`
+
+Here are the accessible roles:
+
+  heading:
+
+  Name "Tags / Funções":
+  [36m<h1[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+  [36m/>[39m
+
+  Name "Filtros":
+  [36m<h3[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"filters-title"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"subtitle"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"no-descricao"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Nova Tag":
+  [36m<button[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"btn-primary btn-md"[39m
+  [36m/>[39m
+
+  Name "Limpar":
+  [36m<button[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"btn-clear-filters"[39m
+  [36m/>[39m
+
+  Name "Editar":
+  [36m<button[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"action-btn btn-icon btn-edit"[39m
+    [33mtitle[39m=[32m"Editar"[39m
+  [36m/>[39m
+
+  Name "Excluir":
+  [36m<button[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"action-btn btn-icon btn-danger"[39m
+    [33mtitle[39m=[32m"Excluir"[39m
+  [36m/>[39m
+
+  Name "Editar":
+  [36m<button[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"action-btn btn-icon btn-edit"[39m
+    [33mtitle[39m=[32m"Editar"[39m
+  [36m/>[39m
+
+  Name "Excluir":
+  [36m<button[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"action-btn btn-icon btn-danger"[39m
+    [33mtitle[39m=[32m"Excluir"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Buscar nome / descrição":
+  [36m<input[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+    [33mclass[39m=[32m"filter-select ng-untouched ng-pristine ng-valid"[39m
+    [33mid[39m=[32m"filtroNome"[39m
+    [33mplaceholder[39m=[32m"Ex: Supervisor, PM, Vigia..."[39m
+    [33mstyle[39m=[32m"background-image: none; padding-right: 0.875rem;"[39m
+    [33mtype[39m=[32m"text"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  strong:
+
+  Name "":
+  [36m<strong[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<strong[39m
+    [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c1875123719[39m=[32m""[39m
+    [33mid[39m=[32m"root3"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+      [33mclass[39m=[32m"page-container"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+        [33mclass[39m=[32m"page-header"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"header-content"[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"page-title-icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33md[39m=[32m"M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33mx1[39m=[32m"7"[39m
+                [33mx2[39m=[32m"7.01"[39m
+                [33my1[39m=[32m"7"[39m
+                [33my2[39m=[32m"7"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0m Tags / Funções [0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"subtitle"[39m
+          [36m>[39m
+            [0mGerencie as funções disponíveis para contratos e postos[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"btn-primary btn-md"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mviewBox[39m=[32m"0 0 20 20"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclip-rule[39m=[32m"evenodd"[39m
+              [33md[39m=[32m"M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"[39m
+              [33mfill-rule[39m=[32m"evenodd"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m Nova Tag [0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+        [33mclass[39m=[32m"filters-section"[39m
+      [36m>[39m
+        [36m<h3[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"filters-title"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"filters-title-icon"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mviewBox[39m=[32m"0 0 20 20"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclip-rule[39m=[32m"evenodd"[39m
+              [33md[39m=[32m"M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"[39m
+              [33mfill-rule[39m=[32m"evenodd"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m Filtros [0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"filters-grid tag-filters-grid"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"filter-group"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"filter-label"[39m
+              [33mfor[39m=[32m"filtroNome"[39m
+            [36m>[39m
+              [0mBuscar nome / descrição[0m
+            [36m</label>[39m
+            [36m<input[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"filter-select ng-untouched ng-pristine ng-valid"[39m
+              [33mid[39m=[32m"filtroNome"[39m
+              [33mplaceholder[39m=[32m"Ex: Supervisor, PM, Vigia..."[39m
+              [33mstyle[39m=[32m"background-image: none; padding-right: 0.875rem;"[39m
+              [33mtype[39m=[32m"text"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"filter-actions"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"btn-clear-filters"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33mfill[39m=[32m"currentColor"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mviewBox[39m=[32m"0 0 20 20"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                  [33mclip-rule[39m=[32m"evenodd"[39m
+                  [33md[39m=[32m"M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"[39m
+                  [33mfill-rule[39m=[32m"evenodd"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Limpar [0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"results-count"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [36m>[39m
+            [0mMostrando [0m
+            ...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/features/tags/tag-list/tag-list.component.spec.ts:50:34
+     48|   it('abre o modal de criação ao clicar em "+ Nova Tag"', async () => {
+     49|     await setup();
+     50|     await userEvent.click(screen.getByRole('button', { name: /\+ Nova …
+       |                                  ^
+     51|     expect(screen.getByRole('heading', { name: 'Nova Tag' })).toBeTrut…
+     52|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > renderiza os botões de seleção para cada tag
+TestingLibraryElementError: Unable to find an element with the text: Auxiliar. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c3509680523[39m=[32m""[39m
+    [33mid[39m=[32m"root0"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+      [33mclass[39m=[32m"tag-picker"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"picker-header"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"picker-label"[39m
+        [36m>[39m
+          [0mFunções[0m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<input[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"search-input ng-untouched ng-pristine ng-valid"[39m
+        [33mplaceholder[39m=[32m"Buscar por nome ou descrição..."[39m
+        [33mtype[39m=[32m"text"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"tag-list"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mVigilante[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mGuarda patrimonial[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mSupervisor[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mLíder de equipe[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mPorteiro[0m
+            [36m</strong>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:28:19
+     26|     expect(screen.getByText('Vigilante')).toBeTruthy();
+     27|     expect(screen.getByText('Supervisor')).toBeTruthy();
+     28|     expect(screen.getByText('Auxiliar')).toBeTruthy();
+       |                   ^
+     29|   });
+     30| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > permite buscar tags por nome
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /Buscar tag/
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c3509680523[39m=[32m""[39m
+    [33mid[39m=[32m"root1"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+      [33mclass[39m=[32m"tag-picker"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"picker-header"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"picker-label"[39m
+        [36m>[39m
+          [0mFunções[0m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<input[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"search-input ng-untouched ng-pristine ng-valid"[39m
+        [33mplaceholder[39m=[32m"Buscar por nome ou descrição..."[39m
+        [33mtype[39m=[32m"text"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"tag-list"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mVigilante[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mGuarda patrimonial[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mSupervisor[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mLíder de equipe[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mPorteiro[0m
+            [36m</strong>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:33:26
+     31|   it('permite buscar tags por nome', async () => {
+     32|     await setup();
+     33|     const input = screen.getByPlaceholderText(/Buscar tag/);
+       |                          ^
+     34|     await userEvent.type(input, 'vigilante');
+     35| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > exibe mensagem quando nenhuma tag é encontrada
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /Buscar tag/
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c3509680523[39m=[32m""[39m
+    [33mid[39m=[32m"root2"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+      [33mclass[39m=[32m"tag-picker"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"picker-header"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"picker-label"[39m
+        [36m>[39m
+          [0mFunções[0m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<input[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"search-input ng-untouched ng-pristine ng-valid"[39m
+        [33mplaceholder[39m=[32m"Buscar por nome ou descrição..."[39m
+        [33mtype[39m=[32m"text"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"tag-list"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mVigilante[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mGuarda patrimonial[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mSupervisor[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mLíder de equipe[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mPorteiro[0m
+            [36m</strong>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:42:26
+     40|   it('exibe mensagem quando nenhuma tag é encontrada', async () => {
+     41|     await setup();
+     42|     const input = screen.getByPlaceholderText(/Buscar tag/);
+       |                          ^
+     43|     await userEvent.type(input, 'inexistente');
+     44| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > abre e fecha o dropdown ao focar/desfocar
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /Buscar tag/
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c3509680523[39m=[32m""[39m
+    [33mid[39m=[32m"root3"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+      [33mclass[39m=[32m"tag-picker"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"picker-header"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"picker-label"[39m
+        [36m>[39m
+          [0mFunções[0m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<input[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"search-input ng-untouched ng-pristine ng-valid"[39m
+        [33mplaceholder[39m=[32m"Buscar por nome ou descrição..."[39m
+        [33mtype[39m=[32m"text"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"tag-list"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mVigilante[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mGuarda patrimonial[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mSupervisor[0m
+            [36m</strong>[39m
+            [36m<small[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mLíder de equipe[0m
+            [36m</small>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"tag-option"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"check"[39m
+          [36m>[39m
+            [0m[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [33mclass[39m=[32m"content"[39m
+          [36m>[39m
+            [36m<strong[39m
+              [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+            [36m>[39m
+              [0mPorteiro[0m
+            [36m</strong>[39m
+          [36m</span>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:50:26
+     48|   it('abre e fecha o dropdown ao focar/desfocar', async () => {
+     49|     await setup();
+     50|     const input = screen.getByPlaceholderText(/Buscar tag/);
+       |                          ^
+     51| 
+     52|     await userEvent.click(input);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > permite selecionar múltiplas tags e exibe-as no input
+Error: NG0303: Can't set value of the 'tagsSelected' input on the '_TagPickerComponent' component. Make sure that the 'tagsSelected' property is declared as an input using the input() or model() function or the @Input() decorator.
+ ❯ reportUnknownPropertyError node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:2830:11
+ ❯ ComponentRef.setInput node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:8422:7
+ ❯ setComponentInputs node_modules/@testing-library/angular/fesm2022/testing-library-angular.mjs:300:30
+ ❯ renderFixture node_modules/@testing-library/angular/fesm2022/testing-library-angular.mjs:152:13
+ ❯ render node_modules/@testing-library/angular/fesm2022/testing-library-angular.mjs:176:21
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:61:5
+     59|   it('permite selecionar múltiplas tags e exibe-as no input', async ()…
+     60|     const onTagsSelected = vi.fn();
+     61|     await setup({ tagsSelected: onTagsSelected });
+       |     ^
+     62| 
+     63|     await userEvent.click(screen.getByPlaceholderText(/Buscar tag/));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > permite remover uma tag selecionada ao clicar no "X"
+Error: NG0303: Can't set value of the 'tagsSelected' input on the '_TagPickerComponent' component. Make sure that the 'tagsSelected' property is declared as an input using the input() or model() function or the @Input() decorator.
+ ❯ reportUnknownPropertyError node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:2830:11
+ ❯ ComponentRef.setInput node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:8422:7
+ ❯ setComponentInputs node_modules/@testing-library/angular/fesm2022/testing-library-angular.mjs:300:30
+ ❯ renderFixture node_modules/@testing-library/angular/fesm2022/testing-library-angular.mjs:152:13
+ ❯ render node_modules/@testing-library/angular/fesm2022/testing-library-angular.mjs:176:21
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:79:25
+     77|   it('permite remover uma tag selecionada ao clicar no "X"', async () …
+     78|     const onTagsSelected = vi.fn();
+     79|     const { fixture } = await setup({
+       |                         ^
+     80|       tagsSelected: onTagsSelected,
+     81|       initialTags: [mockTags[0]],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  6 failed | 11 passed (17)
+      Tests  9 failed | 69 passed (78)
+   Start at  21:45:57
+   Duration  9.02s (transform 3.14s, setup 11.29s, import 5.51s, tests 8.00s, environment 38.28s)
+

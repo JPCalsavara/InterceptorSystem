@@ -71,6 +71,7 @@
       <select
         id="funcionarioId"
         formControlName="funcionarioId"
+        data-testid="diaria-funcionario"
         class="form-control"
         [class.error]="hasError('funcionarioId')"
       >
@@ -99,6 +100,7 @@
       <select
         id="alocacaoId"
         formControlName="alocacaoId"
+        data-testid="diaria-alocacao"
         class="form-control"
         [class.error]="hasError('alocacaoId')"
       >
@@ -128,6 +130,7 @@
         type="date"
         id="data"
         formControlName="data"
+        data-testid="diaria-data"
         class="form-control"
         [class.error]="hasError('data')"
       />
@@ -151,6 +154,7 @@
       <select
         id="statusDiaria"
         formControlName="statusDiaria"
+        data-testid="diaria-status"
         class="form-control"
         [class.error]="hasError('statusDiaria')"
       >
@@ -198,7 +202,7 @@
       <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
         Cancelar
       </button>
-      <button type="submit" class="btn-primary" [disabled]="loading() || form.invalid">
+      <button type="submit" class="btn-primary" [disabled]="loading() || form.invalid" data-testid="btn-save-diaria">
         @if (loading()) {
           <span class="spinner-small"></span>
           Salvando...

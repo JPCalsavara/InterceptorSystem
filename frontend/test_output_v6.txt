@@ -1,0 +1,530 @@
+
+> frontend@0.0.0 test
+> ng test --watch=false
+
+❯ Building...
+✔ Building...
+Initial chunk files                                                      | Names                                                                 |  Raw size
+spec-app-features-contratos-contrato-detail-contrato-detail.component.js | spec-app-features-contratos-contrato-detail-contrato-detail.component | 175.51 kB | 
+spec-app-features-contratos-contrato-form-contrato-form.component.js     | spec-app-features-contratos-contrato-form-contrato-form.component     | 150.50 kB | 
+spec-app-pages-dashboard-dashboard.component.js                          | spec-app-pages-dashboard-dashboard.component                          | 150.38 kB | 
+spec-app-features-contratos-contrato-list-contrato-list.component.js     | spec-app-features-contratos-contrato-list-contrato-list.component     |  96.74 kB | 
+spec-app-features-tags-tag-list-tag-list.component.js                    | spec-app-features-tags-tag-list-tag-list.component                    |  60.88 kB | 
+styles.css                                                               | styles                                                                |  32.01 kB | 
+chunk-VBNSR6IQ.js                                                        | -                                                                     |  17.59 kB | 
+spec-app-services-auth.service.js                                        | spec-app-services-auth.service                                        |   8.25 kB | 
+chunk-ENZ4CWWK.js                                                        | -                                                                     |   8.07 kB | 
+chunk-YXJMCAYO.js                                                        | -                                                                     |   5.31 kB | 
+chunk-A44TLS2P.js                                                        | -                                                                     |   4.74 kB | 
+spec-app-services-contrato.service.js                                    | spec-app-services-contrato.service                                    |   4.14 kB | 
+spec-app-services-diaria.service.js                                      | spec-app-services-diaria.service                                      |   3.96 kB | 
+spec-app-services-cliente.service.js                                     | spec-app-services-cliente.service                                     |   3.77 kB | 
+spec-app-services-funcionario.service.js                                 | spec-app-services-funcionario.service                                 |   3.48 kB | 
+spec-app-services-posto.service.js                                       | spec-app-services-posto.service                                       |   3.12 kB | 
+spec-app-shared-components-tag-picker-tag-picker.component.js            | spec-app-shared-components-tag-picker-tag-picker.component            |   3.05 kB | 
+spec-app-shared-helpers-contrato-calculo.helper.js                       | spec-app-shared-helpers-contrato-calculo.helper                       |   2.97 kB | 
+spec-app-services-tag.service.js                                         | spec-app-services-tag.service                                         |   2.93 kB | 
+chunk-7FJQOHBQ.js                                                        | -                                                                     |   2.86 kB | 
+spec-app-services-alocacao.service.js                                    | spec-app-services-alocacao.service                                    |   2.83 kB | 
+chunk-ZF5FSE4V.js                                                        | -                                                                     |   2.82 kB | 
+spec-app-services-entity-cache-coordinator.service.js                    | spec-app-services-entity-cache-coordinator.service                    |   2.56 kB | 
+chunk-ZMQ3RWDO.js                                                        | -                                                                     |   2.51 kB | 
+chunk-LLFWUWTB.js                                                        | -                                                                     |   2.37 kB | 
+chunk-CB6DBKXB.js                                                        | -                                                                     |   2.27 kB | 
+chunk-PGPMFGQH.js                                                        | -                                                                     |   2.22 kB | 
+chunk-DM5QS3SY.js                                                        | -                                                                     |   2.13 kB | 
+spec-app-app.js                                                          | spec-app-app                                                          |   2.12 kB | 
+chunk-L2IC2CS6.js                                                        | -                                                                     |   1.99 kB | 
+chunk-4O5EHUEN.js                                                        | -                                                                     |   1.74 kB | 
+chunk-HNP7MONP.js                                                        | -                                                                     |   1.68 kB | 
+init-testbed.js                                                          | init-testbed                                                          |   1.20 kB | 
+chunk-DDE4NLQV.js                                                        | -                                                                     | 178 bytes | 
+
+                                                                         | Initial total                                                         | 768.85 kB
+
+Application bundle generation complete. [8.777 seconds] - 2026-05-13T00:47:51.610Z
+
+
+ RUN  v4.0.16 /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend
+
+ ✓ |frontend| src/app/app.spec.ts (1 test) 255ms
+ ✓ |frontend| src/app/services/contrato.service.spec.ts (6 tests) 144ms
+ ✓ |frontend| src/app/services/tag.service.spec.ts (5 tests) 76ms
+ ✓ |frontend| src/app/services/auth.service.spec.ts (10 tests) 196ms
+ ✓ |frontend| src/app/services/cliente.service.spec.ts (6 tests) 142ms
+ ✓ |frontend| src/app/services/diaria.service.spec.ts (6 tests) 66ms
+ ✓ |frontend| src/app/services/alocacao.service.spec.ts (3 tests) 47ms
+ ✓ |frontend| src/app/services/funcionario.service.spec.ts (5 tests) 50ms
+ ✓ |frontend| src/app/services/entity-cache-coordinator.service.spec.ts (4 tests) 8ms
+ ✓ |frontend| src/app/shared/helpers/contrato-calculo.helper.spec.ts (7 tests) 9ms
+ ✓ |frontend| src/app/services/posto.service.spec.ts (5 tests) 47ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > renderiza o título "Novo Contrato" no modo de criação
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+stderr | src/app/features/tags/tag-list/tag-list.component.spec.ts > TagListComponent > exibe mensagem de erro quando o serviço falha
+Error: Erro de servidor
+    at /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.spec.ts:44:44
+    at Observable.init [as _subscribe] (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/observable/throwError.js:8:64)
+    at Observable._trySubscribe (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:41:25)
+    at /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:35:31
+    at Object.errorContext (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/util/errorContext.js:22:9)
+    at Observable.subscribe (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:26:24)
+    at _TagListComponent.loadTags (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.ts:56:27)
+    at _TagListComponent.ngOnInit (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.ts:46:10)
+    at callHookInternal (file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > carrega e exibe a lista de clientes no select
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > preenche valores padrão nos campos numéricos
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts (7 tests | 2 failed) 1776ms
+     ✓ renderiza os botões de seleção para cada tag  355ms
+     ✓ permite buscar tags por nome  623ms
+     × exibe mensagem quando nenhuma tag é encontrada 200ms
+     ✓ abre e fecha o dropdown ao focar/desfocar 89ms
+     × permite selecionar múltiplas tags e emite evento 153ms
+     ✓ não emite selectionChange em tag travada 228ms
+     ✓ não emite selectionChange quando disabled 120ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe erros de validação ao submeter o form vazio
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts (5 tests | 1 failed) 1825ms
+     ✓ renderiza a lista de tags carregadas  681ms
+     × exibe o contador de resultados correto 256ms
+     ✓ exibe mensagem de erro quando o serviço falha 110ms
+     ✓ abre o modal de criação ao clicar em "Nova Tag"  720ms
+     ✓ chama service.delete ao confirmar exclusão 52ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe o botão de voltar para a lista de contratos
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ✓ |frontend| src/app/features/contratos/contrato-form/contrato-form.component.spec.ts (5 tests) 2263ms
+     ✓ renderiza o título "Novo Contrato" no modo de criação  1297ms
+     ✓ exibe erros de validação ao submeter o form vazio  320ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/pages/dashboard/dashboard.component.spec.ts [ src/app/pages/dashboard/dashboard.component.spec.ts ]
+Error: zone-testing.js is needed for the fakeAsync() test helper but could not be found.
+        Please make sure that your environment includes zone.js/testing
+ ❯ withFakeAsyncTestModule node_modules/@angular/core/fesm2022/testing.mjs:297:11
+ ❯ fakeAsync node_modules/@angular/core/fesm2022/testing.mjs:311:10
+ ❯ src/app/pages/dashboard/dashboard.component.spec.ts:163:49
+    161|     });
+    162| 
+    163|     it('deve carregar clientes ao inicializar', fakeAsync(() => {
+       |                                                 ^
+    164|       fixture.detectChanges();
+    165|       tick();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts [ src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts ]
+Error: zone-testing.js is needed for the fakeAsync() test helper but could not be found.
+        Please make sure that your environment includes zone.js/testing
+ ❯ withFakeAsyncTestModule node_modules/@angular/core/fesm2022/testing.mjs:297:11
+ ❯ fakeAsync node_modules/@angular/core/fesm2022/testing.mjs:311:10
+ ❯ src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts:97:34
+     95|   });
+     96| 
+     97|   it('should load data on init', fakeAsync(() => {
+       |                                  ^
+     98|     mockContratoService.delete.and.returnValue(of(undefined));
+     99|     mockContratoService.getById.and.returnValue(of(mockContrato as any…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts [ src/app/features/contratos/contrato-list/contrato-list.component.spec.ts ]
+Error: zone-testing.js is needed for the fakeAsync() test helper but could not be found.
+        Please make sure that your environment includes zone.js/testing
+ ❯ withFakeAsyncTestModule node_modules/@angular/core/fesm2022/testing.mjs:297:11
+ ❯ fakeAsync node_modules/@angular/core/fesm2022/testing.mjs:311:10
+ ❯ src/app/features/contratos/contrato-list/contrato-list.component.spec.ts:111:51
+    109|   });
+    110| 
+    111|   it('should call delete service when confirmed', fakeAsync(() => {
+       |                                                   ^
+    112|     spyOn(window, 'confirm').and.returnValue(true);
+    113|     mockContratoService.delete.and.returnValue(of(undefined));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts > TagListComponent > exibe o contador de resultados correto
+TestingLibraryElementError: Found multiple elements with the text: /2/
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<strong[39m
+  [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+[36m>[39m
+  [0m2[0m
+[36m</strong>[39m
+
+Ignored nodes: comments, script, style
+[36m<strong[39m
+  [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+[36m>[39m
+  [0m2[0m
+[36m</strong>[39m
+
+Ignored nodes: comments, script, style
+[36m<span[39m
+  [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+  [33mclass[39m=[32m"tag-valor-amount"[39m
+[36m>[39m
+  [0mR$200.00[0m
+[36m</span>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c1875123719[39m=[32m""[39m
+    [33mid[39m=[32m"root1"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+      [33mclass[39m=[32m"page-container"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+        [33mclass[39m=[32m"page-header"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"header-content"[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"page-title-icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33md[39m=[32m"M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33mx1[39m=[32m"7"[39m
+                [33mx2[39m=[32m"7.01"[39m
+                [33my1[39m=[32m"7"[39m
+                [33my2[39m=[32m"7"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0m Tags / Funções [0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"subtitle"[39m
+          [36m>[39m
+            [0mGerencie as funções disponíveis para contratos e postos[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"btn-primary btn-md"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mviewBox[39m=[32m"0 0 20 20"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclip-rule[39m=[32m"evenodd"[39m
+              [33md[39m=[32m"M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"[39m
+              [33mfill-rule[39m=[32m"evenodd"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m Nova Tag [0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+        [33mclass[39m=[32m"filters-section"[39m
+      [36m>[39m
+        [36m<h3[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"filters-title"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"filters-title-icon"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mviewBox[39m=[32m"0 0 20 20"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclip-rule[39m=[32m"evenodd"[39m
+              [33md[39m=[32m"M3 3a1 1 0 011-1h12a1 1 0 01.8 1.6L12 10v5a1 1 0 01-1.447.894l-2-1A1 1 0 018 14v-4L3.2 3.6A1 1 0 013 3z"[39m
+              [33mfill-rule[39m=[32m"evenodd"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0m Filtros [0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"filters-grid tag-filters-grid"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"filter-group"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"filter-label"[39m
+              [33mfor[39m=[32m"filtroNome"[39m
+            [36m>[39m
+              [0mBuscar nome / descrição[0m
+            [36m</label>[39m
+            [36m<input[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"filter-select ng-untouched ng-pristine ng-valid"[39m
+              [33mid[39m=[32m"filtroNome"[39m
+              [33mplaceholder[39m=[32m"Ex: Supervisor, PM, Vigia..."[39m
+              [33mstyle[39m=[32m"background-image: none; padding-right: 0.875rem;"[39m
+              [33mtype[39m=[32m"text"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+            [33mclass[39m=[32m"filter-actions"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+              [33mclass[39m=[32m"btn-clear-filters"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                [33mfill[39m=[32m"currentColor"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mviewBox[39m=[32m"0 0 20 20"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+                  [33mclip-rule[39m=[32m"evenodd"[39m
+                  [33md[39m=[32m"M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"[39m
+                  [33mfill-rule[39m=[32m"evenodd"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Limpar [0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [33mclass[39m=[32m"results-count"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33m_ngcontent-a-c1875123719[39m=[32m""[39m
+          [36m>[39m
+            [0mMostrando [0m
+            ...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getElementError node_modules/@testing-library/dom/dist/query-helpers.js:20:35
+ ❯ getMultipleElementsFoundError node_modules/@testing-library/dom/dist/query-helpers.js:23:10
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/features/tags/tag-list/tag-list.component.spec.ts:39:19
+     37|     await setup();
+     38|     expect(screen.getByText(/Mostrando/)).toBeTruthy();
+     39|     expect(screen.getByText(/2/)).toBeTruthy();
+       |                   ^
+     40|   });
+     41| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > exibe mensagem quando nenhuma tag é encontrada
+TestingLibraryElementError: Unable to find an element with the text: /Nenhuma tag encontrada/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div[39m
+    [33m_nghost-a-c3509680523[39m=[32m""[39m
+    [33mid[39m=[32m"root2"[39m
+    [33mng-version[39m=[32m"21.0.6"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+      [33mclass[39m=[32m"tag-picker"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"picker-header"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+          [33mclass[39m=[32m"picker-label"[39m
+        [36m>[39m
+          [0mFunções[0m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<input[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"search-input ng-untouched ng-valid ng-dirty"[39m
+        [33mplaceholder[39m=[32m"Buscar por nome ou descrição..."[39m
+        [33mtype[39m=[32m"text"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33m_ngcontent-a-c3509680523[39m=[32m""[39m
+        [33mclass[39m=[32m"empty-state"[39m
+      [36m>[39m
+        [0mNenhuma tag disponível.[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:45:19
+     43|     await userEvent.type(input, 'inexistente');
+     44| 
+     45|     expect(screen.getByText(/Nenhuma tag encontrada/)).toBeTruthy();
+       |                   ^
+     46|   });
+     47| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts > TagPickerComponent > permite selecionar múltiplas tags e emite evento
+AssertionError: expected "vi.fn()" to be called with arguments: [ [ 't1', 't2' ] ]
+
+Received: 
+
+  1st vi.fn() call:
+
+  [
+    [
+      "t1",
+-     "t2",
+    ],
+  ]
+
+  2nd vi.fn() call:
+
+  [
+    [
+-     "t1",
+      "t2",
+    ],
+  ]
+
+
+Number of calls: 2
+
+ ❯ src/app/shared/components/tag-picker/tag-picker.component.spec.ts:66:17
+     64| 
+     65|     await userEvent.click(screen.getByText(/Supervisor/));
+     66|     expect(spy).toHaveBeenCalledWith(['t1', 't2']);
+       |                 ^
+     67|   });
+     68| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  5 failed | 12 passed (17)
+      Tests  3 failed | 72 passed (75)
+   Start at  21:47:51
+   Duration  7.75s (transform 3.55s, setup 10.04s, import 5.40s, tests 6.90s, environment 35.03s)
+

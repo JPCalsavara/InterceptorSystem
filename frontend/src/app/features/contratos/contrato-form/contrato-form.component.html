@@ -42,6 +42,7 @@
         <select
           id="clienteId"
           formControlName="clienteId"
+          data-testid="contrato-cliente"
           class="form-input"
           [class.error]="hasError('clienteId')"
           [disabled]="isEdit()"
@@ -63,6 +64,7 @@
         <textarea
           id="descricao"
           formControlName="descricao"
+          data-testid="contrato-titulo"
           class="form-input"
           [class.error]="hasError('descricao')"
           rows="3"
@@ -177,6 +179,7 @@
               <label class="form-label">Tipo de Posto <span class="required">*</span></label>
               <select
                 formControlName="tipoPosto"
+                data-testid="contrato-tipo-posto"
                 class="form-input"
               >
                 @for (opt of tipoPostoOptions; track opt.value) {
@@ -446,6 +449,7 @@
             id="dataInicio"
             type="date"
             formControlName="dataInicio"
+            data-testid="contrato-data-inicio"
             class="form-input"
             [class.error]="hasError('dataInicio')"
           />
@@ -470,6 +474,7 @@
             id="dataFim"
             type="date"
             formControlName="dataFim"
+            data-testid="contrato-data-fim"
             class="form-input"
             [class.error]="hasError('dataFim')"
           />
@@ -489,6 +494,7 @@
         <select
           id="status"
           formControlName="status"
+          data-testid="contrato-status"
           class="form-input"
           [class.error]="hasError('status')"
         >
@@ -544,7 +550,7 @@
             <div class="bk-group">
               <div class="bk-group-header bk-custo">
                 <span class="bk-group-label">Custo</span>
-                <span class="bk-group-total">- {{ custoTotalForm() | currency: 'BRL' }}</span>
+                <span class="bk-group-total" data-testid="custo-direto">- {{ custoTotalForm() | currency: 'BRL' }}</span>
               </div>
               <div class="bk-items">
                 <div class="bk-item">
@@ -583,7 +589,7 @@
                       >{{ form.value.percentualImpostos }}% sobre custo direto</span
                     >
                   </span>
-                  <span class="bk-item-value deduction"
+                  <span class="bk-item-value deduction" data-testid="valor-impostos"
                     >- {{ encargosProvisoes() | currency: 'BRL' }}</span
                   >
                 </div>
@@ -696,7 +702,7 @@
           </div>
           <div class="result-content">
             <p class="result-label">Valor Total do Contrato</p>
-            <h2 class="result-value">{{ valorTotalCalculado | currency: 'BRL' }}</h2>
+            <h2 class="result-value" data-testid="valor-total-mensal">{{ valorTotalCalculado | currency: 'BRL' }}</h2>
             <p class="result-info">Calculado automaticamente com base nos valores informados</p>
           </div>
         </div>
@@ -708,7 +714,7 @@
           <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()">
+          <button type="submit" class="btn-primary" [disabled]="loading()" data-testid="btn-save-contrato">
             @if (loading()) {
               <span class="spinner-small"></span>
               Salvando...

@@ -43,8 +43,11 @@
     "@testing-library/angular": "^19.2.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/jasmine": "^6.0.0",
+    "cypress": "^15.15.0",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "zone.js": "^0.16.2"
   }
 }

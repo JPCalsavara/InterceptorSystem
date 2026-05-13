@@ -1,0 +1,99 @@
+
+> frontend@0.0.0 test
+> ng test --watch=false
+
+❯ Building...
+✔ Building...
+Initial chunk files                                                      | Names                                                                 |  Raw size
+spec-app-features-contratos-contrato-detail-contrato-detail.component.js | spec-app-features-contratos-contrato-detail-contrato-detail.component | 175.51 kB | 
+spec-app-features-contratos-contrato-form-contrato-form.component.js     | spec-app-features-contratos-contrato-form-contrato-form.component     | 150.45 kB | 
+spec-app-pages-dashboard-dashboard.component.js                          | spec-app-pages-dashboard-dashboard.component                          | 150.38 kB | 
+spec-app-features-contratos-contrato-list-contrato-list.component.js     | spec-app-features-contratos-contrato-list-contrato-list.component     |  96.74 kB | 
+spec-app-features-tags-tag-list-tag-list.component.js                    | spec-app-features-tags-tag-list-tag-list.component                    |  60.84 kB | 
+styles.css                                                               | styles                                                                |  32.01 kB | 
+chunk-VBNSR6IQ.js                                                        | -                                                                     |  17.59 kB | 
+spec-app-services-auth.service.js                                        | spec-app-services-auth.service                                        |   8.25 kB | 
+chunk-ENZ4CWWK.js                                                        | -                                                                     |   8.07 kB | 
+chunk-YXJMCAYO.js                                                        | -                                                                     |   5.31 kB | 
+chunk-A44TLS2P.js                                                        | -                                                                     |   4.74 kB | 
+spec-app-shared-components-tag-picker-tag-picker.component.js            | spec-app-shared-components-tag-picker-tag-picker.component            |   4.49 kB | 
+spec-app-services-contrato.service.js                                    | spec-app-services-contrato.service                                    |   4.14 kB | 
+spec-app-services-diaria.service.js                                      | spec-app-services-diaria.service                                      |   3.96 kB | 
+spec-app-services-cliente.service.js                                     | spec-app-services-cliente.service                                     |   3.77 kB | 
+spec-app-services-funcionario.service.js                                 | spec-app-services-funcionario.service                                 |   3.48 kB | 
+spec-app-services-posto.service.js                                       | spec-app-services-posto.service                                       |   3.12 kB | 
+spec-app-shared-helpers-contrato-calculo.helper.js                       | spec-app-shared-helpers-contrato-calculo.helper                       |   2.97 kB | 
+spec-app-services-tag.service.js                                         | spec-app-services-tag.service                                         |   2.93 kB | 
+chunk-7FJQOHBQ.js                                                        | -                                                                     |   2.86 kB | 
+spec-app-services-alocacao.service.js                                    | spec-app-services-alocacao.service                                    |   2.83 kB | 
+chunk-ZF5FSE4V.js                                                        | -                                                                     |   2.82 kB | 
+spec-app-services-entity-cache-coordinator.service.js                    | spec-app-services-entity-cache-coordinator.service                    |   2.56 kB | 
+chunk-ZMQ3RWDO.js                                                        | -                                                                     |   2.51 kB | 
+chunk-LLFWUWTB.js                                                        | -                                                                     |   2.37 kB | 
+chunk-CB6DBKXB.js                                                        | -                                                                     |   2.27 kB | 
+chunk-PGPMFGQH.js                                                        | -                                                                     |   2.22 kB | 
+chunk-DM5QS3SY.js                                                        | -                                                                     |   2.13 kB | 
+spec-app-app.js                                                          | spec-app-app                                                          |   2.12 kB | 
+chunk-L2IC2CS6.js                                                        | -                                                                     |   1.99 kB | 
+chunk-4O5EHUEN.js                                                        | -                                                                     |   1.74 kB | 
+chunk-HNP7MONP.js                                                        | -                                                                     |   1.68 kB | 
+init-testbed.js                                                          | init-testbed                                                          |   1.20 kB | 
+chunk-DDE4NLQV.js                                                        | -                                                                     | 178 bytes | 
+
+                                                                         | Initial total                                                         | 770.20 kB
+
+Application bundle generation complete. [8.512 seconds] - 2026-05-13T00:45:20.045Z
+
+
+ RUN  v4.0.16 /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 17 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/app.spec.ts [ src/app/app.spec.ts ]
+ FAIL  |frontend| src/app/services/alocacao.service.spec.ts [ src/app/services/alocacao.service.spec.ts ]
+ FAIL  |frontend| src/app/services/auth.service.spec.ts [ src/app/services/auth.service.spec.ts ]
+ FAIL  |frontend| src/app/services/cliente.service.spec.ts [ src/app/services/cliente.service.spec.ts ]
+ FAIL  |frontend| src/app/services/contrato.service.spec.ts [ src/app/services/contrato.service.spec.ts ]
+ FAIL  |frontend| src/app/services/diaria.service.spec.ts [ src/app/services/diaria.service.spec.ts ]
+ FAIL  |frontend| src/app/services/entity-cache-coordinator.service.spec.ts [ src/app/services/entity-cache-coordinator.service.spec.ts ]
+Error: Cannot set base providers because it has already been called
+ ❯ TestBedImpl.initTestEnvironment node_modules/@angular/core/fesm2022/testing.mjs:1334:13
+ ❯ src/test-setup.ts:10:14
+      8| } from '@angular/platform-browser/testing';
+      9| 
+     10| getTestBed().initTestEnvironment(
+       |              ^
+     11|   BrowserTestingModule,
+     12|   platformBrowserTesting(),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  |frontend| src/app/services/funcionario.service.spec.ts [ src/app/services/funcionario.service.spec.ts ]
+ FAIL  |frontend| src/app/services/posto.service.spec.ts [ src/app/services/posto.service.spec.ts ]
+ FAIL  |frontend| src/app/services/tag.service.spec.ts [ src/app/services/tag.service.spec.ts ]
+ FAIL  |frontend| src/app/pages/dashboard/dashboard.component.spec.ts [ src/app/pages/dashboard/dashboard.component.spec.ts ]
+ FAIL  |frontend| src/app/shared/helpers/contrato-calculo.helper.spec.ts [ src/app/shared/helpers/contrato-calculo.helper.spec.ts ]
+ FAIL  |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts [ src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts ]
+ FAIL  |frontend| src/app/features/contratos/contrato-form/contrato-form.component.spec.ts [ src/app/features/contratos/contrato-form/contrato-form.component.spec.ts ]
+ FAIL  |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts [ src/app/features/contratos/contrato-list/contrato-list.component.spec.ts ]
+ FAIL  |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts [ src/app/features/tags/tag-list/tag-list.component.spec.ts ]
+ FAIL  |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts [ src/app/shared/components/tag-picker/tag-picker.component.spec.ts ]
+Error: Cannot set base providers because it has already been called
+ ❯ TestBedImpl.initTestEnvironment node_modules/@angular/core/fesm2022/testing.mjs:1334:13
+ ❯ src/test-setup.ts:10:14
+      8| } from '@angular/platform-browser/testing';
+      9| 
+     10| getTestBed().initTestEnvironment(
+       |              ^
+     11|   BrowserTestingModule,
+     12|   platformBrowserTesting(),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+
+ Test Files  17 failed (17)
+      Tests  no tests
+   Start at  21:45:20
+   Duration  4.72s (transform 268ms, setup 0ms, import 0ms, tests 0ms, environment 37.02s)
+

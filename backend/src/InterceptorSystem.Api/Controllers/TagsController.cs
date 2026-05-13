@@ -1,5 +1,6 @@
 using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +9,11 @@ namespace InterceptorSystem.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/tags")]
-public class TagsController : ControllerBase
+public class TagsController : TenantControllerBase
 {
     private readonly ITagAppService _service;
 
-    public TagsController(ITagAppService service)
+    public TagsController(ITagAppService service, ICurrentTenantService currentTenant) : base(currentTenant)
     {
         _service = service;
     }
@@ -21,7 +22,7 @@ public class TagsController : ControllerBase
     [ProducesResponseType(typeof(TagDtoOutput), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create(CreateTagDtoInput input)
+    public async Task<IActionResult> Create(CreateTagDtoInput input, CancellationToken ct = default)
     {
         try
         {
@@ -36,7 +37,7 @@ public class TagsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<TagDtoOutput>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(CancellationToken ct = default)
     {
         var result = await _service.GetAllAsync();
         return Ok(result);
@@ -45,7 +46,7 @@ public class TagsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(TagDtoOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
         var result = await _service.GetByIdAsync(id);
         return result == null ? NotFound() : Ok(result);
@@ -55,7 +56,7 @@ public class TagsController : ControllerBase
     [ProducesResponseType(typeof(TagDtoOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update(Guid id, UpdateTagDtoInput input)
+    public async Task<IActionResult> Update(Guid id, UpdateTagDtoInput input, CancellationToken ct = default)
     {
         try
         {
@@ -75,7 +76,7 @@ public class TagsController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
     {
         try
         {

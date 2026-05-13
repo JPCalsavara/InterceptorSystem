@@ -39,7 +39,7 @@ public class DiariaRepository : IDiariaRepository
         return new PagedResult<Diaria>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
-    public async Task<IEnumerable<Diaria>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Diaria>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
         => await _context.Diarias
             .Join(
                 _context.Alocacoes,
@@ -53,25 +53,25 @@ public class DiariaRepository : IDiariaRepository
                 (x, posto) => new { x.diaria, posto })
             .Where(x => x.posto.ClienteId == clienteId && x.posto.Ativo)
             .Select(x => x.diaria)
-            .ToListAsync();
+            .ToListAsync(ct);
 
-    public async Task<IEnumerable<Diaria>> GetByFuncionarioAsync(Guid funcionarioId)
-        => await _context.Diarias.Where(a => a.FuncionarioId == funcionarioId).ToListAsync();
+    public async Task<IEnumerable<Diaria>> GetByFuncionarioAsync(Guid funcionarioId, CancellationToken ct = default)
+        => await _context.Diarias.Where(a => a.FuncionarioId == funcionarioId).ToListAsync(ct);
 
-    public async Task<IEnumerable<Diaria>> GetByAlocacaoAsync(Guid alocacaoId)
-        => await _context.Diarias.Where(a => a.AlocacaoId == alocacaoId).ToListAsync();
+    public async Task<IEnumerable<Diaria>> GetByAlocacaoAsync(Guid alocacaoId, CancellationToken ct = default)
+        => await _context.Diarias.Where(a => a.AlocacaoId == alocacaoId).ToListAsync(ct);
 
-    public async Task<IEnumerable<Diaria>> GetByAlocacaoEDataAsync(Guid alocacaoId, DateOnly data)
-        => await _context.Diarias.Where(a => a.AlocacaoId == alocacaoId && a.Data == data).ToListAsync();
+    public async Task<IEnumerable<Diaria>> GetByAlocacaoEDataAsync(Guid alocacaoId, DateOnly data, CancellationToken ct = default)
+        => await _context.Diarias.Where(a => a.AlocacaoId == alocacaoId && a.Data == data).ToListAsync(ct);
 
-    public async Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim)
+    public async Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim, CancellationToken ct = default)
         => await _context.Diarias
             .Include(d => d.Alocacao)
             .Where(d => d.Alocacao!.ContratoId == contratoId
                      && d.Data >= inicio && d.Data <= fim)
-            .ToListAsync();
+            .ToListAsync(ct);
 
-    public async Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes)
+    public async Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes, CancellationToken ct = default)
     {
         var inicio = new DateOnly(ano, mes, 1);
         var fim = inicio.AddMonths(1).AddDays(-1);
@@ -84,21 +84,21 @@ public class DiariaRepository : IDiariaRepository
                         && d.StatusDiaria == StatusDiaria.CONFIRMADA
                         && d.Data >= inicio
                         && d.Data <= fim)
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
-    public async Task<bool> ExisteDiariaNaDataAsync(Guid funcionarioId, DateOnly data, Guid? diariaIdIgnorada = null)
+    public async Task<bool> ExisteDiariaNaDataAsync(Guid funcionarioId, DateOnly data, Guid? diariaIdIgnorada = null, CancellationToken ct = default)
         => await _context.Diarias
             .Where(a => a.FuncionarioId == funcionarioId && 
                        a.Data == data &&
                        (diariaIdIgnorada == null || a.Id != diariaIdIgnorada))
-            .AnyAsync();
+            .AnyAsync(ct);
 
-    public async Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds)
+    public async Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds, CancellationToken ct = default)
     {
         return await _context.Diarias
             .Where(d => alocacaoIds.Contains(d.AlocacaoId))
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
     public void Add(Diaria entity) => _context.Diarias.Add(entity);

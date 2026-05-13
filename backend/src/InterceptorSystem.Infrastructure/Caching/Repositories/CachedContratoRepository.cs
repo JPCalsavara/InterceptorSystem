@@ -35,8 +35,8 @@ public class CachedContratoRepository : IContratoRepository
     public Task<IPagedResult<Contrato>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         => _decorated.GetPagedAsync(page, pageSize, cancellationToken);
 
-    public Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null) 
-        => _decorated.ExisteContratoVigenteAsync(clienteId, contratoIdIgnorado);
+    public Task<bool> ExisteContratoVigenteAsync(Guid clienteId, Guid? contratoIdIgnorado = null, CancellationToken ct = default) 
+        => _decorated.ExisteContratoVigenteAsync(clienteId, contratoIdIgnorado, ct);
 
     public async Task<IEnumerable<Contrato>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -52,27 +52,27 @@ public class CachedContratoRepository : IContratoRepository
         return cachedList ?? Enumerable.Empty<Contrato>();
     }
 
-    public async Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Contrato>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Contratos_{empresaId}_Cliente_{clienteId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Contrato>? cachedList))
         {
-            cachedList = await _decorated.GetByClienteIdAsync(clienteId);
+            cachedList = await _decorated.GetByClienteIdAsync(clienteId, ct);
             _cache.Set(cacheKey, cachedList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)));
         }
 
         return cachedList ?? Enumerable.Empty<Contrato>();
     }
 
-    public Task<IEnumerable<Contrato>> GetAtivosByClienteIdAsync(Guid clienteId)
+    public Task<IEnumerable<Contrato>> GetAtivosByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
-        return _decorated.GetAtivosByClienteIdAsync(clienteId);
+        return _decorated.GetAtivosByClienteIdAsync(clienteId, ct);
     }
 
-    public Task<Contrato> GetByClienteId(Guid clienteId)
+    public Task<Contrato?> GetByClienteId(Guid clienteId, CancellationToken ct = default)
     {
-        return _decorated.GetByClienteId(clienteId);
+        return _decorated.GetByClienteId(clienteId, ct);
     }
 }

@@ -73,15 +73,15 @@ public class DiariaBatchAppServiceTests
             true);
 
         _mockFuncionarioRepository
-            .Setup(r => r.GetByIdAsync(funcionarioId))
+            .Setup(r => r.GetByIdAsync(funcionarioId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(funcionario);
 
         _mockAlocacaoRepository
-            .Setup(r => r.GetByIdAsync(alocacaoId))
+            .Setup(r => r.GetByIdAsync(alocacaoId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(alocacao);
 
         _mockContratoRepository
-            .Setup(r => r.GetByIdAsync(contratoId))
+            .Setup(r => r.GetByIdAsync(contratoId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Contrato?)null);
     }
 
@@ -101,7 +101,7 @@ public class DiariaBatchAppServiceTests
 
         var batch = new CreateDiariasBatchDtoInput(diarias);
 
-        _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockUnitOfWork.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
         ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
@@ -116,7 +116,7 @@ public class DiariaBatchAppServiceTests
         Assert.All(result, a => Assert.Equal(TipoDiaria.REGULAR, a.TipoDiaria));
 
         _mockRepository.Verify(r => r.Add(It.IsAny<Diaria>()), Times.Exactly(3));
-        _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public class DiariaBatchAppServiceTests
 
         var batch = new CreateDiariasBatchDtoInput(diarias);
 
-        _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockUnitOfWork.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
         ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
@@ -197,7 +197,7 @@ public class DiariaBatchAppServiceTests
         Assert.All(result, a => Assert.Equal(alocacaoId, a.AlocacaoId));
         
         _mockRepository.Verify(r => r.Add(It.IsAny<Diaria>()), Times.Exactly(result.Count));
-        _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public class DiariaBatchAppServiceTests
 
         var batch = new CreateDiariasBatchDtoInput(diarias);
 
-        _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockUnitOfWork.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
         ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act
@@ -239,7 +239,7 @@ public class DiariaBatchAppServiceTests
         Assert.All(result, a => Assert.Equal(alocacaoId, a.AlocacaoId));
         
         _mockRepository.Verify(r => r.Add(It.IsAny<Diaria>()), Times.Exactly(result.Count));
-        _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -258,7 +258,7 @@ public class DiariaBatchAppServiceTests
         };
 
         var batch = new CreateDiariasBatchDtoInput(diarias);
-        _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockUnitOfWork.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
         ConfigurarRepositoriosParaBatch(funcionarioId, alocacaoId);
 
         // Act

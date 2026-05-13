@@ -28,6 +28,9 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./src/e2e/tsconfig.json"
     }
   ]
 }

@@ -26,6 +26,10 @@ services:
     depends_on:
       - mailhog
 
+    # Expõe a API na mesma porta esperada pelo frontend local (environment.ts)
+    ports:
+      - "5010:8080"
+
     # Substitui o "dotnet InterceptorSystem.Api.dll" pelo modo Watch
     command: ["dotnet", "watch", "run", "--no-launch-profile"]
 

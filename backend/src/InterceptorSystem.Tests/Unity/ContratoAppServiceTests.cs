@@ -1,6 +1,8 @@
 using InterceptorSystem.Application.Common.Interfaces;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces;
+
 using InterceptorSystem.Domain.SharedKernel.Exceptions;
 using InterceptorSystem.Domain.SharedKernel.Interfaces;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
@@ -15,8 +17,10 @@ public class ContratoAppServiceTests
 {
     private readonly Mock<IContratoRepository> _contratoRepo = new();
     private readonly Mock<IClienteRepository> _clienteRepo = new();
-    private readonly Mock<ITagRepository> _tagRepo = new();
+    private readonly Mock<IContratoTagService> _tagServiceMock = new();
     private readonly Mock<ICurrentTenantService> _tenantService = new();
+    private readonly Mock<IContratoCalculoService> _calculoService = new();
+    private readonly Mock<IDiariaAppService> _diariaService = new();
     private readonly Mock<IUnitOfWork> _uow = new();
     private readonly ContratoAppService _service;
 
@@ -27,8 +31,10 @@ public class ContratoAppServiceTests
         _service = new ContratoAppService(
             _contratoRepo.Object,
             _clienteRepo.Object,
-            _tagRepo.Object,
-            _tenantService.Object);
+            _tagServiceMock.Object,
+            _tenantService.Object,
+            _calculoService.Object,
+            _diariaService.Object);
     }
 
     [Fact]
@@ -53,7 +59,7 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId))
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
         
         Contrato? savedContrato = null;
@@ -62,9 +68,9 @@ public class ContratoAppServiceTests
             typeof(Contrato).GetProperty("Cliente")!.SetValue(c, new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
             savedContrato = c;
         });
-        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Guid id) => savedContrato?.Id == id ? savedContrato : null);
+        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Guid id, CancellationToken ct) => savedContrato?.Id == id ? savedContrato : null);
         
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(input);
 
@@ -118,7 +124,7 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Cliente?)null);
+        _clienteRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
         _contratoRepo.Verify(r => r.Add(It.IsAny<Contrato>()), Times.Never);
@@ -146,7 +152,7 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId))
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
 
         await Assert.ThrowsAsync<DomainException>(() => _service.CreateAsync(input));
@@ -190,8 +196,8 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(20)),
             StatusContrato.ATIVO);
 
-        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.UpdateAsync(contrato.Id, input);
 
@@ -202,7 +208,7 @@ public class ContratoAppServiceTests
     [Fact]
     public async Task Update_DeveFalhar_QuandoContratoNaoExiste()
     {
-        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
+        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Contrato?)null);
 
         var input = new UpdateContratoDtoInput(
@@ -242,7 +248,7 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today),
             StatusContrato.ATIVO);
 
-        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
 
         await Assert.ThrowsAsync<DomainException>(() => _service.UpdateAsync(contrato.Id, input));
     }
@@ -267,8 +273,8 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
             StatusContrato.PENDENTE);
 
-        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         await _service.DeleteAsync(contrato.Id);
 
@@ -278,7 +284,7 @@ public class ContratoAppServiceTests
     [Fact]
     public async Task Delete_DeveFalhar_QuandoContratoInexistente()
     {
-        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Contrato?)null);
+        _contratoRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Contrato?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(Guid.NewGuid()));
         _contratoRepo.Verify(r => r.Remove(It.IsAny<Contrato>()), Times.Never);
@@ -308,8 +314,8 @@ public class ContratoAppServiceTests
             StatusContrato.PENDENTE);
 
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(cliente);
-        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, null)).ReturnsAsync(true);
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(cliente);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, null, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
         Assert.Contains("Já existe um contrato vigente para este cliente", exception.Message);
@@ -352,8 +358,8 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
             StatusContrato.ATIVO);
 
-        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
-        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, contrato.Id)).ReturnsAsync(true);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateAsync(contrato.Id, input));
         Assert.Contains("Já existe um contrato vigente para este cliente", exception.Message);
@@ -398,9 +404,9 @@ public class ContratoAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddDays(15)),
             StatusContrato.ATIVO);
 
-        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id)).ReturnsAsync(contrato);
-        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, contrato.Id)).ReturnsAsync(false);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.ExisteContratoVigenteAsync(clienteId, contrato.Id, It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.UpdateAsync(contrato.Id, input);
 

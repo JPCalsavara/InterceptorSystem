@@ -86,6 +86,7 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
                     if (entry.Entity.EmpresaId == Guid.Empty && _tenantService.EmpresaId.HasValue)
                     {
                         // Segurança extra: se o construtor não setou, garantimos aqui.
+                        entry.Property(x => x.EmpresaId).CurrentValue = _tenantService.EmpresaId.Value;
                     }
                     break;
 

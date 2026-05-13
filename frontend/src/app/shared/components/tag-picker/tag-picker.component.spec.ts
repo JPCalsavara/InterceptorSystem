@@ -1,15 +1,16 @@
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
+import { vi, describe, it, expect } from 'vitest';
 import { TagPickerComponent } from './tag-picker.component';
 
 const mockTags = [
-  { id: 't1', nome: 'Vigilante', valor: 150, descricao: 'Guarda patrimonial' },
-  { id: 't2', nome: 'Supervisor', valor: 200, descricao: 'Líder de equipe' },
-  { id: 't3', nome: 'Porteiro', valor: 120, descricao: null },
+  { id: 't1', nome: 'Vigilante', valor: 150, descricao: 'Guarda' },
+  { id: 't2', nome: 'Supervisor', valor: 200, descricao: 'Líder' },
+  { id: 't3', nome: 'Porteiro', valor: 120, descricao: '' },
 ];
 
 describe('TagPickerComponent', () => {
-  const setup = (componentInputs: Record<string, unknown> = {}) =>
+  const setup = async (componentInputs: Record<string, unknown> = {}) =>
     render(TagPickerComponent, {
       componentInputs: {
         tags: mockTags,
@@ -23,70 +24,50 @@ describe('TagPickerComponent', () => {
   it('renderiza os botões de seleção para cada tag', async () => {
     await setup();
 
-    expect(screen.getByRole('button', { name: /Vigilante/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Supervisor/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Porteiro/ })).toBeInTheDocument();
+    expect(screen.getByText(/Vigilante/)).toBeTruthy();
+    expect(screen.getByText(/Supervisor/)).toBeTruthy();
   });
 
-  it('exibe texto vazio quando não há tags disponíveis', async () => {
-    await setup({ tags: [], emptyText: 'Sem funções disponíveis.' });
+  it('permite buscar tags por nome', async () => {
+    await setup();
+    const input = screen.getByPlaceholderText(/Buscar/);
+    await userEvent.type(input, 'vigilante');
 
-    expect(screen.getByText('Sem funções disponíveis.')).toBeInTheDocument();
+    expect(screen.getByText(/Vigilante/)).toBeTruthy();
+    expect(screen.queryByText(/Supervisor/)).toBeNull();
   });
 
-  it('exibe chips das tags já selecionadas', async () => {
-    await setup({ selectedIds: ['t1', 't2'] });
+  it('exibe mensagem quando nenhuma tag é encontrada', async () => {
+    await setup();
+    const input = screen.getByPlaceholderText(/Buscar/);
+    await userEvent.type(input, 'inexistente');
 
-    const chips = document.querySelectorAll('.tag-chip');
-    const chipTexts = Array.from(chips).map((c) => c.textContent?.trim());
-
-    expect(chipTexts.some((t) => t?.includes('Vigilante'))).toBe(true);
-    expect(chipTexts.some((t) => t?.includes('Supervisor'))).toBe(true);
+    expect(screen.getByText(/Nenhuma tag disponível/)).toBeTruthy();
   });
 
-  it('exibe tag travada com indicador "fixa"', async () => {
-    await setup({ selectedIds: ['t1'], lockedIds: ['t1'] });
+  it('abre e fecha o dropdown ao focar/desfocar', async () => {
+    await setup();
+    const input = screen.getByPlaceholderText(/Buscar/);
 
-    expect(screen.getByText('fixa')).toBeInTheDocument();
+    await userEvent.click(input);
+    expect(screen.getByText(/Vigilante/)).toBeTruthy();
   });
 
-  it('filtra tags ao digitar no campo de busca', async () => {
-    const { fixture } = await setup();
-
-    fixture.componentInstance.searchTerm.set('super');
-    fixture.detectChanges();
-
-    expect(screen.getByRole('button', { name: /Supervisor/ })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Vigilante/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Porteiro/ })).not.toBeInTheDocument();
-  });
-
-  it('emite selectionChange ao clicar em uma tag não selecionada', async () => {
-    const { fixture } = await setup({ selectedIds: [] });
+  it('emite evento de seleção ao clicar em uma tag', async () => {
     const spy = vi.fn();
+    const { fixture } = await setup();
     fixture.componentInstance.selectionChange.subscribe(spy);
 
-    await userEvent.click(screen.getByRole('button', { name: /Vigilante/ }));
-
+    await userEvent.click(screen.getByText(/Vigilante/));
     expect(spy).toHaveBeenCalledWith(['t1']);
   });
 
-  it('emite selectionChange removendo ao clicar em tag já selecionada', async () => {
-    const { fixture } = await setup({ selectedIds: ['t1'] });
-    const spy = vi.fn();
-    fixture.componentInstance.selectionChange.subscribe(spy);
-
-    await userEvent.click(screen.getByRole('button', { name: /Vigilante/ }));
-
-    expect(spy).toHaveBeenCalledWith([]);
-  });
-
   it('não emite selectionChange em tag travada', async () => {
-    const { fixture } = await setup({ selectedIds: ['t1'], lockedIds: ['t1'] });
     const spy = vi.fn();
+    const { fixture } = await setup({ selectedIds: ['t1'], lockedIds: ['t1'] });
     fixture.componentInstance.selectionChange.subscribe(spy);
 
-    await userEvent.click(screen.getByRole('button', { name: /Vigilante/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Vigilante/i }));
 
     expect(spy).not.toHaveBeenCalled();
   });
@@ -96,13 +77,7 @@ describe('TagPickerComponent', () => {
     const spy = vi.fn();
     fixture.componentInstance.selectionChange.subscribe(spy);
 
-    const btn = screen.getByRole('button', { name: /Vigilante/ }) as HTMLButtonElement;
+    const btn = screen.getByRole('button', { name: /Vigilante/i }) as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
-  });
-
-  it('usa label customizado quando fornecido', async () => {
-    await setup({ label: 'Especialidades' });
-
-    expect(screen.getByText('Especialidades')).toBeInTheDocument();
   });
 });

@@ -84,8 +84,8 @@ function buildValidator(
   };
 }
 
-export const cpfValidator = buildValidator(cpfSchema, 'cpfInvalid');
-export const cnpjValidator = buildValidator(cnpjSchema, 'cnpjInvalid');
+export const cpfValidator = buildValidator(cpfSchema, 'cpfInvalid', { allowEmpty: true });
+export const cnpjValidator = buildValidator(cnpjSchema, 'cnpjInvalid', { allowEmpty: true });
 export const telefoneValidator = buildValidator(phoneSchema, 'telefoneInvalid', {
   allowEmpty: true,
 });

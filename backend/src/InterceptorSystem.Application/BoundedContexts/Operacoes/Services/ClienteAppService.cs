@@ -20,7 +20,7 @@ public class ClienteAppService : IClienteAppService
         _tenantService = tenantService;
     }
 
-    public async Task<ClienteDtoOutput> CreateAsync(CreateClienteDtoInput input)
+    public async Task<ClienteDtoOutput> CreateAsync(CreateClienteDtoInput input, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
         
@@ -36,14 +36,14 @@ public class ClienteAppService : IClienteAppService
             telefoneEmergencia: input.TelefoneEmergencia);
         
         _repository.Add(cliente);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
         
         return ClienteDtoOutput.FromEntity(cliente)!;
     }
 
-    public async Task<ClienteDtoOutput> UpdateAsync(Guid id, UpdateClienteDtoInput input)
+    public async Task<ClienteDtoOutput> UpdateAsync(Guid id, UpdateClienteDtoInput input, CancellationToken ct = default)
     {
-        var cliente = await _repository.GetByIdAsync(id);
+        var cliente = await _repository.GetByIdAsync(id, ct);
         if (cliente == null)
             throw new KeyNotFoundException("Cliente não encontrado.");
         
@@ -58,21 +58,21 @@ public class ClienteAppService : IClienteAppService
             input.TelefoneEmergencia);
         
         _repository.Update(cliente);
-        await  _repository.UnitOfWork.CommitAsync();
+        await  _repository.UnitOfWork.CommitAsync(ct);
         
         return ClienteDtoOutput.FromEntity(cliente)!;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var cliente = await _repository.GetByIdAsync(id);
+        var cliente = await _repository.GetByIdAsync(id, ct);
         if (cliente == null)
             throw new KeyNotFoundException("Cliente não encontrado.");
 
         _repository.Remove(cliente);
         try
         {
-            await _repository.UnitOfWork.CommitAsync();
+            await _repository.UnitOfWork.CommitAsync(ct);
         }
         catch (EntityInUseException ex)
         {
@@ -82,15 +82,15 @@ public class ClienteAppService : IClienteAppService
         }
     }
 
-    public async Task<ClienteDtoOutput?> GetByIdAsync(Guid id)
+    public async Task<ClienteDtoOutput?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var cliente = await _repository.GetByIdAsync(id);
+        var cliente = await _repository.GetByIdAsync(id, ct);
         return cliente != null ? ClienteDtoOutput.FromEntity(cliente) : null;
     }
 
-    public async Task<IEnumerable<ClienteDtoOutput>> GetAllAsync()
+    public async Task<IEnumerable<ClienteDtoOutput>> GetAllAsync(CancellationToken ct = default)
     {
-        var lista = await _repository.GetAllAsync();
+        var lista = await _repository.GetAllAsync(ct);
         return lista.Select(c => ClienteDtoOutput.FromEntity(c)).Where(dto => dto != null)!;
     }
 }

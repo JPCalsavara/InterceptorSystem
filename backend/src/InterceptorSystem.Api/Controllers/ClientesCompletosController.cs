@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 using InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using InterceptorSystem.Application.Common.Interfaces;
 
 namespace InterceptorSystem.Api.Controllers;
 
@@ -11,11 +12,11 @@ namespace InterceptorSystem.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/clientes-completos")]
-public class ClientesCompletosController : ControllerBase
+public class ClientesCompletosController : TenantControllerBase
 {
     private readonly IClienteOrquestradorService _orquestradorService;
 
-    public ClientesCompletosController(IClienteOrquestradorService orquestradorService)
+    public ClientesCompletosController(IClienteOrquestradorService orquestradorService, ICurrentTenantService currentTenant) : base(currentTenant)
     {
         _orquestradorService = orquestradorService;
     }
@@ -66,11 +67,11 @@ public class ClientesCompletosController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(ClienteCompletoDtoOutput), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateCompleto([FromBody] CreateClienteCompletoDtoInput input)
+    public async Task<IActionResult> CreateCompleto([FromBody] CreateClienteCompletoDtoInput input, CancellationToken ct = default)
     {
         try
         {
-            var resultado = await _orquestradorService.CriarClienteCompletoAsync(input);
+            var resultado = await _orquestradorService.CriarClienteCompletoAsync(input, ct);
             
             // Retorna 201 Created com o resultado completo
             return StatusCode(201, resultado);
@@ -95,9 +96,9 @@ public class ClientesCompletosController : ControllerBase
     [HttpPost("validar")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Validar([FromBody] CreateClienteCompletoDtoInput input)
+    public async Task<IActionResult> Validar([FromBody] CreateClienteCompletoDtoInput input, CancellationToken ct = default)
     {
-        var (valido, mensagemErro) = await _orquestradorService.ValidarCriacaoCompletaAsync(input);
+        var (valido, mensagemErro) = await _orquestradorService.ValidarCriacaoCompletaAsync(input, ct);
         
         if (valido)
         {

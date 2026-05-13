@@ -11,11 +11,11 @@ public interface IClienteOrquestradorService
     /// <summary>
     /// Cria um cliente completo com contrato e postos de trabalho automaticamente
     /// </summary>
-    Task<ClienteCompletoDtoOutput> CriarClienteCompletoAsync(CreateClienteCompletoDtoInput input);
+    Task<ClienteCompletoDtoOutput> CriarClienteCompletoAsync(CreateClienteCompletoDtoInput input, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Valida se é possível criar um cliente completo com os dados fornecidos
     /// </summary>
-    Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateClienteCompletoDtoInput input);
+    Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateClienteCompletoDtoInput input, CancellationToken cancellationToken = default);
 }
 

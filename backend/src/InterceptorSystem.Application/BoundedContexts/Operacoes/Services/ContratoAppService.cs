@@ -12,7 +12,7 @@ public class ContratoAppService : IContratoAppService
 {
     private readonly IContratoRepository _repository;
     private readonly IClienteRepository _clienteRepository;
-    private readonly ITagRepository _tagRepository;
+    private readonly IContratoTagService _tagService;
     private readonly ICurrentTenantService _tenantService;
     private readonly IContratoCalculoService _calculoService;
     private readonly IDiariaAppService _diariaAppService;
@@ -20,24 +20,24 @@ public class ContratoAppService : IContratoAppService
     public ContratoAppService(
         IContratoRepository repository,
         IClienteRepository clienteRepository,
-        ITagRepository tagRepository,
+        IContratoTagService tagService,
         ICurrentTenantService tenantService,
         IContratoCalculoService calculoService,
         IDiariaAppService diariaAppService)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
-        _tagRepository = tagRepository;
+        _tagService = tagService;
         _tenantService = tenantService;
         _calculoService = calculoService;
         _diariaAppService = diariaAppService;
     }
 
-    public async Task<ContratoDtoOutput> CreateAsync(CreateContratoDtoInput input)
+    public async Task<ContratoDtoOutput> CreateAsync(CreateContratoDtoInput input, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
-        var cliente = await _clienteRepository.GetByIdAsync(input.ClienteId)
+        var cliente = await _clienteRepository.GetByIdAsync(input.ClienteId, ct)
             ?? throw new KeyNotFoundException("Cliente não encontrado para o contrato.");
 
         // Validar se já existe um contrato vigente para este cliente
@@ -65,36 +65,25 @@ public class ContratoAppService : IContratoAppService
             input.Status,
             input.ValorDiariaVigilante);
 
-        if (input.Tags != null)
+        // Assign tags using the dedicated tag service
+        if (input.Tags != null && input.Tags.Any())
         {
-            foreach (var tagInput in input.Tags)
-            {
-                var tag = await _tagRepository.GetByIdAsync(tagInput.TagId);
-                if (tag == null)
-                {
-                    throw new KeyNotFoundException($"Tag não encontrada: {tagInput.TagId}.");
-                }
-            }
-
-            var tags = input.Tags
-                .DistinctBy(t => t.TagId)
-                .Select(t => new ContratoTag(empresaId, contrato.Id, t.TagId, t.ValorDiaria))
-                .ToList();
-            contrato.DefinirTags(tags);
+            var tagsInput = input.Tags.Select(t => (t.TagId, t.ValorDiaria)).ToList();
+            await _tagService.AtribuirTagsAsync(contrato, tagsInput);
         }
 
         _repository.Add(contrato);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
 
-        var saved = await _repository.GetByIdAsync(contrato.Id)
+        var saved = await _repository.GetByIdAsync(contrato.Id, ct)
             ?? throw new InvalidOperationException("Contrato não encontrado após persistência.");
 
         return ContratoDtoOutput.FromEntity(saved)!;
     }
 
-    public async Task<ContratoDtoOutput> UpdateAsync(Guid id, UpdateContratoDtoInput input)
+    public async Task<ContratoDtoOutput> UpdateAsync(Guid id, UpdateContratoDtoInput input, CancellationToken ct = default)
     {
-        var contrato = await _repository.GetByIdAsync(id)
+        var contrato = await _repository.GetByIdAsync(id, ct)
             ?? throw new KeyNotFoundException("Contrato não encontrado.");
 
         // Validar se não há contrato vigente quando alterando status para ATIVO ou PENDENTE
@@ -123,55 +112,43 @@ public class ContratoAppService : IContratoAppService
             input.DataFim,
             input.ValorDiariaVigilante);
 
-        if (input.Tags != null)
+        // Update tags using the dedicated tag service
+        if (input.Tags != null && input.Tags.Any())
         {
-            var empresaIdForTags = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
-            foreach (var tagInput in input.Tags)
-            {
-                var tag = await _tagRepository.GetByIdAsync(tagInput.TagId);
-                if (tag == null)
-                {
-                    throw new KeyNotFoundException($"Tag não encontrada: {tagInput.TagId}.");
-                }
-            }
-
-            var tags = input.Tags
-                .DistinctBy(t => t.TagId)
-                .Select(t => new ContratoTag(empresaIdForTags, contrato.Id, t.TagId, t.ValorDiaria))
-                .ToList();
-            contrato.DefinirTags(tags);
+            var tagsInput = input.Tags.Select(t => (t.TagId, t.ValorDiaria)).ToList();
+            await _tagService.AtribuirTagsAsync(contrato, tagsInput);
         }
 
         contrato.AtualizarStatus(input.Status);
 
         _repository.Update(contrato);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
 
-        var saved = await _repository.GetByIdAsync(contrato.Id)
+        var saved = await _repository.GetByIdAsync(contrato.Id, ct)
             ?? throw new InvalidOperationException("Contrato não encontrado após atualização.");
 
         return ContratoDtoOutput.FromEntity(saved)!;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var contrato = await _repository.GetByIdAsync(id)
+        var contrato = await _repository.GetByIdAsync(id, ct)
             ?? throw new KeyNotFoundException("Contrato não encontrado.");
 
         contrato.PrepararExclusao();
         _repository.Remove(contrato);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
     }
 
-    public async Task<ContratoDtoOutput?> GetByIdAsync(Guid id)
+    public async Task<ContratoDtoOutput?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var contrato = await _repository.GetByIdAsync(id);
+        var contrato = await _repository.GetByIdAsync(id, ct);
         return ContratoDtoOutput.FromEntity(contrato!);
     }
 
-    public async Task<IEnumerable<ContratoDtoOutput>> GetAllAsync()
+    public async Task<IEnumerable<ContratoDtoOutput>> GetAllAsync(CancellationToken ct = default)
     {
-        var contratos = await _repository.GetAllAsync();
+        var contratos = await _repository.GetAllAsync(ct);
         
         var hoje = DateOnly.FromDateTime(DateTime.Today);
         var alterados = false;
@@ -188,7 +165,7 @@ public class ContratoAppService : IContratoAppService
         
         if (alterados)
         {
-            await _repository.UnitOfWork.CommitAsync();
+            await _repository.UnitOfWork.CommitAsync(ct);
         }
 
         var dtos = new List<ContratoDtoOutput>();
@@ -199,7 +176,7 @@ public class ContratoAppService : IContratoAppService
 
             if (contrato.Status == StatusContrato.ATIVO)
             {
-                var resumo = await _diariaAppService.GetResumoByContratoAsync(contrato.Id, hoje.Year, hoje.Month);
+                var resumo = await _diariaAppService.GetResumoByContratoAsync(contrato.Id, hoje.Year, hoje.Month, ct);
                 
                 var diariasTotais = resumo.TotalDiarias;
                 // TODO: A lógica para diárias noturnas e de fds precisa ser reavaliada,
@@ -237,9 +214,9 @@ public class ContratoAppService : IContratoAppService
         return dtos;
     }
 
-    public async Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
-        var contratos = await _repository.GetAtivosByClienteIdAsync(clienteId);
+        var contratos = await _repository.GetAtivosByClienteIdAsync(clienteId, ct);
         return contratos
             .Select(ContratoDtoOutput.FromEntity)
             .Where(dto => dto != null)

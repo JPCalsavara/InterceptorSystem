@@ -6,7 +6,16 @@ namespace InterceptorSystem.Domain.SharedKernel.Exceptions;
 /// </summary>
 public class DomainException : Exception
 {
-    public DomainException(string message) : base(message) { }
+    // Optional code that can be used by middleware/clients to classify errors
+    public string? ErrorCode { get; }
 
-    public DomainException(string message, Exception innerException) : base(message, innerException) { }
+    public DomainException(string message, string? errorCode = null) : base(message) 
+    { 
+        ErrorCode = errorCode;
+    }
+
+    public DomainException(string message, Exception innerException, string? errorCode = null) : base(message, innerException) 
+    {
+        ErrorCode = errorCode;
+    }
 }

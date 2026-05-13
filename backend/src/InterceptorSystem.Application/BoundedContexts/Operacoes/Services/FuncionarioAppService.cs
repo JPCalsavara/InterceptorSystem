@@ -30,11 +30,11 @@ public class FuncionarioAppService : IFuncionarioAppService
         _tenantService = tenantService;
     }
 
-    public async Task<FuncionarioDtoOutput> CreateAsync(CreateFuncionarioDtoInput input)
+    public async Task<FuncionarioDtoOutput> CreateAsync(CreateFuncionarioDtoInput input, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado no contexto do locatário.");
 
-        var contrato = await _contratoRepository.GetByIdAsync(input.ContratoId);
+        var contrato = await _contratoRepository.GetByIdAsync(input.ContratoId, ct);
         if (contrato == null)
         {
             throw new KeyNotFoundException("Contrato não encontrado.");
@@ -42,7 +42,7 @@ public class FuncionarioAppService : IFuncionarioAppService
 
         if (input.ClienteId.HasValue)
         {
-            var cliente = await _clienteRepository.GetByIdAsync(input.ClienteId.Value);
+            var cliente = await _clienteRepository.GetByIdAsync(input.ClienteId.Value, ct);
             if (cliente == null)
             {
                 throw new KeyNotFoundException("Cliente não encontrado para o funcionário.");
@@ -61,7 +61,7 @@ public class FuncionarioAppService : IFuncionarioAppService
         }
 
 
-        var cpfExistente = await _repository.GetByCpfAsync(input.Cpf);
+        var cpfExistente = await _repository.GetByCpfAsync(input.Cpf, ct);
         if (cpfExistente != null)
         {
             throw new InvalidOperationException("Já existe um funcionário cadastrado com este CPF.");
@@ -83,7 +83,7 @@ public class FuncionarioAppService : IFuncionarioAppService
         {
             foreach (var tagId in input.TagIds)
             {
-                var tag = await _tagRepository.GetByIdAsync(tagId);
+                var tag = await _tagRepository.GetByIdAsync(tagId, ct);
                 if (tag == null)
                 {
                     throw new KeyNotFoundException($"Tag não encontrada: {tagId}.");
@@ -98,14 +98,14 @@ public class FuncionarioAppService : IFuncionarioAppService
         }
 
         _repository.Add(funcionario);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
 
         return FuncionarioDtoOutput.FromEntity(funcionario)!;
     }
 
-    public async Task<FuncionarioDtoOutput> UpdateAsync(Guid id, UpdateFuncionarioDtoInput input)
+    public async Task<FuncionarioDtoOutput> UpdateAsync(Guid id, UpdateFuncionarioDtoInput input, CancellationToken ct = default)
     {
-        var funcionario = await _repository.GetByIdAsync(id);
+        var funcionario = await _repository.GetByIdAsync(id, ct);
         if (funcionario == null)
         {
             throw new KeyNotFoundException("Funcionário não encontrado.");
@@ -124,7 +124,7 @@ public class FuncionarioAppService : IFuncionarioAppService
             var empresaIdForTags = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
             foreach (var tagId in input.TagIds)
             {
-                var tag = await _tagRepository.GetByIdAsync(tagId);
+                var tag = await _tagRepository.GetByIdAsync(tagId, ct);
                 if (tag == null)
                 {
                     throw new KeyNotFoundException($"Tag não encontrada: {tagId}.");
@@ -139,14 +139,14 @@ public class FuncionarioAppService : IFuncionarioAppService
         }
 
         _repository.Update(funcionario);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
 
         return FuncionarioDtoOutput.FromEntity(funcionario)!;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var funcionario = await _repository.GetByIdAsync(id);
+        var funcionario = await _repository.GetByIdAsync(id, ct);
         if (funcionario == null)
         {
             throw new KeyNotFoundException("Funcionário não encontrado.");
@@ -154,18 +154,18 @@ public class FuncionarioAppService : IFuncionarioAppService
 
         funcionario.PrepararExclusao();
         _repository.Remove(funcionario);
-        await _repository.UnitOfWork.CommitAsync();
+        await _repository.UnitOfWork.CommitAsync(ct);
     }
 
-    public async Task<FuncionarioDtoOutput?> GetByIdAsync(Guid id)
+    public async Task<FuncionarioDtoOutput?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var funcionario = await _repository.GetByIdAsync(id);
+        var funcionario = await _repository.GetByIdAsync(id, ct);
         return FuncionarioDtoOutput.FromEntity(funcionario!);
     }
 
-    public async Task<IEnumerable<FuncionarioDtoOutput>> GetAllAsync()
+    public async Task<IEnumerable<FuncionarioDtoOutput>> GetAllAsync(CancellationToken ct = default)
     {
-        var funcionarios = await _repository.GetAllAsync();
+        var funcionarios = await _repository.GetAllAsync(ct);
         return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
     }
 
@@ -180,9 +180,9 @@ public class FuncionarioAppService : IFuncionarioAppService
         var cliente = await _clienteRepository.GetByIdAsync(clienteId);
         return cliente != null;
     }
-    public async Task<IEnumerable<FuncionarioDtoOutput>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<FuncionarioDtoOutput>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
-        var funcionarios = await _repository.GetByClienteAsync(clienteId);
+        var funcionarios = await _repository.GetByClienteAsync(clienteId, ct);
         return funcionarios.Select(f => FuncionarioDtoOutput.FromEntity(f)!);
     }
 }

@@ -124,6 +124,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
                   id="nomeEmpresa"
                   type="text"
                   formControlName="nomeEmpresa"
+                  data-testid="register-name"
                   [class.input-error]="hasError('nomeEmpresa')"
                   placeholder="Gestao Facilities Condominial Ltda"
                 />
@@ -138,6 +139,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
                   id="cnpj"
                   type="text"
                   formControlName="cnpj"
+                  data-testid="cnpj"
                   [class.input-error]="hasError('cnpj')"
                   placeholder="00.000.000/0001-00"
                   mask="00.000.000/0000-00"
@@ -153,6 +155,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
                   id="email"
                   type="email"
                   formControlName="email"
+                  data-testid="register-email"
                   [class.input-error]="hasError('email')"
                   placeholder="contato@empresa.com"
                   autocomplete="email"
@@ -169,6 +172,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
                     id="senha"
                     [type]="mostrarSenha() ? 'text' : 'password'"
                     formControlName="senha"
+                    data-testid="register-password"
                     [class.input-error]="hasError('senha')"
                     placeholder="8+ carac., 1 maiúscula, 1 num."
                     autocomplete="new-password"
@@ -229,6 +233,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
               <button
                 type="submit"
                 class="btn-primary btn-lg"
+                data-testid="register-submit"
                 [disabled]="carregando()"
                 style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-1);"
               >

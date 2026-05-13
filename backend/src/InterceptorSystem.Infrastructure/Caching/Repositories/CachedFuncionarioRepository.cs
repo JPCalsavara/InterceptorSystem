@@ -51,7 +51,7 @@ public class CachedFuncionarioRepository : IFuncionarioRepository
     public Task<IPagedResult<Funcionario>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         => _decorated.GetPagedAsync(page, pageSize, cancellationToken);
 
-    public Task<Funcionario?> GetByCpfAsync(string cpf) => _decorated.GetByCpfAsync(cpf);
+    public Task<Funcionario?> GetByCpfAsync(string cpf, CancellationToken ct = default) => _decorated.GetByCpfAsync(cpf, ct);
 
     public async Task<IEnumerable<Funcionario>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -67,14 +67,14 @@ public class CachedFuncionarioRepository : IFuncionarioRepository
         return cachedList ?? Enumerable.Empty<Funcionario>();
     }
 
-    public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId)
+    public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Funcionarios_{empresaId}_Cliente_{clienteId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Funcionario>? cachedList))
         {
-            cachedList = await _decorated.GetByClienteAsync(clienteId);
+            cachedList = await _decorated.GetByClienteAsync(clienteId, ct);
             _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Moderate));
         }
 

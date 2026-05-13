@@ -86,7 +86,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         <!-- Profile -->
         <div class="navbar-profile">
           <!-- Desktop trigger: opens dropdown -->
-          <div class="profile-trigger desktop-trigger" (click)="toggleDropdown()">
+          <div class="profile-trigger desktop-trigger" (click)="toggleDropdown()" data-testid="user-menu-button">
             <div class="avatar">
               <span>{{ getInitials() }}</span>
             </div>
@@ -153,7 +153,7 @@ import { LayoutStateService } from '../services/layout-state.service';
                 Plano
               </a>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item danger" (click)="logout()">
+              <button class="dropdown-item danger" (click)="logout()" data-testid="logout-button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path
                     stroke-linecap="round"

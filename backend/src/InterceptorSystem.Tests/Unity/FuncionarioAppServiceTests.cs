@@ -71,7 +71,7 @@ public class FuncionarioAppServiceTests
             TipoFuncionario.CLT);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(input.ClienteId.Value)).ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
+        _clienteRepo.Setup(r => r.GetByIdAsync(input.ClienteId.Value, It.IsAny<CancellationToken>())).ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
@@ -89,10 +89,10 @@ public class FuncionarioAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
             status: StatusContrato.ATIVO);
-        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
         
-        _funcionarioRepo.Setup(r => r.GetByCpfAsync(input.Cpf)).ReturnsAsync((Funcionario?)null);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _funcionarioRepo.Setup(r => r.GetByCpfAsync(input.Cpf, It.IsAny<CancellationToken>())).ReturnsAsync((Funcionario?)null);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(input);
 
@@ -107,7 +107,7 @@ public class FuncionarioAppServiceTests
         var clienteId = Guid.NewGuid();
         var input = CriarInputValido(clienteId, Guid.NewGuid());
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync((Cliente?)null);
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.CreateAsync(input));
     }
@@ -121,7 +121,7 @@ public class FuncionarioAppServiceTests
         var input = CriarInputValido(clienteId, contratoId);
         
         _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
-        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
+        _clienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(new Cliente(empresaId, "Cond", "11222333000181", "São Paulo", "SP"));
         
         // FASE 2: Mock de contrato vigente
         var contrato = new Contrato(empresaId,
@@ -139,10 +139,10 @@ public class FuncionarioAppServiceTests
             DateOnly.FromDateTime(DateTime.Today.AddMonths(-1)), 
             DateOnly.FromDateTime(DateTime.Today.AddMonths(12)), 
             status: StatusContrato.ATIVO);
-        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId)).ReturnsAsync(contrato);
+        _contratoRepo.Setup(r => r.GetByIdAsync(contratoId, It.IsAny<CancellationToken>())).ReturnsAsync(contrato);
         
         // FASE 3: Sem parâmetros de salário
-        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido)).ReturnsAsync(new Funcionario(empresaId, clienteId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT));
+        _funcionarioRepo.Setup(r => r.GetByCpfAsync(CpfValido, It.IsAny<CancellationToken>())).ReturnsAsync(new Funcionario(empresaId, clienteId, contratoId, "Outro", CpfValido, "+5511888888888", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
     }
@@ -165,7 +165,7 @@ public class FuncionarioAppServiceTests
         var id = Guid.NewGuid();
         // FASE 3: Sem parâmetros de salário
         var input = new UpdateFuncionarioDtoInput("Jose", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Funcionario?)null);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Funcionario?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, input));
     }
@@ -177,8 +177,8 @@ public class FuncionarioAppServiceTests
         // FASE 3: Sem parâmetros de salário
         var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO);
 
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>())).ReturnsAsync(funcionario);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.UpdateAsync(funcionario.Id, input);
 
@@ -190,7 +190,7 @@ public class FuncionarioAppServiceTests
     public async Task DeleteAsync_DeveFalhar_QuandoFuncionarioNaoExiste()
     {
         var id = Guid.NewGuid();
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Funcionario?)null);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>())).ReturnsAsync((Funcionario?)null);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(id));
     }
@@ -199,8 +199,8 @@ public class FuncionarioAppServiceTests
     public async Task DeleteAsync_DeveExcluirFuncionarioQuandoExiste()
     {
         var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
-        _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>())).ReturnsAsync(funcionario);
+        _uow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         await _service.DeleteAsync(funcionario.Id);
 
@@ -217,9 +217,9 @@ public class FuncionarioAppServiceTests
             new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "João", "12345678909", "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT),
             new Funcionario(empresaId, Guid.NewGuid(), Guid.NewGuid(), "Maria", "12345678909", "+5511888888888", StatusFuncionario.AFASTADO, TipoEscala.SEMANAL_COMERCIAL, TipoFuncionario.TERCEIRIZADO)
         };
-        _funcionarioRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(lista);
+        _funcionarioRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(lista);
 
-        var result = await _service.GetAllAsync();
+        var result = await _service.GetAllAsync(It.IsAny<CancellationToken>());
 
         Assert.Equal(2, result.Count());
     }
@@ -228,9 +228,9 @@ public class FuncionarioAppServiceTests
     public async Task GetByIdAsync_DeveRetornarFuncionario()
     {
         var funcionario = CriarFuncionario(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>())).ReturnsAsync(funcionario);
 
-        var result = await _service.GetByIdAsync(funcionario.Id);
+        var result = await _service.GetByIdAsync(funcionario.Id, It.IsAny<CancellationToken>());
 
         Assert.NotNull(result);
         Assert.Equal(funcionario.Id, result!.Id);
@@ -239,9 +239,9 @@ public class FuncionarioAppServiceTests
     [Fact(DisplayName = "GetByIdAsync - Retorna nulo quando funcionário não existe")]
     public async Task GetByIdAsync_DeveRetornarNulo_QuandoNaoExiste()
     {
-        _funcionarioRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Funcionario?)null);
+        _funcionarioRepo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Funcionario?)null);
 
-        var result = await _service.GetByIdAsync(Guid.NewGuid());
+        var result = await _service.GetByIdAsync(Guid.NewGuid(), It.IsAny<CancellationToken>());
 
         Assert.Null(result);
     }

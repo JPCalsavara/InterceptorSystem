@@ -50,8 +50,8 @@ public class PostoAppServiceTests
         var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua das Flores", "123", null, "São Paulo", "SP");
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
-        _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync(cliente);
-        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(cliente);
+        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.CreateAsync(input);
@@ -77,7 +77,7 @@ public class PostoAppServiceTests
             p.Estado == "SP"
         )), Times.Once);
 
-        _mockUow.Verify(u => u.CommitAsync(), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "CreateAsync - Deve falhar quando cliente não existe")]
@@ -89,7 +89,7 @@ public class PostoAppServiceTests
         var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
-        _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId)).ReturnsAsync((Cliente?)null);
+        _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
@@ -125,8 +125,8 @@ public class PostoAppServiceTests
 
         var input = new UpdatePostoInput("Portaria B", "13010-111", "Rua Nova", "456", "Bloco A", "Campinas", "SP");
 
-        _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
-        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
+        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.UpdateAsync(postoId, input);
@@ -142,7 +142,7 @@ public class PostoAppServiceTests
         Assert.Equal("SP", result.Estado);
 
         _mockRepo.Verify(r => r.Update(It.IsAny<Posto>()), Times.Once);
-        _mockUow.Verify(u => u.CommitAsync(), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "UpdateAsync - Deve falhar quando posto não existe")]
@@ -152,7 +152,7 @@ public class PostoAppServiceTests
         var postoId = Guid.NewGuid();
         var input = new UpdatePostoInput("Portaria B", "01310-100", "Rua Nova", "10", null, "São Paulo", "SP");
 
-        _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync((Posto?)null);
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync((Posto?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(postoId, input));
@@ -174,15 +174,15 @@ public class PostoAppServiceTests
         var postoId = Guid.NewGuid();
         var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
-        _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
-        _mockUow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
+        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         // Act
         await _service.DeleteAsync(postoId);
 
         // Assert
         _mockRepo.Verify(r => r.Update(It.Is<Posto>(p => !p.Ativo)), Times.Once);
-        _mockUow.Verify(u => u.CommitAsync(), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "DeleteAsync - Deve falhar quando posto não existe")]
@@ -190,7 +190,7 @@ public class PostoAppServiceTests
     {
         // Arrange
         var postoId = Guid.NewGuid();
-        _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync((Posto?)null);
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync((Posto?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(postoId));
@@ -212,17 +212,17 @@ public class PostoAppServiceTests
         var postoId = Guid.NewGuid();
         var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
-        _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync(posto);
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
 
         // Act
-        var result = await _service.GetByIdAsync(postoId);
+        var result = await _service.GetByIdAsync(postoId, It.IsAny<CancellationToken>());
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal("Portaria A", result.Nome);
         Assert.Equal("São Paulo", result.Cidade);
 
-        _mockRepo.Verify(r => r.GetByIdAsync(postoId), Times.Once);
+        _mockRepo.Verify(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "GetByIdAsync - Deve retornar null quando posto não existe")]
@@ -230,14 +230,14 @@ public class PostoAppServiceTests
     {
         // Arrange
         var postoId = Guid.NewGuid();
-        _mockRepo.Setup(r => r.GetByIdAsync(postoId)).ReturnsAsync((Posto?)null);
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync((Posto?)null);
 
         // Act
-        var result = await _service.GetByIdAsync(postoId);
+        var result = await _service.GetByIdAsync(postoId, It.IsAny<CancellationToken>());
 
         // Assert
         Assert.Null(result);
-        _mockRepo.Verify(r => r.GetByIdAsync(postoId), Times.Once);
+        _mockRepo.Verify(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion
@@ -257,25 +257,25 @@ public class PostoAppServiceTests
             new Posto(clienteId, empresaId, "Portaria C", "13010-111", "Rua C", "30", null, "Campinas", "SP")
         };
 
-        _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(postos);
+        _mockRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(postos);
 
         // Act
-        var result = await _service.GetAllAsync();
+        var result = await _service.GetAllAsync(It.IsAny<CancellationToken>());
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(3, result.Count());
-        _mockRepo.Verify(r => r.GetAllAsync(), Times.Once);
+        _mockRepo.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "GetAllAsync - Deve retornar lista vazia quando não há postos")]
     public async Task GetAllAsync_DeveRetornarListaVazia_QuandoNaoHaPostos()
     {
         // Arrange
-        _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Posto>());
+        _mockRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Posto>());
 
         // Act
-        var result = await _service.GetAllAsync();
+        var result = await _service.GetAllAsync(It.IsAny<CancellationToken>());
 
         // Assert
         Assert.NotNull(result);
@@ -298,17 +298,17 @@ public class PostoAppServiceTests
             new Posto(clienteId, empresaId, "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP")
         };
 
-        _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId)).ReturnsAsync(postos);
+        _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None)).ReturnsAsync(postos);
 
         // Act
-        var result = await _service.GetByClienteIdAsync(clienteId);
+        var result = await _service.GetByClienteIdAsync(clienteId, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(2, result.Count());
         Assert.All(result, p => Assert.Equal(clienteId, p.ClienteId));
 
-        _mockRepo.Verify(r => r.GetByClienteIdAsync(clienteId), Times.Once);
+        _mockRepo.Verify(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None), Times.Once);
     }
 
     [Fact(DisplayName = "GetByClienteIdAsync - Deve retornar lista vazia quando não há postos")]
@@ -316,7 +316,7 @@ public class PostoAppServiceTests
     {
         // Arrange
         var clienteId = Guid.NewGuid();
-        _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId)).ReturnsAsync(new List<Posto>());
+        _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None)).ReturnsAsync(new List<Posto>());
 
         // Act
         var result = await _service.GetByClienteIdAsync(clienteId);

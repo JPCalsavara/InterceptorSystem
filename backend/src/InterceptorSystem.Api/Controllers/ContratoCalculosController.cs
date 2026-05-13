@@ -25,7 +25,7 @@ public class ContratoCalculosController : ControllerBase
     [HttpPost("calcular-valor-total")]
     [ProducesResponseType(typeof(CalculoValorTotalOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<CalculoValorTotalOutput> CalcularValorTotal([FromBody] CalculoValorTotalInput input)
+    public ActionResult<CalculoValorTotalOutput> CalcularValorTotal([FromBody] CalculoValorTotalInput input, CancellationToken ct = default)
     {
         try
         {
@@ -47,6 +47,14 @@ public class ContratoCalculosController : ControllerBase
             if (input.PercentualAdicionalFimSemana < 0 || input.PercentualAdicionalFimSemana > 1)
                 return BadRequest(new { error = "Percentual adicional fim de semana deve estar entre 0 e 1." });
             
+            // Validar que encargos + margens não excedem 100%
+            var totalPercentuais = input.PercentualEncargosProvisoes + 
+                                  input.MargemLucroPercentual + 
+                                  input.MargemCoberturaFaltasPercentual;
+            if (totalPercentuais >= 1m)
+                return BadRequest(new { 
+                    error = $"Soma de encargos ({input.PercentualEncargosProvisoes:P}) + margens ({input.MargemLucroPercentual:P} + {input.MargemCoberturaFaltasPercentual:P}) não pode ser >= 100%. Total: {totalPercentuais:P}"
+                });
 
             var output = _contratoCalculoService.CalcularValorTotal(input);
             return Ok(output);
@@ -67,7 +75,7 @@ public class ContratoCalculosController : ControllerBase
     [HttpPost("simular-sem-alocacoes")]
     [ProducesResponseType(typeof(SimulacaoFinanceiraMensalOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<SimulacaoFinanceiraMensalOutput> SimularSemAlocacoes([FromBody] SimulacaoFinanceiraMensalInput input)
+    public ActionResult<SimulacaoFinanceiraMensalOutput> SimularSemAlocacoes([FromBody] SimulacaoFinanceiraMensalInput input, CancellationToken ct = default)
     {
         try
         {
@@ -91,6 +99,15 @@ public class ContratoCalculosController : ControllerBase
 
             if (input.PercentualAdicionalFimSemana < 0 || input.PercentualAdicionalFimSemana > 1)
                 return BadRequest(new { error = "Percentual adicional fim de semana deve estar entre 0 e 1." });
+
+            // Validar que encargos + margens não excedem 100%
+            var totalPercentuais = input.PercentualEncargosProvisoes + 
+                                  input.MargemLucroPercentual + 
+                                  input.MargemCoberturaFaltasPercentual;
+            if (totalPercentuais >= 1m)
+                return BadRequest(new { 
+                    error = $"Soma de encargos ({input.PercentualEncargosProvisoes:P}) + margens ({input.MargemLucroPercentual:P} + {input.MargemCoberturaFaltasPercentual:P}) não pode ser >= 100%. Total: {totalPercentuais:P}"
+                });
 
             var output = _contratoCalculoService.SimularSemAlocacoes(input);
             return Ok(output);

@@ -43,8 +43,8 @@ public class CachedDiariaRepository : IDiariaRepository
     public Task<IPagedResult<Diaria>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         => _decorated.GetPagedAsync(page, pageSize, cancellationToken);
 
-    public Task<bool> ExisteDiariaNaDataAsync(Guid funcionarioId, DateOnly data, Guid? diariaIdIgnorada = null)
-        => _decorated.ExisteDiariaNaDataAsync(funcionarioId, data, diariaIdIgnorada);
+    public Task<bool> ExisteDiariaNaDataAsync(Guid funcionarioId, DateOnly data, Guid? diariaIdIgnorada = null, CancellationToken ct = default)
+        => _decorated.ExisteDiariaNaDataAsync(funcionarioId, data, diariaIdIgnorada, ct);
 
     // ========== CACHED METHODS ==========
 
@@ -62,70 +62,70 @@ public class CachedDiariaRepository : IDiariaRepository
         return cachedList ?? Enumerable.Empty<Diaria>();
     }
 
-    public async Task<IEnumerable<Diaria>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Diaria>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Diarias_{empresaId}_Cliente_{clienteId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Diaria>? cachedList))
         {
-            cachedList = await _decorated.GetByClienteIdAsync(clienteId);
+            cachedList = await _decorated.GetByClienteIdAsync(clienteId, ct);
             _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Volatile));
         }
 
         return cachedList ?? Enumerable.Empty<Diaria>();
     }
 
-    public async Task<IEnumerable<Diaria>> GetByFuncionarioAsync(Guid funcionarioId)
+    public async Task<IEnumerable<Diaria>> GetByFuncionarioAsync(Guid funcionarioId, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Diarias_{empresaId}_Funcionario_{funcionarioId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Diaria>? cachedList))
         {
-            cachedList = await _decorated.GetByFuncionarioAsync(funcionarioId);
+            cachedList = await _decorated.GetByFuncionarioAsync(funcionarioId, ct);
             _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Volatile));
         }
 
         return cachedList ?? Enumerable.Empty<Diaria>();
     }
 
-    public async Task<IEnumerable<Diaria>> GetByAlocacaoAsync(Guid alocacaoId)
+    public async Task<IEnumerable<Diaria>> GetByAlocacaoAsync(Guid alocacaoId, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Diarias_{empresaId}_Alocacao_{alocacaoId}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Diaria>? cachedList))
         {
-            cachedList = await _decorated.GetByAlocacaoAsync(alocacaoId);
+            cachedList = await _decorated.GetByAlocacaoAsync(alocacaoId, ct);
             _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Volatile));
         }
 
         return cachedList ?? Enumerable.Empty<Diaria>();
     }
 
-    public async Task<IEnumerable<Diaria>> GetByAlocacaoEDataAsync(Guid alocacaoId, DateOnly data)
+    public async Task<IEnumerable<Diaria>> GetByAlocacaoEDataAsync(Guid alocacaoId, DateOnly data, CancellationToken ct = default)
     {
         var empresaId = _tenantService.EmpresaId ?? throw new InvalidOperationException("EmpresaId não encontrado.");
         var cacheKey = $"Diarias_{empresaId}_Alocacao_{alocacaoId}_Data_{data:yyyy-MM-dd}";
 
         if (!_cache.TryGetValue(cacheKey, out IEnumerable<Diaria>? cachedList))
         {
-            cachedList = await _decorated.GetByAlocacaoEDataAsync(alocacaoId, data);
+            cachedList = await _decorated.GetByAlocacaoEDataAsync(alocacaoId, data, ct);
             _cache.Set(cacheKey, cachedList, CacheConfiguration.GetCacheOptions(CacheVolatility.Volatile));
         }
 
         return cachedList ?? Enumerable.Empty<Diaria>();
     }
 
-    public Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim)
-        => _decorated.GetByContratoIdAsync(contratoId, inicio, fim);
+    public Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim, CancellationToken ct = default)
+        => _decorated.GetByContratoIdAsync(contratoId, inicio, fim, ct);
 
-    public Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes)
-        => _decorated.GetResumoFinanceiroByContratoAsync(contratoId, ano, mes);
+    public Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes, CancellationToken ct = default)
+        => _decorated.GetResumoFinanceiroByContratoAsync(contratoId, ano, mes, ct);
 
-    public Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds)
+    public Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds, CancellationToken ct = default)
     {
-        return _decorated.GetDiariasByAlocacoesIdsAsync(alocacaoIds);
+        return _decorated.GetDiariasByAlocacoesIdsAsync(alocacaoIds, ct);
     }
 }

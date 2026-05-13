@@ -81,6 +81,7 @@
           id="nome"
           type="text"
           formControlName="nome"
+          data-testid="cliente-nome"
           class="form-input"
           [class.error]="hasError('nome')"
           placeholder="Ex: Cliente Horizonte Verde"
@@ -96,6 +97,7 @@
           id="cnpj"
           type="text"
           formControlName="cnpj"
+          data-testid="cliente-cnpj"
           class="form-input"
           [class.error]="hasError('cnpj')"
           placeholder="12.345.678/0001-90"
@@ -175,6 +177,7 @@
             id="emailGestor"
             type="email"
             formControlName="emailGestor"
+            data-testid="cliente-email"
             class="form-input"
             [class.error]="hasError('emailGestor')"
             placeholder="gestor@cliente.com.br"
@@ -190,6 +193,7 @@
             id="telefoneEmergencia"
             type="tel"
             formControlName="telefoneEmergencia"
+            data-testid="cliente-telefone"
             class="form-input"
             [class.error]="hasError('telefoneEmergencia')"
             placeholder="(11) 98765-4321"
@@ -209,7 +213,7 @@
           <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()">
+          <button type="submit" class="btn-primary" [disabled]="loading()" data-testid="btn-save-cliente">
             @if (loading()) {
               <span class="spinner-small"></span>
               Salvando...

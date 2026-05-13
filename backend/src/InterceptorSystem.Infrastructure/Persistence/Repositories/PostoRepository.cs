@@ -52,12 +52,12 @@ public class PostoRepository : IPostoRepository
         return new PagedResult<Posto>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
-    public async Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId)
+    public async Task<IEnumerable<Posto>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
         return await _context.Postos
             .Include(p => p.Cliente)
             .Where(p => p.ClienteId == clienteId && p.Ativo)
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
     public void Add(Posto entity) => _context.Postos.Add(entity);

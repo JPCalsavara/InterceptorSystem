@@ -8,8 +8,8 @@ namespace InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces
 {
     public interface IAlocacaoRepository : IRepository<Alocacao>
     {
-        Task<List<Alocacao>> GetAlocacoesByClienteIdAsync(Guid clienteId);
-        Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId);
-        Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId);
+        Task<List<Alocacao>> GetAlocacoesByClienteIdAsync(Guid clienteId, CancellationToken ct = default);
+        Task<IEnumerable<Alocacao>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default);
+        Task<IEnumerable<Alocacao>> GetByPostoIdAsync(Guid postoId, CancellationToken ct = default);
     }
 }

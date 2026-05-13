@@ -67,7 +67,11 @@
         </div>
         <div class="metricas-grid">
           @for (metrica of metricasFinanceiras(); track metrica.titulo) {
-            <div class="card" [style.border-left-color]="metrica.cor">
+            <div
+              class="card"
+              [attr.data-testid]="'card-' + metrica.titulo.toLowerCase().replace(' ', '-')"
+              [style.border-left-color]="metrica.cor"
+            >
               <div class="card-header">
                 <span class="metrica-icone">
                   @switch (metrica.icone) {

@@ -71,7 +71,7 @@ public class FuncionarioRepository : IFuncionarioRepository
         return new PagedResult<Funcionario>(items, totalCount, normalizedPage, normalizedPageSize);
     }
 
-    public async Task<Funcionario?> GetByCpfAsync(string cpf)
+    public async Task<Funcionario?> GetByCpfAsync(string cpf, CancellationToken ct = default)
     {
         var normalizedCpf = new string((cpf ?? string.Empty).Where(char.IsDigit).ToArray());
 
@@ -83,10 +83,10 @@ public class FuncionarioRepository : IFuncionarioRepository
                     .ThenInclude(ct => ct.Tag)
             .Include(f => f.Tags)
                 .ThenInclude(ft => ft.Tag)
-            .FirstOrDefaultAsync(f => f.Cpf.Valor == normalizedCpf);
+            .FirstOrDefaultAsync(f => f.Cpf.Valor == normalizedCpf, ct);
     }
 
-    public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId)
+    public async Task<IEnumerable<Funcionario>> GetByClienteAsync(Guid clienteId, CancellationToken ct = default)
         => await _context.Funcionarios
             .Include(f => f.Contrato)
                 .ThenInclude(c => c!.Cliente)
@@ -98,7 +98,7 @@ public class FuncionarioRepository : IFuncionarioRepository
             .Include(f => f.Tags)
                 .ThenInclude(ft => ft.Tag)
             .Where(f => f.ClienteId == clienteId)
-            .ToListAsync();
+            .ToListAsync(ct);
 
     public void Add(Funcionario entity) => _context.Funcionarios.Add(entity);
     public void Update(Funcionario entity) => _context.Funcionarios.Update(entity);

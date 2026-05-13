@@ -1,0 +1,418 @@
+❯ Building...
+✔ Building...
+Application bundle generation failed. [16.823 seconds] - 2026-05-13T01:04:56.838Z
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:3:44:
+      3 │     login(email: string, password: string): Chainable<void>;
+        ╵                                             ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:4:33:
+      4 │     createCliente(cliente: any): Chainable<void>;
+        ╵                                  ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:5:48:
+      5 │     createPosto(clienteId: string, posto: any): Chainable<void>;
+        ╵                                                 ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:6:54:
+      6 │     createContrato(clienteId: string, contrato: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:7:60:
+      7 │ ...eFuncionario(clienteId: string, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:8:73:
+      8 │ ...Setup(cliente: any, posto: any, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:9:65:
+      9 │ ...ipleDiarias(funcionarioId: string, count: number): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:0:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'email' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:31:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'password' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:38:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                       ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:14:2:
+      14 │   cy.visit('/auth/login');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:15:2:
+      15 │   cy.get('[data-testid="login-email"]').type(email);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:16:2:
+      16 │   cy.get('[data-testid="login-password"]').type(password);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:17:2:
+      17 │   cy.get('[data-testid="login-submit"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:0:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:39:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:21:2:
+      21 │   cy.visit('/clientes/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:22:2:
+      22 │   cy.get('[data-testid="cliente-nome"]').type(cliente.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:23:2:
+      23 │   cy.get('[data-testid="cliente-cnpj"]').type(cliente.cnpj);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:24:2:
+      24 │   cy.get('[data-testid="btn-save-cliente"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:0:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:37:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                      ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:48:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                                 ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:28:2:
+      28 │   cy.visit(`/postos/novo?cliente=${clienteId}`);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:29:2:
+      29 │   cy.get('[data-testid="posto-nome"]').type(posto.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:30:2:
+      30 │   cy.get('[data-testid="btn-save-posto"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:0:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:40:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                         ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'contrato' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:51:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                                    ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:34:2:
+      34 │   cy.visit('/contratos/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:35:2:
+      35 │   cy.get('[data-testid="contrato-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:36:2:
+      36 │   cy.get('[data-testid="contrato-titulo"]').type(contrato.titulo |...
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:37:2:
+      37 │   cy.get('[data-testid="btn-save-contrato"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:0:
+      40 │ Cypress.Commands.add('createFuncionario', (clienteId, funcionario)...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:43:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                          ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:54:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:41:2:
+      41 │   cy.visit('/funcionarios/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:42:2:
+      42 │   cy.get('[data-testid="funcionario-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:43:2:
+      43 │   cy.get('[data-testid="funcionario-nome"]').type(funcionario.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:44:2:
+      44 │   cy.get('[data-testid="funcionario-cpf"]').type(funcionario.cpf);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:45:2:
+      45 │   cy.get('[data-testid="btn-save-funcionario"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:0:
+      48 │ Cypress.Commands.add('createFullContractSetup', (cliente, posto, f...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:49:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                     ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:58:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                              ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:65:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:49:2:
+      49 │   cy.createCliente(cliente);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:51:2:
+      51 │   cy.createPosto('dummy-id', posto);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:52:2:
+      52 │   cy.createContrato('dummy-id', {});
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:53:2:
+      53 │   cy.createFuncionario('dummy-id', funcionario);
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:0:
+      56 │ Cypress.Commands.add('createMultipleDiarias', (funcionarioId, coun...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionarioId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:47:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                            ~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'count' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:62:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                                           ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:58:4:
+      58 │     cy.visit('/diarias/novo');
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:60:4:
+      60 │     cy.get('[data-testid="btn-save-diaria"]').click();
+         ╵     ~~
+
+
+Watch mode enabled. Watching for file changes...
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                        |  Raw size
+styles.css          | styles                       |  32.05 kB | 
+main.js             | main                         |  11.41 kB | 
+chunk-R3FF2VD3.js   | -                            |   3.42 kB | 
+chunk-653SOEEV.js   | -                            |   1.51 kB | 
+chunk-DDE4NLQV.js   | -                            | 178 bytes | 
+
+                    | Initial total                |  48.58 kB
+
+Lazy chunk files    | Names                        |  Raw size
+chunk-372VYX2K.js   | cliente-wizard-component     | 296.02 kB | 
+chunk-EUPCKFMH.js   | cliente-detail-component     | 179.25 kB | 
+chunk-UECSDSQY.js   | landing-component            | 176.77 kB | 
+chunk-FBBMVFRE.js   | contrato-detail-component    | 172.00 kB | 
+chunk-UF4VSIS4.js   | -                            | 148.81 kB | 
+chunk-CES7JLX4.js   | -                            | 144.28 kB | 
+chunk-6XR7BIDC.js   | dashboard-component          | 137.81 kB | 
+chunk-CRRZIZNI.js   | posto-detail-component       | 128.51 kB | 
+chunk-ORREETJQ.js   | funcionario-detail-component | 126.69 kB | 
+chunk-6NWDWYX7.js   | app-shell-component          | 116.35 kB | 
+chunk-VGORMSTV.js   | contrato-list-component      |  94.00 kB | 
+chunk-2IU6ZDTX.js   | suporte-page-component       |  63.71 kB | 
+chunk-FCLR7IUT.js   | tag-list-component           |  60.32 kB | 
+chunk-4NO3FBWX.js   | perfil-component             |  53.29 kB | 
+chunk-HSYMXQSU.js   | funcionario-form-component   |  51.75 kB | 
+...and 36 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [10.777 seconds] - 2026-05-13T01:10:12.817Z
+
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+22:10:13 [vite] (client) Re-optimizing dependencies because lockfile has changed
+An unhandled exception occurred: EACCES: permission denied, rmdir '/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/.angular/cache/21.0.4/frontend/vite/deps'
+See "/tmp/ng-Oxh42l/angular-errors.log" for further details.
