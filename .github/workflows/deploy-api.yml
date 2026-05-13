@@ -150,6 +150,33 @@ jobs:
             else
               echo "⚠️ .env file not found, skipping migrations"
             fi
+             # Debug: Mostrar diretório e verificar .env
+             echo "🔍 Verificando ambiente..."
+             echo "Diretório atual: $(pwd)"
+             if [ -f .env ]; then
+               echo "✅ Arquivo .env encontrado"
+               echo "Linhas em .env: $(wc -l < .env)"
+               # Verificar se tem variáveis críticas (sem expor valores)
+               grep -q "ConnectionStrings__DefaultConnection" .env && echo "✅ ConnectionString encontrada" || echo "❌ ConnectionString NÃO encontrada"
+               grep -q "Jwt__Key" .env && echo "✅ JWT_Key encontrada" || echo "❌ JWT_Key NÃO encontrada"
+             else
+               echo "❌ ERRO: .env não encontrado em $(pwd)"
+               echo "Arquivos disponíveis:"
+               ls -la | grep -E "^\.|\.env|compose"
+               exit 1
+             fi
+
+             echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
+             docker run --rm \
+               --network host \
+               --env-file .env \
+               -e "ASPNETCORE_ENVIRONMENT=Production" \
+               interceptor-api:latest \
+               bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1" || {
+               echo "⚠️ Migrations falharam. Verificando detalhes..."
+               # Se falhou, tenta fazer skip de migrations apenas para iniciar a API
+               echo "⚠️ Continuando com deploy mesmo assim..."
+             }
 
             echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
             docker compose -f compose.ec2.yml pull --ignore-pull-failures || true
