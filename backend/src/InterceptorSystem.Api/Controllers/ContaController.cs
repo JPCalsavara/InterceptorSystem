@@ -1,6 +1,6 @@
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Application.Modulos.Auth.Interfaces;
-using InterceptorSystem.Application.Modulos.Whatsapp.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Whatsapp.DTOs;
 using InterceptorSystem.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,9 @@ public class ContaController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPerfil()
+    [ProducesResponseType(typeof(ContaPerfilDtoOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetPerfil(CancellationToken ct = default)
     {
         var empresaId = _currentTenantService.EmpresaId;
         if (empresaId == null)
@@ -40,7 +42,11 @@ public class ContaController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> AtualizarPerfil([FromBody] AtualizarContaDtoInput input)
+    [ProducesResponseType(typeof(ContaPerfilDtoOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AtualizarPerfil([FromBody] AtualizarContaDtoInput input, CancellationToken ct = default)
     {
         var empresaId = _currentTenantService.EmpresaId;
         if (empresaId == null)
@@ -66,7 +72,10 @@ public class ContaController : ControllerBase
     }
 
     [HttpPost("telefone")]
-    public async Task<IActionResult> CadastrarTelefone([FromBody] CadastrarTelefoneDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CadastrarTelefone([FromBody] CadastrarTelefoneDtoInput input, CancellationToken ct = default)
     {
         var empresaId = _currentTenantService.EmpresaId;
         if (empresaId == null)
@@ -88,7 +97,9 @@ public class ContaController : ControllerBase
     }
 
     [HttpPost("telefone/confirmar")]
-    public async Task<IActionResult> ConfirmarTelefone([FromBody] ConfirmarTelefoneDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ConfirmarTelefone([FromBody] ConfirmarTelefoneDtoInput input, CancellationToken ct = default)
     {
         try
         {

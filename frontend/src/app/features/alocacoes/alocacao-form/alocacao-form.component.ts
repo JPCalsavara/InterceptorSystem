@@ -1,232 +1,201 @@
-import {
-  Component,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  Input,
-  Output,
-  EventEmitter,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AlocacaoService } from '../../../services/alocacao.service';
-import { FuncionarioService } from '../../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { PostoService } from '../../../services/posto.service';
+import { ContratoService } from '../../../services/contrato.service';
+import { ClienteService } from '../../../services/cliente.service';
 import {
-  Funcionario,
-  PostoDeTrabalho,
-  Condominio,
   Alocacao,
-  StatusAlocacao,
-  TipoAlocacao,
+  Posto,
+  Contrato,
+  Cliente,
+  TipoEscala,
+  CreateAlocacaoDto,
+  UpdateAlocacaoDto,
 } from '../../../models/index';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-alocacao-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './alocacao-form.component.html',
   styleUrl: './alocacao-form.component.scss',
 })
-export class AlocacaoFormComponent implements OnInit, OnChanges {
+export class AlocacaoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private service = inject(AlocacaoService);
-  private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private condominioService = inject(CondominioService);
+  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private contratoService = inject(ContratoService);
+  private clienteService = inject(ClienteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  @Input() embeddedAlocacaoId: string | null = null;
-  @Output() savedEvent = new EventEmitter<void>();
-  @Output() cancelledEvent = new EventEmitter<void>();
-
-  get isEmbedded(): boolean {
-    return this.embeddedAlocacaoId !== null;
-  }
-
   form!: FormGroup;
-  funcionarios = signal<Funcionario[]>([]);
-  postos = signal<PostoDeTrabalho[]>([]);
-  condominios = signal<Condominio[]>([]);
+  postos = signal<Posto[]>([]);
+  contratos = signal<Contrato[]>([]);
+  clientes = signal<Cliente[]>([]);
+
   loading = signal(false);
   error = signal<string | null>(null);
+  submitted = signal(false);
   isEditMode = signal(false);
   alocacaoId: string | null = null;
 
-  statusOptions = [
-    { value: StatusAlocacao.CONFIRMADA, label: 'Confirmada' },
-    { value: StatusAlocacao.CANCELADA, label: 'Cancelada' },
-    { value: StatusAlocacao.FALTA_REGISTRADA, label: 'Falta Registrada' },
-  ];
-
-  tipoOptions = [
-    { value: TipoAlocacao.REGULAR, label: 'Regular' },
-    { value: TipoAlocacao.DOBRA_PROGRAMADA, label: 'Dobra Programada' },
-    { value: TipoAlocacao.SUBSTITUICAO, label: 'Substituição' },
+  tipoEscalaOptions = [
+    { value: TipoEscala.DOZE_POR_TRINTA_SEIS, label: '12x36' },
+    { value: TipoEscala.SEMANAL_COMERCIAL, label: 'Comercial' },
+    { value: TipoEscala.OITO_HORAS_SEIS_POR_DOIS, label: '8h (6x2)' },
+    { value: TipoEscala.ALCALA_8H, label: '8 Horas (Diário)' },
+    { value: TipoEscala.FOLGUISTA, label: 'Folguista' },
   ];
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      funcionarioId: ['', Validators.required],
-      postoDeTrabalhoId: ['', Validators.required],
-      data: ['', Validators.required],
-      statusAlocacao: [StatusAlocacao.CONFIRMADA, Validators.required],
-      tipoAlocacao: [TipoAlocacao.REGULAR, Validators.required],
-    });
-
-    this.loadDependencies();
-    this.initFromSource();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['embeddedAlocacaoId'] && this.form) {
-      this.initFromSource();
-    }
-  }
-
-  private initFromSource(): void {
-    this.alocacaoId = this.embeddedAlocacaoId ?? this.route.snapshot.paramMap.get('id');
+    this.alocacaoId = this.route.snapshot.paramMap.get('id');
     this.isEditMode.set(!!this.alocacaoId);
 
-    if (this.isEditMode() && this.alocacaoId) {
-      this.loadAlocacao(this.alocacaoId);
-    } else {
-      this.form.enable();
-      this.form.reset({
-        statusAlocacao: StatusAlocacao.CONFIRMADA,
-        tipoAlocacao: TipoAlocacao.REGULAR,
-      });
-    }
+    this.form = this.fb.group({
+      clienteId: ['', Validators.required],
+      postoId: ['', Validators.required],
+      contratoId: ['', Validators.required],
+      horarioInicio: ['07:00', [Validators.required]],
+      horarioFim: ['19:00', [Validators.required]],
+      tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
+      permiteDobrarEscala: [true],
+    });
+
+    this.loadInitialData();
+
+    // Quando mudar cliente, filtrar postos e contratos
+    this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
+      if (!this.isEditMode()) {
+        this.form.patchValue({ postoId: '', contratoId: '' });
+      }
+    });
   }
 
-  loadDependencies(): void {
-    this.funcionarioService.getAll().subscribe({
-      next: (data) => this.funcionarios.set(data),
-      error: (err) => console.error('Erro ao carregar funcionários:', err),
-    });
+  loadInitialData(): void {
+    this.loading.set(true);
+    forkJoin({
+      clientes: this.clienteService.getAll(),
+      postos: this.postoService.getAll(),
+      contratos: this.contratoService.getAll(),
+    }).subscribe({
+      next: (data) => {
+        this.clientes.set(data.clientes);
+        this.postos.set(data.postos);
+        this.contratos.set(data.contratos);
 
-    this.postoService.getAll().subscribe({
-      next: (data) => this.postos.set(data),
-      error: (err) => console.error('Erro ao carregar postos:', err),
-    });
+        if (this.isEditMode() && this.alocacaoId) {
+          this.loadAlocacao(this.alocacaoId);
+        } else {
+          // Pre-fill from query params if available
+          const qClienteId = this.route.snapshot.queryParamMap.get('clienteId');
+          const qPostoId = this.route.snapshot.queryParamMap.get('postoId');
+          if (qClienteId) this.form.patchValue({ clienteId: qClienteId });
+          if (qPostoId) this.form.patchValue({ postoId: qPostoId });
 
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+          this.loading.set(false);
+        }
+      },
+      error: () => {
+        this.error.set('Erro ao carregar dados iniciais.');
+        this.loading.set(false);
+      },
     });
   }
 
   loadAlocacao(id: string): void {
-    this.loading.set(true);
-    this.service.getById(id).subscribe({
+    this.alocacaoService.getById(id).subscribe({
       next: (data: Alocacao) => {
+        const posto = this.postos().find((p) => p.id === data.postoId);
         this.form.patchValue({
-          funcionarioId: data.funcionarioId,
-          postoDeTrabalhoId: data.postoDeTrabalhoId,
-          data: data.data,
-          statusAlocacao: data.statusAlocacao,
-          tipoAlocacao: data.tipoAlocacao,
+          clienteId: posto?.clienteId,
+          postoId: data.postoId,
+          contratoId: data.contratoId,
+          horarioInicio: data.horarioInicio.substring(0, 5),
+          horarioFim: data.horarioFim.substring(0, 5),
+          tipoEscala: data.tipoEscala,
+          permiteDobrarEscala: data.permiteDobrarEscala,
         });
-        // Em modo de edição, funcionario e posto não podem ser alterados
-        this.form.get('funcionarioId')?.disable();
-        this.form.get('postoDeTrabalhoId')?.disable();
+
+        // Context fields are not part of update DTO, keep them read-only on edit.
+        this.form.get('clienteId')?.disable();
+        this.form.get('postoId')?.disable();
+        this.form.get('contratoId')?.disable();
+
         this.loading.set(false);
       },
-      error: (err) => {
+      error: () => {
         this.error.set('Erro ao carregar alocação.');
         this.loading.set(false);
-        console.error(err);
       },
     });
   }
 
-  getCondominioNome(postoId: string): string {
-    const posto = this.postos().find((p) => p.id === postoId);
-    if (!posto) return '';
-    return this.condominios().find((c) => c.id === posto.condominioId)?.nome || '';
-  }
-
-  getPostoLabel(posto: PostoDeTrabalho): string {
-    const inicio = posto.horarioInicio.substring(0, 5);
-    const fim = posto.horarioFim.substring(0, 5);
-    const condominio = this.getCondominioNome(posto.id);
-    return `${inicio} - ${fim} (${condominio})`;
-  }
-
   onSubmit(): void {
+    this.submitted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     this.loading.set(true);
-    this.error.set(null);
+    const val = this.form.getRawValue();
 
-    const formValue = this.form.getRawValue();
+    // Garantir formato HH:mm:ss
+    const inicio = val.horarioInicio.length === 5 ? `${val.horarioInicio}:00` : val.horarioInicio;
+    const fim = val.horarioFim.length === 5 ? `${val.horarioFim}:00` : val.horarioFim;
 
     if (this.isEditMode() && this.alocacaoId) {
-      const updateDto = {
-        statusAlocacao: formValue.statusAlocacao,
-        tipoAlocacao: formValue.tipoAlocacao,
-        data: formValue.data,
+      const dto: UpdateAlocacaoDto = {
+        horarioInicio: inicio,
+        horarioFim: fim,
+        tipoEscala: val.tipoEscala,
+        permiteDobrarEscala: val.permiteDobrarEscala,
       };
-
-      this.service.update(this.alocacaoId, updateDto).subscribe({
-        next: () => {
-          this.loading.set(false);
-          if (this.isEmbedded) {
-            this.savedEvent.emit();
-          } else {
-            this.router.navigate(['/alocacoes']);
-          }
-        },
+      this.alocacaoService.update(this.alocacaoId, dto).subscribe({
+        next: () => this.router.navigate(['/alocacoes']),
         error: (err) => {
-          this.error.set(err.error?.message || 'Erro ao atualizar alocação.');
+          this.error.set(err.error?.error || 'Erro ao atualizar turno.');
           this.loading.set(false);
-          console.error(err);
         },
       });
     } else {
-      const createDto = {
-        funcionarioId: formValue.funcionarioId,
-        postoDeTrabalhoId: formValue.postoDeTrabalhoId,
-        data: formValue.data,
-        statusAlocacao: formValue.statusAlocacao,
-        tipoAlocacao: formValue.tipoAlocacao,
+      const dto: CreateAlocacaoDto = {
+        postoId: val.postoId,
+        contratoId: val.contratoId,
+        horarioInicio: inicio,
+        horarioFim: fim,
+        tipoEscala: val.tipoEscala,
+        permiteDobrarEscala: val.permiteDobrarEscala,
       };
-
-      this.service.create(createDto).subscribe({
-        next: () => {
-          this.loading.set(false);
-          if (this.isEmbedded) {
-            this.savedEvent.emit();
-          } else {
-            this.router.navigate(['/alocacoes']);
-          }
-        },
+      this.alocacaoService.create(dto).subscribe({
+        next: () => this.router.navigate(['/alocacoes']),
         error: (err) => {
-          this.error.set(err.error?.message || 'Erro ao criar alocação.');
+          this.error.set(err.error?.error || 'Erro ao criar turno.');
           this.loading.set(false);
-          console.error(err);
         },
       });
     }
   }
 
-  dismissError(): void {
-    this.error.set(null);
+  filteredPostos(): Posto[] {
+    const clienteId = this.form.get('clienteId')?.value;
+    if (!clienteId) return [];
+    return this.postos().filter((p) => p.clienteId === clienteId);
   }
 
-  cancel(): void {
-    if (this.isEmbedded) {
-      this.cancelledEvent.emit();
-    } else {
-      this.router.navigate(['/alocacoes']);
-    }
+  filteredContratos(): Contrato[] {
+    const clienteId = this.form.get('clienteId')?.value;
+    if (!clienteId) return [];
+    return this.contratos().filter((c) => c.clienteId === clienteId);
+  }
+
+  hasError(name: string): boolean {
+    const ctrl = this.form.get(name);
+    return !!ctrl && ctrl.invalid && (ctrl.touched || this.submitted());
   }
 }

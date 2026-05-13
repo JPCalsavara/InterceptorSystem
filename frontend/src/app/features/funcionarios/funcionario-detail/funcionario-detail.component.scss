@@ -1,3 +1,5 @@
+@use '../../../../styles/shared-pages' as *;
+
 .detail-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -127,7 +129,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
   }
 }
 
@@ -145,17 +147,7 @@
 }
 
 .metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
+  @include responsive-grid(3, 1rem);
 }
 
 .metric-card {
@@ -182,7 +174,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.2) 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, transparent) 0%, color-mix(in srgb, var(--primary-color) 20%, transparent) 100%);
     border-radius: 0.5rem;
     flex-shrink: 0;
   }
@@ -207,11 +199,11 @@
       font-weight: 700;
 
       &.alert {
-        color: var(--app-ref-ff9800);
+        color: var(--warning-color);
       }
 
       &.danger {
-        color: var(--app-ref-f44336);
+        color: var(--error-color);
       }
     }
   }
@@ -233,7 +225,7 @@
   border-radius: 0.75rem;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid var(--app-ref-2196f3);
+  border-left: 4px solid var(--primary-color);
 
   .posto-header {
     display: flex;
@@ -252,8 +244,8 @@
   }
 }
 
-// Alocações Section
-.alocacoes-section {
+// Diárias Section
+.diarias-section {
   margin-bottom: 2rem;
 }
 
@@ -349,7 +341,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.alocacoes-table {
+.diarias-table {
   width: 100%;
   border-collapse: collapse;
 
@@ -423,7 +415,7 @@
 }
 
 .valor-positivo {
-  color: var(--app-ref-16a34a);
+  color: var(--success-color);
   font-weight: 600;
 }
 
@@ -442,13 +434,7 @@
 }
 
 .faltas-container {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  @include responsive-grid-asymmetric(1fr, 2fr, 1.5rem);
 }
 
 .faltas-summary {
@@ -457,7 +443,7 @@
     border-radius: 0.75rem;
     padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid var(--app-ref-f44336);
+    border-left: 4px solid var(--error-color);
 
     h3 {
       font-size: 1.125rem;
@@ -500,7 +486,7 @@
           color: var(--text-primary);
 
           &.danger {
-            color: var(--app-ref-f44336);
+            color: var(--error-color);
             font-size: 1.25rem;
           }
         }
@@ -549,7 +535,7 @@
 
     .falta-valor {
       text-align: right;
-      color: var(--app-ref-f44336);
+      color: var(--error-color);
       font-weight: 600;
     }
 
@@ -571,7 +557,7 @@
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid var(--app-ref-3b82f6);
+  border-left: 4px solid var(--color-info);
 }
 
 .noturno-header {
@@ -592,7 +578,7 @@
   font-weight: 600;
   padding: 0.2rem 0.6rem;
   background: rgba(59, 130, 246, 0.12);
-  color: var(--app-ref-2563eb);
+  color: var(--color-info);
   border-radius: 9999px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -637,10 +623,10 @@
   }
 
   &.diurno .noturno-stat-count {
-    color: var(--app-ref-059669);
+    color: var(--success-color);
   }
   &.noturno .noturno-stat-count {
-    color: var(--app-ref-4f46e5);
+    color: var(--color-info);
   }
 }
 
@@ -694,7 +680,7 @@
   font-variant-numeric: tabular-nums;
 
   &.positive {
-    color: var(--app-ref-4f46e5);
+    color: var(--color-info);
   }
   &.total {
     font-size: 1rem;

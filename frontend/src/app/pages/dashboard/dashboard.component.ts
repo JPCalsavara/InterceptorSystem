@@ -1,20 +1,24 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CondominioService } from '../../services/condominio.service';
+import { switchMap, catchError, of, forkJoin } from 'rxjs';
+import { ClienteService } from '../../services/cliente.service';
 import { FuncionarioService } from '../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../services/posto-de-trabalho.service';
-import { AlocacaoService } from '../../services/alocacao.service';
+import { PostoService } from '../../services/posto.service';
+import { DiariaService } from '../../services/diaria.service';
 import { ContratoService } from '../../services/contrato.service';
+import { ContratoFinanceiroUiService } from '../../services/contrato-financeiro-ui.service';
 import {
-  Condominio,
+  Cliente,
   Funcionario,
-  PostoDeTrabalho,
-  Alocacao,
+  Posto,
+  Diaria,
   Contrato,
   StatusContrato,
-  StatusAlocacao,
+  StatusDiaria,
   StatusFuncionario,
+  ContratoResumoFinanceiro,
+  CalculoValorTotalOutput,
 } from '../../models/index';
 
 interface DashboardCard {
@@ -42,16 +46,17 @@ interface MetricaFinanceira {
 
 interface ContratoProximoVencimento {
   id: string;
-  condominioNome: string;
+  clienteNome: string;
   dataFim: string;
   diasRestantes: number;
   valorTotalMensal: number;
 }
 
-interface CondominioCard {
+interface ClienteCard {
   id: string;
   nome: string;
-  cnpj: string;
+  cidade: string;
+  estado: string;
   ativo: boolean;
   faturamentoMensal: number;
   custoEstimado: number;
@@ -67,12 +72,12 @@ interface CondominioCard {
 interface FuncionarioRanking {
   id: string;
   nome: string;
-  condominioNome: string;
+  clienteNome: string;
   tipoFuncionario: string;
-  alocacoesNoMes: number;
+  diariasNoMes: number;
   faltasNoMes: number;
-  taxaPresenca: number; // 0-100
-  salarioTotal?: number;
+  taxaPresenca: number;
+  custoMensal?: number;
 }
 
 interface DadosMensais {
@@ -91,21 +96,24 @@ interface DadosMensais {
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private diariaService = inject(DiariaService);
   private contratoService = inject(ContratoService);
+  private financeiroUiService = inject(ContratoFinanceiroUiService);
 
-  condominios = signal<Condominio[]>([]);
+  clientes = signal<Cliente[]>([]);
   funcionarios = signal<Funcionario[]>([]);
-  postos = signal<PostoDeTrabalho[]>([]);
-  alocacoes = signal<Alocacao[]>([]);
+  postos = signal<Posto[]>([]);
+  diarias = signal<Diaria[]>([]);
   contratos = signal<Contrato[]>([]);
+  calculosDetalhados = signal<Map<string, unknown>>(new Map());
+  resumosFinanceiros = signal<Map<string, ContratoResumoFinanceiro>>(new Map());
 
   loading = signal(true);
 
-  // Mês atual para filtrar alocações
+  // Mês atual para filtrar diárias
   private get mesAtual(): { inicio: Date; fim: Date } {
     const hoje = new Date();
     const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -119,17 +127,15 @@ export class DashboardComponent implements OnInit {
       (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
     );
 
-    const faturamentoBruto = contratosVigentes.reduce((sum, c) => sum + c.valorTotalMensal, 0);
-
-    const lucroProjetado = contratosVigentes.reduce(
-      (sum, c) => sum + c.valorTotalMensal * c.margemLucroPercentual,
+    const faturamentoBruto = contratosVigentes.reduce(
+      (sum, c) => sum + this.getFaturamentoDetalhado(c),
       0,
     );
 
+    const lucroProjetado = contratosVigentes.reduce((sum, c) => sum + this.getLucroDetalhado(c), 0);
+
     const custoOperacional = contratosVigentes.reduce(
-      (sum, c) =>
-        sum +
-        c.valorTotalMensal * (1 - c.margemLucroPercentual - c.margemCoberturaFaltasPercentual),
+      (sum, c) => sum + this.getCustoDetalhado(c),
       0,
     );
 
@@ -167,17 +173,17 @@ export class DashboardComponent implements OnInit {
     ];
   });
 
-  // Cards de condomínio com dados financeiros do contrato
-  condominioCards = computed<CondominioCard[]>(() => {
-    return this.condominios()
+  // Cards de cliente com dados financeiros do contrato
+  clienteCards = computed<ClienteCard[]>(() => {
+    return this.clientes()
       .map((cond) => {
         const contrato = this.contratos().find(
           (c) =>
-            c.condominioId === cond.id &&
+            c.clienteId === cond.id &&
             (c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE),
         );
         const funcionariosCond = this.funcionarios().filter(
-          (f) => f.condominioId === cond.id && f.statusFuncionario === StatusFuncionario.ATIVO,
+          (f) => f.clienteId === cond.id && f.statusFuncionario === StatusFuncionario.ATIVO,
         );
 
         let diasParaVencimento: number | null = null;
@@ -191,14 +197,9 @@ export class DashboardComponent implements OnInit {
 
         // Custo e lucro derivados diretamente das margens do contrato (top-down)
         // Evita replicar a fórmula do backend; usa os percentuais já calculados
-        const custoEstimado = contrato
-          ? contrato.valorTotalMensal *
-            (1 - contrato.margemLucroPercentual - contrato.margemCoberturaFaltasPercentual)
-          : 0;
+        const custoEstimado = contrato ? this.getCustoDetalhado(contrato) : 0;
 
-        const lucroEstimado = contrato
-          ? contrato.valorTotalMensal * contrato.margemLucroPercentual
-          : 0;
+        const lucroEstimado = contrato ? this.getLucroDetalhado(contrato) : 0;
 
         // margemLucroPercentual vem em 0-1 do backend; getLucroClass() espera 0-100
         const margemLucro = contrato ? contrato.margemLucroPercentual * 100 : 0;
@@ -206,9 +207,10 @@ export class DashboardComponent implements OnInit {
         return {
           id: cond.id,
           nome: cond.nome,
-          cnpj: cond.cnpj,
+          cidade: cond.cidade,
+          estado: cond.estado,
           ativo: cond.ativo,
-          faturamentoMensal: contrato?.valorTotalMensal ?? 0,
+          faturamentoMensal: contrato ? this.getFaturamentoDetalhado(contrato) : 0,
           custoEstimado,
           lucroEstimado,
           margemLucro,
@@ -226,7 +228,7 @@ export class DashboardComponent implements OnInit {
   funcionariosRanking = computed<FuncionarioRanking[]>(() => {
     const { inicio, fim } = this.mesAtual;
 
-    const alocacoesMes = this.alocacoes().filter((a) => {
+    const diariasMes = this.diarias().filter((a) => {
       const data = new Date(a.data);
       return data >= inicio && data <= fim;
     });
@@ -234,31 +236,31 @@ export class DashboardComponent implements OnInit {
     return this.funcionarios()
       .filter((f) => f.statusFuncionario === StatusFuncionario.ATIVO)
       .map((func) => {
-        const alocacoesFuncionario = alocacoesMes.filter((a) => a.funcionarioId === func.id);
-        const confirmadas = alocacoesFuncionario.filter(
-          (a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA,
+        const diariasFuncionario = diariasMes.filter((a) => a.funcionarioId === func.id);
+        const confirmadas = diariasFuncionario.filter(
+          (a) => a.statusDiaria === StatusDiaria.CONFIRMADA,
         ).length;
-        const faltas = alocacoesFuncionario.filter(
-          (a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA,
+        const faltas = diariasFuncionario.filter(
+          (a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
         ).length;
-        const total = alocacoesFuncionario.length;
+        const total = diariasFuncionario.length;
         const taxaPresenca = total > 0 ? Math.round((confirmadas / total) * 100) : 100;
 
-        const condominio = this.condominios().find((c) => c.id === func.condominioId);
+        const cliente = this.clientes().find((c) => c.id === func.clienteId);
 
         return {
           id: func.id,
           nome: func.nome,
-          condominioNome: condominio?.nome ?? 'Desconhecido',
+          clienteNome: cliente?.nome ?? 'Desconhecido',
           tipoFuncionario: func.tipoFuncionario,
-          alocacoesNoMes: total,
+          diariasNoMes: total,
           faltasNoMes: faltas,
           taxaPresenca,
-          salarioTotal: func.salarioTotal,
+          custoMensal: func.custoMensalReal ?? func.custoMensalEstimado,
         };
       })
-      .filter((f) => f.alocacoesNoMes > 0)
-      .sort((a, b) => b.alocacoesNoMes - a.alocacoesNoMes);
+      .filter((f) => f.diariasNoMes > 0)
+      .sort((a, b) => b.diariasNoMes - a.diariasNoMes);
   });
 
   // Top 5 com mais trabalhos
@@ -282,13 +284,13 @@ export class DashboardComponent implements OnInit {
         const diasRestantes = Math.ceil(
           (dataFim.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24),
         );
-        const condominio = this.condominios().find((cond) => cond.id === c.condominioId);
+        const cliente = this.clientes().find((cond) => cond.id === c.clienteId);
         return {
           id: c.id,
-          condominioNome: condominio?.nome || 'Desconhecido',
+          clienteNome: cliente?.nome || 'Desconhecido',
           dataFim: c.dataFim,
           diasRestantes,
-          valorTotalMensal: c.valorTotalMensal,
+          valorTotalMensal: this.getFaturamentoDetalhado(c),
         };
       })
       .filter((c) => c.diasRestantes <= 30 && c.diasRestantes > 0)
@@ -312,17 +314,15 @@ export class DashboardComponent implements OnInit {
         (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
       );
 
-      const faturamento = contratosVigentes.reduce((sum, c) => sum + c.valorTotalMensal, 0);
+      const faturamento = contratosVigentes.reduce(
+        (sum, c) => sum + this.getFaturamentoDetalhado(c),
+        0,
+      );
       const custoOperacional = contratosVigentes.reduce(
-        (sum, c) =>
-          sum +
-          c.valorTotalMensal * (1 - c.margemLucroPercentual - c.margemCoberturaFaltasPercentual),
+        (sum, c) => sum + this.getCustoDetalhado(c),
         0,
       );
-      const lucro = contratosVigentes.reduce(
-        (sum, c) => sum + c.valorTotalMensal * c.margemLucroPercentual,
-        0,
-      );
+      const lucro = contratosVigentes.reduce((sum, c) => sum + this.getLucroDetalhado(c), 0);
 
       resultado.push({
         mes: mesNome.charAt(0).toUpperCase() + mesNome.slice(1),
@@ -353,19 +353,19 @@ export class DashboardComponent implements OnInit {
   loadAllData(): void {
     this.loading.set(true);
     Promise.all([
-      this.loadCondominios(),
+      this.loadClientes(),
       this.loadFuncionarios(),
       this.loadPostos(),
-      this.loadAlocacoes(),
+      this.loadDiarias(),
       this.loadContratos(),
     ]).finally(() => this.loading.set(false));
   }
 
-  loadCondominios(): Promise<void> {
+  loadClientes(): Promise<void> {
     return new Promise((resolve) => {
-      this.condominioService.getAll().subscribe({
+      this.clienteService.getAll().subscribe({
         next: (data) => {
-          this.condominios.set(data);
+          this.clientes.set(data);
           resolve();
         },
         error: () => resolve(),
@@ -397,11 +397,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  loadAlocacoes(): Promise<void> {
+  loadDiarias(): Promise<void> {
     return new Promise((resolve) => {
-      this.alocacaoService.getAll().subscribe({
+      this.diariaService.getAll().subscribe({
         next: (data) => {
-          this.alocacoes.set(data);
+          this.diarias.set(data);
           resolve();
         },
         error: () => resolve(),
@@ -414,6 +414,7 @@ export class DashboardComponent implements OnInit {
       this.contratoService.getAll().subscribe({
         next: (data) => {
           this.contratos.set(data);
+          this.loadResumosFinanceiros();
           resolve();
         },
         error: () => resolve(),
@@ -421,10 +422,100 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  loadResumosFinanceiros(): void {
+    const contratosVigentes = this.contratos().filter(
+      (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+    );
+
+    if (contratosVigentes.length === 0) {
+      this.resumosFinanceiros.set(new Map());
+      this.loadCalculosDetalhados();
+      return;
+    }
+
+    const { inicio, fim } = this.mesAtual;
+    const ano = inicio.getFullYear();
+    const mes = fim.getMonth() + 1;
+
+    const requests = contratosVigentes.map((contrato) =>
+      this.diariaService
+        .getResumoFinanceiroByContrato(contrato.id, ano, mes)
+        .pipe(catchError(() => of(null))),
+    );
+
+    forkJoin(requests).subscribe((resultados) => {
+      const novoMapa = new Map<string, ContratoResumoFinanceiro>();
+      resultados.forEach((resultado, index) => {
+        if (resultado !== null) {
+          novoMapa.set(contratosVigentes[index].id, resultado);
+        }
+      });
+      this.resumosFinanceiros.set(novoMapa);
+      this.loadCalculosDetalhados();
+    });
+  }
+
+  loadCalculosDetalhados(): void {
+    const contratosVigentes = this.contratos().filter(
+      (c) => c.status === StatusContrato.ATIVO || c.status === StatusContrato.PENDENTE,
+    );
+
+    if (contratosVigentes.length === 0) {
+      this.calculosDetalhados.set(new Map());
+      return;
+    }
+
+    this.financeiroUiService
+      .carregarCalculosDetalhados$(
+        contratosVigentes,
+        this.resumosFinanceiros(),
+        this.getFuncionariosPorClienteMap(),
+      )
+      .subscribe({
+        next: (mapa) => this.calculosDetalhados.set(mapa),
+        error: () => this.calculosDetalhados.set(new Map()),
+      });
+  }
+
+  private getFuncionariosPorClienteMap(): Map<string, number> {
+    const mapa = new Map<string, number>();
+    this.funcionarios().forEach((funcionario) => {
+      mapa.set(funcionario.clienteId, (mapa.get(funcionario.clienteId) ?? 0) + 1);
+    });
+    return mapa;
+  }
+
   getTendenciaIcon(tendencia: string): string {
     if (tendencia === 'up') return '↗';
     if (tendencia === 'down') return '↘';
     return '→';
+  }
+
+  private getFaturamentoDetalhado(contrato: Contrato): number {
+    return this.financeiroUiService.getFaturamentoDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  private getCustoDetalhado(contrato: Contrato): number {
+    return this.financeiroUiService.getCustoDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  private getLucroDetalhado(contrato: Contrato): number {
+    return this.financeiroUiService.getLucroDetalhado(
+      contrato,
+      this.calculosDetalhados() as Map<string, any>,
+    );
+  }
+
+  private normalizarPercentualContrato(valor: number | null | undefined): number {
+    const safe = Number(valor ?? 0);
+    if (!Number.isFinite(safe) || safe < 0) return 0;
+    return safe > 1 ? safe / 100 : safe;
   }
 
   getMesAtualLabel(): string {

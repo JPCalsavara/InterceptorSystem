@@ -2,16 +2,22 @@
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-content">
-      <div class="page-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <h1>
+        <svg
+          class="page-title-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
           />
         </svg>
-        <h1>Dashboard</h1>
-      </div>
+        Dashboard
+      </h1>
       <p class="subtitle">Visão geral do sistema - InterceptorSystem</p>
     </div>
     <div class="header-actions">
@@ -61,7 +67,11 @@
         </div>
         <div class="metricas-grid">
           @for (metrica of metricasFinanceiras(); track metrica.titulo) {
-            <div class="card" [style.border-left-color]="metrica.cor">
+            <div
+              class="card"
+              [attr.data-testid]="'card-' + metrica.titulo.toLowerCase().replace(' ', '-')"
+              [style.border-left-color]="metrica.cor"
+            >
               <div class="card-header">
                 <span class="metrica-icone">
                   @switch (metrica.icone) {
@@ -183,9 +193,9 @@
       </section>
 
       <!-- ============================================================ -->
-      <!-- CARDS DE CONDOMÍNIO                                          -->
+      <!-- CARDS DE CLIENTE                                          -->
       <!-- ============================================================ -->
-      <section class="condominios-section">
+      <section class="clientes-section">
         <div class="section-header">
           <div class="page-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -195,21 +205,21 @@
                 d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"
               />
             </svg>
-            <h1>Condomínios</h1>
+            <h1>Clientes</h1>
           </div>
-          <a routerLink="/condominios" class="section-link">Ver todos →</a>
+          <a routerLink="/clientes" class="section-link">Ver todos →</a>
         </div>
 
-        @if (condominioCards().length === 0) {
+        @if (clienteCards().length === 0) {
           <div class="empty-state-inline">
-            <span>Nenhum condomínio cadastrado.</span>
-            <a routerLink="/condominios" class="btn-acao">Cadastrar →</a>
+            <span>Nenhum cliente cadastrado.</span>
+            <a routerLink="/clientes" class="btn-acao">Cadastrar →</a>
           </div>
         } @else {
-          <div class="condominios-grid">
-            @for (cond of condominioCards(); track cond.id) {
+          <div class="clientes-grid">
+            @for (cond of clienteCards(); track cond.id) {
               <a
-                [routerLink]="['/condominios', cond.id]"
+                [routerLink]="['/clientes', cond.id]"
                 class="cond-card"
                 [class.inativo]="!cond.ativo"
               >
@@ -217,7 +227,7 @@
                 <div class="cond-card-header">
                   <div class="cond-info">
                     <h3 class="cond-nome">{{ cond.nome }}</h3>
-                    <span class="cond-cnpj">{{ cond.cnpj }}</span>
+                    <span class="cliente-cnpj">{{ cond.cidade }} - {{ cond.estado }}</span>
                   </div>
                   <div
                     class="cond-status-badge badge"
@@ -407,10 +417,10 @@
                     d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"
                   /></svg
               ></span>
-              Mais Alocações no Mês
+              Mais Diárias no Mês
             </h3>
             @if (topTrabalhadores().length === 0) {
-              <div class="ranking-empty">Sem alocações registradas neste mês.</div>
+              <div class="ranking-empty">Sem diárias registradas neste mês.</div>
             } @else {
               <ol class="ranking-lista">
                 @for (func of topTrabalhadores(); track func.id; let pos = $index) {
@@ -418,10 +428,10 @@
                     <span class="pos-badge" [class]="'pos-' + (pos + 1)">{{ pos + 1 }}</span>
                     <div class="rank-info">
                       <span class="rank-nome">{{ func.nome }}</span>
-                      <span class="rank-cond">{{ func.condominioNome }}</span>
+                      <span class="rank-cond">{{ func.clienteNome }}</span>
                     </div>
                     <div class="rank-stats">
-                      <span class="rank-valor confirmado">{{ func.alocacoesNoMes }}</span>
+                      <span class="rank-valor confirmado">{{ func.diariasNoMes }}</span>
                       <span class="rank-sub">plantões</span>
                     </div>
                     <div class="rank-presenca">
@@ -488,7 +498,7 @@
                     <span class="pos-badge falta-badge">{{ pos + 1 }}</span>
                     <div class="rank-info">
                       <span class="rank-nome">{{ func.nome }}</span>
-                      <span class="rank-cond">{{ func.condominioNome }}</span>
+                      <span class="rank-cond">{{ func.clienteNome }}</span>
                     </div>
                     <div class="rank-stats">
                       <span class="rank-valor falta">{{ func.faltasNoMes }}</span>
@@ -538,7 +548,7 @@
               <div class="alerta-card" [class]="getUrgenciaClass(contrato.diasRestantes)">
                 <div class="alerta-header">
                   <div class="alerta-info">
-                    <h4 class="alerta-titulo">{{ contrato.condominioNome }}</h4>
+                    <h4 class="alerta-titulo">{{ contrato.clienteNome }}</h4>
                     <p class="alerta-valor">{{ formatCurrency(contrato.valorTotalMensal) }}/mês</p>
                   </div>
                   <div class="alerta-dias">

@@ -1,19 +1,21 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { AlocacaoService } from '../../../services/alocacao.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { PostoService } from '../../../services/posto.service';
+import { DiariaService } from '../../../services/diaria.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { ContratoService } from '../../../services/contrato.service';
+import { AlocacaoService } from '../../../services/alocacao.service';
 import {
-  PostoDeTrabalho,
-  Alocacao,
-  Condominio,
+  Posto,
+  Diaria,
+  Cliente,
   Funcionario,
   Contrato,
-  StatusAlocacao,
-  TipoAlocacao,
+  Alocacao,
+  StatusDiaria,
+  TipoDiaria,
 } from '../../../models/index';
 
 @Component({
@@ -25,15 +27,17 @@ import {
 })
 export class PostoDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private postoService = inject(PostoDeTrabalhoService);
-  private alocacaoService = inject(AlocacaoService);
-  private condominioService = inject(CondominioService);
+  private postoService = inject(PostoService);
+  private diariaService = inject(DiariaService);
+  private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
   private contratoService = inject(ContratoService);
+  private alocacaoService = inject(AlocacaoService);
 
-  posto = signal<PostoDeTrabalho | null>(null);
+  posto = signal<Posto | null>(null);
+  diarias = signal<Diaria[]>([]);
   alocacoes = signal<Alocacao[]>([]);
-  condominio = signal<Condominio | null>(null);
+  cliente = signal<Cliente | null>(null);
   funcionarios = signal<Funcionario[]>([]);
   contrato = signal<Contrato | null>(null);
   loading = signal(true);
@@ -43,25 +47,25 @@ export class PostoDetailComponent implements OnInit {
   selectedMonth = signal({ month: new Date().getMonth(), year: new Date().getFullYear() });
 
   // Computed properties
-  totalAlocacoes = computed(() => this.alocacoes().length);
+  totalDiarias = computed(() => this.diarias().length);
 
-  alocacoesConfirmadas = computed(
-    () => this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA).length,
+  diariasConfirmadas = computed(
+    () => this.diarias().filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA).length,
   );
 
   faltas = computed(() =>
-    this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.FALTA_REGISTRADA),
+    this.diarias().filter((a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA),
   );
 
   totalFaltas = computed(() => this.faltas().length);
 
-  alocacoesCanceladas = computed(
-    () => this.alocacoes().filter((a) => a.statusAlocacao === StatusAlocacao.CANCELADA).length,
+  diariasCanceladas = computed(
+    () => this.diarias().filter((a) => a.statusDiaria === StatusDiaria.CANCELADA).length,
   );
 
   // Funcionários únicos que trabalharam neste posto
   funcionariosParticipantes = computed(() => {
-    const funcionarioIds = new Set(this.alocacoes().map((a) => a.funcionarioId));
+    const funcionarioIds = new Set(this.diarias().map((a) => a.funcionarioId));
     return this.funcionarios().filter((f) => funcionarioIds.has(f.id));
   });
 
@@ -69,72 +73,71 @@ export class PostoDetailComponent implements OnInit {
 
   // Taxa de presença
   taxaPresenca = computed(() => {
-    const total = this.totalAlocacoes();
+    const total = this.totalDiarias();
     if (total === 0) return 100;
-    const confirmadas = this.alocacoesConfirmadas();
+    const confirmadas = this.diariasConfirmadas();
     return (confirmadas / total) * 100;
   });
 
-  // Alocações por tipo
-  alocacoesPorTipo = computed(() => {
-    const tipos = new Map<TipoAlocacao, number>();
+  // Diárias por tipo
+  diariasPorTipo = computed(() => {
+    const tipos = new Map<TipoDiaria, number>();
 
-    this.alocacoes().forEach((a) => {
-      const count = tipos.get(a.tipoAlocacao) || 0;
-      tipos.set(a.tipoAlocacao, count + 1);
+    this.diarias().forEach((a) => {
+      const count = tipos.get(a.tipoDiaria) || 0;
+      tipos.set(a.tipoDiaria, count + 1);
     });
 
     return [
-      { tipo: 'Regular', count: tipos.get(TipoAlocacao.REGULAR) || 0, icon: 'R' },
-      { tipo: 'Dobra Programada', count: tipos.get(TipoAlocacao.DOBRA_PROGRAMADA) || 0, icon: 'D' },
-      { tipo: 'Substituição', count: tipos.get(TipoAlocacao.SUBSTITUICAO) || 0, icon: 'S' },
+      { tipo: 'Regular', count: tipos.get(TipoDiaria.REGULAR) || 0, icon: 'R' },
+      { tipo: 'Dobra Programada', count: tipos.get(TipoDiaria.DOBRA_PROGRAMADA) || 0, icon: 'D' },
+      { tipo: 'Substituição', count: tipos.get(TipoDiaria.SUBSTITUICAO) || 0, icon: 'S' },
     ];
   });
 
-  // Ranking de funcionários por alocações confirmadas
+  // Ranking de funcionários por diárias confirmadas
   rankingFuncionarios = computed(() => {
-    const alocacoesPorFunc = new Map<string, number>();
+    const diariasPorFunc = new Map<string, number>();
 
-    this.alocacoes()
-      .filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
+    this.diarias()
+      .filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA)
       .forEach((a) => {
-        const count = alocacoesPorFunc.get(a.funcionarioId) || 0;
-        alocacoesPorFunc.set(a.funcionarioId, count + 1);
+        const count = diariasPorFunc.get(a.funcionarioId) || 0;
+        diariasPorFunc.set(a.funcionarioId, count + 1);
       });
 
     return this.funcionarios()
       .map((f) => ({
         funcionario: f,
-        total: alocacoesPorFunc.get(f.id) || 0,
+        total: diariasPorFunc.get(f.id) || 0,
       }))
       .filter((item) => item.total > 0)
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
   });
 
-  // Alocações filtradas pelo mês selecionado
-  alocacoesFiltradas = computed(() => {
+  // Diárias filtradas pelo mês selecionado
+  diariasFiltradas = computed(() => {
     const { month, year } = this.selectedMonth();
-    return this.alocacoes().filter((a) => {
+    return this.diarias().filter((a) => {
       const d = new Date(a.data + 'T12:00:00');
       return d.getMonth() === month && d.getFullYear() === year;
     });
   });
 
-  // Se este posto recebe bônus noturno
-  recebeBonus = computed(() => {
-    const p = this.posto();
+  // Se este posto tem configurações de contrato para bônus
+  recebeBonusContrato = computed(() => {
     const c = this.contrato();
-    if (!p || !c) return false;
-    return this.calcularProporcaoNoturna(p) > 0 && (c.percentualAdicionalNoturno || 0) > 0;
+    if (!c) return false;
+    return (c.percentualAdicionalNoturno || 0) > 0;
   });
 
   // Total ganho no mês selecionado (apenas confirmadas)
   totalGanhoMes = computed(() => {
     if (!this.contrato()) return 0;
-    return this.alocacoesFiltradas()
-      .filter((a) => a.statusAlocacao === StatusAlocacao.CONFIRMADA)
-      .reduce((sum, a) => sum + this.calcularValorAlocacao(a), 0);
+    return this.diariasFiltradas()
+      .filter((a) => a.statusDiaria === StatusDiaria.CONFIRMADA)
+      .reduce((sum, a) => sum + this.calcularValorDiaria(a), 0);
   });
 
   ngOnInit(): void {
@@ -161,27 +164,40 @@ export class PostoDetailComponent implements OnInit {
     });
   }
 
-  private loadRelatedData(posto: PostoDeTrabalho): void {
-    // Carregar condomínio
-    this.condominioService.getById(posto.condominioId).subscribe({
-      next: (condominio) => this.condominio.set(condominio),
-      error: (err) => console.warn('Erro ao carregar condomínio:', err),
+  private loadRelatedData(posto: Posto): void {
+    // Carregar cliente
+    this.clienteService.getById(posto.clienteId).subscribe({
+      next: (cliente) => this.cliente.set(cliente),
+      error: (err) => console.warn('Erro ao carregar cliente:', err),
     });
 
     // Carregar contrato
-    this.contratoService.getById(posto.contratoId).subscribe({
-      next: (contrato) => this.contrato.set(contrato),
+    this.contratoService.getAll().subscribe({
+      next: (contratos) => {
+        const contrato = contratos.find((c) => c.clienteId === posto.clienteId && c.status === 'ATIVO');
+        if (contrato) this.contrato.set(contrato);
+      },
       error: (err) => console.warn('Erro ao carregar contrato:', err),
     });
 
-    // Carregar alocações
-    this.alocacaoService.getAll().subscribe({
-      next: (alocacoes) => {
-        this.alocacoes.set(alocacoes.filter((a) => a.postoDeTrabalhoId === posto.id));
+    // Carregar alocações do posto
+    this.alocacaoService.getByPostoId(posto.id).subscribe({
+      next: (alocs) => {
+        this.alocacoes.set(alocs);
+        const alocIds = alocs.map((a) => a.id);
 
-        // Carregar funcionários das alocações
-        const funcionarioIds = [...new Set(alocacoes.map((a) => a.funcionarioId))];
-        this.loadFuncionarios(funcionarioIds);
+        // Carregar diárias das alocações deste posto
+        this.diariaService.getAll().subscribe({
+          next: (diarias) => {
+            const diariasDoPosto = diarias.filter((d) => alocIds.includes(d.alocacaoId));
+            this.diarias.set(diariasDoPosto);
+
+            // Carregar funcionários das diárias
+            const funcionarioIds = [...new Set(diariasDoPosto.map((a) => a.funcionarioId))];
+            this.loadFuncionarios(funcionarioIds);
+          },
+          error: (err) => console.warn('Erro ao carregar diárias:', err),
+        });
       },
       error: (err) => console.warn('Erro ao carregar alocações:', err),
     });
@@ -198,38 +214,29 @@ export class PostoDetailComponent implements OnInit {
     });
   }
 
-  // Proporção de horas noturnas do turno (CLT Art. 73: 22h–05h) — 0.0 a 1.0
-  private calcularProporcaoNoturna(posto: PostoDeTrabalho): number {
-    const inicio = parseInt(posto.horarioInicio.substring(0, 2), 10);
-    const fim = parseInt(posto.horarioFim.substring(0, 2), 10);
-    const duracao = inicio > fim ? 24 - inicio + fim : fim - inicio;
-    if (duracao === 0) return 0;
-    let horasNoturnas = 0;
-    for (let i = 0; i < duracao; i++) {
-      const hora = (inicio + i) % 24;
-      if (hora >= 22 || hora < 5) horasNoturnas++;
-    }
-    return horasNoturnas / duracao;
+  trackAloc(index: number, aloc: Alocacao): string {
+    return aloc.id;
   }
 
-  // Calcula o valor de uma alocação (multiplicador FDS + adicional noturno proporcional)
-  calcularValorAlocacao(alocacao: Alocacao): number {
+  diariaRecebeBonus(diaria: Diaria): boolean {
+    const alocacao = this.alocacoes().find(a => a.id === diaria.alocacaoId);
+    return !!alocacao?.temHorarioNoturno && this.recebeBonusContrato();
+  }
+
+  // Calcula o valor de uma diária (multiplicador FDS + adicional noturno proporcional)
+  calcularValorDiaria(diaria: Diaria): number {
     const contrato = this.contrato();
-    const posto = this.posto();
     if (!contrato) return 0;
 
     let valor = contrato.valorDiariaCobrada || 0;
-    const data = new Date(alocacao.data + 'T12:00:00');
+    const data = new Date(diaria.data + 'T12:00:00');
     const diaSemana = data.getDay();
 
     if (diaSemana === 0) valor *= 2.0;       // +100% domingo
     else if (diaSemana === 6) valor *= 1.5;  // +50% sábado
 
-    if (posto) {
-      const proporcaoNoturna = this.calcularProporcaoNoturna(posto);
-      if (proporcaoNoturna > 0) {
-        valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
-      }
+    if (this.diariaRecebeBonus(diaria)) {
+      valor *= 1 + (contrato.percentualAdicionalNoturno || 0);
     }
 
     return valor;
@@ -266,29 +273,29 @@ export class PostoDetailComponent implements OnInit {
     return func?.nome || 'Desconhecido';
   }
 
-  getStatusBadgeClass(status: StatusAlocacao): string {
+  getStatusBadgeClass(status: StatusDiaria): string {
     const classes = {
-      [StatusAlocacao.CONFIRMADA]: 'badge-success',
-      [StatusAlocacao.CANCELADA]: 'badge-secondary',
-      [StatusAlocacao.FALTA_REGISTRADA]: 'badge-danger',
+      [StatusDiaria.CONFIRMADA]: 'badge-success',
+      [StatusDiaria.CANCELADA]: 'badge-secondary',
+      [StatusDiaria.FALTA_REGISTRADA]: 'badge-danger',
     };
     return classes[status] || 'badge-secondary';
   }
 
-  getStatusLabel(status: StatusAlocacao): string {
+  getStatusLabel(status: StatusDiaria): string {
     const labels = {
-      [StatusAlocacao.CONFIRMADA]: 'Confirmada',
-      [StatusAlocacao.CANCELADA]: 'Cancelada',
-      [StatusAlocacao.FALTA_REGISTRADA]: 'Falta',
+      [StatusDiaria.CONFIRMADA]: 'Confirmada',
+      [StatusDiaria.CANCELADA]: 'Cancelada',
+      [StatusDiaria.FALTA_REGISTRADA]: 'Falta',
     };
     return labels[status] || 'Desconhecido';
   }
 
-  getTipoLabel(tipo: TipoAlocacao): string {
+  getTipoLabel(tipo: TipoDiaria): string {
     const labels = {
-      [TipoAlocacao.REGULAR]: 'Regular',
-      [TipoAlocacao.DOBRA_PROGRAMADA]: 'Dobra Programada',
-      [TipoAlocacao.SUBSTITUICAO]: 'Substituição',
+      [TipoDiaria.REGULAR]: 'Regular',
+      [TipoDiaria.DOBRA_PROGRAMADA]: 'Dobra Programada',
+      [TipoDiaria.SUBSTITUICAO]: 'Substituição',
     };
     return labels[tipo] || 'Desconhecido';
   }
@@ -304,7 +311,7 @@ export class PostoDetailComponent implements OnInit {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
-  formatHorario(inicio: string, fim: string): string {
-    return `${inicio.substring(0, 5)} - ${fim.substring(0, 5)}`;
+  formatNome(nome: string, cidade: string): string {
+    return `${nome} - ${cidade}`;
   }
 }

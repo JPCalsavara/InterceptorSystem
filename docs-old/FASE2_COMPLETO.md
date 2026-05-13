@@ -34,15 +34,15 @@ cd src/docs/sql-scripts
 ```
 
 ## 📊 Dados de Teste
-- 3 Condomínios
+- 3 Clientes
 - 3 Contratos vigentes  
 - 35 Funcionários (TODOS com ContratoId)
-- 12 Alocações
+- 12 Diárias
 
 ## 🔑 UUIDs Fixos
 ```
 EmpresaId:        11111111-1111-1111-1111-111111111111
-Condomínio Solar: 22222222-2222-2222-2222-222222222221
+Cliente Solar: 22222222-2222-2222-2222-222222222221
 Contrato Solar:   33333333-3333-3333-3333-333333333331
 ```
 

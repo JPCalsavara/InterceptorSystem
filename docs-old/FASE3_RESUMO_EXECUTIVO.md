@@ -57,7 +57,7 @@ decimal SalarioTotal      // Soma de tudo
 ```json
 POST /api/funcionarios
 {
-  "condominioId": "...",
+  "clienteId": "...",
   "contratoId": "...",
   "nome": "João Silva",
   "cpf": "12345678901",
@@ -75,7 +75,7 @@ POST /api/funcionarios
 ```json
 POST /api/funcionarios
 {
-  "condominioId": "...",
+  "clienteId": "...",
   "contratoId": "...",
   "nome": "João Silva",
   "cpf": "12345678901",

@@ -1,4 +1,4 @@
-# ✅ FASE 4 - Correção de Testes de Alocação
+# ✅ FASE 4 - Correção de Testes de Diária
 
 **Data:** 2026-01-08  
 **Status:** ✅ CORRIGIDO
@@ -7,7 +7,7 @@
 
 ## 🐛 Problema Identificado
 
-Após a FASE 4, os testes de `AlocacaoAppServiceTests` estavam falhando com o erro:
+Após a FASE 4, os testes de `DiariaAppServiceTests` estavam falhando com o erro:
 
 ```
 System.InvalidOperationException: Capacidade máxima do posto atingida para esta data.
@@ -17,7 +17,7 @@ System.InvalidOperationException: Capacidade máxima do posto atingida para esta
 
 ## 🔍 Causa Raiz
 
-A propriedade `CapacidadeMaximaPorDobras` em `PostoDeTrabalho` depende de `QuantidadeIdealFuncionarios`:
+A propriedade `CapacidadeMaximaPorDobras` em `Posto` depende de `QuantidadeIdealFuncionarios`:
 
 ```csharp
 public int CapacidadeMaximaPorDobras => PermiteDobrarEscala 
@@ -33,17 +33,17 @@ public int QuantidadeIdealFuncionarios
 {
     get
     {
-        if (Condominio == null) return 0;  // ❌ PROBLEMA!
-        var totalPostos = Condominio.PostosDeTrabalho?.Count ?? 1;
+        if (Cliente == null) return 0;  // ❌ PROBLEMA!
+        var totalPostos = Cliente.Postos?.Count ?? 1;
         return totalPostos > 0 
-            ? Condominio.QuantidadeFuncionariosIdeal / totalPostos 
+            ? Cliente.QuantidadeFuncionariosIdeal / totalPostos 
             : 0;
     }
 }
 ```
 
 **Nos testes unitários:**
-- ❌ Mocks de `PostoDeTrabalho` não tinham navegação `Condominio` configurada
+- ❌ Mocks de `Posto` não tinham navegação `Cliente` configurada
 - ❌ `QuantidadeIdealFuncionarios` retornava **0**
 - ❌ `CapacidadeMaximaPorDobras` também era **0**
 - ❌ Validação `quantidadeAtual < capacidadeMaxima` sempre falhava!
@@ -52,34 +52,34 @@ public int QuantidadeIdealFuncionarios
 
 ## ✅ Soluções Implementadas
 
-### 1. **Helper CriarPosto com Mock de Condominio**
+### 1. **Helper CriarPosto com Mock de Cliente**
 
 **ANTES:**
 ```csharp
-private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) =>
-    new(condominioId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
-    // ❌ Sem Condominio -> QuantidadeIdealFuncionarios = 0
+private static Posto CriarPosto(Guid clienteId, Guid empresaId) =>
+    new(clienteId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true);
+    // ❌ Sem Cliente -> QuantidadeIdealFuncionarios = 0
 ```
 
 **DEPOIS:**
 ```csharp
-private static PostoDeTrabalho CriarPosto(Guid condominioId, Guid empresaId) 
+private static Posto CriarPosto(Guid clienteId, Guid empresaId) 
 {
-    // Criar Condominio mock
-    var condominio = new Condominio(
-        empresaId, "Condominio Teste", "12345678000190", "Rua Teste", 
+    // Criar Cliente mock
+    var cliente = new Cliente(
+        empresaId, "Cliente Teste", "12345678000190", "Rua Teste", 
         12, // QuantidadeFuncionariosIdeal
         TimeSpan.FromHours(6), "test@test.com", "+5511999999999");
     
-    var posto = new PostoDeTrabalho(condominioId, empresaId, ...);
+    var posto = new Posto(clienteId, empresaId, ...);
     
     // Configurar navegação usando Reflection
-    var condominioProperty = typeof(PostoDeTrabalho).GetProperty("Condominio");
-    condominioProperty?.SetValue(posto, condominio);
+    var clienteProperty = typeof(Posto).GetProperty("Cliente");
+    clienteProperty?.SetValue(posto, cliente);
     
-    // Adicionar posto à coleção do condomínio
-    condominio.GetType().GetProperty("PostosDeTrabalho")
-        ?.SetValue(condominio, new List<PostoDeTrabalho> { posto });
+    // Adicionar posto à coleção do cliente
+    cliente.GetType().GetProperty("Postos")
+        ?.SetValue(cliente, new List<Posto> { posto });
     
     return posto;
     // ✅ Agora QuantidadeIdealFuncionarios = 12 / 1 = 12
@@ -96,17 +96,17 @@ Centralizou a configuração de mocks repetitivos:
 private void ConfigurarMocksBasicos(
     Guid empresaId, 
     Funcionario funcionario, 
-    PostoDeTrabalho posto, 
-    IEnumerable<Alocacao>? alocacoesExistentes = null)
+    Posto posto, 
+    IEnumerable<Diaria>? diariasExistentes = null)
 {
     _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
     _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
     _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
-    _alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id))
-        .ReturnsAsync(alocacoesExistentes ?? Array.Empty<Alocacao>());
+    _diariaRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id))
+        .ReturnsAsync(diariasExistentes ?? Array.Empty<Diaria>());
     // ✅ FASE 4: Mock essencial para validação de capacidade
-    _alocacaoRepo.Setup(r => r.GetByPostoEDataAsync(posto.Id, It.IsAny<DateOnly>()))
-        .ReturnsAsync(alocacoesExistentes ?? Array.Empty<Alocacao>());
+    _diariaRepo.Setup(r => r.GetByPostoEDataAsync(posto.Id, It.IsAny<DateOnly>()))
+        .ReturnsAsync(diariasExistentes ?? Array.Empty<Diaria>());
     _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 }
 ```
@@ -120,27 +120,27 @@ private void ConfigurarMocksBasicos(
 _tenantService.Setup(t => t.EmpresaId).Returns(empresaId);
 _funcionarioRepo.Setup(r => r.GetByIdAsync(funcionario.Id)).ReturnsAsync(funcionario);
 _postoRepo.Setup(r => r.GetByIdAsync(posto.Id)).ReturnsAsync(posto);
-_alocacaoRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(...);
-_alocacaoRepo.Setup(r => r.GetByPostoEDataAsync(posto.Id, ...)).ReturnsAsync(...);
+_diariaRepo.Setup(r => r.GetByFuncionarioAsync(funcionario.Id)).ReturnsAsync(...);
+_diariaRepo.Setup(r => r.GetByPostoEDataAsync(posto.Id, ...)).ReturnsAsync(...);
 _uow.Setup(u => u.CommitAsync()).ReturnsAsync(true);
 ```
 
 **DEPOIS (simples):**
 ```csharp
-ConfigurarMocksBasicos(empresaId, funcionario, posto, alocacoesExistentes);
+ConfigurarMocksBasicos(empresaId, funcionario, posto, diariasExistentes);
 ```
 
 ---
 
 ## 📝 Arquivos Modificados
 
-1. ✅ `AlocacaoAppServiceTests.cs`
-   - Helper `CriarPosto()` com mock de Condominio
+1. ✅ `DiariaAppServiceTests.cs`
+   - Helper `CriarPosto()` com mock de Cliente
    - Novo helper `ConfigurarMocksBasicos()`
    - Testes atualizados:
-     - `CreateAsync_DeveCriarAlocacao()`
+     - `CreateAsync_DeveCriarDiaria()`
      - `CreateAsync_DevePermitirConsecutivaQuandoDobra()`
-     - `CreateAsync_DevePermitirDobraProgramadaAposAlocacaoRegular()`
+     - `CreateAsync_DevePermitirDobraProgramadaAposDiariaRegular()`
 
 ---
 
@@ -148,9 +148,9 @@ ConfigurarMocksBasicos(empresaId, funcionario, posto, alocacoesExistentes);
 
 | Teste | Status | Correção |
 |-------|--------|----------|
-| `CreateAsync_DeveCriarAlocacao` | ✅ Corrigido | Helper + ConfigurarMocksBasicos |
+| `CreateAsync_DeveCriarDiaria` | ✅ Corrigido | Helper + ConfigurarMocksBasicos |
 | `CreateAsync_DevePermitirConsecutivaQuandoDobra` | ✅ Corrigido | ConfigurarMocksBasicos |
-| `CreateAsync_DevePermitirDobraProgramadaAposAlocacaoRegular` | ✅ Corrigido | ConfigurarMocksBasicos |
+| `CreateAsync_DevePermitirDobraProgramadaAposDiariaRegular` | ✅ Corrigido | ConfigurarMocksBasicos |
 
 ---
 
@@ -158,8 +158,8 @@ ConfigurarMocksBasicos(empresaId, funcionario, posto, alocacoesExistentes);
 
 **Antes:**
 ```
-PostoDeTrabalho (mock)
-├── Condominio = null                      ❌
+Posto (mock)
+├── Cliente = null                      ❌
 └── QuantidadeIdealFuncionarios = 0        ❌
     └── CapacidadeMaximaPorDobras = 0      ❌
         └── Validação sempre falha!        ❌
@@ -167,10 +167,10 @@ PostoDeTrabalho (mock)
 
 **Depois:**
 ```
-PostoDeTrabalho (mock)
-├── Condominio (mock configurado)                     ✅
+Posto (mock)
+├── Cliente (mock configurado)                     ✅
 │   ├── QuantidadeFuncionariosIdeal = 12              ✅
-│   └── PostosDeTrabalho.Count = 1                    ✅
+│   └── Postos.Count = 1                    ✅
 └── QuantidadeIdealFuncionarios = 12 / 1 = 12         ✅
     └── CapacidadeMaximaPorDobras = 12 * 2 = 24       ✅
         └── Validação passa (0 < 24)                   ✅
@@ -180,10 +180,10 @@ PostoDeTrabalho (mock)
 
 ## ✅ Resultado Final
 
-- ✅ Todos os testes de `AlocacaoAppServiceTests` agora passam
+- ✅ Todos os testes de `DiariaAppServiceTests` agora passam
 - ✅ Mocks corretamente configurados para FASE 4
 - ✅ Código mais limpo com helpers reutilizáveis
 - ✅ Validação de capacidade funciona corretamente
 
-**FASE 4 - Testes de Alocação 100% Corrigidos!** 🎉
+**FASE 4 - Testes de Diária 100% Corrigidos!** 🎉
 

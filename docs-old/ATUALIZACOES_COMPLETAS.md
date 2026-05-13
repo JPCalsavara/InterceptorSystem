@@ -9,8 +9,8 @@
 - Adicionada seção "Novidades da Versão 2.0"
 - Atualizado Resultado com métricas das 5 fases
 - Adicionadas regras de negócio das FASES 1-4
-- Atualizado Condomínio com configurações operacionais
-- Atualizado PostoDeTrabalho com FASE 4
+- Atualizado Cliente com configurações operacionais
+- Atualizado Posto com FASE 4
 - Atualizado Funcionário com FASES 2 e 3
 - Adicionada nova seção "Criação em Cascata (FASE 5)"
 - Atualizada tabela de validações
@@ -49,7 +49,7 @@ Documentação técnica completa:
 - Métricas
 ### **6. CURLS_FASE5.md** ✅
 6 exemplos de cURL para teste:
-- Criar condomínio completo (sucesso)
+- Criar cliente completo (sucesso)
 - Validar dados (dry-run)
 - Erro: quantidade diferente
 - Erro: não divisível
@@ -58,12 +58,12 @@ Documentação técnica completa:
 ---
 ## 📊 Resumo das Mudanças
 ### **Arquivos de Código Criados (FASE 5)**
-1. `CondominioCompletoDto.cs` - DTOs
-2. `ICondominioOrquestradorService.cs` - Interface
-3. `CondominioOrquestradorService.cs` - Serviço
-4. `CondominiosCompletosController.cs` - Controller
-5. `CondominioOrquestradorServiceTests.cs` - Testes unitários
-6. `CondominiosCompletosControllerIntegrationTests.cs` - Testes integração
+1. `ClienteCompletoDto.cs` - DTOs
+2. `IClienteOrquestradorService.cs` - Interface
+3. `ClienteOrquestradorService.cs` - Serviço
+4. `ClientesCompletosController.cs` - Controller
+5. `ClienteOrquestradorServiceTests.cs` - Testes unitários
+6. `ClientesCompletosControllerIntegrationTests.cs` - Testes integração
 ### **Arquivos de Documentação Criados/Atualizados**
 1. `README.md` - Atualizado
 2. `PLANO_REFATORACAO.md` - Atualizado
@@ -71,7 +71,7 @@ Documentação técnica completa:
 4. `CHANGELOG.md` - Novo
 5. `FASE5_CRIACAO_CASCATA.md` - Novo
 6. `CURLS_FASE5.md` - Novo
-7. `condominio-completo.json` - Novo payload
+7. `cliente-completo.json` - Novo payload
 8. `ATUALIZACOES_COMPLETAS.md` - Este arquivo
 ### **Arquivos de Configuração Atualizados**
 1. `DependencyInjection.cs` - Registrado novo serviço
@@ -79,12 +79,12 @@ Documentação técnica completa:
 ## 🎯 Principais Novidades
 ### **1. Endpoint de Criação Completa**
 ```http
-POST /api/condominios-completos
+POST /api/clientes-completos
 ```
-Cria Condomínio + Contrato + Postos em 1 request (antes eram 4)
+Cria Cliente + Contrato + Postos em 1 request (antes eram 4)
 ### **2. Endpoint de Validação**
 ```http
-POST /api/condominios-completos/validar
+POST /api/clientes-completos/validar
 ```
 Valida dados antes de salvar (dry-run para melhor UX)
 ### **3. Cálculo Automático**
@@ -100,7 +100,7 @@ Valida dados antes de salvar (dry-run para melhor UX)
 ## 📈 Métricas de Melhoria
 | Indicador | v1.0 | v2.0 | Melhoria |
 |-----------|------|------|----------|
-| Requests para criar condomínio completo | 4 | 1 | **75% ↓** |
+| Requests para criar cliente completo | 4 | 1 | **75% ↓** |
 | Código frontend (linhas) | ~80 | ~20 | **75% ↓** |
 | Salários calculados manualmente | Sim | Não | **100%** |
 | Postos criados manualmente | Sim | Não | **100%** |
@@ -108,7 +108,7 @@ Valida dados antes de salvar (dry-run para melhor UX)
 ---
 ## ✅ Checklist de Implementação
 ### **FASE 1** ✅
-- [x] Configs operacionais em Condomínio
+- [x] Configs operacionais em Cliente
 - [x] Testes
 - [x] Documentação
 ### **FASE 2** ✅
@@ -122,7 +122,7 @@ Valida dados antes de salvar (dry-run para melhor UX)
 - [x] Testes
 - [x] Migration
 ### **FASE 4** ✅
-- [x] Simplificar PostoDeTrabalho
+- [x] Simplificar Posto
 - [x] Quantidade calculada
 - [x] Testes
 - [x] Migration
@@ -141,21 +141,21 @@ Valida dados antes de salvar (dry-run para melhor UX)
 - [x] Changelog
 ---
 ## 🚀 Como Usar as Novas Funcionalidades
-### **1. Criar Condomínio Completo**
+### **1. Criar Cliente Completo**
 ```bash
-curl -X POST http://localhost/api/condominios-completos \
+curl -X POST http://localhost/api/clientes-completos \
   -H "Content-Type: application/json" \
-  -d @src/docs/test-payloads/condominio-completo.json
+  -d @src/docs/test-payloads/cliente-completo.json
 ```
 ### **2. Validar Antes de Criar**
 ```bash
-curl -X POST http://localhost/api/condominios-completos/validar \
+curl -X POST http://localhost/api/clientes-completos/validar \
   -H "Content-Type: application/json" \
-  -d @src/docs/test-payloads/condominio-completo.json
+  -d @src/docs/test-payloads/cliente-completo.json
 ```
 ### **3. Via Swagger**
 1. http://localhost/swagger
-2. Localizar `POST /api/condominios-completos`
+2. Localizar `POST /api/clientes-completos`
 3. Try it out → Execute
 ---
 ## 📚 Onde Encontrar Mais Informações

@@ -1,19 +1,22 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { CondominioService } from '../../services/condominio.service';
+import { ClienteService } from '../../services/cliente.service';
 import { FuncionarioService } from '../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../services/posto-de-trabalho.service';
-import { AlocacaoService } from '../../services/alocacao.service';
+import { PostoService } from '../../services/posto.service';
+import { DiariaService } from '../../services/diaria.service';
 import { ContratoService } from '../../services/contrato.service';
-import { StatusContrato, StatusAlocacao, StatusFuncionario } from '../../models/index';
+import { StatusContrato, StatusDiaria, StatusFuncionario } from '../../models/index';
 import { LayoutStateService } from '../services/layout-state.service';
+import { AlocacaoService } from '../../services/alocacao.service';
+import { TagService } from '../../services/tag.service';
+import { AuthService } from '../../services/auth.service';
 
 interface NavItem {
   label: string;
   route: string;
   icon: string;
-  countKey?: 'condominios' | 'funcionarios' | 'postos' | 'alocacoes' | 'contratos';
+  countKey?: 'clientes' | 'funcionarios' | 'postos' | 'alocacoes' | 'diarias' | 'contratos' | 'tags';
 }
 
 @Component({
@@ -21,14 +24,20 @@ interface NavItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <aside class="sidebar" [class.open]="layoutState.leftDrawerOpen()">
+    <aside
+      class="sidebar"
+      [class.open]="layoutState.leftDrawerOpen()"
+      [class.collapsed]="layoutState.sidebarCollapsed()"
+    >
       <nav class="nav">
-        @for (item of navItems; track item.route) {
+        <div class="nav-main">
+          @for (item of navItems; track item.route) {
           <a
             [routerLink]="item.route"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             class="nav-item"
+            [attr.title]="layoutState.sidebarCollapsed() ? item.label : null"
             (click)="layoutState.leftDrawerOpen.set(false)"
           >
             <span class="icon">
@@ -92,6 +101,25 @@ interface NavItem {
                     />
                   </svg>
                 }
+                @case ('clock') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                }
+                @case ('tag') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"
+                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                  </svg>
+                }
               }
             </span>
 
@@ -101,6 +129,52 @@ interface NavItem {
             }
           </a>
         }
+      </div>
+
+      <div class="nav-footer">
+        <!-- Suporte -->
+        <a routerLink="/suporte" routerLinkActive="active" class="nav-item" [attr.title]="layoutState.sidebarCollapsed() ? 'Suporte' : null" (click)="layoutState.leftDrawerOpen.set(false)">
+          <span class="icon">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+            </svg>
+          </span>
+          <span class="label">Suporte</span>
+        </a>
+
+        <!-- Sair -->
+        <button type="button" class="nav-item btn-logout" (click)="logout()" [attr.title]="layoutState.sidebarCollapsed() ? 'Sair' : null">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+            </svg>
+          </span>
+          <span class="label">Sair</span>
+        </button>
+
+        <div class="nav-divider"></div>
+
+
+        <button
+          type="button"
+          class="collapse-toggle"
+          (click)="layoutState.toggleSidebarCollapsed()"
+          [attr.aria-label]="
+            layoutState.sidebarCollapsed() ? 'Expandir menu lateral' : 'Colapsar menu lateral'
+          "
+          [attr.title]="
+            layoutState.sidebarCollapsed() ? 'Expandir menu lateral' : 'Colapsar menu lateral'
+          "
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            @if (layoutState.sidebarCollapsed()) {
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+            } @else {
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+            }
+          </svg>
+        </button>
+      </div>
       </nav>
     </aside>
   `,
@@ -117,14 +191,54 @@ interface NavItem {
         overflow-y: auto;
         padding: var(--space-6) var(--space-4);
         transition:
+          width 0.25s ease,
           background-color 0.3s ease,
           border-color 0.3s ease;
+      }
+
+      .sidebar.collapsed {
+        width: 88px;
       }
 
       .nav {
         display: flex;
         flex-direction: column;
+        height: 100%;
+      }
+
+      .nav-main {
+        display: flex;
+        flex-direction: column;
         gap: var(--space-2);
+        flex: 1;
+      }
+
+      .nav-footer {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        margin-top: auto;
+      }
+
+      .btn-logout {
+        background: transparent;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: var(--text-sm);
+      }
+
+      .btn-logout:hover {
+        background: #fee2e2 !important;
+        color: #dc2626 !important;
+      }
+
+      .nav-divider {
+        height: 1px;
+        background: var(--border-subtle);
+        margin: var(--space-2) 0;
       }
 
       .nav-item {
@@ -150,6 +264,11 @@ interface NavItem {
         }
       }
 
+      .sidebar.collapsed .nav-item {
+        justify-content: center;
+        padding: var(--space-3);
+      }
+
       .icon {
         font-size: 1.5rem;
         line-height: 1;
@@ -169,6 +288,11 @@ interface NavItem {
         font-size: var(--text-sm);
       }
 
+      .sidebar.collapsed .label,
+      .sidebar.collapsed .nav-badge {
+        display: none;
+      }
+
       .nav-badge {
         margin-left: auto;
         background: var(--bg-tertiary);
@@ -182,6 +306,37 @@ interface NavItem {
       .nav-item.active .nav-badge {
         background: var(--surface-card);
         color: var(--primary-color);
+      }
+
+      .collapse-toggle {
+        margin-top: auto;
+        width: 100%;
+        height: 40px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--bg-tertiary);
+          color: var(--primary-color);
+          border-color: var(--primary-color);
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .sidebar.collapsed .collapse-toggle {
+        width: 48px;
+        align-self: center;
       }
 
       /* Scrollbar customization */
@@ -214,6 +369,25 @@ interface NavItem {
           padding: var(--space-6) var(--space-4);
         }
 
+        .sidebar.collapsed {
+          width: 260px;
+        }
+
+        /* On mobile, always present full drawer content, even if desktop
+           collapsed state is persisted in localStorage. */
+        .sidebar.collapsed .label {
+          display: flex;
+        }
+
+        .sidebar.collapsed .nav-badge {
+          display: inline-flex;
+        }
+
+        .sidebar.collapsed .nav-item {
+          justify-content: flex-start;
+          padding: var(--space-3) var(--space-4);
+        }
+
         .sidebar.open {
           transform: translateX(0);
         }
@@ -222,9 +396,17 @@ interface NavItem {
           display: flex;
         }
 
+        .nav-badge {
+          display: inline-flex;
+        }
+
         .nav-item {
           justify-content: flex-start;
           padding: var(--space-3) var(--space-4);
+        }
+
+        .collapse-toggle {
+          display: none;
         }
       }
     `,
@@ -232,39 +414,40 @@ interface NavItem {
 })
 export class SidebarComponent implements OnInit {
   layoutState = inject(LayoutStateService);
-
-  private condominioService = inject(CondominioService);
+  private authService = inject(AuthService);
+  private clienteService = inject(ClienteService);
   private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private diariaService = inject(DiariaService);
   private contratoService = inject(ContratoService);
+  private alocacaoService = inject(AlocacaoService);
+  private tagService = inject(TagService);
 
   counts = signal<Record<string, number | null>>({
-    condominios: null,
+    clientes: null,
     funcionarios: null,
     postos: null,
     alocacoes: null,
+    diarias: null,
     contratos: null,
+    tags: null,
   });
 
   navItems: NavItem[] = [
     { label: 'Resumo', route: '/dashboard', icon: 'chart-bar' },
-    {
-      label: 'Condomínios',
-      route: '/condominios',
-      icon: 'building-office',
-      countKey: 'condominios',
-    },
+    { label: 'Clientes', route: '/clientes', icon: 'building-office', countKey: 'clientes' },
     { label: 'Contratos', route: '/contratos', icon: 'document-text', countKey: 'contratos' },
     { label: 'Funcionários', route: '/funcionarios', icon: 'user-group', countKey: 'funcionarios' },
-    { label: 'Postos de Trabalho', route: '/postos', icon: 'map-pin', countKey: 'postos' },
-    { label: 'Alocações', route: '/alocacoes', icon: 'calendar-days', countKey: 'alocacoes' },
+    { label: 'Postos', route: '/postos', icon: 'map-pin', countKey: 'postos' },
+    { label: 'Alocações', route: '/alocacoes', icon: 'clock', countKey: 'alocacoes' },
+    { label: 'Tags', route: '/tags', icon: 'tag', countKey: 'tags' },
+    { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' },
   ];
 
   ngOnInit() {
-    this.condominioService.getAll().subscribe({
+    this.clienteService.getAll().subscribe({
       next: (data) =>
-        this.counts.update((c) => ({ ...c, condominios: data.filter((x: any) => x.ativo).length })),
+        this.counts.update((c) => ({ ...c, clientes: data.filter((x: any) => x.ativo).length })),
     });
     this.funcionarioService.getAll().subscribe({
       next: (data) =>
@@ -278,10 +461,13 @@ export class SidebarComponent implements OnInit {
       next: (data) => this.counts.update((c) => ({ ...c, postos: data.length })),
     });
     this.alocacaoService.getAll().subscribe({
+      next: (data) => this.counts.update((c) => ({ ...c, alocacoes: data.length })),
+    });
+    this.diariaService.getAll().subscribe({
       next: (data) =>
         this.counts.update((c) => ({
           ...c,
-          alocacoes: data.filter((x: any) => x.statusAlocacao === StatusAlocacao.CONFIRMADA).length,
+          diarias: data.filter((x: any) => x.statusDiaria === StatusDiaria.CONFIRMADA).length,
         })),
     });
     this.contratoService.getAll().subscribe({
@@ -291,5 +477,13 @@ export class SidebarComponent implements OnInit {
           contratos: data.filter((x: any) => x.status === StatusContrato.ATIVO).length,
         })),
     });
+    this.tagService.getAll().subscribe({
+      next: (data) => this.counts.update((c) => ({ ...c, tags: data.length })),
+    });
+  }
+
+  logout() {
+    this.layoutState.closeAll();
+    this.authService.logout();
   }
 }

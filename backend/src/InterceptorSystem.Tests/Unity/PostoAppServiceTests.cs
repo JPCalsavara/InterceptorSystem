@@ -1,0 +1,330 @@
+using InterceptorSystem.Application.Common.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
+using Moq;
+
+namespace InterceptorSystem.Tests.Unity;
+
+/// <summary>
+/// Testes unitários para PostoAppService.
+/// Posto agora é apenas locação física (Nome, Endereço, Cidade, Estado).
+/// A lógica de agendamento/escala foi movida para AlocacaoAppService.
+/// </summary>
+public class PostoAppServiceTests
+{
+    private readonly Mock<IPostoRepository> _mockRepo;
+    private readonly Mock<IClienteRepository> _mockClienteRepo;
+    private readonly Mock<ICurrentTenantService> _mockTenant;
+    private readonly Mock<IUnitOfWork> _mockUow;
+    private readonly PostoAppService _service;
+
+    public PostoAppServiceTests()
+    {
+        _mockRepo = new Mock<IPostoRepository>();
+        _mockClienteRepo = new Mock<IClienteRepository>();
+        _mockTenant = new Mock<ICurrentTenantService>();
+        _mockUow = new Mock<IUnitOfWork>();
+
+        _mockRepo.Setup(r => r.UnitOfWork).Returns(_mockUow.Object);
+        _mockTenant.Setup(t => t.EmpresaId).Returns(Guid.NewGuid());
+
+        _service = new PostoAppService(
+            _mockRepo.Object,
+            _mockClienteRepo.Object,
+            _mockTenant.Object);
+    }
+
+    #region CreateAsync Tests
+
+    [Fact(DisplayName = "CreateAsync - Deve criar posto com dados válidos")]
+    public async Task CreateAsync_DeveCriar_QuandoDadosValidos()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var cliente = new Cliente(empresaId, "Cliente Teste", "11222333000181", "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua das Flores", "123", null, "São Paulo", "SP");
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(cliente);
+        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        // Act
+        var result = await _service.CreateAsync(input);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Portaria A", result.Nome);
+        Assert.Equal("01310100", result.Cep);
+        Assert.Equal("Rua das Flores", result.Endereco);
+        Assert.Equal("123", result.Numero);
+        Assert.Null(result.Complemento);
+        Assert.Equal("São Paulo", result.Cidade);
+        Assert.Equal("SP", result.Estado);
+        Assert.True(result.Ativo);
+
+        _mockRepo.Verify(r => r.Add(It.Is<Posto>(p =>
+            p.ClienteId == clienteId &&
+            p.Nome == "Portaria A" &&
+            p.Cep == "01310100" &&
+            p.Endereco == "Rua das Flores" &&
+            p.Numero == "123" &&
+            p.Cidade == "São Paulo" &&
+            p.Estado == "SP"
+        )), Times.Once);
+
+        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando cliente não existe")]
+    public async Task CreateAsync_DeveFalhar_QuandoClienteNaoExiste()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+
+        _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
+        _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        Assert.Contains("Cliente não encontrado", exception.Message);
+
+        _mockRepo.Verify(r => r.Add(It.IsAny<Posto>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "CreateAsync - Deve falhar quando tenant não está definido")]
+    public async Task CreateAsync_DeveFalhar_QuandoTenantNaoDefinido()
+    {
+        // Arrange
+        var input = new CreatePostoInput(Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+        _mockTenant.Setup(t => t.EmpresaId).Returns((Guid?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(input));
+        _mockRepo.Verify(r => r.Add(It.IsAny<Posto>()), Times.Never);
+    }
+
+    #endregion
+
+    #region UpdateAsync Tests
+
+    [Fact(DisplayName = "UpdateAsync - Deve atualizar posto quando dados válidos")]
+    public async Task UpdateAsync_DeveAtualizarPostoQuandoDadosValidos()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var postoId = Guid.NewGuid();
+        var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua Velha", "100", null, "São Paulo", "SP");
+
+        var input = new UpdatePostoInput("Portaria B", "13010-111", "Rua Nova", "456", "Bloco A", "Campinas", "SP");
+
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
+        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        // Act
+        var result = await _service.UpdateAsync(postoId, input);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Portaria B", result.Nome);
+        Assert.Equal("13010111", result.Cep);
+        Assert.Equal("Rua Nova", result.Endereco);
+        Assert.Equal("456", result.Numero);
+        Assert.Equal("Bloco A", result.Complemento);
+        Assert.Equal("Campinas", result.Cidade);
+        Assert.Equal("SP", result.Estado);
+
+        _mockRepo.Verify(r => r.Update(It.IsAny<Posto>()), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "UpdateAsync - Deve falhar quando posto não existe")]
+    public async Task UpdateAsync_DeveFalhar_QuandoPostoNaoExiste()
+    {
+        // Arrange
+        var postoId = Guid.NewGuid();
+        var input = new UpdatePostoInput("Portaria B", "01310-100", "Rua Nova", "10", null, "São Paulo", "SP");
+
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync((Posto?)null);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(postoId, input));
+        Assert.Contains("Posto de Trabalho não encontrado", exception.Message);
+
+        _mockRepo.Verify(r => r.Update(It.IsAny<Posto>()), Times.Never);
+    }
+
+    #endregion
+
+    #region DeleteAsync Tests
+
+    [Fact(DisplayName = "DeleteAsync - Deve desativar posto existente")]
+    public async Task DeleteAsync_DeveDesativar_QuandoPostoExiste()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var postoId = Guid.NewGuid();
+        var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
+        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        // Act
+        await _service.DeleteAsync(postoId);
+
+        // Assert
+        _mockRepo.Verify(r => r.Update(It.Is<Posto>(p => !p.Ativo)), Times.Once);
+        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "DeleteAsync - Deve falhar quando posto não existe")]
+    public async Task DeleteAsync_DeveFalhar_QuandoPostoNaoExiste()
+    {
+        // Arrange
+        var postoId = Guid.NewGuid();
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync((Posto?)null);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(postoId));
+        Assert.Contains("Posto de Trabalho não encontrado", exception.Message);
+
+        _mockRepo.Verify(r => r.Update(It.IsAny<Posto>()), Times.Never);
+    }
+
+    #endregion
+
+    #region GetByIdAsync Tests
+
+    [Fact(DisplayName = "GetByIdAsync - Deve retornar posto quando existe")]
+    public async Task GetByIdAsync_DeveRetornar_QuandoPostoExiste()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var postoId = Guid.NewGuid();
+        var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
+
+        // Act
+        var result = await _service.GetByIdAsync(postoId, It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Portaria A", result.Nome);
+        Assert.Equal("São Paulo", result.Cidade);
+
+        _mockRepo.Verify(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "GetByIdAsync - Deve retornar null quando posto não existe")]
+    public async Task GetByIdAsync_DeveRetornarNull_QuandoPostoNaoExiste()
+    {
+        // Arrange
+        var postoId = Guid.NewGuid();
+        _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync((Posto?)null);
+
+        // Act
+        var result = await _service.GetByIdAsync(postoId, It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.Null(result);
+        _mockRepo.Verify(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
+
+    #region GetAllAsync Tests
+
+    [Fact(DisplayName = "GetAllAsync - Deve retornar lista de postos")]
+    public async Task GetAllAsync_DeveRetornarLista()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var postos = new List<Posto>
+        {
+            new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua A", "10", null, "São Paulo", "SP"),
+            new Posto(clienteId, empresaId, "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP"),
+            new Posto(clienteId, empresaId, "Portaria C", "13010-111", "Rua C", "30", null, "Campinas", "SP")
+        };
+
+        _mockRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(postos);
+
+        // Act
+        var result = await _service.GetAllAsync(It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Count());
+        _mockRepo.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "GetAllAsync - Deve retornar lista vazia quando não há postos")]
+    public async Task GetAllAsync_DeveRetornarListaVazia_QuandoNaoHaPostos()
+    {
+        // Arrange
+        _mockRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Posto>());
+
+        // Act
+        var result = await _service.GetAllAsync(It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result);
+    }
+
+    #endregion
+
+    #region GetByClienteIdAsync Tests
+
+    [Fact(DisplayName = "GetByClienteIdAsync - Deve retornar postos do cliente")]
+    public async Task GetByClienteIdAsync_DeveRetornar_QuandoExistemPostos()
+    {
+        // Arrange
+        var empresaId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
+        var postos = new List<Posto>
+        {
+            new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua A", "10", null, "São Paulo", "SP"),
+            new Posto(clienteId, empresaId, "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP")
+        };
+
+        _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None)).ReturnsAsync(postos);
+
+        // Act
+        var result = await _service.GetByClienteIdAsync(clienteId, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count());
+        Assert.All(result, p => Assert.Equal(clienteId, p.ClienteId));
+
+        _mockRepo.Verify(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None), Times.Once);
+    }
+
+    [Fact(DisplayName = "GetByClienteIdAsync - Deve retornar lista vazia quando não há postos")]
+    public async Task GetByClienteIdAsync_DeveRetornarVazio_QuandoNaoHaPostos()
+    {
+        // Arrange
+        var clienteId = Guid.NewGuid();
+        _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None)).ReturnsAsync(new List<Posto>());
+
+        // Act
+        var result = await _service.GetByClienteIdAsync(clienteId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result);
+    }
+
+    #endregion
+}

@@ -1,0 +1,36 @@
+❯ Building...
+✔ Building...
+Initial chunk files | Names                        |  Raw size
+styles.css          | styles                       |  32.05 kB | 
+main.js             | main                         |  11.41 kB | 
+chunk-R3FF2VD3.js   | -                            |   3.42 kB | 
+chunk-653SOEEV.js   | -                            |   1.51 kB | 
+chunk-DDE4NLQV.js   | -                            | 178 bytes | 
+
+                    | Initial total                |  48.58 kB
+
+Lazy chunk files    | Names                        |  Raw size
+chunk-372VYX2K.js   | cliente-wizard-component     | 296.02 kB | 
+chunk-EUPCKFMH.js   | cliente-detail-component     | 179.25 kB | 
+chunk-UECSDSQY.js   | landing-component            | 176.77 kB | 
+chunk-FBBMVFRE.js   | contrato-detail-component    | 172.00 kB | 
+chunk-UF4VSIS4.js   | -                            | 148.81 kB | 
+chunk-CES7JLX4.js   | -                            | 144.28 kB | 
+chunk-6XR7BIDC.js   | dashboard-component          | 137.81 kB | 
+chunk-CRRZIZNI.js   | posto-detail-component       | 128.51 kB | 
+chunk-ORREETJQ.js   | funcionario-detail-component | 126.69 kB | 
+chunk-6NWDWYX7.js   | app-shell-component          | 116.35 kB | 
+chunk-VGORMSTV.js   | contrato-list-component      |  94.00 kB | 
+chunk-2IU6ZDTX.js   | suporte-page-component       |  63.71 kB | 
+chunk-FCLR7IUT.js   | tag-list-component           |  60.32 kB | 
+chunk-4NO3FBWX.js   | perfil-component             |  53.29 kB | 
+chunk-HSYMXQSU.js   | funcionario-form-component   |  51.75 kB | 
+...and 36 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [16.029 seconds] - 2026-05-13T01:05:45.302Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+22:05:45 [vite] (client) Re-optimizing dependencies because lockfile has changed
+An unhandled exception occurred: EACCES: permission denied, rmdir '/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/.angular/cache/21.0.4/frontend/vite/deps'
+See "/tmp/ng-Z6eo05/angular-errors.log" for further details.

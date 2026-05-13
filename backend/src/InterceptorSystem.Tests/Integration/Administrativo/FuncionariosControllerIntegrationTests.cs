@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using InterceptorSystem.Application.Modulos.Administrativo.DTOs;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Integration.Administrativo;
 
@@ -11,32 +11,32 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     {
     }
 
-    private async Task<Guid> CriarCondominioAsync()
+    private async Task<Guid> CriarClienteAsync()
     {
-        var input = new CreateCondominioDtoInput(
-            "Condomínio Func", 
-            $"{DateTime.Now.Ticks % 100000000:00000000}/0001-55", 
-            "Rua Func",
-            10,
-            TimeSpan.FromHours(6)
+        var input = new CreateClienteDtoInput(
+            "Cliente Teste", 
+            "11222333000181",
+            "São Paulo",
+            "SP"
         );
-        var response = await Client.PostAsJsonAsync("/api/condominios", input);
+        var response = await Client.PostAsJsonAsync("/api/clientes", input);
         response.EnsureSuccessStatusCode();
-        var dto = await ReadAsAsync<CondominioDtoOutput>(response);
+        var dto = await ReadAsAsync<ClienteDtoOutput>(response);
         return dto!.Id;
     }
 
     // FASE 2: Criar contrato vigente para vincular funcionários
-    private async Task<Guid> CriarContratoAsync(Guid condominioId)
+    private async Task<Guid> CriarContratoAsync(Guid clienteId)
     {
         var input = new CreateContratoDtoInput(
-            condominioId,
+            clienteId,
             "Contrato Teste",
             10000m,  // ValorTotalMensal
             100m,    // ValorDiariaCobrada
             0.30m,   // PercentualAdicionalNoturno (30% = 0.30)
+            1.0m,    // PercentualAdicionalFimSemana (100% = 1.0)
             500m,    // ValorBeneficiosExtrasMensal
-            0.15m,   // PercentualImpostos (15% = 0.15)
+            0.15m,   // PercentualEncargosProvisoes (15% = 0.15)
             2,
             0.20m,   // MargemLucroPercentual (20% = 0.20)
             0.10m,   // MargemCoberturaFaltasPercentual (10% = 0.10)
@@ -50,13 +50,13 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
         return dto!.Id;
     }
 
-    private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid condominioId)
+    private async Task<FuncionarioDtoOutput> CriarFuncionarioAsync(Guid clienteId)
     {
-        var contratoId = await CriarContratoAsync(condominioId);
+        var contratoId = await CriarContratoAsync(clienteId);
         
         // FASE 3: Sem parâmetros de salário (calculados automaticamente)
         var input = new CreateFuncionarioDtoInput(
-            condominioId,
+            clienteId,
             contratoId,
             "Funcionario Teste",
             GerarCpfFake(),
@@ -69,22 +69,40 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
         return await ReadAsAsync<FuncionarioDtoOutput>(response) ?? throw new InvalidOperationException();
     }
 
-    private string GerarCpfFake() => $"{DateTime.Now.Ticks % 100000000000:00000000000}";
-
-    // FASE 2: Helper para criar condomínio + contrato juntos
-    private async Task<(Guid condominioId, Guid contratoId)> CriarCondominioComContratoAsync()
+    private string GerarCpfFake()
     {
-        var condominioId = await CriarCondominioAsync();
-        var contratoId = await CriarContratoAsync(condominioId);
-        return (condominioId, contratoId);
+        var baseDigits = $"{DateTime.UtcNow.Ticks % 1000000000:000000000}";
+        var d1 = CalcularDigitoCpf(baseDigits, new[] { 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        var d2 = CalcularDigitoCpf(baseDigits + d1, new[] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        return baseDigits + d1 + d2;
+    }
+
+    private static int CalcularDigitoCpf(string input, IReadOnlyList<int> pesos)
+    {
+        var soma = 0;
+        for (var i = 0; i < input.Length; i++)
+        {
+            soma += (input[i] - '0') * pesos[i];
+        }
+
+        var resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    }
+
+    // FASE 2: Helper para criar cliente + contrato juntos
+    private async Task<(Guid clienteId, Guid contratoId)> CriarClienteComContratoAsync()
+    {
+        var clienteId = await CriarClienteAsync();
+        var contratoId = await CriarContratoAsync(clienteId);
+        return (clienteId, contratoId);
     }
 
     [Fact(DisplayName = "POST /api/funcionarios - Deve criar funcionário quando dados válidos")]
     public async Task Post_DeveCriarFuncionario()
     {
-        var (condominioId, contratoId) = await CriarCondominioComContratoAsync();
+        var (clienteId, contratoId) = await CriarClienteComContratoAsync();
         // FASE 3: Sem parâmetros de salário
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", GerarCpfFake(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+        var input = new CreateFuncionarioDtoInput(clienteId, contratoId, "Funcionario Teste", GerarCpfFake(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
 
@@ -94,10 +112,10 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "POST /api/funcionarios - Deve retornar 400 quando CPF duplicado")]
     public async Task Post_DeveFalhar_QuandoCpfDuplicado()
     {
-        var (condominioId, contratoId) = await CriarCondominioComContratoAsync();
+        var (clienteId, contratoId) = await CriarClienteComContratoAsync();
         var cpf = GerarCpfFake();
         // FASE 3: Sem parâmetros de salário
-        var input = new CreateFuncionarioDtoInput(condominioId, contratoId, "Funcionario Teste", cpf, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+        var input = new CreateFuncionarioDtoInput(clienteId, contratoId, "Funcionario Teste", cpf, "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
         await Client.PostAsJsonAsync("/api/funcionarios", input);
 
         var response = await Client.PostAsJsonAsync("/api/funcionarios", input);
@@ -105,8 +123,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Fact(DisplayName = "POST /api/funcionarios - Deve retornar 404 quando condomínio inexistente")]
-    public async Task Post_DeveFalhar_QuandoCondominioNaoExiste()
+    [Fact(DisplayName = "POST /api/funcionarios - Deve retornar 404 quando cliente inexistente")]
+    public async Task Post_DeveFalhar_QuandoClienteNaoExiste()
     {
         // FASE 3: Sem parâmetros de salário
         var input = new CreateFuncionarioDtoInput(Guid.NewGuid(), Guid.NewGuid(), "Funcionario Teste", GerarCpfFake(), "+5511999999999", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
@@ -119,8 +137,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "GET /api/funcionarios/{id} - Deve retornar 200 quando existe")]
     public async Task GetById_DeveRetornar200()
     {
-        var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        var funcionario = await CriarFuncionarioAsync(clienteId);
 
         var response = await Client.GetAsync($"/api/funcionarios/{funcionario.Id}");
 
@@ -138,8 +156,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "GET /api/funcionarios - Deve retornar lista")]
     public async Task GetAll_DeveRetornarLista()
     {
-        var condominioId = await CriarCondominioAsync();
-        await CriarFuncionarioAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        await CriarFuncionarioAsync(clienteId);
 
         var response = await Client.GetAsync("/api/funcionarios");
 
@@ -149,8 +167,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "PUT /api/funcionarios/{id} - Deve atualizar funcionário")]
     public async Task Put_DeveAtualizarFuncionario()
     {
-        var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        var funcionario = await CriarFuncionarioAsync(clienteId);
         // FASE 3: Sem parâmetros de salário
         var input = new UpdateFuncionarioDtoInput("Atualizado", "+5511777777777", StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
 
@@ -173,8 +191,8 @@ public class FuncionariosControllerIntegrationTests : IntegrationTestBase
     [Fact(DisplayName = "DELETE /api/funcionarios/{id} - Deve excluir funcionário existente")]
     public async Task Delete_DeveExcluirFuncionario()
     {
-        var condominioId = await CriarCondominioAsync();
-        var funcionario = await CriarFuncionarioAsync(condominioId);
+        var clienteId = await CriarClienteAsync();
+        var funcionario = await CriarFuncionarioAsync(clienteId);
 
         var response = await Client.DeleteAsync($"/api/funcionarios/{funcionario.Id}");
 

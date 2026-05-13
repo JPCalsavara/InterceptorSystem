@@ -47,7 +47,7 @@ src/
 
 ## ✅ Regras de Negócio Principais
 
-### **Condomínio**
+### **Cliente**
 - CNPJ único por empresa
 - Define quantidade ideal de funcionários e horário de troca
 
@@ -56,17 +56,17 @@ src/
 - DEVE estar vinculado a contrato vigente
 - Salários calculados automaticamente do contrato
 
-### **PostoDeTrabalho**
+### **Posto**
 - Turnos de **exatamente 12 horas**
-- Quantidade de funcionários calculada do condomínio
+- Quantidade de funcionários calculada do cliente
 
-### **Alocação**
+### **Diária**
 - NÃO permite dias consecutivos (exceto DOBRA_PROGRAMADA)
 - Descanso obrigatório após dobra
-- Um funcionário = uma alocação por vez
+- Um funcionário = uma diária por vez
 
 ### **Contrato**
-- Apenas 1 contrato vigente por condomínio
+- Apenas 1 contrato vigente por cliente
 - Auto-finaliza quando `DataFim` < hoje
 - Margens de lucro e faltas DEVEM ser consideradas
 
@@ -76,8 +76,8 @@ src/
 
 ### **Criação Completa (FASE 5)**
 ```http
-POST /api/condominios-completos
-POST /api/condominios-completos/validar
+POST /api/clientes-completos
+POST /api/clientes-completos/validar
 ```
 
 ### **Cálculo de Contrato**
@@ -87,11 +87,11 @@ POST /api/contratos/calculos/calcular-valor-total
 
 ### **CRUD Básico**
 ```http
-GET/POST/PUT/DELETE /api/condominios
+GET/POST/PUT/DELETE /api/clientes
 GET/POST/PUT/DELETE /api/contratos
 GET/POST/PUT/DELETE /api/funcionarios
-GET/POST/PUT/DELETE /api/postos-de-trabalho
-GET/POST/PUT/DELETE /api/alocacoes
+GET/POST/PUT/DELETE /api/postos
+GET/POST/PUT/DELETE /api/diarias
 ```
 
 ---
@@ -119,12 +119,12 @@ dotnet test --filter "FullyQualifiedName~Integration"
 
 Localizados em: `src/docs/test-payloads/`
 
-- `condominios.json`
+- `clientes.json`
 - `contratos.json`
 - `funcionarios.json`
-- `postos-de-trabalho.json`
-- `alocacoes.json`
-- `condominio-completo.json` (FASE 5)
+- `postos.json`
+- `diarias.json`
+- `cliente-completo.json` (FASE 5)
 
 ---
 

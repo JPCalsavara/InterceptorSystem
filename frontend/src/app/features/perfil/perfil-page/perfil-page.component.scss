@@ -1,0 +1,120 @@
+/* Use shared layout tokens implicitly */
+
+.perfil-layout {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-4);
+  align-items: flex-start;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
+.perfil-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+}
+
+.perfil-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.perfil-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: var(--fw-medium);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: var(--bg-tertiary);
+    color: var(--primary-color);
+  }
+
+  &.active {
+    background: var(--bg-secondary);
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+  }
+}
+
+.perfil-content {
+  flex: 1;
+  padding: var(--space-8);
+}
+
+.section-title {
+  font-size: var(--text-lg);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.section-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-bold);
+  box-shadow: var(--shadow-md);
+}
+
+.avatar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  max-width: 600px;
+}

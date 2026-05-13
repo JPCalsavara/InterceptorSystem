@@ -1,0 +1,195 @@
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(5,33): error TS2307: Cannot find module '../../services/contrato.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(6,40): error TS2307: Cannot find module '../../services/contrato-calculo.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(7,32): error TS2307: Cannot find module '../../services/cliente.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(8,36): error TS2307: Cannot find module '../../services/funcionario.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(9,30): error TS2307: Cannot find module '../../services/posto.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(10,33): error TS2307: Cannot find module '../../services/alocacao.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(11,31): error TS2307: Cannot find module '../../services/diaria.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(12,47): error TS2307: Cannot find module '../../services/entity-cache-coordinator.service' or its corresponding type declarations.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(17,28): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(18,27): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(19,27): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(20,31): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(21,25): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(22,28): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(23,26): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(24,25): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(66,27): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(67,26): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(68,26): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(69,30): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(70,24): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(71,27): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(72,25): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(73,24): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(118,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(135,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(152,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(164,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(190,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(214,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(225,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(236,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(247,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(261,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(273,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(296,37): error TS2551: Property 'variacaoLucroPercentual' does not exist on type 'ContratoDetailComponent'. Did you mean 'variacaoLucroPercent'?
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(298,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(310,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(320,41): error TS2339: Property 'lucroSimuladoParaComparativo' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(325,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(351,19): error TS2339: Property 'onSave' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(356,11): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(369,19): error TS2339: Property 'onSave' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(373,28): error TS2551: Property 'error' does not exist on type 'ContratoDetailComponent'. Did you mean 'erro'?
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(374,11): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(386,19): error TS2339: Property 'onSave' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(390,28): error TS2551: Property 'error' does not exist on type 'ContratoDetailComponent'. Did you mean 'erro'?
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(391,11): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(403,19): error TS2339: Property 'onSave' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(408,11): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(420,19): error TS2339: Property 'onDelete' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(425,11): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(435,24): error TS2339: Property 'ngOnDestroy' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(439,26): error TS2304: Cannot find name 'spyOn'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(439,32): error TS7053: Element implicitly has an 'any' type because expression of type '"destroy$"' can't be used to index type 'ContratoDetailComponent'.
+  Property 'destroy$' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(440,27): error TS2304: Cannot find name 'spyOn'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(440,33): error TS7053: Element implicitly has an 'any' type because expression of type '"destroy$"' can't be used to index type 'ContratoDetailComponent'.
+  Property 'destroy$' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(442,17): error TS2339: Property 'ngOnDestroy' does not exist on type 'ContratoDetailComponent'.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(469,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(484,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(514,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(531,9): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts(545,7): error TS2349: This expression is not callable.
+  Type 'TestContext' has no call signatures.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(21,28): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(22,27): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(23,31): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(24,26): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(25,32): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(26,19): error TS2503: Cannot find namespace 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(34,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(35,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(46,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(47,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(56,5): error TS2739: Type '{ id: string; nome: string; cnpj: string; ativo: true; }' is missing the following properties from type 'Cliente': cidade, estado
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(57,5): error TS2739: Type '{ id: string; nome: string; cnpj: string; ativo: false; }' is missing the following properties from type 'Cliente': cidade, estado
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(70,7): error TS2322: Type '"DOZE_POR_TRINTA_SEIS"' is not assignable to type 'TipoEscala'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(71,7): error TS2322: Type '"CLT"' is not assignable to type 'TipoFuncionario'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(78,27): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(84,26): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(85,30): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(86,25): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(87,31): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(90,18): error TS2304: Cannot find name 'jasmine'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(119,50): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(121,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(127,49): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(129,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(135,53): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(137,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(143,46): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(145,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(198,62): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(200,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(261,45): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(269,40): error TS2345: Argument of type 'Map<string, { id: string; totalFaturado: number; totalCusto: number; lucroLiquido: number; }>' is not assignable to parameter of type 'Map<string, ContratoResumoFinanceiro>'.
+  Type '{ id: string; totalFaturado: number; totalCusto: number; lucroLiquido: number; }' is missing the following properties from type 'ContratoResumoFinanceiro': contratoId, ano, mes, custoRealDiariasNormais, and 7 more.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(284,57): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(288,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(293,56): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(297,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(302,52): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(306,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(310,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(338,33): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(342,17): error TS2339: Property 'onDelete' does not exist on type 'ContratoListComponent'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(343,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(348,46): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(351,17): error TS2339: Property 'onDelete' does not exist on type 'ContratoListComponent'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(352,7): error TS2304: Cannot find name 'tick'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(357,46): error TS2304: Cannot find name 'fakeAsync'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(361,17): error TS2339: Property 'onDelete' does not exist on type 'ContratoListComponent'.
+src/app/features/contratos/contrato-list/contrato-list.component.spec.ts(362,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(25,27): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(26,31): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(27,25): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(28,26): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(29,28): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(30,32): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(31,19): error TS2503: Cannot find namespace 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(34,5): error TS2739: Type '{ id: string; nome: string; cnpj: string; ativo: true; }' is missing the following properties from type 'Cliente': cidade, estado
+src/app/pages/dashboard/dashboard.component.spec.ts(35,5): error TS2739: Type '{ id: string; nome: string; cnpj: string; ativo: true; }' is missing the following properties from type 'Cliente': cidade, estado
+src/app/pages/dashboard/dashboard.component.spec.ts(36,5): error TS2739: Type '{ id: string; nome: string; cnpj: string; ativo: false; }' is missing the following properties from type 'Cliente': cidade, estado
+src/app/pages/dashboard/dashboard.component.spec.ts(49,7): error TS2322: Type '"DOZE_POR_TRINTA_SEIS"' is not assignable to type 'TipoEscala'.
+src/app/pages/dashboard/dashboard.component.spec.ts(50,7): error TS2322: Type '"CLT"' is not assignable to type 'TipoFuncionario'.
+src/app/pages/dashboard/dashboard.component.spec.ts(62,33): error TS2551: Property 'INATIVO' does not exist on type 'typeof StatusFuncionario'. Did you mean 'ATIVO'?
+src/app/pages/dashboard/dashboard.component.spec.ts(63,7): error TS2322: Type '"DOZE_POR_TRINTA_SEIS"' is not assignable to type 'TipoEscala'.
+src/app/pages/dashboard/dashboard.component.spec.ts(64,7): error TS2322: Type '"PJ"' is not assignable to type 'TipoFuncionario'.
+src/app/pages/dashboard/dashboard.component.spec.ts(77,7): error TS2353: Object literal may only specify known properties, and 'criadoEm' does not exist in type 'Posto'.
+src/app/pages/dashboard/dashboard.component.spec.ts(87,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/pages/dashboard/dashboard.component.spec.ts(89,7): error TS2322: Type '"REGULAR"' is not assignable to type 'TipoDiaria'.
+src/app/pages/dashboard/dashboard.component.spec.ts(101,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/pages/dashboard/dashboard.component.spec.ts(102,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/app/pages/dashboard/dashboard.component.spec.ts(111,26): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(112,30): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(113,24): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(114,25): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(115,27): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(116,31): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(119,18): error TS2304: Cannot find name 'jasmine'.
+src/app/pages/dashboard/dashboard.component.spec.ts(157,49): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(159,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(165,53): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(167,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(173,47): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(175,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(181,48): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(183,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(189,50): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(191,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(224,55): error TS2339: Property 'status' does not exist on type 'Funcionario'.
+src/app/pages/dashboard/dashboard.component.spec.ts(230,18): error TS2339: Property 'status' does not exist on type 'Funcionario'.
+src/app/pages/dashboard/dashboard.component.spec.ts(230,47): error TS2551: Property 'INATIVO' does not exist on type 'typeof StatusFuncionario'. Did you mean 'ATIVO'?
+src/app/pages/dashboard/dashboard.component.spec.ts(261,55): error TS2339: Property 'status' does not exist on type 'Diaria'.
+src/app/pages/dashboard/dashboard.component.spec.ts(284,27): error TS2339: Property 'getTime' does not exist on type 'string'.
+src/app/pages/dashboard/dashboard.component.spec.ts(348,56): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(352,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(357,60): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(363,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(368,57): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(372,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(377,52): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(381,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(385,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(466,65): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(468,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(480,49): error TS2304: Cannot find name 'fakeAsync'.
+src/app/pages/dashboard/dashboard.component.spec.ts(482,7): error TS2304: Cannot find name 'tick'.
+src/app/pages/dashboard/dashboard.component.spec.ts(488,7): error TS2304: Cannot find name 'tick'.
+src/app/services/contrato.service.spec.ts(21,7): error TS2353: Object literal may only specify known properties, and 'percentualImpostos' does not exist in type 'Contrato'.

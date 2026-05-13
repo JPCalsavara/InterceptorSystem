@@ -1,323 +1,118 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
 
 namespace InterceptorSystem.Tests.Unity;
 
 /// <summary>
-/// Testes para a nova lógica de adicional noturno baseado no horário do posto de trabalho (CLT Art. 73)
+/// Testes para a lógica de horário noturno CLT Art. 73.
+/// TemHorarioNoturno agora pertence a Alocacao (shift slot), não Posto (location).
+/// Testes de cálculo de adicional noturno no Funcionario dependem de Phase 3 (Tags).
 /// </summary>
 public class AdicionalNoturnoTests
 {
     private readonly Guid _empresaId = Guid.NewGuid();
-    private readonly Guid _condominioId = Guid.NewGuid();
+    private readonly Guid _postoId = Guid.NewGuid();
     private readonly Guid _contratoId = Guid.NewGuid();
 
-    [Fact(DisplayName = "PostoDeTrabalho - Deve identificar horário noturno (22h às 5h)")]
-    public void PostoDeTrabalho_DeveIdentificarHorarioNoturno()
+    [Fact(DisplayName = "Alocacao - Deve identificar horário noturno (22h às 10h)")]
+    public void Alocacao_DeveIdentificarHorarioNoturno()
     {
         // Arrange & Act
-        var postoNoturno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
+        var alocacao = new Alocacao(
+            _postoId,
             _contratoId,
+            _empresaId,
             new TimeSpan(22, 0, 0), // 22h
             new TimeSpan(10, 0, 0), // 10h (próximo dia)
+            tipoEscala: TipoEscala.DOZE_POR_TRINTA_SEIS,
             permiteDobrarEscala: true
         );
 
         // Assert
-        Assert.True(postoNoturno.TemHorarioNoturno);
+        Assert.True(alocacao.TemHorarioNoturno);
     }
 
-    [Fact(DisplayName = "PostoDeTrabalho - Deve identificar horário diurno (6h às 18h)")]
-    public void PostoDeTrabalho_DeveIdentificarHorarioDiurno()
+    [Fact(DisplayName = "Alocacao - Deve identificar horário diurno (6h às 18h)")]
+    public void Alocacao_DeveIdentificarHorarioDiurno()
     {
         // Arrange & Act
-        var postoDiurno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
+        var alocacao = new Alocacao(
+            _postoId,
             _contratoId,
+            _empresaId,
             new TimeSpan(6, 0, 0),  // 6h
             new TimeSpan(18, 0, 0), // 18h
+            tipoEscala: TipoEscala.DOZE_POR_TRINTA_SEIS,
             permiteDobrarEscala: true
         );
 
         // Assert
-        Assert.False(postoDiurno.TemHorarioNoturno);
+        Assert.False(alocacao.TemHorarioNoturno);
     }
 
-    [Fact(DisplayName = "PostoDeTrabalho - Deve identificar horário noturno parcial (18h às 6h)")]
-    public void PostoDeTrabalho_DeveIdentificarHorarioNoturnoParcial()
+    [Fact(DisplayName = "Alocacao - Deve identificar horário noturno parcial (18h às 6h)")]
+    public void Alocacao_DeveIdentificarHorarioNoturnoParcial()
     {
         // Arrange & Act
-        var postoNoturno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
+        var alocacao = new Alocacao(
+            _postoId,
             _contratoId,
+            _empresaId,
             new TimeSpan(18, 0, 0), // 18h
             new TimeSpan(6, 0, 0),  // 6h (próximo dia)
+            tipoEscala: TipoEscala.DOZE_POR_TRINTA_SEIS,
             permiteDobrarEscala: true
         );
 
         // Assert - Entre 18h e 6h há período noturno (22h às 5h)
-        Assert.True(postoNoturno.TemHorarioNoturno);
+        Assert.True(alocacao.TemHorarioNoturno);
     }
 
-    [Fact(DisplayName = "PostoDeTrabalho - Deve identificar horário noturno (0h às 12h)")]
-    public void PostoDeTrabalho_DeveIdentificarHorarioNoturno_MeiaNoite()
+    [Fact(DisplayName = "Alocacao - Deve identificar horário noturno (0h às 12h)")]
+    public void Alocacao_DeveIdentificarHorarioNoturno_MeiaNoite()
     {
         // Arrange & Act
-        var postoNoturno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
+        var alocacao = new Alocacao(
+            _postoId,
             _contratoId,
+            _empresaId,
             new TimeSpan(0, 0, 0),  // 0h (meia-noite)
             new TimeSpan(12, 0, 0), // 12h
+            tipoEscala: TipoEscala.DOZE_POR_TRINTA_SEIS,
             permiteDobrarEscala: true
         );
 
         // Assert - Entre 0h e 5h é período noturno
-        Assert.True(postoNoturno.TemHorarioNoturno);
+        Assert.True(alocacao.TemHorarioNoturno);
     }
 
-    [Fact(DisplayName = "Funcionario - Deve calcular adicional noturno quando tem alocação em posto noturno")]
-    public void Funcionario_DeveCalcularAdicionalNoturno_QuandoTemAlocacaoNoturna()
+    [Fact(DisplayName = "Alocacao - Deve identificar horário diurno (7h às 15h)")]
+    public void Alocacao_DeveIdentificarHorarioDiurno_8h()
     {
-        // Arrange
-        var condominio = new Condominio(
-            _empresaId,
-            "Condomínio Teste",
-            "12.345.678/0001-90",
-            "Rua Teste, 123",
-            quantidadeIdealPorTurno: 12,
-            horarioTrocaTurno: new TimeSpan(6, 0, 0),
-            emailGestor: "teste@teste.com",
-            telefoneEmergencia: "(11) 98765-4321"
-        );
-
-        var contrato = new Contrato(
-            _empresaId,
-            _condominioId,
-            "Contrato Teste",
-            valorTotalMensal: 36000m,
-            valorDiariaCobrada: 100m,
-            percentualAdicionalNoturno: 0.20m, // 20% de adicional noturno
-            valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0.15m,
-            numeroDePostos: 2,
-            margemLucroPercentual: 0.15m,
-            margemCoberturaFaltasPercentual: 0.10m,
-            dataInicio: DateOnly.FromDateTime(DateTime.Now.AddMonths(-1)),
-            dataFim: DateOnly.FromDateTime(DateTime.Now.AddMonths(5)),
-            StatusContrato.ATIVO
-        );
-
-        var postoNoturno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
-            _contratoId,
-            new TimeSpan(22, 0, 0), // 22h
-            new TimeSpan(10, 0, 0), // 10h
-            permiteDobrarEscala: true
-        );
-
-        var funcionario = new Funcionario(
-            _empresaId,
-            _condominioId,
-            _contratoId,
-            "João Silva",
-            "123.456.789-00",
-            "(11) 98765-4321",
-            StatusFuncionario.ATIVO,
-            TipoEscala.DOZE_POR_TRINTA_SEIS,
-            TipoFuncionario.CLT
-        );
-
-        // Simular navegação (normalmente feita pelo EF Core)
-        typeof(Funcionario).GetProperty("Contrato")!.SetValue(funcionario, contrato);
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio); // IMPORTANTE: Contrato precisa do Condominio para calcular QuantidadeFuncionarios
-        typeof(PostoDeTrabalho).GetProperty("Condominio")!.SetValue(postoNoturno, condominio);
-
+        // Arrange & Act
         var alocacao = new Alocacao(
+            _postoId,
+            _contratoId,
             _empresaId,
-            funcionario.Id,
-            postoNoturno.Id,
-            DateOnly.FromDateTime(DateTime.Now),
-            StatusAlocacao.CONFIRMADA,
-            TipoAlocacao.REGULAR
+            new TimeSpan(7, 0, 0),  // 7h
+            new TimeSpan(15, 0, 0), // 15h (8 horas)
+            tipoEscala: TipoEscala.ALCALA_8H,
+            permiteDobrarEscala: false
         );
-
-        // Simular navegação da alocação
-        typeof(Alocacao).GetProperty("PostoDeTrabalho")!.SetValue(alocacao, postoNoturno);
-        
-        // Adicionar alocação ao funcionário
-        funcionario.Alocacoes.Add(alocacao);
-
-        // Act
-        var adicionalNoturno = funcionario.AdicionalNoturno;
 
         // Assert
-        Assert.True(adicionalNoturno > 0, "Funcionário com alocação em posto noturno deve ter adicional noturno");
-        
-        // Validar cálculo: 20% do salário base
-        var salarioBase = contrato.CalcularSalarioBasePorFuncionario();
-        var adicionalEsperado = contrato.CalcularAdicionalNoturno(salarioBase);
-        
-        Assert.Equal(adicionalEsperado, adicionalNoturno);
+        Assert.False(alocacao.TemHorarioNoturno);
     }
 
-    [Fact(DisplayName = "Funcionario - NÃO deve calcular adicional noturno quando tem alocação em posto diurno")]
-    public void Funcionario_NaoDeveCalcularAdicionalNoturno_QuandoTemAlocacaoDiurna()
+    [Fact(DisplayName = "Alocacao - Deve validar duração entre 4 e 12 horas")]
+    public void Alocacao_DeveFalhar_QuandoDuracaoInvalida()
     {
-        // Arrange
-        var condominio = new Condominio(
-            _empresaId,
-            "Condomínio Teste",
-            "12.345.678/0001-90",
-            "Rua Teste, 123",
-            quantidadeIdealPorTurno: 12,
-            horarioTrocaTurno: new TimeSpan(6, 0, 0),
-            emailGestor: "teste@teste.com",
-            telefoneEmergencia: "(11) 98765-4321"
-        );
-
-        var contrato = new Contrato(
-            _empresaId,
-            _condominioId,
-            "Contrato Teste",
-            valorTotalMensal: 36000m,
-            valorDiariaCobrada: 100m,
-            percentualAdicionalNoturno: 0.20m,
-            valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0.15m,
-            numeroDePostos: 2,
-            margemLucroPercentual: 0.15m,
-            margemCoberturaFaltasPercentual: 0.10m,
-            dataInicio: DateOnly.FromDateTime(DateTime.Now.AddMonths(-1)),
-            dataFim: DateOnly.FromDateTime(DateTime.Now.AddMonths(5)),
-            StatusContrato.ATIVO
-        );
-
-        var postoDiurno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
-            _contratoId,
-            new TimeSpan(6, 0, 0),  // 6h
-            new TimeSpan(18, 0, 0), // 18h
-            permiteDobrarEscala: true
-        );
-
-        var funcionario = new Funcionario(
-            _empresaId,
-            _condominioId,
-            _contratoId,
-            "Maria Santos",
-            "987.654.321-00",
-            "(11) 98765-1234",
-            StatusFuncionario.ATIVO,
-            TipoEscala.DOZE_POR_TRINTA_SEIS,
-            TipoFuncionario.CLT
-        );
-
-        // Simular navegação
-        typeof(Funcionario).GetProperty("Contrato")!.SetValue(funcionario, contrato);
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
-        typeof(PostoDeTrabalho).GetProperty("Condominio")!.SetValue(postoDiurno, condominio);
-
-        var alocacao = new Alocacao(
-            _empresaId,
-            funcionario.Id,
-            postoDiurno.Id,
-            DateOnly.FromDateTime(DateTime.Now),
-            StatusAlocacao.CONFIRMADA,
-            TipoAlocacao.REGULAR
-        );
-
-        typeof(Alocacao).GetProperty("PostoDeTrabalho")!.SetValue(alocacao, postoDiurno);
-        funcionario.Alocacoes.Add(alocacao);
-
-        // Act
-        var adicionalNoturno = funcionario.AdicionalNoturno;
-
-        // Assert
-        Assert.Equal(0m, adicionalNoturno);
-    }
-
-    [Fact(DisplayName = "Funcionario - NÃO deve calcular adicional noturno quando alocação está cancelada")]
-    public void Funcionario_NaoDeveCalcularAdicionalNoturno_QuandoAlocacaoCancelada()
-    {
-        // Arrange
-        var condominio = new Condominio(
-            _empresaId,
-            "Condomínio Teste",
-            "12.345.678/0001-90",
-            "Rua Teste, 123",
-            quantidadeIdealPorTurno: 12,
-            horarioTrocaTurno: new TimeSpan(6, 0, 0),
-            emailGestor: "teste@teste.com",
-            telefoneEmergencia: "(11) 98765-4321"
-        );
-
-        var contrato = new Contrato(
-            _empresaId,
-            _condominioId,
-            "Contrato Teste",
-            valorTotalMensal: 36000m,
-            valorDiariaCobrada: 100m,
-            percentualAdicionalNoturno: 0.20m,
-            valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0.15m,
-            numeroDePostos: 2,
-            margemLucroPercentual: 0.15m,
-            margemCoberturaFaltasPercentual: 0.10m,
-            dataInicio: DateOnly.FromDateTime(DateTime.Now.AddMonths(-1)),
-            dataFim: DateOnly.FromDateTime(DateTime.Now.AddMonths(5)),
-            StatusContrato.ATIVO
-        );
-
-        var postoNoturno = new PostoDeTrabalho(
-            _condominioId,
-            _empresaId,
-            _contratoId,
-            new TimeSpan(22, 0, 0),
-            new TimeSpan(10, 0, 0),
-            permiteDobrarEscala: true
-        );
-
-        var funcionario = new Funcionario(
-            _empresaId,
-            _condominioId,
-            _contratoId,
-            "Carlos Souza",
-            "111.222.333-44",
-            "(11) 98765-5555",
-            StatusFuncionario.ATIVO,
-            TipoEscala.DOZE_POR_TRINTA_SEIS,
-            TipoFuncionario.CLT
-        );
-
-        // Simular navegação
-        typeof(Funcionario).GetProperty("Contrato")!.SetValue(funcionario, contrato);
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
-        typeof(PostoDeTrabalho).GetProperty("Condominio")!.SetValue(postoNoturno, condominio);
-
-        // Alocação CANCELADA
-        var alocacao = new Alocacao(
-            _empresaId,
-            funcionario.Id,
-            postoNoturno.Id,
-            DateOnly.FromDateTime(DateTime.Now),
-            StatusAlocacao.CANCELADA, // ← Cancelada
-            TipoAlocacao.REGULAR
-        );
-
-        typeof(Alocacao).GetProperty("PostoDeTrabalho")!.SetValue(alocacao, postoNoturno);
-        funcionario.Alocacoes.Add(alocacao);
-
-        // Act
-        var adicionalNoturno = funcionario.AdicionalNoturno;
-
-        // Assert
-        Assert.Equal(0m, adicionalNoturno);
+        // Arrange & Act & Assert — 2 horas
+        Assert.Throws<DomainException>(() => new Alocacao(
+            _postoId, _contratoId, _empresaId,
+            new TimeSpan(8, 0, 0), new TimeSpan(10, 0, 0),
+            TipoEscala.DOZE_POR_TRINTA_SEIS, false
+        ));
     }
 }

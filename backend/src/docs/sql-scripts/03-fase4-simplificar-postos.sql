@@ -1,13 +1,13 @@
 -- ========================================
 -- FASE 4: Migration Manual - Remover QuantidadeIdealFuncionarios
--- Descrição: Remove colunas depreciadas de PostosDeTrabalho
+-- Descrição: Remove colunas depreciadas de Postos
 -- Data: 2026-01-08
 -- ========================================
 
 BEGIN;
 
 -- Remover colunas depreciadas (se existirem)
-ALTER TABLE "PostosDeTrabalho" 
+ALTER TABLE "Postos" 
     DROP COLUMN IF EXISTS "QuantidadeIdealFuncionarios",
     DROP COLUMN IF EXISTS "QuantidadeMaximaFuncionarios",
     DROP COLUMN IF EXISTS "NumeroFaltasAcumuladas";
@@ -17,17 +17,17 @@ DO $$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns 
-        WHERE table_name='PostosDeTrabalho' 
+        WHERE table_name='Postos' 
         AND column_name='QuantidadeMaximaFaltas'
     ) THEN
-        ALTER TABLE "PostosDeTrabalho" 
+        ALTER TABLE "Postos" 
             ADD COLUMN "QuantidadeMaximaFaltas" INTEGER NULL;
     END IF;
 END $$;
 
 -- Atualizar registro de migrations (se necessário)
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260108121709_Fase4RemoverQuantidadeIdealDePostoDeTrabalho', '8.0.8')
+VALUES ('20260108121709_Fase4RemoverQuantidadeIdealDePosto', '8.0.8')
 ON CONFLICT ("MigrationId") DO NOTHING;
 
 COMMIT;
@@ -38,14 +38,14 @@ SELECT
     data_type, 
     is_nullable
 FROM information_schema.columns 
-WHERE table_name = 'PostosDeTrabalho'
+WHERE table_name = 'Postos'
 ORDER BY ordinal_position;
 
 -- Mensagem de confirmação
 DO $$
 BEGIN
     RAISE NOTICE '✅ FASE 4 aplicada com sucesso!';
-    RAISE NOTICE '   - QuantidadeIdealFuncionarios: REMOVIDO (calculado do Condomínio)';
+    RAISE NOTICE '   - QuantidadeIdealFuncionarios: REMOVIDO (calculado do Cliente)';
     RAISE NOTICE '   - QuantidadeMaximaFaltas: ADICIONADO';
 END $$;
 

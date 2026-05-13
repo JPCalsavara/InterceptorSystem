@@ -57,7 +57,7 @@
               </svg>
               {{ funcionario()!.celular }}
             </span>
-            @if (condominio()) {
+            @if (cliente()) {
               <span class="meta-item">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -66,7 +66,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {{ condominio()!.nome }}
+                {{ cliente()!.nome }}
               </span>
             }
           </div>
@@ -89,8 +89,8 @@
             </svg>
           </div>
           <div class="metric-content">
-            <span class="metric-label">Total de Alocações</span>
-            <span class="metric-value">{{ totalAlocacoes() }}</span>
+            <span class="metric-label">Total de Diárias</span>
+            <span class="metric-value">{{ totalDiarias() }}</span>
           </div>
         </div>
 
@@ -105,8 +105,8 @@
             </svg>
           </div>
           <div class="metric-content">
-            <span class="metric-label">Alocações Confirmadas</span>
-            <span class="metric-value">{{ alocacoesConfirmadas() }}</span>
+            <span class="metric-label">Diárias Confirmadas</span>
+            <span class="metric-value">{{ diariasConfirmadas() }}</span>
           </div>
         </div>
 
@@ -122,7 +122,7 @@
           </div>
           <div class="metric-content">
             <span class="metric-label">Faltas Registradas</span>
-            <span class="metric-value alert">{{ totalFaltas() }}</span>
+            <span class="metric-value">{{ totalFaltas() }}</span>
           </div>
         </div>
 
@@ -179,7 +179,7 @@
               <span class="metric-label">Salário Simulado</span>
               <span
                 class="metric-value"
-                title="Alocações confirmadas do mês × diária + adicionais FDS/noturno + benefícios"
+                title="Diárias confirmadas do mês × diária + adicionais FDS/noturno + benefícios"
                 >{{ formatCurrency(salarioSimulado()) }}</span
               >
             </div>
@@ -244,16 +244,16 @@
       </div>
     </section>
 
-    <!-- Alocações por Posto -->
-    @if (alocacoesPorPosto().length > 0) {
+    <!-- Diárias por Posto -->
+    @if (diariasPorPosto().length > 0) {
       <section class="postos-section">
-        <h2 class="section-title">Alocações por Posto de Trabalho</h2>
+        <h2 class="section-title">Diárias por Posto de Trabalho</h2>
         <div class="postos-grid">
-          @for (item of alocacoesPorPosto(); track item.posto.id) {
+          @for (item of diariasPorPosto(); track item.posto.id) {
             <div class="posto-card">
               <div class="posto-header">
                 <span class="posto-horario">{{ getPostoNome(item.posto.id) }}</span>
-                <span class="posto-total">{{ item.total }} alocações</span>
+                <span class="posto-total">{{ item.total }} diárias</span>
               </div>
             </div>
           }
@@ -261,10 +261,10 @@
       </section>
     }
 
-    <!-- Histórico de Alocações -->
-    <section class="alocacoes-section">
+    <!-- Histórico de Diárias -->
+    <section class="diarias-section">
       <div class="section-header-with-nav">
-        <h2 class="section-title">Histórico de Alocações</h2>
+        <h2 class="section-title">Histórico de Diárias</h2>
         <div class="month-nav">
           <button class="btn-nav" (click)="previousMonth()" title="Mês anterior">←</button>
           <span class="month-label">{{ getSelectedMonthLabel() }}</span>
@@ -319,7 +319,7 @@
         </div>
       }
 
-      @if (alocacoesFiltradas().length === 0) {
+      @if (diariasFiltradas().length === 0) {
         <div class="empty-state">
           <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -328,11 +328,11 @@
               clip-rule="evenodd"
             />
           </svg>
-          <p>Nenhuma alocação encontrada em {{ getSelectedMonthLabel() }}</p>
+          <p>Nenhuma diária encontrada em {{ getSelectedMonthLabel() }}</p>
         </div>
       } @else {
         <div class="table-container">
-          <table class="alocacoes-table">
+          <table class="diarias-table">
             <thead>
               <tr>
                 <th>Data</th>
@@ -343,23 +343,23 @@
               </tr>
             </thead>
             <tbody>
-              @for (alocacao of alocacoesFiltradas(); track alocacao.id) {
+              @for (diaria of diariasFiltradas(); track diaria.id) {
                 <tr
-                  [class.row-falta]="alocacao.statusAlocacao === 'FALTA_REGISTRADA'"
-                  [class.row-cancelada]="alocacao.statusAlocacao === 'CANCELADA'"
+                  [class.row-falta]="diaria.statusDiaria === 'FALTA_REGISTRADA'"
+                  [class.row-cancelada]="diaria.statusDiaria === 'CANCELADA'"
                 >
-                  <td>{{ formatDate(alocacao.data) }}</td>
-                  <td>{{ getPostoNome(alocacao.postoDeTrabalhoId) }}</td>
+                  <td>{{ formatDate(diaria.data) }}</td>
+                  <td>{{ getPostoNome(diaria.alocacaoId) }}</td>
                   <td>
-                    <span [class]="'badge ' + getStatusBadgeClass(alocacao.statusAlocacao)">
-                      {{ getStatusLabel(alocacao.statusAlocacao) }}
+                    <span [class]="'badge ' + getStatusBadgeClass(diaria.statusDiaria)">
+                      {{ getStatusLabel(diaria.statusDiaria) }}
                     </span>
                   </td>
-                  <td>{{ getTipoLabel(alocacao.tipoAlocacao) }}</td>
+                  <td>{{ getTipoLabel(diaria.tipoDiaria) }}</td>
                   <td class="col-valor">
-                    @if (alocacao.statusAlocacao === 'CONFIRMADA') {
+                    @if (diaria.statusDiaria === 'CONFIRMADA') {
                       <span class="valor-positivo">{{
-                        formatCurrency(calcularValorAlocacao(alocacao))
+                        formatCurrency(calcularValorDiaria(diaria))
                       }}</span>
                     } @else {
                       <span class="valor-zero">—</span>
@@ -419,7 +419,7 @@
             @for (falta of faltas(); track falta.id) {
               <div class="falta-item">
                 <div class="falta-date">{{ formatDate(falta.data) }}</div>
-                <div class="falta-posto">{{ getPostoNome(falta.postoDeTrabalhoId) }}</div>
+                <div class="falta-posto">{{ getPostoNome(falta.alocacaoId) }}</div>
                 @if (contrato()) {
                   <div class="falta-valor">
                     {{ formatCurrency(contrato()!.valorDiariaCobrada) }}
@@ -465,10 +465,10 @@
 
           <div class="faltas-list">
             <h4>Histórico de Cancelamentos</h4>
-            @for (cancelada of alocacoesCanceladas(); track cancelada.id) {
+            @for (cancelada of diariasCanceladas(); track cancelada.id) {
               <div class="falta-item">
                 <div class="falta-date">{{ formatDate(cancelada.data) }}</div>
-                <div class="falta-posto">{{ getPostoNome(cancelada.postoDeTrabalhoId) }}</div>
+                <div class="falta-posto">{{ getPostoNome(cancelada.alocacaoId) }}</div>
                 @if (contrato()) {
                   <div class="falta-valor">
                     {{ formatCurrency(contrato()!.valorDiariaCobrada) }}

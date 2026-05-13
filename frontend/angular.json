@@ -2,7 +2,10 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "cache": {
+      "enabled": false
+    }
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -29,9 +32,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -49,7 +50,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kB",
+                  "maximumWarning": "26kB",
                   "maximumError": "32kB"
                 }
               ],
@@ -65,6 +66,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"
@@ -76,7 +80,13 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": ["src/test-setup.ts"],
+            "coverageInclude": ["src/app/**"],
+            "coverageExclude": ["src/app/models/**", "src/environments/**", "src/**/*.spec.ts"],
+            "coverageReporters": ["text-summary", "html"]
+          }
         }
       }
     }

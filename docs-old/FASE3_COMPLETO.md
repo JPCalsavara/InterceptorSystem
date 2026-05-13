@@ -59,7 +59,7 @@ public Funcionario(...) // Sem parâmetros de salário!
 GetByIdAsync() => Include(f => f.Contrato)
 GetAllAsync() => Include(f => f.Contrato)
 GetByCpfAsync() => Include(f => f.Contrato)
-GetByCondominioAsync() => Include(f => f.Contrato)
+GetByClienteAsync() => Include(f => f.Contrato)
 ```
 
 **Por quê?** As propriedades calculadas precisam do `Contrato` carregado.
@@ -96,7 +96,7 @@ record UpdateFuncionarioDtoInput(...); // ❌ Sem parâmetros de salário!
 #### `FuncionarioAppService.cs`
 ```csharp
 // ✅ CreateAsync - Removidos parâmetros de salário
-var funcionario = new Funcionario(empresaId, condominioId, contratoId, nome, cpf, celular, ...);
+var funcionario = new Funcionario(empresaId, clienteId, contratoId, nome, cpf, celular, ...);
 
 // ✅ UpdateAsync - Removidos parâmetros de salário  
 funcionario.AtualizarDados(nome, celular, ...);
@@ -123,7 +123,7 @@ ALTER TABLE "Funcionarios" DROP COLUMN "ValorDiariasFixas";
 
 ## 📊 Exemplo Prático
 
-### **Cenário:** Condomínio com 12 funcionários
+### **Cenário:** Cliente com 12 funcionários
 
 **Contrato:**
 ```json
@@ -210,7 +210,7 @@ new CreateFuncionarioDtoInput(...); // Sem parâmetros de salário
 ```json
 // ANTES:
 {
-  "condominioId": "...",
+  "clienteId": "...",
   "contratoId": "...",
   "nome": "João",
   "salarioMensal": 2500,
@@ -220,7 +220,7 @@ new CreateFuncionarioDtoInput(...); // Sem parâmetros de salário
 
 // DEPOIS:
 {
-  "condominioId": "...",
+  "clienteId": "...",
   "contratoId": "...",
   "nome": "João"
 }

@@ -59,36 +59,36 @@ public decimal PercentualAdicionalNoturno { get; private set; }
 
 #### 📌 Problema:
 ```csharp
-// Condominio.cs - Apenas dados cadastrais
+// Cliente.cs - Apenas dados cadastrais
 public string Nome { get; private set; }
 public string Cnpj { get; private set; }
 public string Endereco { get; private set; }
 ```
 
 #### ❌ **Falta:**
-- Quantidade ideal de funcionários (deveria estar no Condomínio)
-- Horário de troca de turno (atualmente implícito em PostoDeTrabalho)
+- Quantidade ideal de funcionários (deveria estar no Cliente)
+- Horário de troca de turno (atualmente implícito em Posto)
 - Email do gestor (para notificações automáticas)
 - Telefone de emergência
 
 #### ❌ **Impacto:**
 - Criação manual de Postos de Trabalho (sem automação)
-- Não há validação de "Condomínio precisa de 10 funcionários, mas só tem 7"
+- Não há validação de "Cliente precisa de 10 funcionários, mas só tem 7"
 - Notificações de contratos vencendo não podem ser enviadas
 
 ---
 
-### **3. PostoDeTrabalho com Responsabilidade Excessiva**
+### **3. Posto com Responsabilidade Excessiva**
 
 #### 📌 Problema:
 ```csharp
-// PostoDeTrabalho.cs
-public int QuantidadeIdealFuncionarios { get; private set; } // Deveria vir do Condomínio
+// Posto.cs
+public int QuantidadeIdealFuncionarios { get; private set; } // Deveria vir do Cliente
 public int CapacidadeMaximaPorDobras => PermiteDobrarEscala ? QuantidadeIdealFuncionarios * 2 : QuantidadeIdealFuncionarios;
 ```
 
 #### ❌ **Impacto:**
-- Se Condomínio precisa de 10 funcionários divididos em 2 turnos (5 cada), essa lógica fica **duplicada** em cada PostoDeTrabalho
+- Se Cliente precisa de 10 funcionários divididos em 2 turnos (5 cada), essa lógica fica **duplicada** em cada Posto
 - Mudança na quantidade total requer atualizar **todos os postos**
 
 ---
@@ -99,7 +99,7 @@ public int CapacidadeMaximaPorDobras => PermiteDobrarEscala ? QuantidadeIdealFun
 ```csharp
 public class Funcionario
 {
-    public Guid CondominioId { get; private set; } // ✅ Vinculado ao condomínio
+    public Guid ClienteId { get; private set; } // ✅ Vinculado ao cliente
     // ❌ NÃO vinculado ao contrato vigente
 }
 ```
@@ -115,11 +115,11 @@ public class Funcionario
 
 | # | Melhoria | Complexidade | Necessidade | Impacto | Prioridade |
 |---|----------|--------------|-------------|---------|------------|
-| **1** | Adicionar Configurações Operacionais no Condomínio | 🟢 Baixa | 🔴 Alta | 🔴 Alta | **P0** |
+| **1** | Adicionar Configurações Operacionais no Cliente | 🟢 Baixa | 🔴 Alta | 🔴 Alta | **P0** |
 | **2** | Vincular Funcionário ao Contrato | 🟡 Média | 🔴 Alta | 🔴 Alta | **P0** |
 | **3** | Cálculo Automático de Salário via Contrato | 🔴 Alta | 🟡 Média | 🔴 Alta | **P1** |
-| **4** | Remover QuantidadeIdeal de PostoDeTrabalho | 🟡 Média | 🟡 Média | 🟡 Média | **P1** |
-| **5** | Criação em Cascata (Condomínio → Contrato → Postos) | 🟡 Média | 🟢 Baixa | 🟡 Média | **P2** |
+| **4** | Remover QuantidadeIdeal de Posto | 🟡 Média | 🟡 Média | 🟡 Média | **P1** |
+| **5** | Criação em Cascata (Cliente → Contrato → Postos) | 🟡 Média | 🟢 Baixa | 🟡 Média | **P2** |
 | **6** | Value Objects (Email, Telefone, Dinheiro) | 🔴 Alta | 🟢 Baixa | 🟡 Média | **P3** |
 | **7** | Domain Events para Notificações | 🔴 Alta | 🟢 Baixa | 🟡 Média | **P3** |
 | **8** | CQRS para Relatórios Financeiros | 🔴 Alta | 🟢 Baixa | 🟢 Baixa | **P4** |
@@ -145,11 +145,11 @@ public class Funcionario
 
 ### **FASE 1: Configurações Operacionais** (2-3 dias) - **P0**
 
-#### **Objetivo:** Centralizar configurações operacionais no Condomínio
+#### **Objetivo:** Centralizar configurações operacionais no Cliente
 
-#### **1.1 Atualizar Entidade Condominio** ⏱️ 1h
+#### **1.1 Atualizar Entidade Cliente** ⏱️ 1h
 ```csharp
-public class Condominio : Entity, IAggregateRoot
+public class Cliente : Entity, IAggregateRoot
 {
     // ...propriedades existentes...
     
@@ -160,7 +160,7 @@ public class Condominio : Entity, IAggregateRoot
     public string? TelefoneEmergencia { get; private set; }
     
     // Atualizar construtor
-    public Condominio(
+    public Cliente(
         Guid empresaId, 
         string nome, 
         string cnpj, 
@@ -198,8 +198,8 @@ public class Condominio : Entity, IAggregateRoot
 
 #### **1.2 Atualizar DTOs** ⏱️ 30min
 ```csharp
-// CreateCondominioDtoInput
-public record CreateCondominioDtoInput(
+// CreateClienteDtoInput
+public record CreateClienteDtoInput(
     string Nome, 
     string Cnpj, 
     string Endereco,
@@ -209,8 +209,8 @@ public record CreateCondominioDtoInput(
     string? TelefoneEmergencia = null
 );
 
-// CondominioDtoOutput
-public record CondominioDtoOutput(
+// ClienteDtoOutput
+public record ClienteDtoOutput(
     Guid Id, 
     string Nome, 
     string Cnpj, 
@@ -225,20 +225,20 @@ public record CondominioDtoOutput(
 #### **1.3 Migration** ⏱️ 30min
 ```bash
 cd src/InterceptorSystem.Infrastructure
-dotnet ef migrations add AddConfiguracoesOperacionaisCondominio
+dotnet ef migrations add AddConfiguracoesOperacionaisCliente
 dotnet ef database update
 ```
 
 #### **1.4 Atualizar Testes** ⏱️ 1h
-- Atualizar testes unitários de `Condominio`
-- Atualizar testes de integração de `CondominiosController`
+- Atualizar testes unitários de `Cliente`
+- Atualizar testes de integração de `ClientesController`
 - Adicionar casos de teste para validações
 
 #### **1.5 Atualizar Payloads de Teste** ⏱️ 15min
 ```json
-// docs/test-payloads/condominios.json
+// docs/test-payloads/clientes.json
 {
-  "nome": "Condomínio Estrela",
+  "nome": "Cliente Estrela",
   "cnpj": "12345678000199",
   "endereco": "Rua das Flores, 123",
   "quantidadeFuncionariosIdeal": 10,
@@ -258,7 +258,7 @@ dotnet ef database update
 ```csharp
 public class Funcionario : Entity, IAggregateRoot
 {
-    public Guid CondominioId { get; private set; }
+    public Guid ClienteId { get; private set; }
     public Guid ContratoId { get; private set; } // NOVO
     
     // REMOVER campos de salário manual (faremos isso na Fase 3)
@@ -266,12 +266,12 @@ public class Funcionario : Entity, IAggregateRoot
     // public decimal ValorTotalBeneficiosMensal { get; private set; } ❌
     // public decimal ValorDiariasFixas { get; private set; } ❌
     
-    public Condominio? Condominio { get; private set; }
+    public Cliente? Cliente { get; private set; }
     public Contrato? Contrato { get; private set; } // NOVO
     
     public Funcionario(
         Guid empresaId,
-        Guid condominioId,
+        Guid clienteId,
         Guid contratoId, // NOVO
         string nome,
         string cpf,
@@ -404,7 +404,7 @@ public class Funcionario : Entity, IAggregateRoot
 ```csharp
 public record FuncionarioDtoOutput(
     Guid Id,
-    Guid CondominioId,
+    Guid ClienteId,
     Guid ContratoId,
     string Nome,
     string Cpf,
@@ -427,7 +427,7 @@ public void CalcularSalario_DeveDividirValorTotalMensalCorretamente()
     // Arrange
     var contrato = new Contrato(
         empresaId: Guid.NewGuid(),
-        condominioId: Guid.NewGuid(),
+        clienteId: Guid.NewGuid(),
         descricao: "Teste",
         valorTotalMensal: 30000m,
         valorDiariaCobrada: 1000m,
@@ -453,15 +453,15 @@ public void CalcularSalario_DeveDividirValorTotalMensalCorretamente()
 
 ---
 
-### **FASE 4: Simplificar PostoDeTrabalho** (2 dias) - **P1**
+### **FASE 4: Simplificar Posto** (2 dias) - **P1**
 
-#### **Objetivo:** Remover `QuantidadeIdealFuncionarios` de PostoDeTrabalho
+#### **Objetivo:** Remover `QuantidadeIdealFuncionarios` de Posto
 
 #### **4.1 Atualizar Entidade** ⏱️ 1h
 ```csharp
-public class PostoDeTrabalho : Entity, IAggregateRoot
+public class Posto : Entity, IAggregateRoot
 {
-    public Guid CondominioId { get; private set; }
+    public Guid ClienteId { get; private set; }
     public TimeSpan HorarioInicio { get; private set; }
     public TimeSpan HorarioFim { get; private set; }
     public bool PermiteDobrarEscala { get; private set; }
@@ -469,21 +469,21 @@ public class PostoDeTrabalho : Entity, IAggregateRoot
     // REMOVER
     // public int QuantidadeIdealFuncionarios { get; private set; } ❌
     
-    public Condominio? Condominio { get; private set; }
+    public Cliente? Cliente { get; private set; }
     
-    // Propriedade calculada baseada no Condomínio
+    // Propriedade calculada baseada no Cliente
     [NotMapped]
     public int QuantidadeIdealFuncionarios
     {
         get
         {
-            if (Condominio == null)
-                throw new InvalidOperationException("Posto sem condomínio vinculado.");
+            if (Cliente == null)
+                throw new InvalidOperationException("Posto sem cliente vinculado.");
             
             // Divide igualmente entre turnos
-            var totalPostos = Condominio.PostosDeTrabalho.Count;
+            var totalPostos = Cliente.Postos.Count;
             return totalPostos > 0 
-                ? Condominio.QuantidadeFuncionariosIdeal / totalPostos 
+                ? Cliente.QuantidadeFuncionariosIdeal / totalPostos 
                 : 0;
         }
     }
@@ -500,52 +500,52 @@ dotnet ef database update
 
 ### **FASE 5: Criação em Cascata** (2-3 dias) - **P2**
 
-#### **Objetivo:** Criar Condomínio + Contrato + Postos em uma operação
+#### **Objetivo:** Criar Cliente + Contrato + Postos em uma operação
 
 #### **5.1 Criar Serviço Orquestrador** ⏱️ 2h
 ```csharp
-public interface ICondominioOrquestradorService
+public interface IClienteOrquestradorService
 {
-    Task<CondominioCompletoDtoOutput> CriarCondominioCompletoAsync(
-        CreateCondominioCompletoDtoInput input);
+    Task<ClienteCompletoDtoOutput> CriarClienteCompletoAsync(
+        CreateClienteCompletoDtoInput input);
 }
 
-public class CondominioOrquestradorService : ICondominioOrquestradorService
+public class ClienteOrquestradorService : IClienteOrquestradorService
 {
-    private readonly ICondominioAppService _condominioService;
+    private readonly IClienteAppService _clienteService;
     private readonly IContratoAppService _contratoService;
-    private readonly IPostoDeTrabalhoAppService _postoService;
+    private readonly IPostoAppService _postoService;
     
-    public async Task<CondominioCompletoDtoOutput> CriarCondominioCompletoAsync(
-        CreateCondominioCompletoDtoInput input)
+    public async Task<ClienteCompletoDtoOutput> CriarClienteCompletoAsync(
+        CreateClienteCompletoDtoInput input)
     {
-        // 1. Criar Condomínio
-        var condominio = await _condominioService.CreateAsync(input.Condominio);
+        // 1. Criar Cliente
+        var cliente = await _clienteService.CreateAsync(input.Cliente);
         
         // 2. Criar Contrato
-        input.Contrato.CondominioId = condominio.Id;
+        input.Contrato.ClienteId = cliente.Id;
         var contrato = await _contratoService.CreateAsync(input.Contrato);
         
         // 3. Criar Postos Automaticamente
         var postoDiurno = new CreatePostoInput(
-            CondominioId: condominio.Id,
-            HorarioInicio: input.Condominio.HorarioTrocaTurno,
-            HorarioFim: input.Condominio.HorarioTrocaTurno.Add(TimeSpan.FromHours(12)),
+            ClienteId: cliente.Id,
+            HorarioInicio: input.Cliente.HorarioTrocaTurno,
+            HorarioFim: input.Cliente.HorarioTrocaTurno.Add(TimeSpan.FromHours(12)),
             PermiteDobrarEscala: true
         );
         
         var postoNoturno = new CreatePostoInput(
-            CondominioId: condominio.Id,
-            HorarioInicio: input.Condominio.HorarioTrocaTurno.Add(TimeSpan.FromHours(12)),
-            HorarioFim: input.Condominio.HorarioTrocaTurno,
+            ClienteId: cliente.Id,
+            HorarioInicio: input.Cliente.HorarioTrocaTurno.Add(TimeSpan.FromHours(12)),
+            HorarioFim: input.Cliente.HorarioTrocaTurno,
             PermiteDobrarEscala: true
         );
         
         var posto1 = await _postoService.CreateAsync(postoDiurno);
         var posto2 = await _postoService.CreateAsync(postoNoturno);
         
-        return new CondominioCompletoDtoOutput(
-            Condominio: condominio,
+        return new ClienteCompletoDtoOutput(
+            Cliente: cliente,
             Contrato: contrato,
             Postos: new[] { posto1, posto2 }
         );
@@ -563,7 +563,7 @@ public class CondominioOrquestradorService : ICondominioOrquestradorService
 
 ### **Sprint 2 (Semana 3-4)** ✅ CONCLUÍDO
 - ✅ FASE 3: Cálculo Automático de Salário
-- ✅ FASE 4: Simplificar PostoDeTrabalho
+- ✅ FASE 4: Simplificar Posto
 
 ### **Sprint 3 (Semana 5-6)** ✅ CONCLUÍDO
 - ✅ FASE 5: Criação em Cascata
@@ -614,7 +614,7 @@ public class ContratoFinalizadoEventHandler : INotificationHandler<ContratoFinal
     {
         // Enviar email
         // Gerar relatório
-        // Bloquear alocações
+        // Bloquear diárias
     }
 }
 ```
@@ -623,7 +623,7 @@ public class ContratoFinalizadoEventHandler : INotificationHandler<ContratoFinal
 ```csharp
 public record ObterRelatorioFinanceiroQuery
 {
-    public Guid CondominioId { get; init; }
+    public Guid ClienteId { get; init; }
     public int Mes { get; init; }
     public int Ano { get; init; }
 }
@@ -652,7 +652,7 @@ public class RelatorioFinanceiroQueryHandler
 ### **Depois da Refatoração (Meta)**
 - ✅ Salários sempre consistentes com contrato vigente
 - ✅ Criação automática de postos (80% menos código)
-- ✅ Validações centralizadas no Condomínio
+- ✅ Validações centralizadas no Cliente
 - ✅ 100% dos funcionários vinculados a contratos
 - ✅ Notificações automáticas de contratos vencendo
 - ✅ Relatórios financeiros precisos
@@ -696,10 +696,10 @@ public class RelatorioFinanceiroQueryHandler
 
 | Fase | Status | Impacto |
 |------|--------|---------|
-| **FASE 1:** Configurações Operacionais | ✅ COMPLETO | Condomínio centraliza configs |
+| **FASE 1:** Configurações Operacionais | ✅ COMPLETO | Cliente centraliza configs |
 | **FASE 2:** Vínculo Contrato ↔ Funcionário | ✅ COMPLETO | Funcionários sempre vinculados |
 | **FASE 3:** Cálculo Automático de Salário | ✅ COMPLETO | Salários sempre consistentes |
-| **FASE 4:** Simplificar PostoDeTrabalho | ✅ COMPLETO | Quantidade calculada |
+| **FASE 4:** Simplificar Posto | ✅ COMPLETO | Quantidade calculada |
 | **FASE 5:** Criação em Cascata | ✅ COMPLETO | 1 request ao invés de 4 |
 
 ### **Próximos Passos Recomendados:**

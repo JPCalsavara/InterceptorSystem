@@ -7,21 +7,21 @@
 
 ## 🎯 Objetivo da FASE 4
 
-Remover duplicação de `QuantidadeIdealFuncionarios` do `PostoDeTrabalho`, tornando-o uma propriedade calculada baseada no `Condomínio`.
+Remover duplicação de `QuantidadeIdealFuncionarios` do `Posto`, tornando-o uma propriedade calculada baseada no `Cliente`.
 
 ---
 
 ## ✅ Mudanças Implementadas no Código
 
-### 1. **PostoDeTrabalho.cs** (Entidade)
+### 1. **Posto.cs** (Entidade)
 
 **ANTES:**
 ```csharp
-public class PostoDeTrabalho
+public class Posto
 {
     public int QuantidadeIdealFuncionarios { get; private set; } // ❌ Persistido
     
-    public PostoDeTrabalho(..., int quantidadeIdealFuncionarios, bool permiteDobrar)
+    public Posto(..., int quantidadeIdealFuncionarios, bool permiteDobrar)
     {
         QuantidadeIdealFuncionarios = quantidadeIdealFuncionarios;
     }
@@ -30,7 +30,7 @@ public class PostoDeTrabalho
 
 **DEPOIS:**
 ```csharp
-public class PostoDeTrabalho
+public class Posto
 {
     public int? QuantidadeMaximaFaltas { get; private set; } // ✅ Novo campo
     
@@ -40,15 +40,15 @@ public class PostoDeTrabalho
     {
         get
         {
-            if (Condominio == null) return 0;
-            var totalPostos = Condominio.PostosDeTrabalho?.Count ?? 1;
+            if (Cliente == null) return 0;
+            var totalPostos = Cliente.Postos?.Count ?? 1;
             return totalPostos > 0 
-                ? Condominio.QuantidadeFuncionariosIdeal / totalPostos 
+                ? Cliente.QuantidadeFuncionariosIdeal / totalPostos 
                 : 0;
         }
     }
     
-    public PostoDeTrabalho(..., bool permiteDobrar, int? quantidadeMaximaFaltas = null)
+    public Posto(..., bool permiteDobrar, int? quantidadeMaximaFaltas = null)
     {
         PermiteDobrarEscala = permiteDobrar;
         QuantidadeMaximaFaltas = quantidadeMaximaFaltas;
@@ -58,12 +58,12 @@ public class PostoDeTrabalho
 
 ---
 
-### 2. **PostoDeTrabalhoDto.cs** (DTOs)
+### 2. **PostoDto.cs** (DTOs)
 
 **ANTES:**
 ```csharp
 public record CreatePostoInput(
-    Guid CondominioId, 
+    Guid ClienteId, 
     TimeSpan HorarioInicio, 
     TimeSpan HorarioFim, 
     int QuantidadeIdealFuncionarios,  // ❌ Removido
@@ -79,7 +79,7 @@ public record UpdatePostoInput(
 **DEPOIS:**
 ```csharp
 public record CreatePostoInput(
-    Guid CondominioId, 
+    Guid ClienteId, 
     TimeSpan HorarioInicio, 
     TimeSpan HorarioFim, 
     bool PermiteDobrarEscala = true,
@@ -92,9 +92,9 @@ public record UpdatePostoInput(
     int? QuantidadeMaximaFaltas = null);  // ✅ Novo
 
 // Output mantém QuantidadeIdealFuncionarios (calculado)
-public record PostoDeTrabalhoDto(
+public record PostoDto(
     Guid Id,
-    Guid CondominioId,
+    Guid ClienteId,
     string Horario,
     int QuantidadeIdealFuncionarios,  // ✅ Calculado automaticamente
     bool PermiteDobrarEscala,
@@ -104,12 +104,12 @@ public record PostoDeTrabalhoDto(
 
 ---
 
-### 3. **PostoDeTrabalhoAppService.cs**
+### 3. **PostoAppService.cs**
 
 **ANTES:**
 ```csharp
-var posto = new PostoDeTrabalho(
-    input.CondominioId,
+var posto = new Posto(
+    input.ClienteId,
     empresaId,
     input.HorarioInicio,
     input.HorarioFim,
@@ -119,8 +119,8 @@ var posto = new PostoDeTrabalho(
 
 **DEPOIS:**
 ```csharp
-var posto = new PostoDeTrabalho(
-    input.CondominioId,
+var posto = new Posto(
+    input.ClienteId,
     empresaId,
     input.HorarioInicio,
     input.HorarioFim,
@@ -130,23 +130,23 @@ var posto = new PostoDeTrabalho(
 
 ---
 
-### 4. **PostoDeTrabalhoRepository.cs**
+### 4. **PostoRepository.cs**
 
-✅ Eager loading de `Condominio.PostosDeTrabalho` para cálculo correto:
+✅ Eager loading de `Cliente.Postos` para cálculo correto:
 
 ```csharp
-public async Task<PostoDeTrabalho?> GetByIdAsync(Guid id)
+public async Task<Posto?> GetByIdAsync(Guid id)
 {
-    return await _context.PostosDeTrabalho
-        .Include(p => p.Condominio)
-            .ThenInclude(c => c.PostosDeTrabalho)  // ✅ Para calcular divisão
+    return await _context.Postos
+        .Include(p => p.Cliente)
+            .ThenInclude(c => c.Postos)  // ✅ Para calcular divisão
         .FirstOrDefaultAsync(p => p.Id == id);
 }
 ```
 
 ---
 
-### 5. **PostoDeTrabalhoConfiguration.cs**
+### 5. **PostoConfiguration.cs**
 
 **ANTES:**
 ```csharp
@@ -167,18 +167,18 @@ builder.Property(p => p.QuantidadeMaximaFaltas)
 
 ## ⚠️ TESTES PENDENTES DE CORREÇÃO
 
-Todos os testes que usam `PostoDeTrabalho`, `CreatePostoInput` ou `UpdatePostoInput` precisam ser atualizados:
+Todos os testes que usam `Posto`, `CreatePostoInput` ou `UpdatePostoInput` precisam ser atualizados:
 
 ### **Padrão de Correção:**
 
 **ANTES (5 parâmetros):**
 ```csharp
-new PostoDeTrabalho(condId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true)
+new Posto(condId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), 2, true)
 ```
 
 **DEPOIS (4 parâmetros):**
 ```csharp
-new PostoDeTrabalho(condId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true)
+new Posto(condId, empresaId, TimeSpan.FromHours(6), TimeSpan.FromHours(18), true)
 ```
 
 **ANTES (CreatePostoInput - 5 parâmetros):**
@@ -205,10 +205,10 @@ new UpdatePostoInput(TimeSpan.FromHours(6), TimeSpan.FromHours(18), true)
 
 ## 📋 Arquivos de Teste que Precisam de Correção
 
-1. ✅ `AlocacaoAppServiceTests.cs` - Helper corrigido
-2. ⚠️ `PostoDeTrabalhoAppServiceTests.cs` - ~15 usos
-3. ⚠️ `PostosDeTrabalhoControllerIntegrationTests.cs` - ~30 usos
-4. ✅ `AlocacoesControllerIntegrationTests.cs` - Já correto
+1. ✅ `DiariaAppServiceTests.cs` - Helper corrigido
+2. ⚠️ `PostoAppServiceTests.cs` - ~15 usos
+3. ⚠️ `PostosControllerIntegrationTests.cs` - ~30 usos
+4. ✅ `DiariasControllerIntegrationTests.cs` - Já correto
 
 ---
 
@@ -216,15 +216,15 @@ new UpdatePostoInput(TimeSpan.FromHours(6), TimeSpan.FromHours(18), true)
 
 Use Find & Replace (Ctrl+H) no Rider/VS:
 
-### 1. **Construtor PostoDeTrabalho:**
+### 1. **Construtor Posto:**
 **Find:**
 ```regex
-new PostoDeTrabalho\(([^,]+),\s*([^,]+),\s*TimeSpan\.FromHours\((\d+)\),\s*TimeSpan\.FromHours\((\d+)\),\s*\d+,\s*(true|false)\)
+new Posto\(([^,]+),\s*([^,]+),\s*TimeSpan\.FromHours\((\d+)\),\s*TimeSpan\.FromHours\((\d+)\),\s*\d+,\s*(true|false)\)
 ```
 
 **Replace:**
 ```
-new PostoDeTrabalho($1, $2, TimeSpan.FromHours($3), TimeSpan.FromHours($4), $5)
+new Posto($1, $2, TimeSpan.FromHours($3), TimeSpan.FromHours($4), $5)
 ```
 
 ### 2. **CreatePostoInput:**
@@ -264,7 +264,7 @@ QuantidadeIdealFuncionarios = \d+,
 
 ## 📊 Migration
 
-**Arquivo:** `20260108121709_Fase4RemoverQuantidadeIdealDePostoDeTrabalho.cs`
+**Arquivo:** `20260108121709_Fase4RemoverQuantidadeIdealDePosto.cs`
 
 **Status:** ⚠️ Migration vazia (EF Core não detectou mudanças)
 
@@ -278,7 +278,7 @@ QuantidadeIdealFuncionarios = \d+,
 
 | Antes | Depois |
 |-------|--------|
-| ❌ Duplicação: cada posto tinha seu `QuantidadeIdeal` | ✅ Centralizado no Condomínio |
+| ❌ Duplicação: cada posto tinha seu `QuantidadeIdeal` | ✅ Centralizado no Cliente |
 | ❌ Mudança no total requer atualizar todos os postos | ✅ Mudança automática em todos os postos |
 | ❌ Possibilidade de inconsistência (posto com 5, outro com 3) | ✅ Sempre consistente (calculado) |
 | ❌ 1 campo persistido | ✅ 0 campos (propriedade calculada) |
@@ -290,7 +290,7 @@ QuantidadeIdealFuncionarios = \d+,
 1. ⚠️ **Corrigir testes manualmente** usando regex acima
 2. ✅ Compilar: `dotnet build`
 3. ✅ Rodar testes: `dotnet test`
-4. ✅ Verificar schema do banco: `\d "PostosDeTrabalho"`
+4. ✅ Verificar schema do banco: `\d "Postos"`
 5. ✅ Criar migration manual se necessário
 
 ---

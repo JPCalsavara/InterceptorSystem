@@ -1,6 +1,6 @@
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using InterceptorSystem.Domain.Modulos.Auth.Enums;
-using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,8 +36,8 @@ public class TokenVerificacaoRepository : ITokenVerificacaoRepository
             token.Consumir();
     }
 
-    public async Task<bool> CommitAsync()
+    public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync() > 0;
+        return await _context.CommitAsync(cancellationToken);
     }
 }

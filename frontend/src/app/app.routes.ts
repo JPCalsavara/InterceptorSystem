@@ -64,41 +64,41 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/conta/conta.component').then((m) => m.ContaComponent),
       },
       {
-        path: 'condominios',
+        path: 'clientes',
         children: [
           {
             path: '',
             loadComponent: () =>
-              import('./features/condominios/condominio-list/condominio-list.component').then(
-                (m) => m.CondominioListComponent,
+              import('./features/clientes/cliente-list/cliente-list.component').then(
+                (m) => m.ClienteListComponent,
               ),
           },
           {
             path: 'novo',
             loadComponent: () =>
-              import('./features/condominios/condominio-form/condominio-form.component').then(
-                (m) => m.CondominioFormComponent,
+              import('./features/clientes/cliente-form/cliente-form.component').then(
+                (m) => m.ClienteFormComponent,
               ),
           },
           {
             path: 'criar-completo',
             loadComponent: () =>
-              import('./features/condominios/condominio-wizard/condominio-wizard.component').then(
-                (m) => m.CondominioWizardComponent,
+              import('./features/clientes/cliente-wizard/cliente-wizard.component').then(
+                (m) => m.ClienteWizardComponent,
               ),
           },
           {
             path: ':id/editar',
             loadComponent: () =>
-              import('./features/condominios/condominio-form/condominio-form.component').then(
-                (m) => m.CondominioFormComponent,
+              import('./features/clientes/cliente-form/cliente-form.component').then(
+                (m) => m.ClienteFormComponent,
               ),
           },
           {
             path: ':id',
             loadComponent: () =>
-              import('./features/condominios/condominio-detail/condominio-detail.component').then(
-                (m) => m.CondominioDetailComponent,
+              import('./features/clientes/cliente-detail/cliente-detail.component').then(
+                (m) => m.ClienteDetailComponent,
               ),
           },
         ],
@@ -220,13 +220,6 @@ export const routes: Routes = [
               ),
           },
           {
-            path: 'batch',
-            loadComponent: () =>
-              import('./features/alocacoes/alocacao-batch-form/alocacao-batch-form.component').then(
-                (m) => m.AlocacaoBatchFormComponent,
-              ),
-          },
-          {
             path: ':id/editar',
             loadComponent: () =>
               import('./features/alocacoes/alocacao-form/alocacao-form.component').then(
@@ -238,6 +231,105 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/alocacoes/alocacao-detail/alocacao-detail.component').then(
                 (m) => m.AlocacaoDetailComponent,
+              ),
+          },
+        ],
+      },
+      {
+        path: 'tags',
+        loadComponent: () =>
+          import('./features/tags/tag-list/tag-list.component').then((m) => m.TagListComponent),
+      },
+      {
+        path: 'suporte',
+        loadComponent: () =>
+          import('./features/suporte/suporte-page/suporte-page.component').then(
+            (m) => m.SuportePageComponent,
+          ),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/perfil/perfil-page/perfil-page.component').then(
+            (m) => m.PerfilPageComponent,
+          ),
+      },
+      {
+        path: 'diarias',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/diarias/diaria-list/diaria-list.component').then(
+                (m) => m.DiariaListComponent,
+              ),
+          },
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/diarias/diaria-form/diaria-form.component').then(
+                (m) => m.DiariaFormComponent,
+              ),
+          },
+          {
+            path: 'batch',
+            loadComponent: () =>
+              import('./features/diarias/diaria-batch-form/diaria-batch-form.component').then(
+                (m) => m.DiariaBatchFormComponent,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/diarias/diaria-form/diaria-form.component').then(
+                (m) => m.DiariaFormComponent,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/diarias/diaria-detail/diaria-detail.component').then(
+                (m) => m.DiariaDetailComponent,
+              ),
+          },
+        ],
+      },
+      {
+        path: 'cronograma',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/diarias/diaria-list/diaria-list.component').then(
+                (m) => m.DiariaListComponent,
+              ),
+          },
+          {
+            path: 'novo',
+            loadComponent: () =>
+              import('./features/diarias/diaria-form/diaria-form.component').then(
+                (m) => m.DiariaFormComponent,
+              ),
+          },
+          {
+            path: 'batch',
+            loadComponent: () =>
+              import('./features/diarias/diaria-batch-form/diaria-batch-form.component').then(
+                (m) => m.DiariaBatchFormComponent,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/diarias/diaria-form/diaria-form.component').then(
+                (m) => m.DiariaFormComponent,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/diarias/diaria-detail/diaria-detail.component').then(
+                (m) => m.DiariaDetailComponent,
               ),
           },
         ],

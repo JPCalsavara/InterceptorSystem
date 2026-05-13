@@ -4,27 +4,30 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { CondominioService } from '../../../services/condominio.service';
+import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
+import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
+import { celularValidator, cpfValidator } from '../../../shared/validators/br-documents.validators';
 import {
   StatusFuncionario,
   TipoFuncionario,
   TipoEscala,
   Contrato,
   StatusContrato,
+  Tag,
 } from '../../../models';
 
 @Component({
   selector: 'app-funcionario-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective, TagPickerComponent],
   templateUrl: './funcionario-form.component.html',
   styleUrl: './funcionario-form.component.scss',
 })
 export class FuncionarioFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(FuncionarioService);
-  private condominioService = inject(CondominioService);
+  private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -35,8 +38,9 @@ export class FuncionarioFormComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
-  condominios = signal<any[]>([]);
+  clientes = signal<any[]>([]);
   contratos = signal<Contrato[]>([]);
+  tags = signal<Tag[]>([]);
 
   StatusFuncionario = StatusFuncionario;
   TipoFuncionario = TipoFuncionario;
@@ -61,12 +65,15 @@ export class FuncionarioFormComponent implements OnInit {
       label: '12x36 (12 horas trabalhadas, 36 de descanso)',
     },
     { value: TipoEscala.SEMANAL_COMERCIAL, label: 'Semanal Comercial (44h semanais)' },
+    { value: TipoEscala.ALCALA_8H, label: 'Alcalá 8h (Segunda a Sábado)' },
+    { value: TipoEscala.FOLGUISTA, label: 'Folguista' },
+    { value: TipoEscala.OITO_HORAS_SEIS_POR_DOIS, label: '8h (6x2)' },
   ];
 
   ngOnInit(): void {
-    this.loadCondominios();
+    this.loadClientes();
     this.buildForm();
-    this.setupCondominioChange();
+    this.setupClienteChange();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -76,30 +83,50 @@ export class FuncionarioFormComponent implements OnInit {
     }
   }
 
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => console.error('Erro ao carregar condomínios:', err),
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => console.error('Erro ao carregar clientes:', err),
     });
   }
 
-  setupCondominioChange(): void {
-    this.form.get('condominioId')?.valueChanges.subscribe((condominioId) => {
-      if (condominioId) {
-        this.loadContratos(condominioId);
+  setupClienteChange(): void {
+    this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
+      if (clienteId) {
+        this.loadContratoTags(clienteId);
       } else {
         this.contratos.set([]);
+        this.tags.set([]);
+        this.form.get('tagIds')?.setValue([]);
       }
     });
   }
 
-  loadContratos(condominioId: string): void {
+  loadContratoTags(clienteId: string): void {
     this.contratoService.getAll().subscribe({
       next: (data) => {
-        const contratosDoCondominio = data.filter(
-          (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO,
+        const contratosDoCliente = data.filter(
+          (c) => c.clienteId === clienteId && c.status !== StatusContrato.FINALIZADO,
         );
-        this.contratos.set(contratosDoCondominio);
+        this.contratos.set(contratosDoCliente);
+
+        const tags = contratosDoCliente
+          .flatMap((c) => c.tags ?? [])
+          .reduce((acc, ct) => {
+            if (!acc.some((tag) => tag.id === ct.tagId)) {
+              acc.push({ id: ct.tagId, nome: ct.tagNome, valor: 0 });
+            }
+            return acc;
+          }, [] as Tag[]);
+
+        const allowedIds = new Set(tags.map((tag) => tag.id));
+        const selectedIds = Array.isArray(this.form.get('tagIds')?.value)
+          ? this.form.get('tagIds')?.value
+          : [];
+        const filteredIds = selectedIds.filter((id: string) => allowedIds.has(id));
+
+        this.tags.set(tags);
+        this.form.get('tagIds')?.setValue(filteredIds);
       },
       error: (err) => console.error('Erro ao carregar contratos:', err),
     });
@@ -107,37 +134,27 @@ export class FuncionarioFormComponent implements OnInit {
 
   buildForm(): void {
     this.form = this.fb.group({
-      condominioId: ['', Validators.required],
+      clienteId: ['', Validators.required],
+      contratoId: ['', Validators.required],
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      cpf: ['', [Validators.required, this.cpfValidator]],
-      celular: ['', [Validators.required, this.celularValidator]],
+      cpf: ['', [Validators.required, cpfValidator]],
+      celular: ['', [Validators.required, celularValidator]],
       statusFuncionario: [StatusFuncionario.ATIVO, Validators.required],
       tipoFuncionario: [TipoFuncionario.CLT, Validators.required],
       tipoEscala: [TipoEscala.DOZE_POR_TRINTA_SEIS, Validators.required],
+      tagIds: [[]],
     });
-  }
-
-  private cpfValidator(control: any) {
-    if (!control.value) return null;
-    if (control.value.length !== 11) {
-      return { cpfInvalid: true };
-    }
-    return null;
-  }
-
-  private celularValidator(control: any) {
-    if (!control.value) return null;
-    if (control.value.length < 10 || control.value.length > 11) {
-      return { celularInvalid: true };
-    }
-    return null;
   }
 
   loadFuncionario(id: string): void {
     this.loading.set(true);
     this.service.getById(id).subscribe({
       next: (data) => {
-        this.form.patchValue(data);
+        const tagIds = (data.tags ?? []).map((tag) => tag.id);
+        this.form.patchValue({
+          ...data,
+          tagIds,
+        });
         this.loading.set(false);
       },
       error: (err) => {
@@ -158,7 +175,7 @@ export class FuncionarioFormComponent implements OnInit {
 
     if (this.contratos().length === 0 && !this.isEdit()) {
       this.error.set(
-        'Não há contratos ativos para o condomínio selecionado. Cadastre um contrato primeiro.',
+        'Não há contratos ativos para o cliente selecionado. Cadastre um contrato primeiro.',
       );
       return;
     }
@@ -166,10 +183,7 @@ export class FuncionarioFormComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    const formValue = {
-      ...this.form.value,
-      contratoId: this.isEdit() ? this.form.value.contratoId : this.contratos()[0].id,
-    };
+    const formValue = this.form.value;
 
     const request = this.isEdit()
       ? this.service.update(this.funcionarioId()!, formValue)
@@ -218,9 +232,17 @@ export class FuncionarioFormComponent implements OnInit {
     if (errors['required']) return 'Este campo é obrigatório';
     if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
     if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['cpfInvalid']) return 'CPF deve conter 11 dígitos';
+    if (errors['cpfInvalid']) return 'CPF inválido (verifique o formato e os dígitos)';
     if (errors['celularInvalid']) return 'Celular deve conter 10 ou 11 dígitos';
 
     return 'Campo inválido';
+  }
+
+  onTagSelectionChange(tagIds: string[]): void {
+    const tagIdsControl = this.form.get('tagIds');
+    if (!tagIdsControl) return;
+
+    tagIdsControl.setValue(tagIds);
+    tagIdsControl.markAsTouched();
   }
 }

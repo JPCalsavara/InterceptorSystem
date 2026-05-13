@@ -1,151 +1,66 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 
 namespace InterceptorSystem.Tests.Unity;
 
 /// <summary>
-/// Testes para validar os cálculos financeiros do Contrato
-/// CRÍTICO: Valida FASE 3 (margens de lucro e faltas)
+/// Testes para validar os cálculos financeiros do Contrato e Funcionário.
+/// Phase 4: CalcularSalarioBasePorFuncionario removido; validamos CustoMensalEstimado via Tags.
 /// </summary>
 public class ContratoCalculosTests
 {
-    [Fact]
-    public void CalcularSalarioBase_DeveConsiderarTodasAsMargens()
+    private static void PopularFuncionarios(Contrato contrato, int quantidade = 12)
     {
-        // Arrange - Cenário realista
-        var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        
-        // Criar condomínio (necessário para calcular QuantidadeFuncionarios)
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
-        
-        var contrato = new Contrato(
-            empresaId: empresaId,
-            condominioId: condominioId,
-            descricao: "Contrato Teste",
-            valorTotalMensal: 72000m,
-            valorDiariaCobrada: 100m,
-            percentualAdicionalNoturno: 0.30m,
-            valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0.15m,              // 15% = R$ 10.800
-            numeroDePostos: 2,                      // Número de postos/turnos (QuantidadeFuncionarios = 6 × 2 = 12)
-            margemLucroPercentual: 0.20m,           // 20% = R$ 14.400
-            margemCoberturaFaltasPercentual: 0.10m, // 10% = R$  7.200
-            dataInicio: DateOnly.FromDateTime(DateTime.Today),
-            dataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-            status: StatusContrato.ATIVO
-        );
-        
-        // Simular navegação (normalmente feita pelo EF Core)
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
-
-        // Act
-        var salarioBase = contrato.CalcularSalarioBasePorFuncionario();
-
-        // Assert
-        // Distribuição esperada de R$ 72.000:
-        // - Impostos (15%):  R$ 10.800
-        // - Lucro (20%):     R$ 14.400
-        // - Faltas (10%):    R$  7.200
-        // - Benefícios:      R$  3.600
-        // = Base Salários:   R$ 36.000
-        // ÷ 12 funcionários = R$  3.000
-        Assert.Equal(3000m, salarioBase);
+        var empresaId = contrato.EmpresaId;
+        for (int i = 0; i < quantidade; i++)
+        {
+            var cpf = GerarCpfValido(i);
+            var func = new Funcionario(
+                empresaId, Guid.NewGuid(), contrato.Id,
+                $"Func {i}", cpf, "11999999999",
+                StatusFuncionario.ATIVO, TipoEscala.DOZE_POR_TRINTA_SEIS, TipoFuncionario.CLT);
+            typeof(Funcionario).GetProperty("Contrato")!.SetValue(func, contrato);
+            contrato.Funcionarios.Add(func);
+        }
     }
 
-    [Fact]
-    public void CalcularSalarioBase_SemMargens_DeveDarValorMaior()
+    private static string GerarCpfValido(int seed)
     {
-        // Arrange - Mesmo valor total mas SEM margens
-        var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        
-        // Criar condomínio (necessário para calcular QuantidadeFuncionarios)
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
-        
-        var contrato = new Contrato(
-            empresaId: empresaId,
-            condominioId: condominioId,
-            descricao: "Sem Margens",
-            valorTotalMensal: 72000m,
-            valorDiariaCobrada: 100m,
-            percentualAdicionalNoturno: 0.30m,
-            valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0m,                 // 0%
-            numeroDePostos: 2,                      // Número de postos/turnos (12 funcionários)
-            margemLucroPercentual: 0m,              // 0%
-            margemCoberturaFaltasPercentual: 0m,    // 0%
-            dataInicio: DateOnly.FromDateTime(DateTime.Today),
-            dataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-            status: StatusContrato.ATIVO
-        );
-        
-        // Simular navegação (normalmente feita pelo EF Core)
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
-
-        // Act
-        var salarioBase = contrato.CalcularSalarioBasePorFuncionario();
-
-        // Assert
-        // (72000 - 0 - 0 - 0 - 3600) / 12 = 5700
-        // Muito maior que 3000 (com margens)
-        Assert.Equal(5700m, salarioBase);
+        var baseDigits = $"{(123456789 + seed) % 1000000000:000000000}";
+        var d1 = CalcularDigitoCpf(baseDigits, new[] { 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        var d2 = CalcularDigitoCpf(baseDigits + d1, new[] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 });
+        return baseDigits + d1 + d2;
     }
 
-    [Fact]
-    public void CalcularSalarioBase_BaseNegativa_DeveLancarExcecao()
+    private static int CalcularDigitoCpf(string input, IReadOnlyList<int> pesos)
     {
-        // Arrange - Margens muito altas para o valor total
-        var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
-        
-        var contrato = new Contrato(
-            empresaId: empresaId,
-            condominioId: condominioId,
-            descricao: "Margens Altas Demais",
-            valorTotalMensal: 1000m,                // Valor muito baixo
-            valorDiariaCobrada: 100m,
-            percentualAdicionalNoturno: 0.30m,
-            valorBeneficiosExtrasMensal: 900m,
-            percentualImpostos: 0.15m,              // 150
-            numeroDePostos: 2,                      // Número de postos/turnos (12 funcionários)
-            margemLucroPercentual: 0.20m,           // 200
-            margemCoberturaFaltasPercentual: 0.10m, // 100
-            dataInicio: DateOnly.FromDateTime(DateTime.Today),
-            dataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
-            status: StatusContrato.ATIVO
-        );
-        
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        var soma = 0;
+        for (var i = 0; i < input.Length; i++)
+        {
+            soma += (input[i] - '0') * pesos[i];
+        }
 
-        // Act & Assert
-        // (1000 - 150 - 200 - 100 - 900) = -350 (negativo!)
-        var ex = Assert.Throws<InvalidOperationException>(
-            () => contrato.CalcularSalarioBasePorFuncionario()
-        );
-
-        Assert.Contains("Base para salários é negativa ou zero", ex.Message);
+        var resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
     }
-
 
     [Fact]
     public void CalcularAdicionalNoturno_DeveRetornarPercentualCorreto()
     {
         // Arrange
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Adicional Noturno",
             valorTotalMensal: 10000m,
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,      // 30%
+            percentualAdicionalFimSemana: 1.0m,
             valorBeneficiosExtrasMensal: 1000m,
-            percentualImpostos: 0.15m,
+            percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,                      // Número de postos/turnos
             margemLucroPercentual: 0.20m,
             margemCoberturaFaltasPercentual: 0.10m,
@@ -169,19 +84,20 @@ public class ContratoCalculosTests
     {
         // Arrange
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
+        var clienteId = Guid.NewGuid();
         
-        var condominio = new Condominio(empresaId, "Residencial Teste", "12.345.678/0001-90", "Rua Teste, 123", 6, TimeSpan.FromHours(6));
+        var cliente = new Cliente(empresaId, "Residencial Teste", "11222333000181", "São Paulo", "SP");
         
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Benefícios",
             valorTotalMensal: 10000m,
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,
+            percentualAdicionalFimSemana: 1.0m,
             valorBeneficiosExtrasMensal: 3600m,     // Total
-            percentualImpostos: 0.15m,
+            percentualEncargosProvisoes: 0.15m,
             numeroDePostos: 2,                      // Número de postos/turnos (12 funcionários)
             margemLucroPercentual: 0.20m,
             margemCoberturaFaltasPercentual: 0.10m,
@@ -190,7 +106,8 @@ public class ContratoCalculosTests
             status: StatusContrato.ATIVO
         );
         
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
+        typeof(Contrato).GetProperty("Cliente")!.SetValue(contrato, cliente);
+        PopularFuncionarios(contrato, 12);
 
         // Act
         var beneficiosPorFuncionario = contrato.CalcularBeneficiosPorFuncionario();
@@ -201,55 +118,50 @@ public class ContratoCalculosTests
     }
 
     [Fact]
-    public void CalcularSalarioBase_CenarioRealCompleto()
+    public void CustoMensalEstimado_DeveUsarMaiorValorDaTagNoContrato()
     {
-        // Arrange - Cenário real documentado
-        // Contrato: R$ 72.000/mês para 12 funcionários
         var empresaId = Guid.NewGuid();
-        var condominioId = Guid.NewGuid();
-        
-        var condominio = new Condominio(empresaId, "Residencial Estrela", "12.345.678/0001-90", "Av. Estrela, 456", 6, TimeSpan.FromHours(6));
-        
+        var clienteId = Guid.NewGuid();
+
         var contrato = new Contrato(
             empresaId: empresaId,
-            condominioId: condominioId,
+            clienteId: clienteId,
             descricao: "Residencial Estrela - Contrato 2026",
             valorTotalMensal: 72000m,
             valorDiariaCobrada: 100m,
             percentualAdicionalNoturno: 0.30m,
+            percentualAdicionalFimSemana: 1.0m,
             valorBeneficiosExtrasMensal: 3600m,
-            percentualImpostos: 0.15m,
-            numeroDePostos: 2,                      // Número de postos/turnos (12 funcionários)
+            percentualEncargosProvisoes: 0.15m,
+            numeroDePostos: 2,
             margemLucroPercentual: 0.20m,
             margemCoberturaFaltasPercentual: 0.10m,
             dataInicio: DateOnly.FromDateTime(DateTime.Today),
             dataFim: DateOnly.FromDateTime(DateTime.Today.AddMonths(12)),
             status: StatusContrato.ATIVO
         );
-        
-        typeof(Contrato).GetProperty("Condominio")!.SetValue(contrato, condominio);
 
-        // Act - Calcular tudo
-        var salarioBase = contrato.CalcularSalarioBasePorFuncionario();
-        var adicionalNoturno = contrato.CalcularAdicionalNoturno(salarioBase);
-        var beneficios = contrato.CalcularBeneficiosPorFuncionario();
-        var salarioTotal = salarioBase + adicionalNoturno + beneficios;
+        PopularFuncionarios(contrato, 12);
+        var funcionario = contrato.Funcionarios.First();
 
-        // Assert - Validar breakdown completo
-        Assert.Equal(3000m, salarioBase);          // Base
-        Assert.Equal(900m, adicionalNoturno);      // 30% do base
-        Assert.Equal(300m, beneficios);            // 3600 / 12
-        Assert.Equal(4200m, salarioTotal);         // Total
+        var tagBasica = new Tag(empresaId, "Vigia", 250m);
+        var tagPremium = new Tag(empresaId, "PM", 400m);
 
-        // Validar distribuição do valor total (72000)
-        var impostos = 72000m * 0.15m;             // 10800
-        var lucro = 72000m * 0.20m;                // 14400
-        var faltas = 72000m * 0.10m;               // 7200
-        var beneficiosTotais = 3600m;
-        var salariosTotais = salarioBase * 12;     // 36000
+        contrato.DefinirTags(new[]
+        {
+            new ContratoTag(empresaId, contrato.Id, tagBasica.Id, 250m),
+            new ContratoTag(empresaId, contrato.Id, tagPremium.Id, 400m)
+        });
 
-        var soma = impostos + lucro + faltas + beneficiosTotais + salariosTotais;
-        Assert.Equal(72000m, soma);                // Deve fechar!
+        funcionario.DefinirTags(new[]
+        {
+            new FuncionarioTag(empresaId, funcionario.Id, tagBasica.Id),
+            new FuncionarioTag(empresaId, funcionario.Id, tagPremium.Id)
+        });
+
+        var custoEstimado = funcionario.CustoMensalEstimado;
+
+        Assert.Equal(12300m, custoEstimado);
     }
 }
 

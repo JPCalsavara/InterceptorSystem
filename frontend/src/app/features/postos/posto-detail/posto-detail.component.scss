@@ -1,3 +1,5 @@
+@use '../../../../styles/shared-pages' as *;
+
 .detail-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -80,13 +82,13 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, var(--app-ref-2196f3) 0%, var(--app-ref-1976d2) 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
         color: white;
         border-radius: 2rem;
         font-size: 1.25rem;
         font-weight: 600;
         margin-bottom: 1rem;
-        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
       }
 
       .header-meta {
@@ -141,7 +143,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
   }
 }
 
@@ -182,11 +184,11 @@
   }
 
   &.highlight {
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.15) 100%);
-    border: 2px solid rgba(33, 150, 243, 0.3);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, transparent) 0%, color-mix(in srgb, var(--primary-color) 15%, transparent) 100%);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
 
     .metric-icon {
-      background: linear-gradient(135deg, rgba(33, 150, 243, 0.2) 0%, rgba(33, 150, 243, 0.3) 100%);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 20%, transparent) 0%, color-mix(in srgb, var(--primary-color) 30%, transparent) 100%);
       font-size: 2.25rem;
     }
 
@@ -203,7 +205,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.2) 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, transparent) 0%, color-mix(in srgb, var(--primary-color) 20%, transparent) 100%);
     border-radius: 0.5rem;
     flex-shrink: 0;
   }
@@ -228,15 +230,15 @@
       font-weight: 700;
 
       &.success {
-        color: var(--app-ref-4caf50);
+        color: var(--success-color);
       }
 
       &.alert {
-        color: var(--app-ref-ff9800);
+        color: var(--warning-color);
       }
 
       &.danger {
-        color: var(--app-ref-f44336);
+        color: var(--error-color);
       }
     }
   }
@@ -261,7 +263,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border-left: 4px solid var(--app-ref-2196f3);
+  border-left: 4px solid var(--primary-color);
 
   .tipo-icon {
     font-size: 2rem;
@@ -360,7 +362,7 @@
     .count-value {
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--app-ref-2196f3);
+      color: var(--primary-color);
     }
 
     .count-label {
@@ -370,8 +372,8 @@
   }
 }
 
-// Alocações Section (reuso do estilo do funcionário-detail)
-.alocacoes-section {
+// Diárias Section (reuso do estilo do funcionário-detail)
+.diarias-section {
   margin-bottom: 2rem;
 }
 
@@ -400,7 +402,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.alocacoes-table {
+.diarias-table {
   width: 100%;
   border-collapse: collapse;
 
@@ -547,7 +549,7 @@
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid var(--app-ref-3b82f6);
+  border-left: 4px solid var(--color-info);
 }
 
 .noturno-header {
@@ -592,7 +594,7 @@
 
 // Valores financeiros na tabela
 .valor-positivo {
-  color: var(--app-ref-16a34a);
+  color: var(--success-color);
   font-weight: 600;
 }
 
@@ -611,13 +613,7 @@
 }
 
 .faltas-container {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  @include responsive-grid-asymmetric(1fr, 2fr, 1.5rem);
 }
 
 .faltas-summary {
@@ -626,7 +622,7 @@
     border-radius: 0.75rem;
     padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid var(--app-ref-f44336);
+    border-left: 4px solid var(--error-color);
 
     h3 {
       font-size: 1.125rem;
@@ -669,7 +665,7 @@
           color: var(--text-primary);
 
           &.danger {
-            color: var(--app-ref-f44336);
+            color: var(--error-color);
             font-size: 1.25rem;
           }
         }
@@ -732,3 +728,68 @@
     }
   }
 }
+
+/* -------------------------------------------------
+   Alocações Section (list of allocations / shifts)
+   ------------------------------------------------- */
+.alocacoes-section {
+  margin-bottom: 2rem;
+
+  .section-header {
+    margin-bottom: 1rem;
+  }
+
+  .alocacoes-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .alocacao-card {
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .alocacao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .alocacao-body {
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+
+        .label {
+          font-weight: 500;
+        }
+        .value {
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    @extend .empty-state; // reuse existing empty‑state styling
+    text-align: center;
+    font-style: italic;
+  }
+}
+

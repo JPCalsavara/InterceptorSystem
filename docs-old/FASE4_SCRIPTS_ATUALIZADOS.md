@@ -7,13 +7,13 @@
 
 ## 📋 Arquivos Atualizados
 
-### 1. **postos-de-trabalho.json**
+### 1. **postos.json**
 **Status:** ✅ Já estava correto (sem QuantidadeIdealFuncionarios)
 
 ```json
 {
   "create": {
-    "condominioId": "00000000-0000-0000-0000-000000000000",
+    "clienteId": "00000000-0000-0000-0000-000000000000",
     "horarioInicio": "06:00:00",
     "horarioFim": "18:00:00"
   }
@@ -28,16 +28,16 @@
 **Mudanças:**
 ```sql
 -- ANTES (FASE 2):
-INSERT INTO "PostosDeTrabalho" (
-    "Id", "EmpresaId", "CondominioId", 
+INSERT INTO "Postos" (
+    "Id", "EmpresaId", "ClienteId", 
     "HorarioInicio", "HorarioFim", "NumeroFaltasAcumuladas",
     "QuantidadeIdealFuncionarios", "QuantidadeMaximaFuncionarios", "PermiteDobrarEscala"
 )
 VALUES ('...', '...', '...', '06:00:00', '18:00:00', 0, 6, 8, true);
 
 -- DEPOIS (FASE 4):
-INSERT INTO "PostosDeTrabalho" (
-    "Id", "EmpresaId", "CondominioId", 
+INSERT INTO "Postos" (
+    "Id", "EmpresaId", "ClienteId", 
     "HorarioInicio", "HorarioFim", 
     "PermiteDobrarEscala", "QuantidadeMaximaFaltas"
 )
@@ -56,13 +56,13 @@ VALUES ('...', '...', '...', '06:00:00', '18:00:00', true, 3);
 
 ```sql
 -- Remove colunas depreciadas:
-ALTER TABLE "PostosDeTrabalho" 
+ALTER TABLE "Postos" 
     DROP COLUMN IF EXISTS "QuantidadeIdealFuncionarios",
     DROP COLUMN IF EXISTS "QuantidadeMaximaFuncionarios",
     DROP COLUMN IF EXISTS "NumeroFaltasAcumuladas";
 
 -- Adiciona nova coluna:
-ALTER TABLE "PostosDeTrabalho" 
+ALTER TABLE "Postos" 
     ADD COLUMN "QuantidadeMaximaFaltas" INTEGER NULL;
 ```
 
@@ -116,11 +116,11 @@ chmod +x reset-and-populate.sh
 
 ---
 
-## 📊 Estrutura de PostoDeTrabalho (FASE 4)
+## 📊 Estrutura de Posto (FASE 4)
 
 ### **Antes:**
 ```
-PostosDeTrabalho
+Postos
 ├── HorarioInicio
 ├── HorarioFim
 ├── QuantidadeIdealFuncionarios      ❌ Removido
@@ -131,13 +131,13 @@ PostosDeTrabalho
 
 ### **Depois:**
 ```
-PostosDeTrabalho
+Postos
 ├── HorarioInicio
 ├── HorarioFim
 ├── PermiteDobrarEscala
 ├── QuantidadeMaximaFaltas           ✅ Novo (opcional)
 └── QuantidadeIdealFuncionarios      ✅ Propriedade calculada [NotMapped]
-    └── Cálculo: Condominio.QuantidadeFuncionariosIdeal / TotalPostos
+    └── Cálculo: Cliente.QuantidadeFuncionariosIdeal / TotalPostos
 ```
 
 ---
@@ -149,7 +149,7 @@ PostosDeTrabalho
 docker exec -i interceptor_db psql -U admin -d interceptor_db < 01-popular-dados-teste.sql
 
 # 2. Consultar postos (via API)
-curl http://localhost/api/postos-de-trabalho
+curl http://localhost/api/postos
 
 # 3. Verificar que QuantidadeIdealFuncionarios está calculado:
 # Residencial Solar: 12 funcionários / 2 postos = 6 funcionários/posto

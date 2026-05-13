@@ -22,23 +22,23 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 ### ✨ Adicionado
 
 #### **FASE 5: Criação em Cascata**
-- **Novo endpoint** `POST /api/condominios-completos` para criar Condomínio + Contrato + Postos em 1 request
-- **Novo endpoint** `POST /api/condominios-completos/validar` para validação dry-run
-- **Novo serviço** `CondominioOrquestradorService` para orquestração de criação
-- **Nova interface** `ICondominioOrquestradorService`
-- **Novos DTOs**: `CreateCondominioCompletoDtoInput`, `CondominioCompletoDtoOutput`
+- **Novo endpoint** `POST /api/clientes-completos` para criar Cliente + Contrato + Postos em 1 request
+- **Novo endpoint** `POST /api/clientes-completos/validar` para validação dry-run
+- **Novo serviço** `ClienteOrquestradorService` para orquestração de criação
+- **Nova interface** `IClienteOrquestradorService`
+- **Novos DTOs**: `CreateClienteCompletoDtoInput`, `ClienteCompletoDtoOutput`
 - **Cálculo automático de horários** de turnos baseado em quantidade de postos
 - **Validações automáticas**: consistência de funcionários, divisibilidade, datas
 - **4 testes unitários** para serviço orquestrador
 - **4 testes de integração** para controller completo
-- **Payload de teste** `condominio-completo.json`
+- **Payload de teste** `cliente-completo.json`
 - **Exemplos de cURL** em `CURLS_FASE5.md`
 
 #### **FASE 1: Configurações Operacionais**
-- Campo `QuantidadeFuncionariosIdeal` em Condomínio
-- Campo `HorarioTrocaTurno` em Condomínio
-- Campo `EmailGestor` em Condomínio (opcional)
-- Campo `TelefoneEmergencia` em Condomínio (opcional)
+- Campo `QuantidadeFuncionariosIdeal` em Cliente
+- Campo `HorarioTrocaTurno` em Cliente
+- Campo `EmailGestor` em Cliente (opcional)
+- Campo `TelefoneEmergencia` em Cliente (opcional)
 
 #### **FASE 2: Vínculo Funcionário ↔ Contrato**
 - Campo `ContratoId` obrigatório em Funcionário
@@ -52,15 +52,15 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 - Propriedade calculada `Beneficios` em Funcionário
 - Propriedade calculada `SalarioTotal` em Funcionário
 
-#### **FASE 4: Simplificação de PostoDeTrabalho**
-- Propriedade calculada `QuantidadeIdealFuncionarios` em PostoDeTrabalho
-- Campo `QuantidadeMaximaFaltas` em PostoDeTrabalho (opcional)
+#### **FASE 4: Simplificação de Posto**
+- Propriedade calculada `QuantidadeIdealFuncionarios` em Posto
+- Campo `QuantidadeMaximaFaltas` em Posto (opcional)
 
 ### 🔄 Modificado
 
 #### **FASE 5**
-- **Controllers**: Adicionado `CondominiosCompletosController`
-- **DI**: Registrado `ICondominioOrquestradorService`
+- **Controllers**: Adicionado `ClientesCompletosController`
+- **DI**: Registrado `IClienteOrquestradorService`
 - **Documentação**: README.md atualizado com novas funcionalidades
 
 #### **FASE 3**
@@ -69,8 +69,8 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 - **DTOs**: Removidos campos de salário dos DTOs de input
 
 #### **FASE 4**
-- **PostoDeTrabalho**: `QuantidadeIdealFuncionarios` agora é `[NotMapped]`
-- **PostoDeTrabalhoRepository**: Eager loading de `Condominio.PostosDeTrabalho`
+- **Posto**: `QuantidadeIdealFuncionarios` agora é `[NotMapped]`
+- **PostoRepository**: Eager loading de `Cliente.Postos`
 - **Scripts SQL**: Atualizado `01-popular-dados-teste.sql`
 
 ### ❌ Removido
@@ -81,15 +81,15 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 - Campo `ValorDiariasFixas` de Funcionário (agora calculado)
 
 #### **FASE 4**
-- Campo `QuantidadeIdealFuncionarios` persistido em PostoDeTrabalho
-- Campo `QuantidadeMaximaFuncionarios` de PostoDeTrabalho
-- Campo `NumeroFaltasAcumuladas` de PostoDeTrabalho
+- Campo `QuantidadeIdealFuncionarios` persistido em Posto
+- Campo `QuantidadeMaximaFuncionarios` de Posto
+- Campo `NumeroFaltasAcumuladas` de Posto
 
 ### 🐛 Corrigido
 
 #### **FASE 4**
-- **Testes de Alocação**: Adicionado mock de `Condominio` em `PostoDeTrabalho` para cálculo correto
-- **Helper `CriarPosto()`**: Agora configura navegação `Condominio` via Reflection
+- **Testes de Diária**: Adicionado mock de `Cliente` em `Posto` para cálculo correto
+- **Helper `CriarPosto()`**: Agora configura navegação `Cliente` via Reflection
 - **Helper `ConfigurarMocksBasicos()`**: Adicionado mock de `GetByPostoEDataAsync`
 
 ### 🔒 Segurança
@@ -106,7 +106,7 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 
 ### 📊 Performance
 
-- **Redução de 75%** em número de requests para criar condomínio completo (de 4 para 1)
+- **Redução de 75%** em número de requests para criar cliente completo (de 4 para 1)
 - **Redução de 75%** em linhas de código no frontend para operações comuns
 - Cálculos de salário em tempo real (sem queries adicionais)
 
@@ -138,7 +138,7 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 - Auto-finalização de contratos vencidos no `GetAllAsync()`
 
 #### **Regras de Negócio**
-- Regra: apenas 1 contrato vigente (`PAGO`) por condomínio
+- Regra: apenas 1 contrato vigente (`PAGO`) por cliente
 - Regra: auto-finalização quando `DataFim < hoje`
 - Validação de sobreposição de datas entre contratos
 
@@ -152,10 +152,10 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 ### ✨ Versão Inicial
 
 #### **Entidades Implementadas**
-- Condomínio
-- PostoDeTrabalho
+- Cliente
+- Posto
 - Funcionário
-- Alocação
+- Diária
 
 #### **Funcionalidades**
 - CRUD completo para todas as entidades
@@ -166,7 +166,7 @@ Esta versão representa uma refatoração completa do sistema com foco em:
 - CNPJ único por empresa
 - CPF único no sistema
 - Turnos de 12 horas
-- Não permitir alocações simultâneas
+- Não permitir diárias simultâneas
 - Não permitir dias consecutivos (exceto dobra)
 - Descanso obrigatório após dobra programada
 

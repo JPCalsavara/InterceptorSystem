@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
 
 namespace InterceptorSystem.Api.Middleware;
 
@@ -34,6 +35,7 @@ public class GlobalExceptionMiddleware
     {
         var (statusCode, message) = exception switch
         {
+            DomainException ex => (HttpStatusCode.BadRequest, ex.Message),
             InvalidOperationException ex => (HttpStatusCode.BadRequest, ex.Message),
             KeyNotFoundException ex => (HttpStatusCode.NotFound, ex.Message),
             UnauthorizedAccessException ex => (HttpStatusCode.Unauthorized, ex.Message),
@@ -53,12 +55,18 @@ public class GlobalExceptionMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        var response = JsonSerializer.Serialize(new
+        var domainEx = exception as DomainException;
+        var traceId = context.TraceIdentifier;
+        var responseObj = new
         {
             error = message,
+            errorCode = domainEx?.ErrorCode,
+            timestamp = DateTime.UtcNow.ToString("o"),
+            traceId,
             statusCode = (int)statusCode
-        });
+        };
 
+        var response = JsonSerializer.Serialize(responseObj);
         await context.Response.WriteAsync(response);
     }
 }

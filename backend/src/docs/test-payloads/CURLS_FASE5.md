@@ -1,12 +1,12 @@
 # 🧪 CURLs de Teste - FASE 5: Criação em Cascata
 
-## 1. Criar Condomínio Completo (Sucesso)
+## 1. Criar Cliente Completo (Sucesso)
 
 ```bash
-curl -X POST http://localhost/api/condominios-completos \
+curl -X POST http://localhost/api/clientes-completos \
   -H "Content-Type: application/json" \
   -d '{
-    "condominio": {
+    "cliente": {
       "nome": "Residencial Estrela",
       "cnpj": "12.345.678/0001-90",
       "endereco": "Rua das Flores, 123 - Jardim América, São Paulo/SP",
@@ -41,10 +41,10 @@ curl -X POST http://localhost/api/condominios-completos \
 ## 2. Validar Dados (Dry-Run)
 
 ```bash
-curl -X POST http://localhost/api/condominios-completos/validar \
+curl -X POST http://localhost/api/clientes-completos/validar \
   -H "Content-Type: application/json" \
   -d '{
-    "condominio": {
+    "cliente": {
       "nome": "Residencial Teste Validação",
       "cnpj": "98.765.432/0001-10",
       "endereco": "Av. Teste, 456",
@@ -85,10 +85,10 @@ curl -X POST http://localhost/api/condominios-completos/validar \
 ## 3. Erro: Quantidade de Funcionários Diferente
 
 ```bash
-curl -X POST http://localhost/api/condominios-completos \
+curl -X POST http://localhost/api/clientes-completos \
   -H "Content-Type: application/json" \
   -d '{
-    "condominio": {
+    "cliente": {
       "nome": "Residencial Erro",
       "cnpj": "11.222.333/0001-44",
       "endereco": "Rua Erro, 666",
@@ -117,7 +117,7 @@ curl -X POST http://localhost/api/condominios-completos \
 **Resultado Esperado:** 400 Bad Request
 ```json
 {
-  "error": "Quantidade de funcionários do contrato (10) deve ser igual à quantidade ideal do condomínio (12)."
+  "error": "Quantidade de funcionários do contrato (10) deve ser igual à quantidade ideal do cliente (12)."
 }
 ```
 
@@ -126,10 +126,10 @@ curl -X POST http://localhost/api/condominios-completos \
 ## 4. Erro: Funcionários Não Divisíveis por Postos
 
 ```bash
-curl -X POST http://localhost/api/condominios-completos/validar \
+curl -X POST http://localhost/api/clientes-completos/validar \
   -H "Content-Type: application/json" \
   -d '{
-    "condominio": {
+    "cliente": {
       "nome": "Residencial Divisibilidade",
       "cnpj": "22.333.444/0001-55",
       "endereco": "Rua Divisão, 777",
@@ -168,10 +168,10 @@ curl -X POST http://localhost/api/condominios-completos/validar \
 ## 5. Criar com 3 Postos (Turnos de 8 horas)
 
 ```bash
-curl -X POST http://localhost/api/condominios-completos \
+curl -X POST http://localhost/api/clientes-completos \
   -H "Content-Type: application/json" \
   -d '{
-    "condominio": {
+    "cliente": {
       "nome": "Residencial Três Turnos",
       "cnpj": "33.444.555/0001-66",
       "endereco": "Av. Três Turnos, 888",
@@ -209,10 +209,10 @@ curl -X POST http://localhost/api/condominios-completos \
 ## 6. Criar Sem Postos Automáticos
 
 ```bash
-curl -X POST http://localhost/api/condominios-completos \
+curl -X POST http://localhost/api/clientes-completos \
   -H "Content-Type: application/json" \
   -d '{
-    "condominio": {
+    "cliente": {
       "nome": "Residencial Manual",
       "cnpj": "44.555.666/0001-77",
       "endereco": "Rua Manual, 999",
@@ -247,7 +247,7 @@ curl -X POST http://localhost/api/condominios-completos \
 ## 🔍 Como Testar no Swagger
 
 1. Acesse: `http://localhost/swagger`
-2. Localize: `POST /api/condominios-completos`
+2. Localize: `POST /api/clientes-completos`
 3. Clique em **Try it out**
 4. Cole o JSON de teste
 5. Execute
@@ -257,17 +257,17 @@ curl -X POST http://localhost/api/condominios-completos \
 
 ## 📊 Validar Criação
 
-Após criar um condomínio completo, valide:
+Após criar um cliente completo, valide:
 
 ```bash
-# 1. Listar condomínios
-curl http://localhost/api/condominios
+# 1. Listar clientes
+curl http://localhost/api/clientes
 
 # 2. Listar contratos
 curl http://localhost/api/contratos
 
 # 3. Listar postos
-curl http://localhost/api/postos-de-trabalho
+curl http://localhost/api/postos
 ```
 
 ---

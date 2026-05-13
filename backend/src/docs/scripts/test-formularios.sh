@@ -58,13 +58,13 @@ test_endpoint() {
 }
 
 # =======================
-# TESTES DE CONDOMÍNIO
+# TESTES DE CLIENTE
 # =======================
-echo "📁 TESTE 1: Condomínios"
+echo "📁 TESTE 1: Clientes"
 echo "─────────────────────────────────────"
 
-# Payload de teste para condomínio
-CONDOMINIO_PAYLOAD='{
+# Payload de teste para cliente
+CLIENTE_PAYLOAD='{
   "nome": "João Pedro Leite Calsavara",
   "cnpj": "12.345.678/0001-90",
   "endereco": "Av. Sr. Libertino Pizani, 137 13484-666",
@@ -74,10 +74,10 @@ CONDOMINIO_PAYLOAD='{
   "telefoneEmergencia": "(15)996690551"
 }'
 
-test_endpoint "POST" "/condominios" "$CONDOMINIO_PAYLOAD" "Criar condomínio com horário 06:00:00"
+test_endpoint "POST" "/clientes" "$CLIENTE_PAYLOAD" "Criar cliente com horário 06:00:00"
 
 # Testar GET
-test_endpoint "GET" "/condominios" "" "Listar condomínios"
+test_endpoint "GET" "/clientes" "" "Listar clientes"
 
 echo ""
 
@@ -87,33 +87,33 @@ echo ""
 echo "📍 TESTE 2: Postos de Trabalho"
 echo "─────────────────────────────────────"
 
-# Primeiro, pegar ID do condomínio criado
-CONDOMINIO_ID=$(curl -s "$BASE_URL/condominios" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+# Primeiro, pegar ID do cliente criado
+CLIENTE_ID=$(curl -s "$BASE_URL/clientes" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
 
-if [ -n "$CONDOMINIO_ID" ]; then
-    echo "   Usando condomínio: $CONDOMINIO_ID"
+if [ -n "$CLIENTE_ID" ]; then
+    echo "   Usando cliente: $CLIENTE_ID"
     
     POSTO_PAYLOAD="{
-      \"condominioId\": \"$CONDOMINIO_ID\",
+      \"clienteId\": \"$CLIENTE_ID\",
       \"horarioInicio\": \"06:00:00\",
       \"horarioFim\": \"18:00:00\",
       \"permiteDobrarEscala\": true,
       \"capacidadeMaximaExtraPorTerceiros\": 2
     }"
     
-    test_endpoint "POST" "/postos-de-trabalho" "$POSTO_PAYLOAD" "Criar posto 06:00-18:00"
+    test_endpoint "POST" "/postos" "$POSTO_PAYLOAD" "Criar posto 06:00-18:00"
     
     POSTO_PAYLOAD2="{
-      \"condominioId\": \"$CONDOMINIO_ID\",
+      \"clienteId\": \"$CLIENTE_ID\",
       \"horarioInicio\": \"18:00:00\",
       \"horarioFim\": \"06:00:00\",
       \"permiteDobrarEscala\": true,
       \"capacidadeMaximaExtraPorTerceiros\": 2
     }"
     
-    test_endpoint "POST" "/postos-de-trabalho" "$POSTO_PAYLOAD2" "Criar posto 18:00-06:00"
+    test_endpoint "POST" "/postos" "$POSTO_PAYLOAD2" "Criar posto 18:00-06:00"
 else
-    echo -e "${YELLOW}⚠️  Pulando testes de posto - nenhum condomínio encontrado${NC}"
+    echo -e "${YELLOW}⚠️  Pulando testes de posto - nenhum cliente encontrado${NC}"
 fi
 
 echo ""
@@ -124,8 +124,8 @@ echo ""
 echo "🔍 TESTE 3: Validações de Formato"
 echo "─────────────────────────────────────"
 
-# Tentar criar condomínio com horário no formato errado (HH:mm)
-CONDOMINIO_INVALIDO='{
+# Tentar criar cliente com horário no formato errado (HH:mm)
+CLIENTE_INVALIDO='{
   "nome": "Teste Formato Errado",
   "cnpj": "98.765.432/0001-10",
   "endereco": "Rua Teste, 123",
@@ -134,11 +134,11 @@ CONDOMINIO_INVALIDO='{
   "emailGestor": "teste@teste.com"
 }'
 
-echo -n "🔍 Criar condomínio com horário HH:mm (deve falhar)... "
+echo -n "🔍 Criar cliente com horário HH:mm (deve falhar)... "
 RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
     -H "Content-Type: application/json" \
-    -d "$CONDOMINIO_INVALIDO" \
-    "$BASE_URL/condominios" 2>&1)
+    -d "$CLIENTE_INVALIDO" \
+    "$BASE_URL/clientes" 2>&1)
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 

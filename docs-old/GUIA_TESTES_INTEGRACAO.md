@@ -139,16 +139,16 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
 ```csharp
 // POST
-var response = await _client.PostAsJsonAsync("/api/condominios", input);
+var response = await _client.PostAsJsonAsync("/api/clientes", input);
 
 // GET
-var response = await _client.GetAsync("/api/condominios/123");
+var response = await _client.GetAsync("/api/clientes/123");
 
 // PUT
-var response = await _client.PutAsJsonAsync("/api/condominios/123", updateInput);
+var response = await _client.PutAsJsonAsync("/api/clientes/123", updateInput);
 
 // DELETE
-var response = await _client.DeleteAsync("/api/condominios/123");
+var response = await _client.DeleteAsync("/api/clientes/123");
 ```
 
 ---
@@ -252,18 +252,18 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
 ```
 InterceptorSystem.Tests/
 ├── Unity/                              # Testes Unitários
-│   ├── CondominioAppServiceTests.cs
-│   └── PostoDeTrabalhoAppServiceTests.cs
+│   ├── ClienteAppServiceTests.cs
+│   └── PostoAppServiceTests.cs
 │
 ├── Integration/                        # Testes de Integração
 │   ├── CustomWebApplicationFactory.cs  # ⭐ Factory customizado
 │   ├── IntegrationTestBase.cs          # ⭐ Classe base (opcional)
-│   ├── CondominiosControllerIntegrationTests.cs
-│   └── PostosDeTrabalhoControllerIntegrationTests.cs
+│   ├── ClientesControllerIntegrationTests.cs
+│   └── PostosControllerIntegrationTests.cs
 │
 └── Fixtures/                           # Dados de teste (opcional)
-    ├── CondominioFixture.cs
-    └── PostoDeTrabalhoFixture.cs
+    ├── ClienteFixture.cs
+    └── PostoFixture.cs
 ```
 
 ---
@@ -271,34 +271,34 @@ InterceptorSystem.Tests/
 ## 📝 Exemplo Completo de Teste de Integração
 
 ```csharp
-public class CondominiosControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+public class ClientesControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
     private readonly CustomWebApplicationFactory _factory;
 
-    public CondominiosControllerIntegrationTests(CustomWebApplicationFactory factory)
+    public ClientesControllerIntegrationTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateClient();
     }
 
-    [Fact(DisplayName = "POST /api/condominios - Deve criar condomínio com dados válidos")]
+    [Fact(DisplayName = "POST /api/clientes - Deve criar cliente com dados válidos")]
     public async Task Create_DeveRetornar201_QuandoDadosValidos()
     {
         // Arrange
-        var input = new CreateCondominioDtoInput(
-            Nome: "Condomínio Solar",
+        var input = new CreateClienteDtoInput(
+            Nome: "Cliente Solar",
             Cnpj: "12.345.678/0001-90",
             Endereco: "Av. Paulista, 1000"
         );
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/condominios", input);
+        var response = await _client.PostAsJsonAsync("/api/clientes", input);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         
-        var result = await response.Content.ReadFromJsonAsync<CondominioDtoOutput>();
+        var result = await response.Content.ReadFromJsonAsync<ClienteDtoOutput>();
         Assert.NotNull(result);
         Assert.Equal(input.Nome, result.Nome);
         Assert.Equal(input.Cnpj, result.Cnpj);

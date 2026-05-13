@@ -20,7 +20,9 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
   min-height: 100vh;
 }
 
@@ -51,6 +53,29 @@ section,
 article {
   background: var(--bg-primary);
   color: var(--text-primary);
+}
+
+:root {
+  --entity-page-padding-top: 1.5rem;
+  --entity-page-padding-bottom: 2rem;
+  --entity-page-padding-inline: var(--space-6);
+}
+
+.main-content
+  .page-router-slot
+  :is(.page-container, .dashboard-container, .detail-container, .wizard-container) {
+  padding: var(--entity-page-padding-top) var(--entity-page-padding-inline)
+    var(--entity-page-padding-bottom) var(--entity-page-padding-inline) !important;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --entity-page-padding-top: var(--space-4);
+    --entity-page-padding-bottom: var(--space-4);
+    --entity-page-padding-inline: var(--space-3);
+  }
 }
 
 .card,

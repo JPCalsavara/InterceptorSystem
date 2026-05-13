@@ -1,75 +1,82 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using InterceptorSystem.Domain.Common;
 using InterceptorSystem.Domain.Common.Interfaces;
+using InterceptorSystem.Domain.Common.ValueObjects;
 using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.Modulos.Administrativo.Events;
 
 namespace InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
 
 public class Funcionario : Entity, IAggregateRoot
 {
-    public Guid CondominioId { get; private set; }
+    public Guid? ClienteId { get; private set; }
     public Guid ContratoId { get; private set; }
     public string Nome { get; private set; } = null!;
-    public string Cpf { get; private set; } = null!;
-    public string Celular { get; private set; } = null!;
+    public Cpf Cpf { get; private set; } = null!;
+    public Telefone Celular { get; private set; } = null!;
     public StatusFuncionario StatusFuncionario { get; private set; }
     public TipoEscala TipoEscala { get; private set; }
     public TipoFuncionario TipoFuncionario { get; private set; }
 
-    public Condominio? Condominio { get; private set; }
+    public Cliente? Cliente { get; private set; }
     public Contrato? Contrato { get; private set; }
-    public ICollection<Alocacao> Alocacoes { get; private set; } = new List<Alocacao>();
+    public ICollection<Diaria> Diarias { get; private set; } = new List<Diaria>();
 
-    // FASE 3: Propriedades Calculadas (não persistem no banco)
-    
+    // Phase 4: employee role tags
+    public ICollection<FuncionarioTag> Tags { get; private set; } = new List<FuncionarioTag>();
+
     /// <summary>
-    /// Salário base calculado automaticamente a partir do contrato
+    /// Custo mensal real baseado na soma das Diárias confirmadas do mês corrente + Benefícios.
+    /// Phase 4: substitui SalarioBase calculado pelo contrato.
     /// </summary>
     [NotMapped]
-    public decimal SalarioBase => Contrato?.CalcularSalarioBasePorFuncionario() ?? 0m;
-    
+    public decimal CustoMensalReal
+    {
+        get
+        {
+            var hoje = DateOnly.FromDateTime(DateTime.Today);
+            var valorDiarias = Diarias
+                .Where(d => d.StatusDiaria == StatusDiaria.CONFIRMADA &&
+                            d.Data.Year == hoje.Year &&
+                            d.Data.Month == hoje.Month)
+                .Sum(d => d.ValorDiaria);
+
+            return valorDiarias + (Contrato?.CalcularBeneficiosPorFuncionario() ?? 0m);
+        }
+    }
+
     /// <summary>
-    /// Adicional noturno (aplicado quando trabalha em posto noturno - 22h às 5h conforme CLT).
-    /// Verifica se o funcionário possui alocações confirmadas em postos de trabalho com horário noturno.
-    /// CLT Art. 73: Trabalho noturno urbano é o executado entre 22h de um dia e 5h do dia seguinte.
+    /// Custo mensal estimado: usa o maior ValorDiaria configurado no contrato
+    /// dentre as tags atribuídas ao funcionário × 30 dias + Benefícios.
+    /// Fallback quando não há diárias confirmadas no mês.
     /// </summary>
     [NotMapped]
-    public decimal AdicionalNoturno
+    public decimal CustoMensalEstimado
     {
         get
         {
             if (Contrato == null)
                 return 0m;
 
-            // Verifica se tem alocações confirmadas em postos noturnos
-            var temAlocacaoNoturna = Alocacoes
-                .Any(a => a.StatusAlocacao == StatusAlocacao.CONFIRMADA && 
-                         a.PostoDeTrabalho != null && 
-                         a.PostoDeTrabalho.TemHorarioNoturno);
+            var funcionarioTagIds = Tags
+                .Select(ft => ft.TagId)
+                .ToHashSet();
 
-            return temAlocacaoNoturna 
-                ? Contrato.CalcularAdicionalNoturno(SalarioBase) 
-                : 0m;
+            var valorDiaria = Contrato.Tags
+                .Where(ct => funcionarioTagIds.Contains(ct.TagId))
+                .Select(ct => ct.ValorDiaria)
+                .DefaultIfEmpty(Contrato.ValorDiariaVigilante ?? 0m)
+                .Max();
+
+            return Math.Round(valorDiaria * 30, 2) + Contrato.CalcularBeneficiosPorFuncionario();
         }
     }
-    
-    /// <summary>
-    /// Benefícios mensais calculados automaticamente
-    /// </summary>
-    [NotMapped]
-    public decimal Beneficios => Contrato?.CalcularBeneficiosPorFuncionario() ?? 0m;
-    
-    /// <summary>
-    /// Salário total = Salário Base + Adicional Noturno + Benefícios
-    /// </summary>
-    [NotMapped]
-    public decimal SalarioTotal => SalarioBase + AdicionalNoturno + Beneficios;
 
     protected Funcionario() { }
 
     public Funcionario(
         Guid empresaId,
-        Guid condominioId,
+        Guid? clienteId,
         Guid contratoId,
         string nome,
         string cpf,
@@ -78,26 +85,26 @@ public class Funcionario : Entity, IAggregateRoot
         TipoEscala tipoEscala,
         TipoFuncionario tipoFuncionario)
     {
-        CheckRule(empresaId == Guid.Empty, "O funcionário deve pertencer a uma empresa.");
-        CheckRule(condominioId == Guid.Empty, "O funcionário deve estar vinculado a um condomínio.");
-        CheckRule(contratoId == Guid.Empty, "O funcionário deve estar vinculado a um contrato.");
-        CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
-        CheckRule(!ValidarFormatoCpf(cpf), "CPF deve conter exatamente 11 dígitos numéricos.");
-        CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
-        CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
+        Enforce(empresaId != Guid.Empty, "O funcionário deve pertencer a uma empresa.");
+        Enforce(contratoId != Guid.Empty, "O funcionário deve estar vinculado a um contrato.");
+        Enforce(!string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(cpf), "CPF é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
+        Enforce(Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
+        Enforce(Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
+        Enforce(Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
 
         EmpresaId = empresaId;
-        CondominioId = condominioId;
+        ClienteId = clienteId;
         ContratoId = contratoId;
         Nome = nome;
-        Cpf = ExtrairDigitos(cpf);
-        Celular = celular;
+        Cpf = Cpf.Criar(cpf);
+        Celular = Telefone.Criar(celular);
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
+
+        AddDomainEvent(new FuncionarioCreatedEvent(EmpresaId, Id, ClienteId));
     }
 
     public void AtualizarDados(
@@ -107,34 +114,36 @@ public class Funcionario : Entity, IAggregateRoot
         TipoEscala tipoEscala,
         TipoFuncionario tipoFuncionario)
     {
-        CheckRule(string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
-        CheckRule(string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
-        CheckRule(!Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
-        CheckRule(!Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(nome), "Nome do funcionário é obrigatório.");
+        Enforce(!string.IsNullOrWhiteSpace(celular), "Celular é obrigatório.");
+        Enforce(Enum.IsDefined(statusFuncionario), "Status do funcionário é obrigatório.");
+        Enforce(Enum.IsDefined(tipoEscala), "Tipo de escala é obrigatório.");
+        Enforce(Enum.IsDefined(tipoFuncionario), "Tipo de funcionário é obrigatório.");
 
         Nome = nome;
-        Celular = celular;
+        Celular = Telefone.Criar(celular);
         StatusFuncionario = statusFuncionario;
         TipoEscala = tipoEscala;
         TipoFuncionario = tipoFuncionario;
+
+        AddDomainEvent(new FuncionarioUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
     /// <summary>
-    /// Valida o formato do CPF (11 dígitos numéricos após remoção de máscara).
+    /// Replaces the full tag set. Phase 4.
     /// </summary>
-    private static bool ValidarFormatoCpf(string cpf)
+    public void DefinirTags(IEnumerable<FuncionarioTag> novasTags)
     {
-        if (string.IsNullOrWhiteSpace(cpf)) return false;
-        var digitos = ExtrairDigitos(cpf);
-        return digitos.Length == 11;
+        Tags.Clear();
+        foreach (var tag in novasTags)
+            Tags.Add(tag);
+
+        AddDomainEvent(new FuncionarioUpdatedEvent(EmpresaId, Id, ClienteId));
     }
 
-    /// <summary>
-    /// Extrai apenas os dígitos numéricos de uma string (remove pontos, traços, barras).
-    /// </summary>
-    private static string ExtrairDigitos(string valor)
+    public void PrepararExclusao()
     {
-        return new string(valor.Where(char.IsDigit).ToArray());
+        AddDomainEvent(new FuncionarioDeletedEvent(EmpresaId, Id, ClienteId));
     }
+
 }

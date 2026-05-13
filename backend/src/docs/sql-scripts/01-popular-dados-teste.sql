@@ -12,15 +12,15 @@
 -- ========================================
 
 -- ========================================
--- 1. CONDOMINIOS (3 condomínios de exemplo)
+-- 1. CLIENTES (3 clientes de exemplo)
 -- ========================================
 
-INSERT INTO "Condominios" ("Id", "EmpresaId", "Nome", "Cnpj", "Endereco", "Ativo", "QuantidadeFuncionariosIdeal", "HorarioTrocaTurno", "EmailGestor", "TelefoneEmergencia", "CreatedAt")
+INSERT INTO "Clientes" ("Id", "EmpresaId", "Nome", "Cnpj", "Endereco", "Ativo", "QuantidadeFuncionariosIdeal", "HorarioTrocaTurno", "EmailGestor", "TelefoneEmergencia", "CreatedAt")
 VALUES 
--- Condomínio 1: Residencial Solar
+-- Cliente 1: Residencial Solar
 ('22222222-2222-2222-2222-222222222221', 
  '11111111-1111-1111-1111-111111111111', 
- 'Condomínio Residencial Solar', 
+ 'Cliente Residencial Solar', 
  '12.345.678/0001-90', 
  'Av. Paulista, 1000 - Bela Vista, São Paulo/SP',
  true,
@@ -30,7 +30,7 @@ VALUES
  '(11) 98765-4321',
  NOW()),
 
--- Condomínio 2: Edifício Horizonte
+-- Cliente 2: Edifício Horizonte
 ('22222222-2222-2222-2222-222222222222', 
  '11111111-1111-1111-1111-111111111111', 
  'Edifício Horizonte Verde', 
@@ -43,7 +43,7 @@ VALUES
  '(11) 99876-5432',
  NOW()),
 
--- Condomínio 3: Torres do Parque
+-- Cliente 3: Torres do Parque
 ('22222222-2222-2222-2222-222222222223', 
  '11111111-1111-1111-1111-111111111111', 
  'Torres do Parque Imperial', 
@@ -57,13 +57,13 @@ VALUES
  NOW());
 
 -- ========================================
--- 2. CONTRATOS (1 contrato vigente por condomínio)
+-- 2. CONTRATOS (1 contrato vigente por cliente)
 -- ========================================
 
 INSERT INTO "Contratos" (
-    "Id", "EmpresaId", "CondominioId", "Descricao", 
+    "Id", "EmpresaId", "ClienteId", "Descricao", 
     "ValorTotalMensal", "ValorDiariaCobrada", "PercentualAdicionalNoturno", 
-    "ValorBeneficiosExtrasMensal", "PercentualImpostos", "QuantidadeFuncionarios",
+    "ValorBeneficiosExtrasMensal", "PercentualEncargosProvisoes", "QuantidadeFuncionarios",
     "MargemLucroPercentual", "MargemCoberturaFaltasPercentual",
     "DataInicio", "DataFim", "Status", "CreatedAt"
 )
@@ -123,12 +123,12 @@ VALUES
  NOW());
 
 -- ========================================
--- 3. POSTOS DE TRABALHO (2 turnos por condomínio)
--- FASE 4: QuantidadeIdealFuncionarios agora é calculado do Condomínio
+-- 3. POSTOS DE TRABALHO (2 turnos por cliente)
+-- FASE 4: QuantidadeIdealFuncionarios agora é calculado do Cliente
 -- ========================================
 
-INSERT INTO "PostosDeTrabalho" (
-    "Id", "EmpresaId", "CondominioId", 
+INSERT INTO "Postos" (
+    "Id", "EmpresaId", "ClienteId", 
     "HorarioInicio", "HorarioFim", 
     "PermiteDobrarEscala", "QuantidadeIdealFuncionarios", "CreatedAt"
 )
@@ -179,7 +179,7 @@ VALUES
 
 -- FASE 3: Funcionários (SEM campos de salário - calculados automaticamente do contrato)
 INSERT INTO "Funcionarios" (
-    "Id", "EmpresaId", "CondominioId", "ContratoId",
+    "Id", "EmpresaId", "ClienteId", "ContratoId",
     "Nome", "Cpf", "Celular", 
     "StatusFuncionario", "TipoEscala", "TipoFuncionario", "CreatedAt"
 )
@@ -293,12 +293,12 @@ VALUES
  'Tatiana Cristina Duarte', '567.890.123-48', '+55 11 97654-0015', 'ATIVO', 'DOZE_POR_TRINTA_SEIS', 'CLT');
 
 -- ========================================
--- 5. ALOCAÇÕES (Alocações de exemplo para Janeiro/2026)
+-- 5. ALOCAÇÕES (Diárias de exemplo para Janeiro/2026)
 -- ========================================
 
-INSERT INTO "Alocacoes" (
-    "Id", "EmpresaId", "FuncionarioId", "PostoDeTrabalhoId",
-    "Data", "StatusAlocacao", "TipoAlocacao", "CreatedAt"
+INSERT INTO "Diarias" (
+    "Id", "EmpresaId", "FuncionarioId", "PostoId",
+    "Data", "StatusDiaria", "TipoDiaria", "CreatedAt"
 )
 VALUES 
 -- Residencial Solar - Turno Diurno (6 funcionários)
@@ -325,11 +325,11 @@ BEGIN
     RAISE NOTICE '========================================';
     RAISE NOTICE 'DADOS POPULADOS COM SUCESSO!';
     RAISE NOTICE '========================================';
-    RAISE NOTICE '✅ 3 Condomínios criados';
-    RAISE NOTICE '✅ 3 Contratos vigentes (1 por condomínio)';
-    RAISE NOTICE '✅ 6 Postos de Trabalho (2 turnos por condomínio)';
+    RAISE NOTICE '✅ 3 Clientes criados';
+    RAISE NOTICE '✅ 3 Contratos vigentes (1 por cliente)';
+    RAISE NOTICE '✅ 6 Postos de Trabalho (2 turnos por cliente)';
     RAISE NOTICE '✅ 35 Funcionários (12 + 8 + 15)';
-    RAISE NOTICE '✅ 12 Alocações de exemplo';
+    RAISE NOTICE '✅ 12 Diárias de exemplo';
     RAISE NOTICE '========================================';
     RAISE NOTICE 'FASE 2: Todos funcionários vinculados a contratos vigentes';
     RAISE NOTICE '========================================';

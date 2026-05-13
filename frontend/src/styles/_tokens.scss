@@ -2,7 +2,7 @@
   /* ==========================================================================
      Primitive Colors (Blue Baby Palette)
      ========================================================================== */
-  --blue-50:  #e1f5fe;
+  --blue-50: #e1f5fe;
   --blue-100: #e3f2fd;
   --blue-200: #bbdefb;
   --blue-300: #90caf9;
@@ -26,9 +26,32 @@
   --text-tertiary: #1976d2;
   --border-subtle: #bbdefb;
   --border-strong: #90caf9;
-  
+
   --primary-color: #2196f3;
   --primary-dark: #1976d2;
+
+  /* Semantic action/feedback colors (pastel claro) */
+  --color-success: #4ade80;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #f87171;
+  --color-danger-bg: #fef2f2;
+  --color-info: #60a5fa;
+  --color-info-bg: #eff6ff;
+
+  /* Compatibility aliases used by feature styles */
+  --success-color: var(--color-success);
+  --success-bg: var(--color-success-bg);
+  --warning-color: var(--color-warning);
+  --warning-bg: var(--color-warning-bg);
+  --danger-color: var(--color-danger);
+  --danger-color-dark: #b91c1c;
+  --error-color: var(--color-danger);
+  --error-text: var(--color-danger);
+  --error-bg: var(--color-danger-bg);
+  --error-border: var(--color-danger);
+  --error-ring: rgba(220, 38, 38, 0.18);
 
   --card-bg: #f5faff;
   --input-bg: #ffffff;
@@ -57,7 +80,7 @@
   --sidebar-hover: #bbdefb;
   --sidebar-active-bg: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
   --sidebar-active-text: #ffffff;
-  --sidebar-active-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.4);
+  --sidebar-active-shadow: 0 4px 6px -1px color-mix(in srgb, var(--primary-color) 40%, transparent);
   --sidebar-scrollbar: #90caf9;
   --sidebar-scrollbar-hover: #64b5f6;
 
@@ -72,128 +95,6 @@
   --kanban-info-border: #3b82f6;
   --kanban-neutral-bg: linear-gradient(135deg, var(--surface-muted) 0%, var(--border-subtle) 100%);
   --kanban-neutral-border: #9ca3af;
-
-  /* App Legacy Color Tokens (auto-generated to remove hardcoded hex in component styles) */
-  --app-ref-0284c7: #0284c7;
-  --app-ref-034133: #034133;
-  --app-ref-0369a1: #0369a1;
-  --app-ref-059669: #059669;
-  --app-ref-064e3b: #064e3b;
-  --app-ref-065f46: #065f46;
-  --app-ref-075985: #075985;
-  --app-ref-0891b2: #0891b2;
-  --app-ref-0c3046: #0c3046;
-  --app-ref-0c4a6e: #0c4a6e;
-  --app-ref-0d47a1: #0d47a1;
-  --app-ref-0d8f73: #0d8f73;
-  --app-ref-0d9488: #0d9488;
-  --app-ref-0f766e: #0f766e;
-  --app-ref-10b981: #10b981;
-  --app-ref-111827: #111827;
-  --app-ref-134e4a: #134e4a;
-  --app-ref-135fb0: #135fb0;
-  --app-ref-14532d: #14532d;
-  --app-ref-1565c0: #1565c0;
-  --app-ref-15803d: #15803d;
-  --app-ref-16a34a: #16a34a;
-  --app-ref-1976d2: #1976d2;
-  --app-ref-1d4ed8: #1d4ed8;
-  --app-ref-1e1b4b: #1e1b4b;
-  --app-ref-1e293b: #1e293b;
-  --app-ref-1e3a5f: #1e3a5f;
-  --app-ref-1e3a8a: #1e3a8a;
-  --app-ref-1e40af: #1e40af;
-  --app-ref-2196f3: #2196f3;
-  --app-ref-2563eb: #2563eb;
-  --app-ref-2dd4bf: #2dd4bf;
-  --app-ref-2e1065: #2e1065;
-  --app-ref-2e7d32: #2e7d32;
-  --app-ref-333: #333;
-  --app-ref-34d399: #34d399;
-  --app-ref-3730a3: #3730a3;
-  --app-ref-388e3c: #388e3c;
-  --app-ref-38bdf8: #38bdf8;
-  --app-ref-3b0764: #3b0764;
-  --app-ref-3b82f6: #3b82f6;
-  --app-ref-3e2723: #3e2723;
-  --app-ref-42a5f5: #42a5f5;
-  --app-ref-43a047: #43a047;
-  --app-ref-4a044e: #4a044e;
-  --app-ref-4ade80: #4ade80;
-  --app-ref-4b5563: #4b5563;
-  --app-ref-4caf50: #4caf50;
-  --app-ref-4f46e5: #4f46e5;
-  --app-ref-5a4000: #5a4000;
-  --app-ref-5d4037: #5d4037;
-  --app-ref-5eead4: #5eead4;
-  --app-ref-60a5fa: #60a5fa;
-  --app-ref-667eea: #667eea;
-  --app-ref-6b7280: #6b7280;
-  --app-ref-6d28d9: #6d28d9;
-  --app-ref-6ee7b7: #6ee7b7;
-  --app-ref-713f12: #713f12;
-  --app-ref-764ba2: #764ba2;
-  --app-ref-7c3aed: #7c3aed;
-  --app-ref-7dd3fc: #7dd3fc;
-  --app-ref-818cf8: #818cf8;
-  --app-ref-854d0e: #854d0e;
-  --app-ref-8d6e63: #8d6e63;
-  --app-ref-92400e: #92400e;
-  --app-ref-9333ea: #9333ea;
-  --app-ref-93c5fd: #93c5fd;
-  --app-ref-991b1b: #991b1b;
-  --app-ref-9ca3af: #9ca3af;
-  --app-ref-a1887f: #a1887f;
-  --app-ref-a78bfa: #a78bfa;
-  --app-ref-a7f3d0: #a7f3d0;
-  --app-ref-b45309: #b45309;
-  --app-ref-b71c1c: #b71c1c;
-  --app-ref-b91c1c: #b91c1c;
-  --app-ref-bbdefb: #bbdefb;
-  --app-ref-bfdbfe: #bfdbfe;
-  --app-ref-c026d3: #c026d3;
-  --app-ref-c0c0c0: #c0c0c0;
-  --app-ref-c4b5fd: #c4b5fd;
-  --app-ref-c5f1d8: #c5f1d8;
-  --app-ref-c62828: #c62828;
-  --app-ref-c7d2fe: #c7d2fe;
-  --app-ref-ccc: #ccc;
-  --app-ref-cd7f32: #cd7f32;
-  --app-ref-d1d5db: #d1d5db;
-  --app-ref-d1fae5: #d1fae5;
-  --app-ref-d32f2f: #d32f2f;
-  --app-ref-d97706: #d97706;
-  --app-ref-d9ecff: #d9ecff;
-  --app-ref-dbeafe: #dbeafe;
-  --app-ref-dc2626: #dc2626;
-  --app-ref-e0e7ff: #e0e7ff;
-  --app-ref-e0f2fe: #e0f2fe;
-  --app-ref-e3f2fd: #e3f2fd;
-  --app-ref-e53935: #e53935;
-  --app-ref-e65100: #e65100;
-  --app-ref-e879f9: #e879f9;
-  --app-ref-eab308: #eab308;
-  --app-ref-ef4444: #ef4444;
-  --app-ref-ef5350: #ef5350;
-  --app-ref-f44336: #f44336;
-  --app-ref-f57c00: #f57c00;
-  --app-ref-f59e0b: #f59e0b;
-  --app-ref-f8fafc: #f8fafc;
-  --app-ref-fb8c00: #fb8c00;
-  --app-ref-fbbf24: #fbbf24;
-  --app-ref-fca5a5: #fca5a5;
-  --app-ref-fcd34d: #fcd34d;
-  --app-ref-fde68a: #fde68a;
-  --app-ref-fecaca: #fecaca;
-  --app-ref-fee2e2: #fee2e2;
-  --app-ref-fef08a: #fef08a;
-  --app-ref-fef3c7: #fef3c7;
-  --app-ref-ff9800: #ff9800;
-  --app-ref-ffd6d6: #ffd6d6;
-  --app-ref-ffd700: #ffd700;
-  --app-ref-ffe69c: #ffe69c;
-  --app-ref-fff: #fff;
-  --app-ref-fff3cd: #fff3cd;
 
   /* ==========================================================================
      Shadows, Spacing & Radii
@@ -240,6 +141,29 @@ body.dark-mode {
 
   --primary-color: #58a6ff;
   --primary-dark: #4a8fd8;
+
+  /* Semantic action/feedback colors (dark mode) */
+  --color-success: #34d399;
+  --color-success-bg: #052e22;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #3b2f08;
+  --color-danger: #f87171;
+  --color-danger-bg: #3f1517;
+  --color-info: #60a5fa;
+  --color-info-bg: #13253f;
+
+  /* Compatibility aliases used by feature styles */
+  --success-color: var(--color-success);
+  --success-bg: var(--color-success-bg);
+  --warning-color: var(--color-warning);
+  --warning-bg: var(--color-warning-bg);
+  --danger-color: var(--color-danger);
+  --danger-color-dark: #ef4444;
+  --error-color: var(--color-danger);
+  --error-text: var(--color-danger);
+  --error-bg: var(--color-danger-bg);
+  --error-border: var(--color-danger);
+  --error-ring: rgba(248, 113, 113, 0.24);
 
   --card-bg: #1e2738;
   --input-bg: #0d1117;

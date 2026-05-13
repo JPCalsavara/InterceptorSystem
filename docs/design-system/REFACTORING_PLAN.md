@@ -19,11 +19,11 @@
 | 9 | Perfil | `pages/perfil/perfil.component.ts` | 685 | 0 | 🟡 Med |
 | 10 | Conta | `pages/conta/conta.component.ts` | 375 | 0 | 🟡 Med |
 | 11 | Plano | `pages/plano/plano.component.ts` | 285 | 1 | 🟡 Med |
-| 12 | Condomínios List | `features/condominios/condominios.component.ts` | 66 | 1 | 🟡 Med |
-| 13 | Condomínio Form | `features/condominios/condominio-form/` | 221 | 4 | 🟡 Med |
-| 14 | Condomínio Detail | `features/condominios/condominio-detail/` | 605 | 4 | 🔴 High |
-| 15 | Condomínio Wizard | `features/condominios/condominio-wizard/` | 601 | 10 | 🔴 High |
-| 16 | Condomínio List | `features/condominios/condominio-list/` | 78 | 0 | 🟢 Low |
+| 12 | Clientes List | `features/clientes/clientes.component.ts` | 66 | 1 | 🟡 Med |
+| 13 | Cliente Form | `features/clientes/cliente-form/` | 221 | 4 | 🟡 Med |
+| 14 | Cliente Detail | `features/clientes/cliente-detail/` | 605 | 4 | 🔴 High |
+| 15 | Cliente Wizard | `features/clientes/cliente-wizard/` | 601 | 10 | 🔴 High |
+| 16 | Cliente List | `features/clientes/cliente-list/` | 78 | 0 | 🟢 Low |
 | 17 | Contratos Parent | `features/contratos/contratos.component.ts` | 119 | 2 | 🟡 Med |
 | 18 | Contrato Form | `features/contratos/contrato-form/` | 335 | 0 | 🟡 Med |
 | 19 | Contrato Detail | `features/contratos/contrato-detail/` | 196 | 0 | 🟢 Low |
@@ -36,11 +36,11 @@
 | 26 | Posto Form | `features/postos/posto-form/` | 200 | 0 | 🟡 Med |
 | 27 | Posto Detail | `features/postos/posto-detail/` | 205 | 2 | 🟡 Med |
 | 28 | Posto List | `features/postos/posto-list/` | 157 | 0 | 🟢 Low |
-| 29 | Alocação Form | `features/alocacoes/alocacao-form/` | 232 | 0 | 🟡 Med |
-| 30 | Alocação Batch | `features/alocacoes/alocacao-batch-form/` | 258 | 0 | 🟡 Med |
-| 31 | Alocação Detail | `features/alocacoes/alocacao-detail/` | 158 | 0 | 🟢 Low |
-| 32 | Alocação List | `features/alocacoes/alocacao-list/` | 558 | 0 | 🔴 High |
-| 33 | Alocações View | `shared/components/alocacoes-view/` | 326 | 0 | 🟡 Med |
+| 29 | Diária Form | `features/diarias/diaria-form/` | 232 | 0 | 🟡 Med |
+| 30 | Diária Batch | `features/diarias/diaria-batch-form/` | 258 | 0 | 🟡 Med |
+| 31 | Diária Detail | `features/diarias/diaria-detail/` | 158 | 0 | 🟢 Low |
+| 32 | Diária List | `features/diarias/diaria-list/` | 558 | 0 | 🔴 High |
+| 33 | Diárias View | `shared/components/diarias-view/` | 326 | 0 | 🟡 Med |
 | 34 | Email Banner | `shared/components/email-verification-banner/` | 101 | 1 | 🟢 Low |
 
 **Total: 34 components · ~45 emojis to replace**
@@ -156,19 +156,19 @@ Read docs/design-system/DESIGN_PATTERN.md. Refactor pages/perfil, pages/conta, a
 
 ---
 
-### Batch 6: Condomínios Feature
+### Batch 6: Clientes Feature
 
 **Files:**
-- `features/condominios/condominios.component.ts` (66 lines, 1 emoji)
-- `features/condominios/condominio-list/` (78 lines)
-- `features/condominios/condominio-form/` (221 lines, 4 emojis in error messages)
-- `features/condominios/condominio-detail/` (605 lines, 4 emojis)
-- `features/condominios/condominio-wizard/` (601 lines, 10 emojis)
+- `features/clientes/clientes.component.ts` (66 lines, 1 emoji)
+- `features/clientes/cliente-list/` (78 lines)
+- `features/clientes/cliente-form/` (221 lines, 4 emojis in error messages)
+- `features/clientes/cliente-detail/` (605 lines, 4 emojis)
+- `features/clientes/cliente-wizard/` (601 lines, 10 emojis)
 
 **Tasks:**
 - [ ] Replace 🏢 in parent component title with `building-office` SVG
-- [ ] Replace 4 emojis in condominio-form error messages (⚠️❌) with SVGs or remove
-- [ ] Replace 4 emojis in condominio-detail (📅⚠️🔄👤) with SVGs
+- [ ] Replace 4 emojis in cliente-form error messages (⚠️❌) with SVGs or remove
+- [ ] Replace 4 emojis in cliente-detail (📅⚠️🔄👤) with SVGs
 - [ ] Replace 10 emojis in wizard (🏢📄👥⚠️📤✅❌) with SVGs / remove from console.log
 - [ ] Apply tokens to all styling
 - [ ] Detail page: card pattern + stat tiles
@@ -176,7 +176,7 @@ Read docs/design-system/DESIGN_PATTERN.md. Refactor pages/perfil, pages/conta, a
 
 **Prompt:**
 ```
-Read docs/design-system/DESIGN_PATTERN.md. Refactor all files under features/condominios/: replace all emojis with Heroicons v2 SVGs. condominios.component.ts (🏢→building-office), condominio-form (remove ⚠️❌ from error strings or replace with SVG), condominio-detail (📅⚠️🔄👤→calendar/exclamation/arrow-path/user SVGs), condominio-wizard (🏢📄👥→building/document/user-group SVGs in steps, remove emojis from console.log). Apply all design tokens. Verify ng build passes.
+Read docs/design-system/DESIGN_PATTERN.md. Refactor all files under features/clientes/: replace all emojis with Heroicons v2 SVGs. clientes.component.ts (🏢→building-office), cliente-form (remove ⚠️❌ from error strings or replace with SVG), cliente-detail (📅⚠️🔄👤→calendar/exclamation/arrow-path/user SVGs), cliente-wizard (🏢📄👥→building/document/user-group SVGs in steps, remove emojis from console.log). Apply all design tokens. Verify ng build passes.
 ```
 
 ---
@@ -211,26 +211,26 @@ Read docs/design-system/DESIGN_PATTERN.md. Refactor features/contratos (replace 
 
 ---
 
-### Batch 8: Alocações Feature + Shared Components
+### Batch 8: Diárias Feature + Shared Components
 
 **Files:**
-- `features/alocacoes/alocacao-list/` (558 lines)
-- `features/alocacoes/alocacao-form/` (232 lines)
-- `features/alocacoes/alocacao-batch-form/` (258 lines)
-- `features/alocacoes/alocacao-detail/` (158 lines)
-- `shared/components/alocacoes-view/` (326 lines)
+- `features/diarias/diaria-list/` (558 lines)
+- `features/diarias/diaria-form/` (232 lines)
+- `features/diarias/diaria-batch-form/` (258 lines)
+- `features/diarias/diaria-detail/` (158 lines)
+- `shared/components/diarias-view/` (326 lines)
 - `shared/components/email-verification-banner/` (101 lines, 1 emoji: ⚠️)
 
 **Tasks:**
 - [ ] Replace ⚠️ in email-verification-banner with `exclamation-triangle` SVG
-- [ ] Apply design tokens to alocação list (kanban, calendar, daily views)
-- [ ] Apply badge tokens for alocação status
+- [ ] Apply design tokens to diária list (kanban, calendar, daily views)
+- [ ] Apply badge tokens for diária status
 - [ ] Responsive kanban board
 - [ ] Consistent card/table patterns
 
 **Prompt:**
 ```
-Read docs/design-system/DESIGN_PATTERN.md. Refactor features/alocacoes (all 4 sub-components) and shared/components (alocacoes-view, email-verification-banner). Replace ⚠️ in banner with exclamation-triangle SVG. Apply kanban status colors (--kanban-success/warning/error/info). Apply design tokens to all styling. Badge classes for TipoAlocacao and StatusAlocacao. Verify ng build passes.
+Read docs/design-system/DESIGN_PATTERN.md. Refactor features/diarias (all 4 sub-components) and shared/components (diarias-view, email-verification-banner). Replace ⚠️ in banner with exclamation-triangle SVG. Apply kanban status colors (--kanban-success/warning/error/info). Apply design tokens to all styling. Badge classes for TipoDiaria and StatusDiaria. Verify ng build passes.
 ```
 
 ---

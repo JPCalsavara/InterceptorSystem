@@ -43,11 +43,11 @@ docker exec -i interceptor_db psql -U admin -d interceptor_db < 01-popular-dados
 
 | Entidade | Quantidade | Descrição |
 |----------|------------|-----------|
-| **Condomínios** | 3 | Residencial Solar, Horizonte Verde, Torres do Parque |
-| **Contratos** | 3 | 1 contrato vigente por condomínio (FASE 2) |
-| **Postos de Trabalho** | 6 | 2 turnos (diurno/noturno) por condomínio *(FASE 4)* |
+| **Clientes** | 3 | Residencial Solar, Horizonte Verde, Torres do Parque |
+| **Contratos** | 3 | 1 contrato vigente por cliente (FASE 2) |
+| **Postos de Trabalho** | 6 | 2 turnos (diurno/noturno) por cliente *(FASE 4)* |
 | **Funcionários** | 35 | 12 + 8 + 15 distribuídos nos contratos *(FASE 3)* |
-| **Alocações** | 12 | Alocações de exemplo para Janeiro/2026 |
+| **Diárias** | 12 | Diárias de exemplo para Janeiro/2026 |
 
 ---
 
@@ -61,7 +61,7 @@ docker exec -i interceptor_db psql -U admin -d interceptor_db < 02-fase3-remover
 ---
 
 ### 4️⃣ `03-fase4-simplificar-postos.sql`
-**FASE 4:** Remove `QuantidadeIdealFuncionarios` de PostosDeTrabalho (agora calculado do Condomínio).
+**FASE 4:** Remove `QuantidadeIdealFuncionarios` de Postos (agora calculado do Cliente).
 
 ```bash
 docker exec -i interceptor_db psql -U admin -d interceptor_db < 03-fase4-simplificar-postos.sql
@@ -96,9 +96,9 @@ Para facilitar testes, os scripts usam UUIDs fixos:
 ```
 EmpresaId:                    11111111-1111-1111-1111-111111111111
 
-Condomínio Solar:             22222222-2222-2222-2222-222222222221
-Condomínio Horizonte:         22222222-2222-2222-2222-222222222222
-Condomínio Torres:            22222222-2222-2222-2222-222222222223
+Cliente Solar:             22222222-2222-2222-2222-222222222221
+Cliente Horizonte:         22222222-2222-2222-2222-222222222222
+Cliente Torres:            22222222-2222-2222-2222-222222222223
 
 Contrato Solar:               33333333-3333-3333-3333-333333333331
 Contrato Horizonte:           33333333-3333-3333-3333-333333333332
@@ -106,14 +106,14 @@ Contrato Torres:              33333333-3333-3333-3333-333333333333
 
 Postos de Trabalho:           44444444-4444-4444-4444-444444444441 a 46
 Funcionários:                 55555555-5555-5555-5555-555555555501 a 35
-Alocações:                    66666666-6666-6666-6666-666666666601 a 12
+Diárias:                    66666666-6666-6666-6666-666666666601 a 12
 ```
 
 ---
 
 ## 📊 Dados de Exemplo Detalhados
 
-### **Condomínio Residencial Solar**
+### **Cliente Residencial Solar**
 - **CNPJ:** 12.345.678/0001-90
 - **Endereço:** Av. Paulista, 1000 - São Paulo/SP
 - **Funcionários:** 12
@@ -156,12 +156,12 @@ Alocações:                    66666666-6666-6666-6666-666666666601 a 12
   - `SalarioTotal` = SalarioBase + AdicionalNoturno + Beneficios
 
 **Novidade da FASE 4:**
-- ✅ **QuantidadeIdealFuncionarios calculado automaticamente!** Campos removidos de `PostosDeTrabalho`:
+- ✅ **QuantidadeIdealFuncionarios calculado automaticamente!** Campos removidos de `Postos`:
   - ❌ `QuantidadeIdealFuncionarios` (removido - agora calculado)
   - ❌ `QuantidadeMaximaFuncionarios` (removido)
   - ❌ `NumeroFaltasAcumuladas` (removido)
 - ✅ Nova propriedade calculada:
-  - `QuantidadeIdealFuncionarios` = Condominio.QuantidadeFuncionariosIdeal / TotalPostos
+  - `QuantidadeIdealFuncionarios` = Cliente.QuantidadeFuncionariosIdeal / TotalPostos
 - ✅ Novo campo opcional:
   - `QuantidadeMaximaFaltas` (controle de faltas antes de dobrar escala)
 
@@ -194,7 +194,7 @@ psql -h localhost -U postgres -d interceptor_db -f 00-reset-database.sql
 Para criar seus próprios dados de teste, edite o arquivo `01-popular-dados-teste.sql` e ajuste:
 
 1. UUIDs (mantendo o padrão para facilitar)
-2. Nomes de condomínios e funcionários
+2. Nomes de clientes e funcionários
 3. Valores de contratos
 4. Horários de postos de trabalho
 

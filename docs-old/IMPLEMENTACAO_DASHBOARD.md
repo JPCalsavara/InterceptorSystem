@@ -14,7 +14,7 @@ Criei a **interface principal do sistema** com navegação completa para todos o
 
 **Funcionalidades**:
 
-- ✅ 5 Cards de acesso rápido (Condomínios, Funcionários, Postos, Alocações, Contratos)
+- ✅ 5 Cards de acesso rápido (Clientes, Funcionários, Postos, Diárias, Contratos)
 - ✅ Design responsivo com grid adaptativo
 - ✅ Cores distintas por módulo (identidade visual)
 - ✅ Estatísticas placeholder (preparado para dados reais)
@@ -27,8 +27,8 @@ Criei a **interface principal do sistema** com navegação completa para todos o
 │     InterceptorSystem                       │
 │     Sistema de Gestão de Segurança          │
 ├─────────────────────────────────────────────┤
-│  🏢 Condominios   👥 Funcionários          │
-│  📍 Postos        📅 Alocações             │
+│  🏢 Clientes   👥 Funcionários          │
+│  📍 Postos        📅 Diárias             │
 │  📄 Contratos                               │
 └─────────────────────────────────────────────┘
 ```
@@ -37,11 +37,11 @@ Criei a **interface principal do sistema** com navegação completa para todos o
 
 ## 🗂️ Módulos Implementados (Telas Placeholder)
 
-### 1. **Condomínios** 🏢
+### 1. **Clientes** 🏢
 
-- Rota: `/condominios`
+- Rota: `/clientes`
 - Cor: Azul (#2196F3)
-- [Componente](frontend/src/app/features/condominios/condominios.component.ts)
+- [Componente](frontend/src/app/features/clientes/clientes.component.ts)
 
 ### 2. **Funcionários** 👥
 
@@ -55,12 +55,12 @@ Criei a **interface principal do sistema** com navegação completa para todos o
 - Cor: Laranja (#FF9800)
 - [Componente](frontend/src/app/features/postos/postos.component.ts)
 
-### 4. **Alocações** 📅
+### 4. **Diárias** 📅
 
-- Rota: `/alocacoes`
+- Rota: `/diarias`
 - Cor: Roxo (#9C27B0)
 - **Diferencial**: Toggle Semanal/Mensal
-- [Componente](frontend/src/app/features/alocacoes/alocacoes.component.ts)
+- [Componente](frontend/src/app/features/diarias/diarias.component.ts)
 
 ### 5. **Contratos** 📄
 
@@ -86,7 +86,7 @@ Criei a **interface principal do sistema** com navegação completa para todos o
 - ✅ **Cores Semânticas**: Cada módulo tem identidade visual
 - ✅ **Gradientes**: Visual moderno e profissional
 
-### Alocações (Funcionalidade Extra)
+### Diárias (Funcionalidade Extra)
 
 ```typescript
 viewMode = signal<"semana" | "mes">("semana");
@@ -113,14 +113,14 @@ frontend/src/app/
 │       └── dashboard.component.scss      ✅ Estilos responsivos
 │
 ├── features/
-│   ├── condominios/
-│   │   └── condominios.component.ts      ✅ Placeholder
+│   ├── clientes/
+│   │   └── clientes.component.ts      ✅ Placeholder
 │   ├── funcionarios/
 │   │   └── funcionarios.component.ts     ✅ Placeholder
 │   ├── postos/
 │   │   └── postos.component.ts           ✅ Placeholder
-│   ├── alocacoes/
-│   │   └── alocacoes.component.ts        ✅ Toggle semana/mês
+│   ├── diarias/
+│   │   └── diarias.component.ts        ✅ Toggle semana/mês
 │   └── contratos/
 │       └── contratos.component.ts        ✅ Grid de status
 │
@@ -161,7 +161,7 @@ npm start
 - Área de estatísticas (preparada para dados reais)
 - Botão de ação colorido
 
-**Módulo Alocações** (Destaque):
+**Módulo Diárias** (Destaque):
 
 - Toggle para alternar entre visualização Semanal/Mensal
 - Lista de funcionalidades planejadas:
@@ -179,9 +179,9 @@ npm start
 
 ## 🔄 Próximos Passos
 
-### Fase 2: CRUD de Condomínios
+### Fase 2: CRUD de Clientes
 
-1. Criar serviço completo (`CondominioService`)
+1. Criar serviço completo (`ClienteService`)
 2. Implementar listagem com tabela
 3. Formulário de criação/edição
 4. Modais de confirmação
@@ -190,8 +190,8 @@ npm start
 ### Fase 3: Repetir para outros módulos
 
 - Funcionários (com enums: Status, Tipo, Escala)
-- Postos (relacionamento N:1 com Condomínios)
-- Alocações (validação de regras complexas)
+- Postos (relacionamento N:1 com Clientes)
+- Diárias (validação de regras complexas)
 - Contratos (ciclo de vida + status)
 
 ### Fase 4: Dashboard Real
@@ -202,7 +202,7 @@ Substituir estatísticas placeholder por dados reais:
 // Exemplo futuro
 stats: {
   label: 'Ativos',
-  value: this.condominioService.getCount()
+  value: this.clienteService.getCount()
 }
 ```
 
@@ -277,4 +277,4 @@ Este trabalho completa:
 
 ---
 
-**Pronto para implementar o CRUD completo de Condomínios?** 🚀
+**Pronto para implementar o CRUD completo de Clientes?** 🚀

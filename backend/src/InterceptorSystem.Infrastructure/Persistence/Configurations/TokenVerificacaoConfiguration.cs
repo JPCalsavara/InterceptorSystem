@@ -1,5 +1,5 @@
-using InterceptorSystem.Domain.Modulos.Auth.Entidades;
-using InterceptorSystem.Domain.Modulos.Auth.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -37,7 +37,7 @@ public class TokenVerificacaoConfiguration : IEntityTypeConfiguration<TokenVerif
 
         builder.HasIndex(t => new { t.ContaId, t.Tipo, t.Usado });
 
-        builder.HasOne<Domain.Modulos.Auth.Entidades.Conta>()
+        builder.HasOne<Domain.BoundedContexts.Auth.Aggregates.Conta>()
             .WithMany()
             .HasForeignKey(t => t.ContaId)
             .OnDelete(DeleteBehavior.Cascade);

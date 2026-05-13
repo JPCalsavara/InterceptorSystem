@@ -1,5 +1,4 @@
-using InterceptorSystem.Domain.Modulos.Administrativo.Entidades;
-using InterceptorSystem.Domain.Modulos.Administrativo.Enums;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,38 +11,21 @@ public class AlocacaoConfiguration : IEntityTypeConfiguration<Alocacao>
         builder.ToTable("Alocacoes");
         builder.HasKey(a => a.Id);
 
-        builder.Property(a => a.Data).IsRequired();
-
-        builder.Property(a => a.StatusAlocacao)
-            .IsRequired()
-            .HasConversion(
-                v => v.ToString(),
-                v => Enum.Parse<StatusAlocacao>(v))
-            .HasMaxLength(50);
-
-        builder.Property(a => a.TipoAlocacao)
-            .IsRequired()
-            .HasConversion(
-                v => v.ToString(),
-                v => Enum.Parse<TipoAlocacao>(v))
-            .HasMaxLength(50);
-
         builder.Property(a => a.EmpresaId).IsRequired();
-        builder.Property(a => a.FuncionarioId).IsRequired();
-        builder.Property(a => a.PostoDeTrabalhoId).IsRequired();
+        builder.Property(a => a.HorarioInicio).IsRequired();
+        builder.Property(a => a.HorarioFim).IsRequired();
+        builder.Property(a => a.TipoEscala).IsRequired().HasConversion<string>();
+        builder.Property(a => a.PermiteDobrarEscala).IsRequired();
+        builder.Property(a => a.QuantidadeFuncionarios).IsRequired().HasDefaultValue(1);
 
-        builder.HasOne(a => a.Funcionario)
-            .WithMany(f => f.Alocacoes)
-            .HasForeignKey(a => a.FuncionarioId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(a => a.PostoDeTrabalho)
+        builder.HasOne(a => a.Posto)
             .WithMany(p => p.Alocacoes)
-            .HasForeignKey(a => a.PostoDeTrabalhoId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(a => a.PostoId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(a => a.EmpresaId);
-        builder.HasIndex(a => new { a.FuncionarioId, a.Data });
-        builder.HasIndex(a => new { a.PostoDeTrabalhoId, a.Data });
+        builder.HasOne(a => a.Contrato)
+            .WithMany(c => c.Alocacoes)
+            .HasForeignKey(a => a.ContratoId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

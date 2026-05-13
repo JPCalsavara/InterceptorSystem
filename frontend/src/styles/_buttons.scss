@@ -34,7 +34,7 @@
   &:hover:not(:disabled) {
     background-color: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
   }
 }
 
@@ -48,6 +48,123 @@
     background-color: var(--bg-tertiary);
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
+  }
+}
+
+.btn-danger {
+  @extend .btn-base;
+  background-color: var(--color-danger);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: var(--danger-color-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.26);
+  }
+}
+
+/* Shared action variants (icon and text action buttons) */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn.btn-action {
+  padding: 0.625rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.action-btn.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: var(--space-2);
+}
+
+.btn-icon.btn-view,
+.btn-icon.btn-edit,
+.btn-icon.btn-danger {
+  width: 36px;
+  height: 36px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.action-btn.btn-view,
+.btn-action.btn-view,
+.btn-icon.btn-view {
+  background: var(--primary-color);
+  border-color: var(--primary-dark);
+  color: white;
+}
+
+.action-btn.btn-edit,
+.btn-action.btn-edit,
+.btn-icon.btn-edit {
+  background: var(--color-warning);
+  border-color: #b45309;
+  color: white;
+}
+
+.action-btn.btn-danger,
+.btn-action.btn-danger,
+.btn-icon.btn-danger {
+  background: var(--color-danger);
+  border-color: var(--danger-color-dark);
+  color: white;
+}
+
+.action-btn.btn-view:hover,
+.btn-action.btn-view:hover,
+.btn-icon.btn-view:hover,
+.action-btn.btn-edit:hover,
+.btn-action.btn-edit:hover,
+.btn-icon.btn-edit:hover,
+.action-btn.btn-danger:hover,
+.btn-action.btn-danger:hover,
+.btn-icon.btn-danger:hover {
+  transform: translateY(-2px);
+}
+
+.action-btn.btn-view:hover,
+.btn-action.btn-view:hover,
+.btn-icon.btn-view:hover {
+  box-shadow: 0 4px 8px color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+.action-btn.btn-edit:hover,
+.btn-action.btn-edit:hover,
+.btn-icon.btn-edit:hover {
+  box-shadow: 0 4px 8px rgba(245, 159, 11, 0.35);
+}
+
+.action-btn.btn-danger:hover,
+.btn-action.btn-danger:hover,
+.btn-icon.btn-danger:hover {
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-warning {
+  @extend .btn-base;
+  background-color: var(--color-warning);
+  color: white;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.28);
   }
 }
 
@@ -105,4 +222,77 @@
   padding: var(--space-3) var(--space-6);
   font-size: var(--text-base);
   border-radius: var(--radius-lg);
+}
+
+/* Form page buttons */
+.form-page .btn-primary,
+.form-page .btn-secondary,
+.diaria-form-shell .btn-primary,
+.diaria-form-shell .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    background 0.2s,
+    border-color 0.2s;
+  min-width: 120px;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+.form-page .btn-primary,
+.diaria-form-shell .btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-sm);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.form-page .btn-secondary,
+.diaria-form-shell .btn-secondary {
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  border: 2px solid var(--border-subtle);
+
+  &:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--border-hover);
+  }
+}
+
+.form-page .spinner-small,
+.diaria-form-shell .spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }

@@ -1,18 +1,21 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlocacaoService } from '../../../services/alocacao.service';
+import { PostoService } from '../../../services/posto.service';
+import { ClienteService } from '../../../services/cliente.service';
+import { DiariaService } from '../../../services/diaria.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { CondominioService } from '../../../services/condominio.service';
 import {
   Alocacao,
+  Posto,
+  Cliente,
+  Diaria,
   Funcionario,
-  PostoDeTrabalho,
-  Condominio,
-  StatusAlocacao,
-  TipoAlocacao,
+  TipoEscala,
+  StatusDiaria
 } from '../../../models/index';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-alocacao-detail',
@@ -22,137 +25,100 @@ import {
   styleUrl: './alocacao-detail.component.scss',
 })
 export class AlocacaoDetailComponent implements OnInit {
-  private service = inject(AlocacaoService);
-  private funcionarioService = inject(FuncionarioService);
-  private postoService = inject(PostoDeTrabalhoService);
-  private condominioService = inject(CondominioService);
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private alocacaoService = inject(AlocacaoService);
+  private postoService = inject(PostoService);
+  private clienteService = inject(ClienteService);
+  private diariaService = inject(DiariaService);
+  private funcionarioService = inject(FuncionarioService);
 
   alocacao = signal<Alocacao | null>(null);
-  funcionario = signal<Funcionario | null>(null);
-  posto = signal<PostoDeTrabalho | null>(null);
-  condominio = signal<Condominio | null>(null);
-  loading = signal(false);
+  posto = signal<Posto | null>(null);
+  cliente = signal<Cliente | null>(null);
+  diarias = signal<Diaria[]>([]);
+  funcionarios = signal<Funcionario[]>([]);
+  
+  loading = signal(true);
   error = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
+
+  nextDiarias = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.diarias()
+      .filter(d => new Date(d.data + 'T12:00:00') >= today)
+      .sort((a, b) => a.data.localeCompare(b.data))
+      .slice(0, 10);
+  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.loadAlocacao(id);
+      this.loadData(id);
     }
   }
 
-  loadAlocacao(id: string): void {
+  loadData(id: string): void {
     this.loading.set(true);
-    this.service.getById(id).subscribe({
-      next: (data: Alocacao) => {
-        this.alocacao.set(data);
-        this.loadRelatedData(data);
+    this.alocacaoService.getById(id).subscribe({
+      next: (aloc) => {
+        this.alocacao.set(aloc);
+        this.loadRelatedData(aloc);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar alocação.');
+        this.error.set('Erro ao carregar turno.');
         this.loading.set(false);
-        console.error(err);
-      },
+      }
     });
   }
 
-  loadRelatedData(alocacao: Alocacao): void {
-    // Load funcionario
-    this.funcionarioService.getById(alocacao.funcionarioId).subscribe({
-      next: (func) => this.funcionario.set(func),
-      error: (err) => console.error('Erro ao carregar funcionário:', err),
-    });
-
-    // Load posto
-    this.postoService.getById(alocacao.postoDeTrabalhoId).subscribe({
-      next: (posto) => {
-        this.posto.set(posto);
-        // Load condominio
-        this.condominioService.getById(posto.condominioId).subscribe({
-          next: (cond) => {
-            this.condominio.set(cond);
-            this.loading.set(false);
-          },
-          error: (err) => {
-            console.error('Erro ao carregar condomínio:', err);
-            this.loading.set(false);
-          },
-        });
+  private loadRelatedData(aloc: Alocacao): void {
+    forkJoin({
+      posto: this.postoService.getById(aloc.postoId),
+      diarias: this.diariaService.getAll(),
+      funcionarios: this.funcionarioService.getAll()
+    }).subscribe({
+      next: (res) => {
+        this.posto.set(res.posto);
+        const filteredDiarias = res.diarias.filter(d => d.alocacaoId === aloc.id);
+        this.diarias.set(filteredDiarias);
+        this.funcionarios.set(res.funcionarios);
+        
+        this.clienteService.getById(res.posto.clienteId).subscribe(c => this.cliente.set(c));
+        
+        this.loading.set(false);
       },
       error: (err) => {
-        console.error('Erro ao carregar posto:', err);
+        console.error('Erro ao carregar dados relacionados:', err);
         this.loading.set(false);
-      },
+      }
     });
   }
 
-  formatDate(dateStr: string): string {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
-  }
-
-  getStatusLabel(status: StatusAlocacao): string {
-    const labels: Record<StatusAlocacao, string> = {
-      CONFIRMADA: 'Confirmada',
-      CANCELADA: 'Cancelada',
-      FALTA_REGISTRADA: 'Falta Registrada',
-    };
-    return labels[status] || status;
-  }
-
-  getStatusClass(status: StatusAlocacao): string {
-    const classes: Record<StatusAlocacao, string> = {
-      CONFIRMADA: 'badge-success',
-      CANCELADA: 'badge-inactive',
-      FALTA_REGISTRADA: 'badge-warning',
-    };
-    return classes[status] || '';
-  }
-
-  getTipoLabel(tipo: TipoAlocacao): string {
-    const labels: Record<TipoAlocacao, string> = {
-      REGULAR: 'Regular',
-      DOBRA_PROGRAMADA: 'Dobra Programada',
-      SUBSTITUICAO: 'Substituição',
+  getEscalaLabel(tipo: TipoEscala): string {
+    const labels = {
+      [TipoEscala.DOZE_POR_TRINTA_SEIS]: '12x36',
+      [TipoEscala.SEMANAL_COMERCIAL]: 'Comercial',
+      [TipoEscala.ALCALA_8H]: '8 Horas',
+      [TipoEscala.FOLGUISTA]: 'Folguista',
+      [TipoEscala.OITO_HORAS_SEIS_POR_DOIS]: '8h (6x2)',
     };
     return labels[tipo] || tipo;
   }
 
-  getTipoClass(tipo: TipoAlocacao): string {
-    const classes: Record<TipoAlocacao, string> = {
-      REGULAR: 'badge-info',
-      DOBRA_PROGRAMADA: 'badge-warning',
-      SUBSTITUICAO: 'badge-secondary',
+  getFuncionarioNome(id: string): string {
+    return this.funcionarios().find(f => f.id === id)?.nome || '—';
+  }
+
+  getStatusClass(status: StatusDiaria): string {
+    const map = {
+      [StatusDiaria.CONFIRMADA]: 'status-confirmada',
+      [StatusDiaria.CANCELADA]: 'status-cancelada',
+      [StatusDiaria.FALTA_REGISTRADA]: 'status-falta'
     };
-    return classes[tipo] || '';
+    return map[status] || '';
   }
 
-  confirmDelete(): void {
-    const aloc = this.alocacao();
-    if (!aloc) return;
-
-    if (confirm(`Deseja excluir a alocação do dia ${this.formatDate(aloc.data)}?`)) {
-      this.service.delete(aloc.id).subscribe({
-        next: () => {
-          this.router.navigate(['/alocacoes']);
-        },
-        error: (err) => {
-          this.error.set('Erro ao excluir alocação.');
-          console.error(err);
-        },
-      });
-    }
-  }
-
-  dismissError(): void {
-    this.error.set(null);
-  }
-
-  dismissSuccess(): void {
-    this.successMessage.set(null);
+  formatDate(date: string): string {
+    return new Date(date + 'T12:00:00').toLocaleDateString('pt-BR');
   }
 }
-

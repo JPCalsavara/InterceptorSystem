@@ -19,31 +19,39 @@ import { LayoutStateService } from '../services/layout-state.service';
   imports: [CommonModule, RouterLink],
   template: `
     <nav class="navbar">
-      <!-- Hamburger: mobile only, opens left sidebar drawer -->
-      <button
-        class="menu-toggle"
-        (click)="toggleLeftDrawer()"
-        [attr.aria-label]="layoutState.leftDrawerOpen() ? 'Fechar menu' : 'Abrir menu'"
-      >
-        @if (layoutState.leftDrawerOpen()) {
-          <!-- x-mark -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
-        } @else {
-          <!-- bars-3 -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        }
-      </button>
+      <div class="navbar-left">
+        <!-- Sidebar toggle: mobile opens drawer, desktop collapses sidebar -->
+        <button
+          class="menu-toggle"
+          (click)="handleSidebarToggle()"
+          [attr.aria-label]="
+            isMobileView()
+              ? layoutState.leftDrawerOpen()
+                ? 'Fechar menu lateral'
+                : 'Abrir menu lateral'
+              : layoutState.sidebarCollapsed()
+                ? 'Expandir sidebar'
+                : 'Colapsar sidebar'
+          "
+        >
+          @if (isMobileView() && layoutState.leftDrawerOpen()) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          }
+        </button>
 
-      <div class="navbar-brand">
-        <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img" />
+        <div class="navbar-brand">
+          <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img" />
+        </div>
       </div>
 
       <div class="navbar-actions">
@@ -78,7 +86,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         <!-- Profile -->
         <div class="navbar-profile">
           <!-- Desktop trigger: opens dropdown -->
-          <div class="profile-trigger desktop-trigger" (click)="toggleDropdown()">
+          <div class="profile-trigger desktop-trigger" (click)="toggleDropdown()" data-testid="user-menu-button">
             <div class="avatar">
               <span>{{ getInitials() }}</span>
             </div>
@@ -145,7 +153,7 @@ import { LayoutStateService } from '../services/layout-state.service';
                 Plano
               </a>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item danger" (click)="logout()">
+              <button class="dropdown-item danger" (click)="logout()" data-testid="logout-button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path
                     stroke-linecap="round"
@@ -255,8 +263,14 @@ import { LayoutStateService } from '../services/layout-state.service';
           border-color 0.3s ease;
       }
 
+      .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
       .menu-toggle {
-        display: none;
+        display: flex;
         width: 40px;
         height: 40px;
         border-radius: var(--radius-full);
@@ -350,7 +364,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         height: 40px;
         flex-shrink: 0;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -569,10 +583,6 @@ import { LayoutStateService } from '../services/layout-state.service';
           padding: 0 var(--space-4);
         }
 
-        .menu-toggle {
-          display: flex;
-        }
-
         .desktop-trigger {
           display: none;
         }
@@ -656,6 +666,29 @@ export class NavbarComponent implements OnInit {
 
   toggleLeftDrawer(): void {
     this.layoutState.leftDrawerOpen.update((v) => !v);
+  }
+
+  handleSidebarToggle(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      this.layoutState.toggleSidebarCollapsed();
+      return;
+    }
+
+    const mobileViewport = window.matchMedia('(max-width: 768px)').matches;
+    if (mobileViewport) {
+      this.toggleLeftDrawer();
+      return;
+    }
+
+    this.layoutState.toggleSidebarCollapsed();
+  }
+
+  isMobileView(): boolean {
+    if (!isPlatformBrowser(this.platformId)) {
+      return false;
+    }
+
+    return window.matchMedia('(max-width: 768px)').matches;
   }
 
   toggleRightDrawer(): void {

@@ -1,0 +1,212 @@
+.form-container-embedded {
+  padding: 1.5rem;
+}
+
+// Info Box
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--color-info-bg);
+  border: 1px solid color-mix(in srgb, var(--color-info) 30%, transparent);
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-info);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+:host-context(.dark-mode) {
+  .info-box {
+    background: color-mix(in srgb, var(--color-info) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-info) 42%, transparent);
+
+    p {
+      color: var(--text-primary);
+    }
+  }
+
+  .help-text.warning {
+    color: var(--warning-color);
+  }
+
+  // Keep form control surfaces consistent with dark theme.
+  .form-control {
+    background: var(--input-bg) !important;
+    color: #ffffff !important;
+    border-color: var(--border-color);
+    color-scheme: dark;
+    caret-color: #ffffff;
+  }
+
+  .form-card {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  }
+
+  .form-actions {
+    border-top-color: var(--border-color);
+  }
+
+  .form-control[type='date']::-webkit-datetime-edit,
+  .form-control[type='time']::-webkit-datetime-edit,
+  .form-control[type='date']::-webkit-datetime-edit-text,
+  .form-control[type='time']::-webkit-datetime-edit-text,
+  .form-control[type='date']::-webkit-datetime-edit-month-field,
+  .form-control[type='date']::-webkit-datetime-edit-day-field,
+  .form-control[type='date']::-webkit-datetime-edit-year-field,
+  .form-control[type='time']::-webkit-datetime-edit-hour-field,
+  .form-control[type='time']::-webkit-datetime-edit-minute-field {
+    color: #ffffff !important;
+  }
+
+  // Improve contrast for date/time native picker icons on dark backgrounds.
+  .form-control[type='date']::-webkit-calendar-picker-indicator,
+  .form-control[type='time']::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1) !important;
+    opacity: 1;
+  }
+
+  // Use a lighter chevron in dark mode for select controls.
+  select.form-control {
+    background-color: var(--input-bg) !important;
+    color: #ffffff !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.7' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+
+    option {
+      background: var(--card-bg);
+      color: #ffffff !important;
+    }
+  }
+
+  // Field icons become clearer against darker form surfaces.
+  .form-label svg {
+    color: var(--color-info);
+  }
+}
+
+// Alert
+// Form Card
+.form-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+}
+
+// Form Group
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+
+  svg {
+    color: var(--primary-color);
+    flex-shrink: 0;
+  }
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #000000 !important;
+  background: var(--input-bg);
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 10%, transparent);
+  }
+
+  &.invalid {
+    border-color: var(--error-border);
+
+    &:focus {
+      box-shadow: 0 0 0 3px var(--error-ring);
+    }
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+  }
+
+  &[readonly] {
+    background: var(--bg-secondary);
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+}
+
+select.form-control {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.help-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+
+  &.warning {
+    color: var(--warning-color);
+    font-weight: 500;
+  }
+}
+
+.error-message {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--error-text);
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+
+  @media (max-width: 640px) {
+    flex-direction: column-reverse;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,6 +1,6 @@
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Application.Modulos.Auth.DTOs;
-using InterceptorSystem.Application.Modulos.Auth.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Auth.DTOs;
+using InterceptorSystem.Application.BoundedContexts.Auth.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -22,7 +22,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("registrar")]
-    public async Task<IActionResult> Registrar([FromBody] RegistrarContaDtoInput input)
+    [ProducesResponseType(typeof(AuthResultDtoOutput), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Registrar([FromBody] RegistrarContaDtoInput input, CancellationToken ct = default)
     {
         try
         {
@@ -36,7 +38,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDtoInput input)
+    [ProducesResponseType(typeof(AuthResultDtoOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Login([FromBody] LoginDtoInput input, CancellationToken ct = default)
     {
         try
         {
@@ -50,7 +54,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("email/confirmar")]
-    public async Task<IActionResult> ConfirmarEmail([FromBody] ConfirmarTokenDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ConfirmarEmail([FromBody] ConfirmarTokenDtoInput input, CancellationToken ct = default)
     {
         try
         {
@@ -69,7 +76,10 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("email/reenviar")]
-    public async Task<IActionResult> ReenviarVerificacaoEmail()
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReenviarVerificacaoEmail(CancellationToken ct = default)
     {
         var empresaId = _currentTenantService.EmpresaId;
         if (empresaId == null)
@@ -91,14 +101,18 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("senha/solicitar-reset")]
-    public async Task<IActionResult> SolicitarResetSenha([FromBody] SolicitarResetSenhaDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> SolicitarResetSenha([FromBody] SolicitarResetSenhaDtoInput input, CancellationToken ct = default)
     {
         await _authAppService.SolicitarResetSenhaAsync(input);
         return Ok(new { mensagem = "Se o e-mail estiver cadastrado, você receberá as instruções em breve." });
     }
 
     [HttpPost("senha/confirmar-reset")]
-    public async Task<IActionResult> ConfirmarResetSenha([FromBody] ConfirmarResetSenhaDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ConfirmarResetSenha([FromBody] ConfirmarResetSenhaDtoInput input, CancellationToken ct = default)
     {
         try
         {
@@ -117,7 +131,10 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("email/solicitar-alteracao")]
-    public async Task<IActionResult> SolicitarAlteracaoEmail([FromBody] SolicitarAlteracaoEmailDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SolicitarAlteracaoEmail([FromBody] SolicitarAlteracaoEmailDtoInput input, CancellationToken ct = default)
     {
         var empresaId = _currentTenantService.EmpresaId;
         if (empresaId == null)
@@ -139,7 +156,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("email/confirmar-alteracao")]
-    public async Task<IActionResult> ConfirmarAlteracaoEmail([FromBody] ConfirmarTokenDtoInput input)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ConfirmarAlteracaoEmail([FromBody] ConfirmarTokenDtoInput input, CancellationToken ct = default)
     {
         try
         {

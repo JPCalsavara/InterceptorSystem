@@ -11,17 +11,17 @@ The `funcionario-detail` page already shows allocations in a table (Date, Posto,
 
 #### [DONE] [funcionario-detail.component.ts](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/funcionarios/funcionario-detail/funcionario-detail.component.ts)
 - ✅ Added `selectedMonth` signal (default: current month/year)
-- ✅ Added `alocacoesFiltradas` computed that filters by `selectedMonth`
-- ✅ Added `calcularValorAlocacao(alocacao)` method — applies weekend bonuses (+100% Sun, +50% Sat) + night shift bonus
-- ✅ Updated `salarioSimulado` to use `selectedMonth` via `alocacoesFiltradas()` instead of hardcoded current month
+- ✅ Added `diariasFiltradas` computed that filters by `selectedMonth`
+- ✅ Added `calcularValorDiaria(diaria)` method — applies weekend bonuses (+100% Sun, +50% Sat) + night shift bonus
+- ✅ Updated `salarioSimulado` to use `selectedMonth` via `diariasFiltradas()` instead of hardcoded current month
 - ✅ Added `totalGanhoMes` computed = sum of all confirmed allocation values for selected month
 - ✅ Added `previousMonth()`, `nextMonth()`, `currentMonth()`, `getSelectedMonthLabel()` navigation methods
 - ✅ Added `formatCurrency()` and `formatDate()` helpers
 
 #### [DONE] [funcionario-detail.component.html](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/funcionarios/funcionario-detail/funcionario-detail.component.html)
 - ✅ Added month selector (prev/next arrows + month/year label + "Hoje" button) above allocation table
-- ✅ Added "Valor" column to allocation table showing `calcularValorAlocacao()` for confirmed allocations
-- ✅ Updated table to iterate `alocacoesFiltradas()` instead of `alocacoes()`
+- ✅ Added "Valor" column to allocation table showing `calcularValorDiaria()` for confirmed allocations
+- ✅ Updated table to iterate `diariasFiltradas()` instead of `diarias()`
 - ✅ Added month total row (`tfoot`) at the bottom of the table with `totalGanhoMes()`
 - ✅ Added empty state message when no allocations found for selected month
 - ✅ Rows styled with `.row-falta` / `.row-cancelada` for visual differentiation
@@ -43,18 +43,18 @@ Adding a **"Dia de Partida"** (`diaPartida`) field allows the manager to toggle 
 
 ### Implemented Changes
 
-#### [DONE] [alocacao-batch-form.component.ts](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/alocacoes/alocacao-batch-form/alocacao-batch-form.component.ts)
+#### [DONE] [diaria-batch-form.component.ts](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/diarias/diaria-batch-form/diaria-batch-form.component.ts)
 - ✅ Added `diaPartida` form control: `'TRABALHA'` (default) or `'FOLGA'`
 - ✅ Added `selectedFuncionarioEscala` signal to track selected employee's scale type
 - ✅ Added `setupFuncionarioChange()` to update scale and reset `diaPartida` on employee change
-- ✅ Updated `generateAlocacoesPreview()`: `let trabalha = formValue.diaPartida !== 'FOLGA'`
+- ✅ Updated `generateDiariasPreview()`: `let trabalha = formValue.diaPartida !== 'FOLGA'`
 
-#### [DONE] [alocacao-batch-form.component.html](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/alocacoes/alocacao-batch-form/alocacao-batch-form.component.html)
+#### [DONE] [diaria-batch-form.component.html](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/diarias/diaria-batch-form/diaria-batch-form.component.html)
 - ✅ Added radio buttons: "Começa Trabalhando" 🔵 / "Começa de Folga" ⚪
 - ✅ Only visible when `selectedFuncionarioEscala() === 'DOZE_POR_TRINTA_SEIS'`
 - ✅ Added helper hint text explaining the purpose of the field
 
-#### [DONE] [alocacao-batch-form.component.scss](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/alocacoes/alocacao-batch-form/alocacao-batch-form.component.scss)
+#### [DONE] [diaria-batch-form.component.scss](file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/diarias/diaria-batch-form/diaria-batch-form.component.scss)
 - ✅ Added `.field-hint`, `.radio-group`, `.radio-option` styles with active state highlighting
 
 ## Verification

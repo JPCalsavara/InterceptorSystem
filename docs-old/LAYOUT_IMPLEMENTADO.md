@@ -41,11 +41,11 @@ Implementei um layout **enterprise-grade** com navbar superior e sidebar lateral
 **Links de Navegação**:
 
 1. 📊 Resumo (Dashboard)
-2. 🏢 Condomínios
+2. 🏢 Clientes
 3. 📄 Contratos
 4. 👥 Funcionários
 5. 📍 Postos de Trabalho
-6. 📅 Alocações
+6. 📅 Diárias
 
 **Funcionalidades**:
 
@@ -188,7 +188,7 @@ getInitials(); // Retorna iniciais (ex: "EI")
 ```typescript
 navItems = [
   { label: "Resumo", route: "/", icon: "📊" },
-  { label: "Condomínios", route: "/condominios", icon: "🏢" },
+  { label: "Clientes", route: "/clientes", icon: "🏢" },
   // ... outros links
 ];
 ```
@@ -227,7 +227,7 @@ navItems = [
    - Dropdown de notificações ao lado do perfil
 
 4. **Breadcrumbs**
-   - Adicionar abaixo da navbar: "Resumo > Condomínios > Editar"
+   - Adicionar abaixo da navbar: "Resumo > Clientes > Editar"
 
 ---
 

@@ -34,21 +34,21 @@ frontend/
 │   │   │   │   ├── form-field-error/
 │   │   │   │   └── loading-spinner/
 │   │   │   ├── models/              # Interfaces TypeScript (DTOs)
-│   │   │   │   ├── condominio.model.ts
+│   │   │   │   ├── cliente.model.ts
 │   │   │   │   ├── funcionario.model.ts
 │   │   │   │   └── api-response.model.ts
 │   │   │   └── pipes/
 │   │   │       └── cpf.pipe.ts
 │   │   │
 │   │   ├── features/                # Módulos de negócio
-│   │   │   ├── condominios/
+│   │   │   ├── clientes/
 │   │   │   │   ├── pages/
-│   │   │   │   │   ├── condominio-list/
-│   │   │   │   │   ├── condominio-form/
-│   │   │   │   │   └── condominio-detail/
+│   │   │   │   │   ├── cliente-list/
+│   │   │   │   │   ├── cliente-form/
+│   │   │   │   │   └── cliente-detail/
 │   │   │   │   ├── services/
-│   │   │   │   │   └── condominio.service.ts
-│   │   │   │   └── condominio.routes.ts
+│   │   │   │   │   └── cliente.service.ts
+│   │   │   │   └── cliente.routes.ts
 │   │   │   │
 │   │   │   ├── funcionarios/
 │   │   │   │   ├── pages/
@@ -56,7 +56,7 @@ frontend/
 │   │   │   │   └── funcionarios.routes.ts
 │   │   │   │
 │   │   │   ├── postos/
-│   │   │   ├── alocacoes/
+│   │   │   ├── diarias/
 │   │   │   └── contratos/
 │   │   │
 │   │   ├── app.config.ts            # Providers (Standalone API)
@@ -71,7 +71,7 @@ frontend/
 │
 ├── cypress/                         # Testes E2E
 │   ├── e2e/
-│   │   ├── condominios.cy.ts
+│   │   ├── clientes.cy.ts
 │   │   └── auth.cy.ts
 │   └── support/
 │
@@ -184,10 +184,10 @@ app.UseHttpsRedirection();
 
 ### 2.1 Criar Models (TypeScript) baseados nos DTOs .NET
 
-**src/app/shared/models/condominio.model.ts**
+**src/app/shared/models/cliente.model.ts**
 
 ```typescript
-export interface Condominio {
+export interface Cliente {
   id: string;
   nome: string;
   cnpj: string;
@@ -198,7 +198,7 @@ export interface Condominio {
   dataCriacao: Date;
 }
 
-export interface CreateCondominioDto {
+export interface CreateClienteDto {
   nome: string;
   cnpj: string;
   endereco: string;
@@ -206,7 +206,7 @@ export interface CreateCondominioDto {
   email: string;
 }
 
-export interface UpdateCondominioDto extends CreateCondominioDto {
+export interface UpdateClienteDto extends CreateClienteDto {
   id: string;
 }
 ```
@@ -320,11 +320,11 @@ export const appConfig: ApplicationConfig = {
 
 ---
 
-## 📅 FASE 3: Primeiro Módulo - Condominios (Dias 5-7)
+## 📅 FASE 3: Primeiro Módulo - Clientes (Dias 5-7)
 
 ### 3.1 Criar Service com RxJS
 
-**src/app/features/condominios/services/condominio.service.ts**
+**src/app/features/clientes/services/cliente.service.ts**
 
 ```typescript
 import { Injectable, inject } from "@angular/core";
@@ -332,29 +332,29 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment } from "@environments/environment";
 import {
-  Condominio,
-  CreateCondominioDto,
-} from "@shared/models/condominio.model";
+  Cliente,
+  CreateClienteDto,
+} from "@shared/models/cliente.model";
 
 @Injectable({ providedIn: "root" })
-export class CondominioService {
+export class ClienteService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/condominios`;
+  private apiUrl = `${environment.apiUrl}/api/clientes`;
 
-  getAll(): Observable<Condominio[]> {
-    return this.http.get<Condominio[]>(this.apiUrl);
+  getAll(): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(this.apiUrl);
   }
 
-  getById(id: string): Observable<Condominio> {
-    return this.http.get<Condominio>(`${this.apiUrl}/${id}`);
+  getById(id: string): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}/${id}`);
   }
 
-  create(dto: CreateCondominioDto): Observable<Condominio> {
-    return this.http.post<Condominio>(this.apiUrl, dto);
+  create(dto: CreateClienteDto): Observable<Cliente> {
+    return this.http.post<Cliente>(this.apiUrl, dto);
   }
 
-  update(id: string, dto: CreateCondominioDto): Observable<Condominio> {
-    return this.http.put<Condominio>(`${this.apiUrl}/${id}`, dto);
+  update(id: string, dto: CreateClienteDto): Observable<Cliente> {
+    return this.http.put<Cliente>(`${this.apiUrl}/${id}`, dto);
   }
 
   delete(id: string): Observable<void> {
@@ -365,24 +365,24 @@ export class CondominioService {
 
 ### 3.2 Criar Componente de Listagem com Signals
 
-**src/app/features/condominios/pages/condominio-list/condominio-list.component.ts**
+**src/app/features/clientes/pages/cliente-list/cliente-list.component.ts**
 
 ```typescript
 import { Component, inject, signal, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { CondominioService } from "../../services/condominio.service";
-import { Condominio } from "@shared/models/condominio.model";
+import { ClienteService } from "../../services/cliente.service";
+import { Cliente } from "@shared/models/cliente.model";
 
 @Component({
-  selector: "app-condominio-list",
+  selector: "app-cliente-list",
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
     <div class="container">
-      <h1>Condomínios</h1>
+      <h1>Clientes</h1>
 
-      <button routerLink="/condominios/novo">Novo Condomínio</button>
+      <button routerLink="/clientes/novo">Novo Cliente</button>
 
       @if (loading()) {
       <p>Carregando...</p>
@@ -399,14 +399,14 @@ import { Condominio } from "@shared/models/condominio.model";
           </tr>
         </thead>
         <tbody>
-          @for (cond of condominios(); track cond.id) {
+          @for (cond of clientes(); track cond.id) {
           <tr>
             <td>{{ cond.nome }}</td>
             <td>{{ cond.cnpj }}</td>
             <td>{{ cond.telefone }}</td>
             <td>
-              <button [routerLink]="['/condominios', cond.id]">Ver</button>
-              <button [routerLink]="['/condominios', cond.id, 'editar']">
+              <button [routerLink]="['/clientes', cond.id]">Ver</button>
+              <button [routerLink]="['/clientes', cond.id, 'editar']">
                 Editar
               </button>
               <button (click)="delete(cond.id)">Excluir</button>
@@ -419,26 +419,26 @@ import { Condominio } from "@shared/models/condominio.model";
     </div>
   `,
 })
-export class CondominioListComponent implements OnInit {
-  private service = inject(CondominioService);
+export class ClienteListComponent implements OnInit {
+  private service = inject(ClienteService);
 
-  condominios = signal<Condominio[]>([]);
+  clientes = signal<Cliente[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadCondominios();
+    this.loadClientes();
   }
 
-  loadCondominios(): void {
+  loadClientes(): void {
     this.loading.set(true);
     this.service.getAll().subscribe({
       next: (data) => {
-        this.condominios.set(data);
+        this.clientes.set(data);
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set("Erro ao carregar condomínios");
+        this.error.set("Erro ao carregar clientes");
         this.loading.set(false);
       },
     });
@@ -447,7 +447,7 @@ export class CondominioListComponent implements OnInit {
   delete(id: string): void {
     if (confirm("Deseja realmente excluir?")) {
       this.service.delete(id).subscribe({
-        next: () => this.loadCondominios(),
+        next: () => this.loadClientes(),
         error: (err) => this.error.set("Erro ao excluir"),
       });
     }
@@ -457,7 +457,7 @@ export class CondominioListComponent implements OnInit {
 
 ### 3.3 Criar Formulário Reativo
 
-**src/app/features/condominios/pages/condominio-form/condominio-form.component.ts**
+**src/app/features/clientes/pages/cliente-form/cliente-form.component.ts**
 
 ```typescript
 import { Component, inject, OnInit } from "@angular/core";
@@ -469,15 +469,15 @@ import {
   Validators,
 } from "@angular/forms";
 import { Router, ActivatedRoute } from "@angular/router";
-import { CondominioService } from "../../services/condominio.service";
+import { ClienteService } from "../../services/cliente.service";
 
 @Component({
-  selector: "app-condominio-form",
+  selector: "app-cliente-form",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="container">
-      <h1>{{ isEdit ? "Editar" : "Novo" }} Condomínio</h1>
+      <h1>{{ isEdit ? "Editar" : "Novo" }} Cliente</h1>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="form-field">
@@ -514,23 +514,23 @@ import { CondominioService } from "../../services/condominio.service";
     </div>
   `,
 })
-export class CondominioFormComponent implements OnInit {
+export class ClienteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private service = inject(CondominioService);
+  private service = inject(ClienteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   form!: FormGroup;
   isEdit = false;
-  condominioId?: string;
+  clienteId?: string;
 
   ngOnInit(): void {
     this.buildForm();
-    this.condominioId = this.route.snapshot.paramMap.get("id") || undefined;
+    this.clienteId = this.route.snapshot.paramMap.get("id") || undefined;
 
-    if (this.condominioId) {
+    if (this.clienteId) {
       this.isEdit = true;
-      this.loadCondominio(this.condominioId);
+      this.loadCliente(this.clienteId);
     }
   }
 
@@ -544,7 +544,7 @@ export class CondominioFormComponent implements OnInit {
     });
   }
 
-  loadCondominio(id: string): void {
+  loadCliente(id: string): void {
     this.service.getById(id).subscribe({
       next: (data) => this.form.patchValue(data),
     });
@@ -553,18 +553,18 @@ export class CondominioFormComponent implements OnInit {
   onSubmit(): void {
     if (this.form.valid) {
       const request = this.isEdit
-        ? this.service.update(this.condominioId!, this.form.value)
+        ? this.service.update(this.clienteId!, this.form.value)
         : this.service.create(this.form.value);
 
       request.subscribe({
-        next: () => this.router.navigate(["/condominios"]),
+        next: () => this.router.navigate(["/clientes"]),
         error: (err) => alert("Erro ao salvar"),
       });
     }
   }
 
   cancel(): void {
-    this.router.navigate(["/condominios"]);
+    this.router.navigate(["/clientes"]);
   }
 }
 ```
@@ -575,7 +575,7 @@ export class CondominioFormComponent implements OnInit {
 
 ### 4.1 Testar Service com Mocks
 
-**condominio.service.spec.ts**
+**cliente.service.spec.ts**
 
 ```typescript
 import { TestBed } from "@angular/core/testing";
@@ -583,19 +583,19 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from "@angular/common/http/testing";
-import { CondominioService } from "./condominio.service";
-import { Condominio } from "@shared/models/condominio.model";
+import { ClienteService } from "./cliente.service";
+import { Cliente } from "@shared/models/cliente.model";
 
-describe("CondominioService", () => {
-  let service: CondominioService;
+describe("ClienteService", () => {
+  let service: ClienteService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [CondominioService],
+      providers: [ClienteService],
     });
-    service = TestBed.inject(CondominioService);
+    service = TestBed.inject(ClienteService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -603,11 +603,11 @@ describe("CondominioService", () => {
     httpMock.verify();
   });
 
-  it("deve listar condominios", () => {
-    const mockCondominios: Condominio[] = [
+  it("deve listar clientes", () => {
+    const mockClientes: Cliente[] = [
       {
         id: "1",
-        nome: "Condomínio Teste",
+        nome: "Cliente Teste",
         cnpj: "12345678000190",
         endereco: "Rua Teste, 123",
         telefone: "11999999999",
@@ -617,36 +617,36 @@ describe("CondominioService", () => {
       },
     ];
 
-    service.getAll().subscribe((condominios) => {
-      expect(condominios.length).toBe(1);
-      expect(condominios[0].nome).toBe("Condomínio Teste");
+    service.getAll().subscribe((clientes) => {
+      expect(clientes.length).toBe(1);
+      expect(clientes[0].nome).toBe("Cliente Teste");
     });
 
-    const req = httpMock.expectOne("http://localhost:5000/api/condominios");
+    const req = httpMock.expectOne("http://localhost:5000/api/clientes");
     expect(req.request.method).toBe("GET");
-    req.flush(mockCondominios);
+    req.flush(mockClientes);
   });
 
-  it("deve criar condominio", () => {
-    const newCondominio = {
-      nome: "Novo Condomínio",
+  it("deve criar cliente", () => {
+    const newCliente = {
+      nome: "Novo Cliente",
       cnpj: "12345678000190",
       endereco: "Rua Nova, 456",
       telefone: "11888888888",
       email: "novo@teste.com",
     };
 
-    service.create(newCondominio).subscribe((result) => {
+    service.create(newCliente).subscribe((result) => {
       expect(result.id).toBeDefined();
-      expect(result.nome).toBe("Novo Condomínio");
+      expect(result.nome).toBe("Novo Cliente");
     });
 
-    const req = httpMock.expectOne("http://localhost:5000/api/condominios");
+    const req = httpMock.expectOne("http://localhost:5000/api/clientes");
     expect(req.request.method).toBe("POST");
-    expect(req.request.body).toEqual(newCondominio);
+    expect(req.request.body).toEqual(newCliente);
     req.flush({
       id: "2",
-      ...newCondominio,
+      ...newCliente,
       empresaId: "1",
       dataCriacao: new Date(),
     });
@@ -656,18 +656,18 @@ describe("CondominioService", () => {
 
 ### 4.2 Testar Componente
 
-**condominio-list.component.spec.ts**
+**cliente-list.component.spec.ts**
 
 ```typescript
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { of, throwError } from "rxjs";
-import { CondominioListComponent } from "./condominio-list.component";
-import { CondominioService } from "../../services/condominio.service";
+import { ClienteListComponent } from "./cliente-list.component";
+import { ClienteService } from "../../services/cliente.service";
 
-describe("CondominioListComponent", () => {
-  let component: CondominioListComponent;
-  let fixture: ComponentFixture<CondominioListComponent>;
-  let mockService: jest.Mocked<CondominioService>;
+describe("ClienteListComponent", () => {
+  let component: ClienteListComponent;
+  let fixture: ComponentFixture<ClienteListComponent>;
+  let mockService: jest.Mocked<ClienteService>;
 
   beforeEach(async () => {
     mockService = {
@@ -676,15 +676,15 @@ describe("CondominioListComponent", () => {
     } as any;
 
     await TestBed.configureTestingModule({
-      imports: [CondominioListComponent],
-      providers: [{ provide: CondominioService, useValue: mockService }],
+      imports: [ClienteListComponent],
+      providers: [{ provide: ClienteService, useValue: mockService }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CondominioListComponent);
+    fixture = TestBed.createComponent(ClienteListComponent);
     component = fixture.componentInstance;
   });
 
-  it("deve carregar condominios no init", () => {
+  it("deve carregar clientes no init", () => {
     const mockData = [
       {
         id: "1",
@@ -701,7 +701,7 @@ describe("CondominioListComponent", () => {
 
     fixture.detectChanges();
 
-    expect(component.condominios()).toEqual(mockData);
+    expect(component.clientes()).toEqual(mockData);
     expect(component.loading()).toBe(false);
   });
 
@@ -710,11 +710,11 @@ describe("CondominioListComponent", () => {
 
     fixture.detectChanges();
 
-    expect(component.error()).toBe("Erro ao carregar condomínios");
+    expect(component.error()).toBe("Erro ao carregar clientes");
     expect(component.loading()).toBe(false);
   });
 
-  it("deve excluir condominio", () => {
+  it("deve excluir cliente", () => {
     mockService.delete.mockReturnValue(of(void 0));
     mockService.getAll.mockReturnValue(of([]));
     jest.spyOn(window, "confirm").mockReturnValue(true);
@@ -730,22 +730,22 @@ describe("CondominioListComponent", () => {
 
 ## 📅 FASE 5: Testes E2E com Cypress (Dia 9)
 
-**cypress/e2e/condominios.cy.ts**
+**cypress/e2e/clientes.cy.ts**
 
 ```typescript
-describe("Condominios CRUD", () => {
+describe("Clientes CRUD", () => {
   beforeEach(() => {
-    cy.visit("/condominios");
+    cy.visit("/clientes");
   });
 
-  it("deve listar condominios", () => {
+  it("deve listar clientes", () => {
     cy.get("table tbody tr").should("have.length.greaterThan", 0);
   });
 
-  it("deve criar novo condominio", () => {
-    cy.contains("Novo Condomínio").click();
+  it("deve criar novo cliente", () => {
+    cy.contains("Novo Cliente").click();
 
-    cy.get("#nome").type("Condomínio Cypress");
+    cy.get("#nome").type("Cliente Cypress");
     cy.get("#cnpj").type("12345678000190");
     cy.get("#endereco").type("Rua Cypress, 100");
     cy.get("#telefone").type("11999887766");
@@ -753,18 +753,18 @@ describe("Condominios CRUD", () => {
 
     cy.get('button[type="submit"]').click();
 
-    cy.url().should("include", "/condominios");
-    cy.contains("Condomínio Cypress").should("be.visible");
+    cy.url().should("include", "/clientes");
+    cy.contains("Cliente Cypress").should("be.visible");
   });
 
   it("deve validar campos obrigatórios", () => {
-    cy.contains("Novo Condomínio").click();
+    cy.contains("Novo Cliente").click();
     cy.get('button[type="submit"]').click();
 
     cy.contains("Nome é obrigatório").should("be.visible");
   });
 
-  it("deve editar condominio existente", () => {
+  it("deve editar cliente existente", () => {
     cy.get("table tbody tr").first().contains("Editar").click();
 
     cy.get("#nome").clear().type("Nome Editado");
@@ -1025,14 +1025,14 @@ docker compose -f docker-compose.fullstack.yml up --build
 
 ---
 
-## 🎯 Próximos Módulos (Após Condominios)
+## 🎯 Próximos Módulos (Após Clientes)
 
 ### Ordem Sugerida de Implementação:
 
-1. ✅ **Condominios** (CRUD básico - fundação)
+1. ✅ **Clientes** (CRUD básico - fundação)
 2. **Funcionários** (enums complexos, validação de CPF, máscaras)
-3. **Postos de Trabalho** (relacionamento N:1 com Condomínios)
-4. **Alocações** (relacionamentos múltiplos + regras de negócio complexas)
+3. **Postos de Trabalho** (relacionamento N:1 com Clientes)
+4. **Diárias** (relacionamentos múltiplos + regras de negócio complexas)
 5. **Contratos** (ciclo de vida, status transitions)
 
 ### Para cada módulo, repetir:
@@ -1126,7 +1126,7 @@ docker compose -f docker-compose.fullstack.yml up --build
 - [ ] CORS habilitado no backend
 - [ ] Módulo Core (Interceptors, Guards)
 - [ ] Módulo Shared (Models, Pipes, Components)
-- [ ] Módulo Condominios completo (CRUD + Testes)
+- [ ] Módulo Clientes completo (CRUD + Testes)
 - [ ] Jest configurado e >= 80% coverage
 - [ ] Cypress com cenários críticos
 - [ ] CI/CD Backend funcionando
@@ -1140,6 +1140,6 @@ docker compose -f docker-compose.fullstack.yml up --build
 
 1. Executar `npx @angular/cli@latest new frontend`
 2. Configurar CORS no [Program.cs](src/InterceptorSystem.Api/Program.cs)
-3. Implementar primeiro endpoint (Condominios/GetAll)
+3. Implementar primeiro endpoint (Clientes/GetAll)
 
 Deseja que eu comece criando a estrutura inicial do Angular agora?

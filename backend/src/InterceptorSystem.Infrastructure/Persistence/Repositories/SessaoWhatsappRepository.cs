@@ -1,12 +1,12 @@
-using InterceptorSystem.Domain.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Whatsapp.Entidades;
-using InterceptorSystem.Domain.Modulos.Whatsapp.Enums;
+using InterceptorSystem.Domain.SharedKernel.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Aggregates;
+using InterceptorSystem.Domain.BoundedContexts.Whatsapp.Enums;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterceptorSystem.Infrastructure.Persistence.Repositories;
 
-public class SessaoWhatsappRepository : InterceptorSystem.Domain.Modulos.Whatsapp.Interfaces.ISessaoWhatsappRepository
+public class SessaoWhatsappRepository : InterceptorSystem.Domain.BoundedContexts.Whatsapp.Interfaces.ISessaoWhatsappRepository
 {
     private readonly ApplicationDbContext _context;
 

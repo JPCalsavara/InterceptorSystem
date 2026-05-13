@@ -4,9 +4,9 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using InterceptorSystem.Application.Common.Interfaces;
-using InterceptorSystem.Domain.Modulos.Administrativo.Interfaces;
-using InterceptorSystem.Domain.Modulos.Auth.Interfaces;
-using InterceptorSystem.Infrastructure.Auth;
+using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
+using InterceptorSystem.Infrastructure.Adapters.Auth;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication;
@@ -38,12 +38,13 @@ public class NoOpEmailService : IEmailService
     public Task EnviarVerificacaoEmailAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
     public Task EnviarResetSenhaAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
     public Task EnviarConfirmacaoAlteracaoEmailAsync(string destinatario, string nomeEmpresa, string link) => Task.CompletedTask;
+    public Task EnviarContatoAsync(string nome, string cidade, string estado, string emailRemetente, string descricao) => Task.CompletedTask;
 }
 
 /// <summary>
 /// Implementação no-op do IWhatsappMessageSender para testes (não envia mensagens de verdade).
 /// </summary>
-public class NoOpWhatsappMessageSender : InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender
+public class NoOpWhatsappMessageSender : InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces.IWhatsappMessageSender
 {
     public Task EnviarTextoAsync(string telefoneDestino, string mensagem, CancellationToken ct = default) => Task.CompletedTask;
 }
@@ -119,12 +120,17 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     .Build();
             });
 
+            // Adicionar serviços faltantes que a factory não injeta adequadamente
+            services.AddMemoryCache();
+
             // Repositórios do domínio administrativo
-            services.AddScoped<ICondominioRepository, CondominioRepository>();
-            services.AddScoped<IPostoDeTrabalhoRepository, PostoDeTrabalhoRepository>();
-            services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
+            services.AddScoped<IPostoRepository, PostoRepository>();
             services.AddScoped<IAlocacaoRepository, AlocacaoRepository>();
+            services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            services.AddScoped<IDiariaRepository, DiariaRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
 
             // Repositório e serviços de autenticação
             services.AddScoped<IContaRepository, ContaRepository>();
@@ -134,7 +140,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             // E-mail no-op para testes
             services.AddScoped<IEmailService, NoOpEmailService>();
-            services.AddScoped<InterceptorSystem.Application.Modulos.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
+            services.AddScoped<InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces.IWhatsappMessageSender, NoOpWhatsappMessageSender>();
 
             // Garante que o banco de dados seja criado
             var sp = services.BuildServiceProvider();

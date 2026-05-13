@@ -1,0 +1,114 @@
+Prebundling has been configured but will not be used because caching has been disabled.
+❯ Building...
+✔ Building...
+Initial chunk files | Names                        |  Raw size
+chunk-WMKDWAFK.js   | -                            |   1.28 MB | 
+chunk-CQ36GJZX.js   | -                            | 264.87 kB | 
+chunk-7MH656N2.js   | -                            | 156.98 kB | 
+chunk-AJZNJKMT.js   | -                            | 111.11 kB | 
+styles.css          | styles                       |  32.05 kB | 
+main.js             | main                         |  11.22 kB | 
+chunk-RNUZRZOZ.js   | -                            |   3.34 kB | 
+chunk-DDE4NLQV.js   | -                            | 178 bytes | 
+
+                    | Initial total                |   1.86 MB
+
+Lazy chunk files    | Names                        |  Raw size
+chunk-RHARVQFX.js   | -                            | 521.59 kB | 
+chunk-TZBEAC2P.js   | cliente-wizard-component     | 293.00 kB | 
+chunk-B5XOISQO.js   | cliente-detail-component     | 178.16 kB | 
+chunk-AOJGEDTY.js   | landing-component            | 175.57 kB | 
+chunk-ZQSN6JQO.js   | contrato-detail-component    | 170.04 kB | 
+chunk-SX3HULZS.js   | -                            | 147.83 kB | 
+chunk-QWRMJH5S.js   | -                            | 142.56 kB | 
+chunk-AZHTBFIT.js   | dashboard-component          | 137.02 kB | 
+chunk-7WIE5UTI.js   | posto-detail-component       | 127.73 kB | 
+chunk-VCDIRBBA.js   | funcionario-detail-component | 125.79 kB | 
+chunk-I46TI5RE.js   | app-shell-component          | 114.10 kB | 
+chunk-53DSLAIX.js   | contrato-list-component      |  92.94 kB | 
+chunk-PRS62K5R.js   | suporte-page-component       |  63.16 kB | 
+chunk-UX6I7ZJJ.js   | tag-list-component           |  60.51 kB | 
+chunk-NKVGFUY7.js   | perfil-component             |  53.27 kB | 
+...and 36 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [18.850 seconds] - 2026-05-13T01:07:17.429Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4201/
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                        |  Raw size
+main.js             | main                         |  11.22 kB | 
+chunk-7AWDIMZ4.js   | -                            |   3.34 kB | 
+chunk-RFJDKLFI.js   | -                            | 183 bytes | 
+
+Lazy chunk files    | Names                        |  Raw size
+chunk-TNY7QNIB.js   | cliente-wizard-component     | 293.00 kB | 
+chunk-LVYJYYV3.js   | cliente-detail-component     | 178.16 kB | 
+chunk-SWUHN54V.js   | landing-component            | 175.57 kB | 
+chunk-JF2MTFM3.js   | contrato-detail-component    | 170.04 kB | 
+chunk-5WPDV63K.js   | -                            | 147.83 kB | 
+chunk-DZ4TGBXY.js   | -                            | 142.56 kB | 
+chunk-U5GLFER5.js   | dashboard-component          | 137.02 kB | 
+chunk-V7LTEPI5.js   | posto-detail-component       | 127.73 kB | 
+chunk-4WSYHZA2.js   | funcionario-detail-component | 125.79 kB | 
+chunk-ENQA2OFZ.js   | app-shell-component          | 114.10 kB | 
+chunk-LA3LIZKE.js   | contrato-list-component      |  92.94 kB | 
+chunk-MG5WFZ5D.js   | tag-list-component           |  60.51 kB | 
+chunk-5H4AJ6JH.js   | perfil-component             |  53.27 kB | 
+chunk-MV7FFEXS.js   | funcionario-form-component   |  52.13 kB | 
+chunk-H4CPRE5W.js   | funcionario-list-component   |  51.07 kB | 
+...and 30 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [12.894 seconds] - 2026-05-13T01:14:55.305Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                      |  Raw size
+main.js             | main                       |  11.22 kB | 
+
+Lazy chunk files    | Names                      |  Raw size
+chunk-BYYTSUS2.js   | -                          | 521.63 kB | 
+chunk-VTVQRFPS.js   | cliente-wizard-component   | 293.00 kB | 
+chunk-GRUGNL7N.js   | funcionario-form-component |  52.13 kB | 
+chunk-TIUO55XD.js   | cadastro-component         |  41.67 kB | 
+chunk-5G4NHAPR.js   | cliente-form-component     |  40.47 kB | 
+
+Application bundle generation complete. [2.751 seconds] - 2026-05-13T01:29:31.647Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                  | Raw size
+main.js             | main                   | 11.22 kB | 
+
+Lazy chunk files    | Names                  | Raw size
+chunk-F6A63OBF.js   | cliente-form-component | 40.42 kB | 
+
+Application bundle generation complete. [2.846 seconds] - 2026-05-13T01:52:37.130Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                  | Raw size
+main.js             | main                   | 11.22 kB | 
+
+Lazy chunk files    | Names                  | Raw size
+chunk-DLRYD2PK.js   | cliente-form-component | 40.66 kB | 
+
+Application bundle generation complete. [2.015 seconds] - 2026-05-13T01:53:58.924Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                  | Raw size
+main.js             | main                   | 11.22 kB | 
+
+Lazy chunk files    | Names                  | Raw size
+chunk-5G4NHAPR.js   | cliente-form-component | 40.47 kB | 
+
+Application bundle generation complete. [1.327 seconds] - 2026-05-13T01:54:30.999Z
+
+Page reload sent to client(s).

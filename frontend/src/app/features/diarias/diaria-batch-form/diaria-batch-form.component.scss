@@ -1,0 +1,232 @@
+// Shared form page structure lives in src/styles/_shared-pages.scss via .form-page
+
+.alert-error {
+  background: var(--color-danger-bg);
+  color: var(--danger-color-dark);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--color-danger);
+}
+
+.form-container {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-bottom: 0;
+  }
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.required {
+  color: var(--error-text);
+  margin-left: 0.25rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-shadow);
+  }
+
+  &.error {
+    border-color: var(--error-border);
+    &:focus {
+      box-shadow: 0 0 0 3px var(--error-ring);
+    }
+  }
+
+  &:disabled {
+    background: var(--bg-secondary);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+select.form-input {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+:host-context(.dark-mode) {
+  // Ensure selects don't fallback to white browser defaults in dark mode.
+  .form-input {
+    background: var(--input-bg) !important;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    color-scheme: dark;
+  }
+
+  select.form-input {
+    background-color: var(--input-bg) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.7' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+
+    option {
+      background: var(--card-bg);
+      color: var(--text-primary);
+    }
+  }
+
+  .form-input[type='date']::-webkit-calendar-picker-indicator,
+  .form-input[type='time']::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.2);
+    opacity: 0.9;
+  }
+
+  // Labels/icons stay visible on dark surfaces.
+  .form-label {
+    color: var(--text-primary);
+  }
+}
+
+.error-message {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--error-text);
+}
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.required-note {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+// Styles specific to batch form
+.summary-box {
+  background: var(--kanban-info-bg);
+  border: 1px solid var(--kanban-info-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--lh-relaxed);
+}
+
+.summary-title {
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+
+  input[type='radio'] {
+    display: none;
+  }
+
+  .radio-icon {
+    font-size: 1.1rem;
+  }
+
+  .radio-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+  }
+
+  &:hover {
+    border-color: var(--primary-color);
+    background: var(--bg-hover);
+  }
+
+  &.active {
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-rgb, 25, 118, 210), 0.08);
+    box-shadow: 0 0 0 1px var(--primary-color);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

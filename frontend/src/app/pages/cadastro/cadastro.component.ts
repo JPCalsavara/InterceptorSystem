@@ -1,59 +1,109 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
+import { cnpjValidator } from '../../shared/validators/br-documents.validators';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
   template: `
     <div class="landing-page">
       <!-- Hero Section -->
       <header class="landing-header">
         <div class="header-container">
           <img src="/logo-preta.png" alt="Interceptor System" class="header-logo" />
-          <a routerLink="/login" class="btn-outline" style="padding: var(--space-2) var(--space-4); text-decoration: none; border-radius: var(--radius-md);">Entrar</a>
+          <a
+            routerLink="/login"
+            class="btn-outline"
+            style="padding: var(--space-2) var(--space-4); text-decoration: none; border-radius: var(--radius-md);"
+            >Entrar</a
+          >
         </div>
       </header>
 
       <main class="landing-main">
-      <a routerLink="/" class="back-link">
-        <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-        </svg>
-        Voltar ao início
-      </a>
+        <a routerLink="/" class="back-link">
+          <svg
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+            />
+          </svg>
+          Voltar ao início
+        </a>
         <section class="hero">
           <div class="hero-content">
-            <div class="hero-badge">Gestão de Segurança Patrimonial</div>
+            <div class="hero-badge">Empresa de Gestao e Facilities em Associacoes Condominiais</div>
             <h1 class="hero-title">
               Controle total da sua<br />
-              <span class="hero-highlight">operação de segurança</span>
+              <span class="hero-highlight">operação condominial</span>
             </h1>
             <p class="hero-description">
-              Gerencie funcionários, contratos, turnos e alocações em um só lugar. Simples,
-              eficiente e pensado para empresas de segurança.
+              Gerencie funcionários, contratos, turnos e diárias em um só lugar. Simples, eficiente
+              e pensado para empresas de gestao e facilities em associacoes condominiais.
             </p>
 
             <ul class="hero-features">
               <li>
-                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
-                Controle de escalas e alocações automáticas
+                Controle de escalas e diárias automáticas
               </li>
               <li>
-                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 Cálculo automático de salários e adicionais noturnos
               </li>
               <li>
-                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 Dashboard financeiro com visão mensal e anual
               </li>
@@ -67,29 +117,36 @@ import { NgxMaskDirective } from 'ngx-mask';
               <p>Comece em menos de 2 minutos</p>
             </div>
 
-            <form class="register-form" (ngSubmit)="onSubmit()" #form="ngForm">
+            <form class="register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
               <div class="form-group">
                 <label for="nomeEmpresa">Nome da empresa</label>
                 <input
                   id="nomeEmpresa"
                   type="text"
-                  name="nomeEmpresa"
-                  [(ngModel)]="nomeEmpresa"
-                  placeholder="Segurança Total Ltda"
-                  required
+                  formControlName="nomeEmpresa"
+                  data-testid="register-name"
+                  [class.input-error]="hasError('nomeEmpresa')"
+                  placeholder="Gestao Facilities Condominial Ltda"
                 />
+                @if (hasError('nomeEmpresa')) {
+                  <span class="field-error">{{ getErrorMessage('nomeEmpresa') }}</span>
+                }
               </div>
 
               <div class="form-group">
-                <label for="cnpj">CNPJ <span class="optional">(opcional)</span></label>
+                <label for="cnpj">CNPJ</label>
                 <input
                   id="cnpj"
                   type="text"
-                  name="cnpj"
-                  [(ngModel)]="cnpj"
+                  formControlName="cnpj"
+                  data-testid="cnpj"
+                  [class.input-error]="hasError('cnpj')"
                   placeholder="00.000.000/0001-00"
                   mask="00.000.000/0000-00"
                 />
+                @if (hasError('cnpj')) {
+                  <span class="field-error">{{ getErrorMessage('cnpj') }}</span>
+                }
               </div>
 
               <div class="form-group">
@@ -97,12 +154,15 @@ import { NgxMaskDirective } from 'ngx-mask';
                 <input
                   id="email"
                   type="email"
-                  name="email"
-                  [(ngModel)]="email"
+                  formControlName="email"
+                  data-testid="register-email"
+                  [class.input-error]="hasError('email')"
                   placeholder="contato@empresa.com"
-                  required
                   autocomplete="email"
                 />
+                @if (hasError('email')) {
+                  <span class="field-error">{{ getErrorMessage('email') }}</span>
+                }
               </div>
 
               <div class="form-group">
@@ -111,13 +171,10 @@ import { NgxMaskDirective } from 'ngx-mask';
                   <input
                     id="senha"
                     [type]="mostrarSenha() ? 'text' : 'password'"
-                    name="senha"
-                    [(ngModel)]="senha"
+                    formControlName="senha"
+                    data-testid="register-password"
+                    [class.input-error]="hasError('senha')"
                     placeholder="8+ carac., 1 maiúscula, 1 num."
-                    required
-                    minlength="8"
-                    pattern="^(?=.*[A-Z])(?=.*\\d).{8,}$"
-                    title="A senha deve conter pelo menos 8 caracteres, 1 letra maiúscula e 1 número."
                     autocomplete="new-password"
                   />
                   <button
@@ -127,24 +184,59 @@ import { NgxMaskDirective } from 'ngx-mask';
                     [title]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
                   >
                     @if (mostrarSenha()) {
-                      <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                      <svg
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                        />
                       </svg>
                     } @else {
-                      <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                     }
                   </button>
                 </div>
+                @if (hasError('senha')) {
+                  <span class="field-error">{{ getErrorMessage('senha') }}</span>
+                }
               </div>
 
               @if (erro()) {
                 <div class="error-message">{{ erro() }}</div>
               }
 
-              <button type="submit" class="btn-primary btn-lg" [disabled]="carregando()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-1);">
+              <button
+                type="submit"
+                class="btn-primary btn-lg"
+                data-testid="register-submit"
+                [disabled]="carregando()"
+                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-1);"
+              >
                 @if (carregando()) {
                   <span class="spinner"></span> Criando conta...
                 } @else {
@@ -347,7 +439,9 @@ import { NgxMaskDirective } from 'ngx-mask';
           color: var(--text-primary);
           font-size: var(--text-base);
           font-weight: var(--fw-regular);
-          transition: border-color 0.2s, box-shadow 0.2s;
+          transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
 
           &:focus {
             outline: none;
@@ -359,7 +453,21 @@ import { NgxMaskDirective } from 'ngx-mask';
             color: var(--text-tertiary);
             opacity: 0.7;
           }
+
+          &.input-error {
+            border-color: #dc2626;
+
+            &:focus {
+              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+            }
+          }
         }
+      }
+
+      .field-error {
+        font-size: var(--text-xs);
+        color: #dc2626;
+        font-weight: var(--fw-medium);
       }
 
       .input-password-wrapper {
@@ -458,10 +566,8 @@ import { NgxMaskDirective } from 'ngx-mask';
   ],
 })
 export class CadastroComponent {
-  nomeEmpresa = '';
-  cnpj = '';
-  email = '';
-  senha = '';
+  private fb = new FormBuilder();
+  form: FormGroup;
   erro = signal<string | null>(null);
   carregando = signal(false);
   mostrarSenha = signal(false);
@@ -469,20 +575,55 @@ export class CadastroComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) {
+    this.form = this.fb.group({
+      nomeEmpresa: ['', [Validators.required, Validators.minLength(3)]],
+      cnpj: ['', [cnpjValidator]],
+      email: ['', [Validators.required, Validators.email]],
+      senha: [
+        '',
+        [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)],
+      ],
+    });
+  }
+
+  hasError(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!field && field.invalid && field.touched;
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const field = this.form.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    const errors = field.errors;
+
+    if (errors['required']) return 'Este campo é obrigatório';
+    if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
+    if (errors['email']) return 'E-mail inválido';
+    if (errors['cnpjInvalid']) return 'CNPJ inválido (ex: 12.345.678/0001-90)';
+    if (errors['pattern']) return 'A senha deve conter pelo menos 8 caracteres, 1 maiúscula e 1 número';
+
+    return 'Campo inválido';
+  }
 
   onSubmit(): void {
-    if (!this.nomeEmpresa || !this.email || !this.senha) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.erro.set(null);
     this.carregando.set(true);
 
+    const { nomeEmpresa, cnpj, email, senha } = this.form.value;
+
     this.authService
       .registrar({
-        nomeEmpresa: this.nomeEmpresa,
-        cnpj: this.cnpj || undefined,
-        email: this.email,
-        senha: this.senha,
+        nomeEmpresa,
+        cnpj: cnpj || undefined,
+        email,
+        senha,
       })
       .subscribe({
         next: () => this.router.navigate(['/dashboard']),

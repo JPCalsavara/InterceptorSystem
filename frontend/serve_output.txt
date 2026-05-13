@@ -1,0 +1,2811 @@
+
+> frontend@0.0.0 start
+> ng serve
+
+❯ Building...
+✔ Building...
+Application bundle generation failed. [18.562 seconds] - 2026-05-13T01:02:15.937Z
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:14:0:
+      14 │ describe('InterceptorSystem E2E - Critical User Journeys', () => {
+         ╵ ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:58:2:
+      58 │   beforeEach(() => {
+         ╵   ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:59:4:
+      59 │     cy.visit(baseUrl);
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:60:4:
+      60 │     cy.clearCookies();
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:61:4:
+      61 │     cy.window().then((win) => win.localStorage.clear());
+         ╵     ~~
+
+
+✘ [ERROR] TS7006: Parameter 'win' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:61:22:
+      61 │     cy.window().then((win) => win.localStorage.clear());
+         ╵                       ~~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:66:2:
+      66 │   describe('Jornada 1: Autenticação e Login', () => {
+         ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:67:4:
+      67 │     it('CT-001: Usuário novo deve registrar-se com sucesso', () => {
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:69:6:
+      69 │       cy.visit(`${baseUrl}/auth/register`);
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:72:6:
+      72 │       cy.get('[data-testid="register-name"]').type('Novo Usuário');
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:73:6:
+      73 │       cy.get('[data-testid="register-email"]').type(testUser.email);
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:74:6:
+      74 │       cy.get('[data-testid="register-password"]').type(testUser.pa...
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:75:6:
+      75 │       cy.get('[data-testid="register-password-confirm"]').type(tes...
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:78:6:
+      78 │       cy.get('[data-testid="register-terms-checkbox"]').click();
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:81:6:
+      81 │       cy.get('[data-testid="register-submit"]').click();
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:84:6:
+      84 │       cy.url().should('include', '/dashboard');
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:85:6:
+      85 │       cy.get('[data-testid="welcome-message"]').should('contain', ...
+         ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:88:4:
+      88 │     it('CT-002: Usuário registrado deve fazer login', () => {
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:90:6:
+      90 │       cy.visit(`${baseUrl}/auth/login`);
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:93:6:
+      93 │       cy.get('[data-testid="login-email"]').type(testUser.email);
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:94:6:
+      94 │       cy.get('[data-testid="login-password"]').type(testUser.passw...
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:97:6:
+      97 │       cy.get('[data-testid="login-submit"]').click();
+         ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:100:6:
+      100 │       cy.url().should('include', '/dashboard');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:101:6:
+      101 │       cy.get('[data-testid="user-greeting"]').should('be.visible');
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:104:4:
+      104 │     it('CT-003: Logout deve remover sessão e limpar armazenament...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:106:6:
+      106 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:109:6:
+      109 │       cy.get('[data-testid="user-menu-button"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:112:6:
+      112 │       cy.get('[data-testid="logout-button"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:115:6:
+      115 │       cy.url().should('include', '/auth/login');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:118:6:
+      118 │       cy.window().then((win) => {
+          ╵       ~~
+
+
+✘ [ERROR] TS7006: Parameter 'win' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:118:24:
+      118 │       cy.window().then((win) => {
+          ╵                         ~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'expect'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:119:8:
+      119 │         expect(win.localStorage.getItem('auth_token')).to.be.null;
+          ╵         ~~~~~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:126:2:
+      126 │   describe('Jornada 2: Criar Novo Cliente', () => {
+          ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:127:4:
+      127 │     beforeEach(() => {
+          ╵     ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:128:6:
+      128 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:131:4:
+      131 │     it('CT-004: Usuário deve criar novo cliente com dados válid...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:133:6:
+      133 │       cy.visit(`${baseUrl}/clientes`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:136:6:
+      136 │       cy.get('[data-testid="btn-new-cliente"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:139:6:
+      139 │       cy.get('[data-testid="cliente-nome"]').type(testCliente.nome);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:140:6:
+      140 │       cy.get('[data-testid="cliente-cnpj"]').type(testCliente.cnpj);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:141:6:
+      141 │       cy.get('[data-testid="cliente-email"]').type(testCliente.em...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:142:6:
+      142 │       cy.get('[data-testid="cliente-telefone"]').type(testCliente...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:143:6:
+      143 │       cy.get('[data-testid="cliente-endereco"]').type(testCliente...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:144:6:
+      144 │       cy.get('[data-testid="cliente-cidade"]').type(testCliente.c...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:145:6:
+      145 │       cy.get('[data-testid="cliente-estado"]').select(testCliente...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:148:6:
+      148 │       cy.get('[data-testid="btn-save-cliente"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:151:6:
+      151 │       cy.get('[data-testid="success-message"]').should('contain',...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:152:6:
+      152 │       cy.get('[data-testid="cliente-list"]').should('contain', te...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:155:4:
+      155 │     it('CT-005: Sistema deve validar CNPJ duplicado', () => {
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:157:6:
+      157 │       cy.visit(`${baseUrl}/clientes/novo`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:160:6:
+      160 │       cy.get('[data-testid="cliente-nome"]').type('Empresa Duplic...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:161:6:
+      161 │       cy.get('[data-testid="cliente-cnpj"]').type('12345678000199');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:164:6:
+      164 │       cy.get('[data-testid="btn-save-cliente"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:167:6:
+      167 │       cy.get('[data-testid="error-message"]').should('contain', '...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:173:2:
+      173 │   describe('Jornada 3: Criar Contrato com Cálculo de Valores', (...
+          ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:174:4:
+      174 │     beforeEach(() => {
+          ╵     ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:175:6:
+      175 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:177:6:
+      177 │       cy.createCliente(testCliente);
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:180:4:
+      180 │     it('CT-006: Usuário deve criar novo contrato e validar cálc...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:182:6:
+      182 │       cy.visit(`${baseUrl}/contratos`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:185:6:
+      185 │       cy.get('[data-testid="btn-new-contrato"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:188:6:
+      188 │       cy.get('[data-testid="contrato-cliente"]').select(testClien...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:189:6:
+      189 │       cy.get('[data-testid="contrato-titulo"]').type(testContrato...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:190:6:
+      190 │       cy.get('[data-testid="contrato-data-inicio"]').type(testCon...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:191:6:
+      191 │       cy.get('[data-testid="contrato-data-fim"]').type(testContra...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:192:6:
+      192 │       cy.get('[data-testid="contrato-status"]').select(testContra...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:195:6:
+      195 │       cy.get('[data-testid="contrato-tipo-posto"]').select('ESCAL...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:198:6:
+      198 │       cy.get('[data-testid="calculo-loading"]').should('not.exist...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:201:6:
+      201 │       cy.get('[data-testid="custo-direto"]').should('contain', 'R...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:202:6:
+      202 │       cy.get('[data-testid="valor-impostos"]').should('contain', ...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:203:6:
+      203 │       cy.get('[data-testid="valor-total-mensal"]').should('contai...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:206:6:
+      206 │       cy.get('[data-testid="custo-direto"]').then(($custo) => {
+          ╵       ~~
+
+
+✘ [ERROR] TS7006: Parameter '$custo' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:206:51:
+      206 │       cy.get('[data-testid="custo-direto"]').then(($custo) => {
+          ╵                                                    ~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:208:8:
+      208 │         cy.get('[data-testid="valor-impostos"]').then(($impostos)...
+          ╵         ~~
+
+
+✘ [ERROR] TS7006: Parameter '$impostos' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:208:55:
+      208 │ ...   cy.get('[data-testid="valor-impostos"]').then(($impostos) => {
+          ╵                                                      ~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:210:10:
+      210 │           cy.get('[data-testid="valor-total-mensal"]').then(($tot...
+          ╵           ~~
+
+
+✘ [ERROR] TS7006: Parameter '$total' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:210:61:
+      210 │ ...  cy.get('[data-testid="valor-total-mensal"]').then(($total) => {
+          ╵                                                         ~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'expect'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:213:12:
+      213 │             expect(totalText).to.exist;
+          ╵             ~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:219:6:
+      219 │       cy.get('[data-testid="btn-save-contrato"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:222:6:
+      222 │       cy.get('[data-testid="success-message"]').should('contain',...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:225:4:
+      225 │     it('CT-007: Contrato deve calcular corretamente para múltipl...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:226:6:
+      226 │       cy.visit(`${baseUrl}/contratos/novo`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:229:6:
+      229 │       cy.get('[data-testid="contrato-cliente"]').select(testClien...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:230:6:
+      230 │       cy.get('[data-testid="contrato-titulo"]').type('Contrato Mu...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:231:6:
+      231 │       cy.get('[data-testid="contrato-tipo-posto"]').select('ESCAL...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:234:6:
+      234 │       cy.get('[data-testid="calculo-loading"]').should('not.exist');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:237:6:
+      237 │       cy.get('[data-testid="valor-total-mensal"]').then(($value1)...
+          ╵       ~~
+
+
+✘ [ERROR] TS7006: Parameter '$value1' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:237:57:
+      237 │ ... cy.get('[data-testid="valor-total-mensal"]').then(($value1) => {
+          ╵                                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:241:8:
+      241 │         cy.get('[data-testid="contrato-tipo-posto"]').select('ESC...
+          ╵         ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:242:8:
+      242 │         cy.get('[data-testid="calculo-loading"]').should('not.exi...
+          ╵         ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:244:8:
+      244 │         cy.get('[data-testid="valor-total-mensal"]').then(($value...
+          ╵         ~~
+
+
+✘ [ERROR] TS7006: Parameter '$value2' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:244:59:
+      244 │ ... cy.get('[data-testid="valor-total-mensal"]').then(($value2) => {
+          ╵                                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'expect'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:248:10:
+      248 │           expect(value1).to.not.equal(value2);
+          ╵           ~~~~~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:256:2:
+      256 │   describe('Jornada 4: Criar Alocações para Contrato', () => {
+          ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:257:4:
+      257 │     beforeEach(() => {
+          ╵     ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:258:6:
+      258 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:259:6:
+      259 │       cy.createCliente(testCliente);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:260:6:
+      260 │       cy.createPosto(testCliente.id, testPosto);
+          ╵       ~~
+
+
+✘ [ERROR] TS2339: Property 'id' does not exist on type '{ nome: string; cnpj: string; email: string; telefone: string; endereco: string; cidade: string; estado: string; }'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:260:33:
+      260 │       cy.createPosto(testCliente.id, testPosto);
+          ╵                                  ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:261:6:
+      261 │       cy.createContrato(testCliente.id, testContrato);
+          ╵       ~~
+
+
+✘ [ERROR] TS2339: Property 'id' does not exist on type '{ nome: string; cnpj: string; email: string; telefone: string; endereco: string; cidade: string; estado: string; }'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:261:36:
+      261 │       cy.createContrato(testCliente.id, testContrato);
+          ╵                                     ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:264:4:
+      264 │     it('CT-008: Usuário deve criar alocações para postos do co...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:266:6:
+      266 │       cy.visit(`${baseUrl}/contratos/${testContrato.id}`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2339: Property 'id' does not exist on type '{ titulo: string; dataInicio: string; dataFim: string; status: string; percentualEncargos: number; margemLucroPercentual: number; margemCoberturaFaltasPercentual: number; }'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:266:52:
+      266 │       cy.visit(`${baseUrl}/contratos/${testContrato.id}`);
+          ╵                                                     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:269:6:
+      269 │       cy.get('[data-testid="btn-add-alocacao"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:272:6:
+      272 │       cy.get('[data-testid="alocacao-posto"]').select(testPosto.n...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:275:6:
+      275 │       cy.get('[data-testid="alocacao-alocacoes"]').clear().type('...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:278:6:
+      278 │       cy.get('[data-testid="alocacao-funcionarios"]').clear().typ...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:281:6:
+      281 │       cy.get('[data-testid="alocacao-turnos-noturnos"]').clear()....
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:284:6:
+      284 │       cy.get('[data-testid="btn-save-alocacao"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:287:6:
+      287 │       cy.get('[data-testid="success-message"]').should('contain',...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:288:6:
+      288 │       cy.get('[data-testid="alocacao-list"]').should('contain', t...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:294:2:
+      294 │   describe('Jornada 5: Criar e Alocar Funcionários', () => {
+          ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:295:4:
+      295 │     beforeEach(() => {
+          ╵     ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:296:6:
+      296 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:297:6:
+      297 │       cy.createCliente(testCliente);
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:300:4:
+      300 │     it('CT-009: Usuário deve criar novo funcionário', () => {
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:302:6:
+      302 │       cy.visit(`${baseUrl}/funcionarios`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:305:6:
+      305 │       cy.get('[data-testid="btn-new-funcionario"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:308:6:
+      308 │       cy.get('[data-testid="funcionario-cliente"]').select(testCl...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:309:6:
+      309 │       cy.get('[data-testid="funcionario-nome"]').type(testFuncion...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:310:6:
+      310 │       cy.get('[data-testid="funcionario-cpf"]').type(testFunciona...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:311:6:
+      311 │       cy.get('[data-testid="funcionario-telefone"]').type(testFun...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:312:6:
+      312 │       cy.get('[data-testid="funcionario-email"]').type(testFuncio...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:313:6:
+      313 │       cy.get('[data-testid="funcionario-tipo-escala"]').select(te...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:314:6:
+      314 │       cy.get('[data-testid="funcionario-tipo"]').select(testFunci...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:317:6:
+      317 │       cy.get('[data-testid="btn-save-funcionario"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:320:6:
+      320 │       cy.get('[data-testid="success-message"]').should('contain',...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:321:6:
+      321 │       cy.get('[data-testid="funcionario-list"]').should('contain'...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:324:4:
+      324 │     it('CT-010: Usuário deve validar CPF duplicado', () => {
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:325:6:
+      325 │       cy.visit(`${baseUrl}/funcionarios/novo`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:328:6:
+      328 │       cy.get('[data-testid="funcionario-cliente"]').select(testCl...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:329:6:
+      329 │       cy.get('[data-testid="funcionario-nome"]').type('Outro Nome');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:330:6:
+      330 │       cy.get('[data-testid="funcionario-cpf"]').type('12345678901');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:332:6:
+      332 │       cy.get('[data-testid="btn-save-funcionario"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:334:6:
+      334 │       cy.get('[data-testid="error-message"]').should('contain', '...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:340:2:
+      340 │   describe('Jornada 6: Registrar Diárias para Funcionários', ()...
+          ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:341:4:
+      341 │     beforeEach(() => {
+          ╵     ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:342:6:
+      342 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:343:6:
+      343 │       cy.createFullContractSetup(testCliente, testPosto, testFunc...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:346:4:
+      346 │     it('CT-011: Usuário deve registrar diária para funcionário...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:348:6:
+      348 │       cy.visit(`${baseUrl}/diarias`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:351:6:
+      351 │       cy.get('[data-testid="btn-new-diaria"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:354:6:
+      354 │       cy.get('[data-testid="diaria-funcionario"]').select(testFun...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:357:6:
+      357 │       cy.get('[data-testid="diaria-alocacao"]').select(testPosto....
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:361:6:
+      361 │       cy.get('[data-testid="diaria-data"]').type(today);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:364:6:
+      364 │       cy.get('[data-testid="diaria-status"]').select('CONFIRMADA');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:367:6:
+      367 │       cy.get('[data-testid="btn-save-diaria"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:370:6:
+      370 │       cy.get('[data-testid="success-message"]').should('contain',...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:373:4:
+      373 │     it('CT-012: Sistema deve rejeitar diária com data anterior',...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:374:6:
+      374 │       cy.visit(`${baseUrl}/diarias/novo`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:376:6:
+      376 │       cy.get('[data-testid="diaria-funcionario"]').select(testFun...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:377:6:
+      377 │       cy.get('[data-testid="diaria-data"]').type('2020-01-01');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:379:6:
+      379 │       cy.get('[data-testid="btn-save-diaria"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:381:6:
+      381 │       cy.get('[data-testid="error-message"]').should('contain', '...
+          ╵       ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:387:2:
+      387 │   describe('Jornada 7: Visualizar Relatórios e Cálculos', () => {
+          ╵   ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'beforeEach'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:388:4:
+      388 │     beforeEach(() => {
+          ╵     ~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:389:6:
+      389 │       cy.login(testUser.email, testUser.password);
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:390:6:
+      390 │       cy.createFullContractSetup(testCliente, testPosto, testFunc...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:391:6:
+      391 │       cy.createMultipleDiarias(testFuncionario.id, 10);
+          ╵       ~~
+
+
+✘ [ERROR] TS2339: Property 'id' does not exist on type '{ nome: string; cpf: string; telefone: string; email: string; tipoEscala: string; tipoFuncionario: string; }'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:391:47:
+      391 │       cy.createMultipleDiarias(testFuncionario.id, 10);
+          ╵                                                ~~
+
+
+✘ [ERROR] TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:394:4:
+      394 │     it('CT-013: Usuário deve visualizar relatório de contrato c...
+          ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:396:6:
+      396 │       cy.visit(`${baseUrl}/contratos/${testContrato.id}`);
+          ╵       ~~
+
+
+✘ [ERROR] TS2339: Property 'id' does not exist on type '{ titulo: string; dataInicio: string; dataFim: string; status: string; percentualEncargos: number; margemLucroPercentual: number; margemCoberturaFaltasPercentual: number; }'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:396:52:
+      396 │       cy.visit(`${baseUrl}/contratos/${testContrato.id}`);
+          ╵                                                     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:399:6:
+      399 │       cy.get('[data-testid="tab-relatorio"]').click();
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:402:6:
+      402 │       cy.get('[data-testid="resumo-mensal"]').should('be.visible');
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:405:6:
+      405 │       cy.get('[data-testid="valor-total-calculado"]').should('con...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:408:6:
+      408 │       cy.get('[data-testid="breakdown-custo-direto"]').should('be...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:409:6:
+      409 │       cy.get('[data-testid="breakdown-impostos"]').should('be.vis...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:410:6:
+      410 │       cy.get('[data-testid="breakdown-margens"]').should('be.visi...
+          ╵       ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:413:6:
+      413 │       cy.get('[data-testid="breakdown-custo-direto"]').then(($cus...
+          ╵       ~~
+
+
+✘ [ERROR] TS7006: Parameter '$custoEl' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:413:61:
+      413 │ ...et('[data-testid="breakdown-custo-direto"]').then(($custoEl) => {
+          ╵                                                       ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:415:8:
+      415 │         cy.get('[data-testid="breakdown-impostos"]').then(($impos...
+          ╵         ~~
+
+
+✘ [ERROR] TS7006: Parameter '$impostosEl' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:415:59:
+      415 │ ...get('[data-testid="breakdown-impostos"]').then(($impostosEl) => {
+          ╵                                                    ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'expect'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:419:10:
+      419 │           expect(custoDiretoText).to.contain('R$');
+          ╵           ~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'expect'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:420:10:
+      420 │           expect(impostosText).to.contain('R$');
+          ╵           ~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/critical-journeys.cy.ts:423:10:
+      423 │           cy.get('[data-testid="valor-total-calculado"]').should(...
+          ╵           ~~
+
+
+Watch mode enabled. Watching for file changes...
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [8.087 seconds] - 2026-05-13T01:04:17.384Z
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:3:44:
+      3 │     login(email: string, password: string): Chainable<void>;
+        ╵                                             ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:4:33:
+      4 │     createCliente(cliente: any): Chainable<void>;
+        ╵                                  ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:5:48:
+      5 │     createPosto(clienteId: string, posto: any): Chainable<void>;
+        ╵                                                 ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:6:54:
+      6 │     createContrato(clienteId: string, contrato: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:7:60:
+      7 │ ...eFuncionario(clienteId: string, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:8:73:
+      8 │ ...Setup(cliente: any, posto: any, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:9:65:
+      9 │ ...ipleDiarias(funcionarioId: string, count: number): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:0:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'email' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:31:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'password' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:38:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                       ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:14:2:
+      14 │   cy.visit('/auth/login');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:15:2:
+      15 │   cy.get('[data-testid="login-email"]').type(email);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:16:2:
+      16 │   cy.get('[data-testid="login-password"]').type(password);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:17:2:
+      17 │   cy.get('[data-testid="login-submit"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:0:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:39:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:21:2:
+      21 │   cy.visit('/clientes/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:22:2:
+      22 │   cy.get('[data-testid="cliente-nome"]').type(cliente.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:23:2:
+      23 │   cy.get('[data-testid="cliente-cnpj"]').type(cliente.cnpj);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:24:2:
+      24 │   cy.get('[data-testid="btn-save-cliente"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:0:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:37:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                      ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:48:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                                 ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:28:2:
+      28 │   cy.visit(`/postos/novo?cliente=${clienteId}`);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:29:2:
+      29 │   cy.get('[data-testid="posto-nome"]').type(posto.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:30:2:
+      30 │   cy.get('[data-testid="btn-save-posto"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:0:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:40:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                         ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'contrato' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:51:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                                    ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:34:2:
+      34 │   cy.visit('/contratos/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:35:2:
+      35 │   cy.get('[data-testid="contrato-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:36:2:
+      36 │   cy.get('[data-testid="contrato-titulo"]').type(contrato.titulo |...
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:37:2:
+      37 │   cy.get('[data-testid="btn-save-contrato"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:0:
+      40 │ Cypress.Commands.add('createFuncionario', (clienteId, funcionario)...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:43:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                          ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:54:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:41:2:
+      41 │   cy.visit('/funcionarios/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:42:2:
+      42 │   cy.get('[data-testid="funcionario-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:43:2:
+      43 │   cy.get('[data-testid="funcionario-nome"]').type(funcionario.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:44:2:
+      44 │   cy.get('[data-testid="funcionario-cpf"]').type(funcionario.cpf);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:45:2:
+      45 │   cy.get('[data-testid="btn-save-funcionario"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:0:
+      48 │ Cypress.Commands.add('createFullContractSetup', (cliente, posto, f...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:49:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                     ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:58:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                              ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:65:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:49:2:
+      49 │   cy.createCliente(cliente);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:51:2:
+      51 │   cy.createPosto('dummy-id', posto);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:52:2:
+      52 │   cy.createContrato('dummy-id', {});
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:53:2:
+      53 │   cy.createFuncionario('dummy-id', funcionario);
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:0:
+      56 │ Cypress.Commands.add('createMultipleDiarias', (funcionarioId, coun...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionarioId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:47:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                            ~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'count' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:62:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                                           ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:58:4:
+      58 │     cy.visit('/diarias/novo');
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:60:4:
+      60 │     cy.get('[data-testid="btn-save-diaria"]').click();
+         ╵     ~~
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [0.006 seconds] - 2026-05-13T01:04:53.807Z
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:3:44:
+      3 │     login(email: string, password: string): Chainable<void>;
+        ╵                                             ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:4:33:
+      4 │     createCliente(cliente: any): Chainable<void>;
+        ╵                                  ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:5:48:
+      5 │     createPosto(clienteId: string, posto: any): Chainable<void>;
+        ╵                                                 ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:6:54:
+      6 │     createContrato(clienteId: string, contrato: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:7:60:
+      7 │ ...eFuncionario(clienteId: string, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:8:73:
+      8 │ ...Setup(cliente: any, posto: any, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:9:65:
+      9 │ ...ipleDiarias(funcionarioId: string, count: number): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:0:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'email' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:31:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'password' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:38:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                       ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:14:2:
+      14 │   cy.visit('/auth/login');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:15:2:
+      15 │   cy.get('[data-testid="login-email"]').type(email);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:16:2:
+      16 │   cy.get('[data-testid="login-password"]').type(password);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:17:2:
+      17 │   cy.get('[data-testid="login-submit"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:0:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:39:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:21:2:
+      21 │   cy.visit('/clientes/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:22:2:
+      22 │   cy.get('[data-testid="cliente-nome"]').type(cliente.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:23:2:
+      23 │   cy.get('[data-testid="cliente-cnpj"]').type(cliente.cnpj);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:24:2:
+      24 │   cy.get('[data-testid="btn-save-cliente"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:0:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:37:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                      ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:48:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                                 ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:28:2:
+      28 │   cy.visit(`/postos/novo?cliente=${clienteId}`);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:29:2:
+      29 │   cy.get('[data-testid="posto-nome"]').type(posto.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:30:2:
+      30 │   cy.get('[data-testid="btn-save-posto"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:0:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:40:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                         ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'contrato' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:51:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                                    ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:34:2:
+      34 │   cy.visit('/contratos/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:35:2:
+      35 │   cy.get('[data-testid="contrato-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:36:2:
+      36 │   cy.get('[data-testid="contrato-titulo"]').type(contrato.titulo |...
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:37:2:
+      37 │   cy.get('[data-testid="btn-save-contrato"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:0:
+      40 │ Cypress.Commands.add('createFuncionario', (clienteId, funcionario)...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:43:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                          ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:54:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:41:2:
+      41 │   cy.visit('/funcionarios/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:42:2:
+      42 │   cy.get('[data-testid="funcionario-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:43:2:
+      43 │   cy.get('[data-testid="funcionario-nome"]').type(funcionario.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:44:2:
+      44 │   cy.get('[data-testid="funcionario-cpf"]').type(funcionario.cpf);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:45:2:
+      45 │   cy.get('[data-testid="btn-save-funcionario"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:0:
+      48 │ Cypress.Commands.add('createFullContractSetup', (cliente, posto, f...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:49:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                     ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:58:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                              ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:65:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:49:2:
+      49 │   cy.createCliente(cliente);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:51:2:
+      51 │   cy.createPosto('dummy-id', posto);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:52:2:
+      52 │   cy.createContrato('dummy-id', {});
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:53:2:
+      53 │   cy.createFuncionario('dummy-id', funcionario);
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:0:
+      56 │ Cypress.Commands.add('createMultipleDiarias', (funcionarioId, coun...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionarioId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:47:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                            ~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'count' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:62:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                                           ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:58:4:
+      58 │     cy.visit('/diarias/novo');
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:60:4:
+      60 │     cy.get('[data-testid="btn-save-diaria"]').click();
+         ╵     ~~
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [0.004 seconds] - 2026-05-13T01:08:13.897Z
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:3:44:
+      3 │     login(email: string, password: string): Chainable<void>;
+        ╵                                             ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:4:33:
+      4 │     createCliente(cliente: any): Chainable<void>;
+        ╵                                  ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:5:48:
+      5 │     createPosto(clienteId: string, posto: any): Chainable<void>;
+        ╵                                                 ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:6:54:
+      6 │     createContrato(clienteId: string, contrato: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:7:60:
+      7 │ ...eFuncionario(clienteId: string, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:8:73:
+      8 │ ...Setup(cliente: any, posto: any, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:9:65:
+      9 │ ...ipleDiarias(funcionarioId: string, count: number): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:0:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'email' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:31:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'password' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:38:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                       ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:14:2:
+      14 │   cy.visit('/auth/login');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:15:2:
+      15 │   cy.get('[data-testid="login-email"]').type(email);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:16:2:
+      16 │   cy.get('[data-testid="login-password"]').type(password);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:17:2:
+      17 │   cy.get('[data-testid="login-submit"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:0:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:39:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:21:2:
+      21 │   cy.visit('/clientes/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:22:2:
+      22 │   cy.get('[data-testid="cliente-nome"]').type(cliente.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:23:2:
+      23 │   cy.get('[data-testid="cliente-cnpj"]').type(cliente.cnpj);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:24:2:
+      24 │   cy.get('[data-testid="btn-save-cliente"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:0:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:37:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                      ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:48:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                                 ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:28:2:
+      28 │   cy.visit(`/postos/novo?cliente=${clienteId}`);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:29:2:
+      29 │   cy.get('[data-testid="posto-nome"]').type(posto.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:30:2:
+      30 │   cy.get('[data-testid="btn-save-posto"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:0:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:40:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                         ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'contrato' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:51:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                                    ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:34:2:
+      34 │   cy.visit('/contratos/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:35:2:
+      35 │   cy.get('[data-testid="contrato-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:36:2:
+      36 │   cy.get('[data-testid="contrato-titulo"]').type(contrato.titulo |...
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:37:2:
+      37 │   cy.get('[data-testid="btn-save-contrato"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:0:
+      40 │ Cypress.Commands.add('createFuncionario', (clienteId, funcionario)...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:43:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                          ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:54:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:41:2:
+      41 │   cy.visit('/funcionarios/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:42:2:
+      42 │   cy.get('[data-testid="funcionario-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:43:2:
+      43 │   cy.get('[data-testid="funcionario-nome"]').type(funcionario.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:44:2:
+      44 │   cy.get('[data-testid="funcionario-cpf"]').type(funcionario.cpf);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:45:2:
+      45 │   cy.get('[data-testid="btn-save-funcionario"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:0:
+      48 │ Cypress.Commands.add('createFullContractSetup', (cliente, posto, f...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:49:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                     ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:58:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                              ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:65:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:49:2:
+      49 │   cy.createCliente(cliente);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:51:2:
+      51 │   cy.createPosto('dummy-id', posto);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:52:2:
+      52 │   cy.createContrato('dummy-id', {});
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:53:2:
+      53 │   cy.createFuncionario('dummy-id', funcionario);
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:0:
+      56 │ Cypress.Commands.add('createMultipleDiarias', (funcionarioId, coun...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionarioId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:47:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                            ~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'count' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:62:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                                           ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:58:4:
+      58 │     cy.visit('/diarias/novo');
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:60:4:
+      60 │     cy.get('[data-testid="btn-save-diaria"]').click();
+         ╵     ~~
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [0.003 seconds] - 2026-05-13T01:09:52.099Z
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:3:44:
+      3 │     login(email: string, password: string): Chainable<void>;
+        ╵                                             ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:4:33:
+      4 │     createCliente(cliente: any): Chainable<void>;
+        ╵                                  ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:5:48:
+      5 │     createPosto(clienteId: string, posto: any): Chainable<void>;
+        ╵                                                 ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:6:54:
+      6 │     createContrato(clienteId: string, contrato: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:7:60:
+      7 │ ...eFuncionario(clienteId: string, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:8:73:
+      8 │ ...Setup(cliente: any, posto: any, funcionario: any): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2315: Type 'Chainable' is not generic. [plugin angular-compiler]
+
+    src/e2e/support.ts:9:65:
+      9 │ ...ipleDiarias(funcionarioId: string, count: number): Chainable<void>;
+        ╵                                                       ~~~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:0:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'email' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:31:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'password' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:13:38:
+      13 │ Cypress.Commands.add('login', (email, password) => {
+         ╵                                       ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:14:2:
+      14 │   cy.visit('/auth/login');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:15:2:
+      15 │   cy.get('[data-testid="login-email"]').type(email);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:16:2:
+      16 │   cy.get('[data-testid="login-password"]').type(password);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:17:2:
+      17 │   cy.get('[data-testid="login-submit"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:0:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:20:39:
+      20 │ Cypress.Commands.add('createCliente', (cliente) => {
+         ╵                                        ~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:21:2:
+      21 │   cy.visit('/clientes/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:22:2:
+      22 │   cy.get('[data-testid="cliente-nome"]').type(cliente.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:23:2:
+      23 │   cy.get('[data-testid="cliente-cnpj"]').type(cliente.cnpj);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:24:2:
+      24 │   cy.get('[data-testid="btn-save-cliente"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:0:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:37:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                      ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:27:48:
+      27 │ Cypress.Commands.add('createPosto', (clienteId, posto) => {
+         ╵                                                 ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:28:2:
+      28 │   cy.visit(`/postos/novo?cliente=${clienteId}`);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:29:2:
+      29 │   cy.get('[data-testid="posto-nome"]').type(posto.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:30:2:
+      30 │   cy.get('[data-testid="btn-save-posto"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:0:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:40:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                         ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'contrato' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:33:51:
+      33 │ Cypress.Commands.add('createContrato', (clienteId, contrato) => {
+         ╵                                                    ~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:34:2:
+      34 │   cy.visit('/contratos/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:35:2:
+      35 │   cy.get('[data-testid="contrato-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:36:2:
+      36 │   cy.get('[data-testid="contrato-titulo"]').type(contrato.titulo |...
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:37:2:
+      37 │   cy.get('[data-testid="btn-save-contrato"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:0:
+      40 │ Cypress.Commands.add('createFuncionario', (clienteId, funcionario)...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'clienteId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:43:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                          ~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:40:54:
+      40 │ ...ss.Commands.add('createFuncionario', (clienteId, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:41:2:
+      41 │   cy.visit('/funcionarios/novo');
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:42:2:
+      42 │   cy.get('[data-testid="funcionario-cliente"]').select(clienteId);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:43:2:
+      43 │   cy.get('[data-testid="funcionario-nome"]').type(funcionario.nome);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:44:2:
+      44 │   cy.get('[data-testid="funcionario-cpf"]').type(funcionario.cpf);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:45:2:
+      45 │   cy.get('[data-testid="btn-save-funcionario"]').click();
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:0:
+      48 │ Cypress.Commands.add('createFullContractSetup', (cliente, posto, f...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'cliente' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:49:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                     ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'posto' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:58:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                              ~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionario' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:48:65:
+      48 │ ....add('createFullContractSetup', (cliente, posto, funcionario) => {
+         ╵                                                     ~~~~~~~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:49:2:
+      49 │   cy.createCliente(cliente);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:51:2:
+      51 │   cy.createPosto('dummy-id', posto);
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:52:2:
+      52 │   cy.createContrato('dummy-id', {});
+         ╵   ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:53:2:
+      53 │   cy.createFuncionario('dummy-id', funcionario);
+         ╵   ~~
+
+
+✘ [ERROR] TS2708: Cannot use namespace 'Cypress' as a value. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:0:
+      56 │ Cypress.Commands.add('createMultipleDiarias', (funcionarioId, coun...
+         ╵ ~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'funcionarioId' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:47:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                            ~~~~~~~~~~~~~
+
+
+✘ [ERROR] TS7006: Parameter 'count' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/e2e/support.ts:56:62:
+      56 │ ....Commands.add('createMultipleDiarias', (funcionarioId, count) => {
+         ╵                                                           ~~~~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:58:4:
+      58 │     cy.visit('/diarias/novo');
+         ╵     ~~
+
+
+✘ [ERROR] TS2304: Cannot find name 'cy'. [plugin angular-compiler]
+
+    src/e2e/support.ts:60:4:
+      60 │     cy.get('[data-testid="btn-save-diaria"]').click();
+         ╵     ~~
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files | Names                        |  Raw size
+styles.css          | styles                       |  32.05 kB | 
+main.js             | main                         |  11.41 kB | 
+chunk-R3FF2VD3.js   | -                            |   3.42 kB | 
+chunk-653SOEEV.js   | -                            |   1.51 kB | 
+chunk-DDE4NLQV.js   | -                            | 178 bytes | 
+
+                    | Initial total                |  48.58 kB
+
+Lazy chunk files    | Names                        |  Raw size
+chunk-372VYX2K.js   | cliente-wizard-component     | 296.02 kB | 
+chunk-EUPCKFMH.js   | cliente-detail-component     | 179.25 kB | 
+chunk-UECSDSQY.js   | landing-component            | 176.77 kB | 
+chunk-FBBMVFRE.js   | contrato-detail-component    | 172.00 kB | 
+chunk-UF4VSIS4.js   | -                            | 148.81 kB | 
+chunk-CES7JLX4.js   | -                            | 144.28 kB | 
+chunk-6XR7BIDC.js   | dashboard-component          | 137.81 kB | 
+chunk-CRRZIZNI.js   | posto-detail-component       | 128.51 kB | 
+chunk-ORREETJQ.js   | funcionario-detail-component | 126.69 kB | 
+chunk-6NWDWYX7.js   | app-shell-component          | 116.35 kB | 
+chunk-VGORMSTV.js   | contrato-list-component      |  94.00 kB | 
+chunk-2IU6ZDTX.js   | suporte-page-component       |  63.71 kB | 
+chunk-FCLR7IUT.js   | tag-list-component           |  60.32 kB | 
+chunk-4NO3FBWX.js   | perfil-component             |  53.29 kB | 
+chunk-HSYMXQSU.js   | funcionario-form-component   |  51.75 kB | 
+...and 36 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [10.344 seconds] - 2026-05-13T01:10:12.373Z
+
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+22:10:12 [vite] (client) Re-optimizing dependencies because lockfile has changed
+An unhandled exception occurred: EACCES: permission denied, rmdir '/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/.angular/cache/21.0.4/frontend/vite/deps'
+See "/tmp/ng-penYmK/angular-errors.log" for further details.

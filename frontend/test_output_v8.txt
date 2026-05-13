@@ -1,0 +1,238 @@
+
+> frontend@0.0.0 test
+> ng test --watch=false
+
+❯ Building...
+✔ Building...
+Initial chunk files                                                      | Names                                                                 |  Raw size
+spec-app-features-contratos-contrato-detail-contrato-detail.component.js | spec-app-features-contratos-contrato-detail-contrato-detail.component | 175.29 kB | 
+spec-app-features-contratos-contrato-form-contrato-form.component.js     | spec-app-features-contratos-contrato-form-contrato-form.component     | 150.50 kB | 
+spec-app-pages-dashboard-dashboard.component.js                          | spec-app-pages-dashboard-dashboard.component                          | 141.58 kB | 
+spec-app-features-contratos-contrato-list-contrato-list.component.js     | spec-app-features-contratos-contrato-list-contrato-list.component     |  96.74 kB | 
+spec-app-features-tags-tag-list-tag-list.component.js                    | spec-app-features-tags-tag-list-tag-list.component                    |  60.87 kB | 
+styles.css                                                               | styles                                                                |  32.01 kB | 
+chunk-VBNSR6IQ.js                                                        | -                                                                     |  17.59 kB | 
+spec-app-services-auth.service.js                                        | spec-app-services-auth.service                                        |   8.25 kB | 
+chunk-ENZ4CWWK.js                                                        | -                                                                     |   8.07 kB | 
+chunk-YXJMCAYO.js                                                        | -                                                                     |   5.31 kB | 
+chunk-A44TLS2P.js                                                        | -                                                                     |   4.74 kB | 
+spec-app-services-contrato.service.js                                    | spec-app-services-contrato.service                                    |   4.14 kB | 
+spec-app-services-diaria.service.js                                      | spec-app-services-diaria.service                                      |   3.96 kB | 
+spec-app-services-cliente.service.js                                     | spec-app-services-cliente.service                                     |   3.77 kB | 
+spec-app-services-funcionario.service.js                                 | spec-app-services-funcionario.service                                 |   3.48 kB | 
+spec-app-services-posto.service.js                                       | spec-app-services-posto.service                                       |   3.12 kB | 
+spec-app-shared-helpers-contrato-calculo.helper.js                       | spec-app-shared-helpers-contrato-calculo.helper                       |   2.97 kB | 
+spec-app-shared-components-tag-picker-tag-picker.component.js            | spec-app-shared-components-tag-picker-tag-picker.component            |   2.94 kB | 
+spec-app-services-tag.service.js                                         | spec-app-services-tag.service                                         |   2.93 kB | 
+chunk-7FJQOHBQ.js                                                        | -                                                                     |   2.86 kB | 
+spec-app-services-alocacao.service.js                                    | spec-app-services-alocacao.service                                    |   2.83 kB | 
+chunk-ZF5FSE4V.js                                                        | -                                                                     |   2.82 kB | 
+spec-app-services-entity-cache-coordinator.service.js                    | spec-app-services-entity-cache-coordinator.service                    |   2.56 kB | 
+chunk-ZMQ3RWDO.js                                                        | -                                                                     |   2.51 kB | 
+chunk-LLFWUWTB.js                                                        | -                                                                     |   2.37 kB | 
+chunk-CB6DBKXB.js                                                        | -                                                                     |   2.27 kB | 
+chunk-PGPMFGQH.js                                                        | -                                                                     |   2.22 kB | 
+chunk-DM5QS3SY.js                                                        | -                                                                     |   2.13 kB | 
+spec-app-app.js                                                          | spec-app-app                                                          |   2.12 kB | 
+chunk-L2IC2CS6.js                                                        | -                                                                     |   1.99 kB | 
+chunk-4O5EHUEN.js                                                        | -                                                                     |   1.74 kB | 
+chunk-HNP7MONP.js                                                        | -                                                                     |   1.68 kB | 
+init-testbed.js                                                          | init-testbed                                                          |   1.20 kB | 
+chunk-DDE4NLQV.js                                                        | -                                                                     | 178 bytes | 
+
+                                                                         | Initial total                                                         | 759.72 kB
+
+Application bundle generation complete. [8.781 seconds] - 2026-05-13T00:53:49.186Z
+
+
+ RUN  v4.0.16 /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend
+
+ ✓ |frontend| src/app/app.spec.ts (1 test) 225ms
+ ❯ |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts (3 tests | 3 failed) 34ms
+     × should create 20ms
+     × should load contracts on init 5ms
+     × should call delete service when confirmed 2ms
+ ✓ |frontend| src/app/services/auth.service.spec.ts (10 tests) 166ms
+ ❯ |frontend| src/app/pages/dashboard/dashboard.component.spec.ts (3 tests | 3 failed) 35ms
+       × deve criar o componente 24ms
+       × deve carregar dados ao inicializar 3ms
+       × deve exibir erro ao carregar clientes falhar 2ms
+ ✓ |frontend| src/app/services/tag.service.spec.ts (5 tests) 64ms
+ ❯ |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts (3 tests | 3 failed) 43ms
+     × should create 23ms
+     × should load data on init 6ms
+     × should handle error if contrato not found 7ms
+ ✓ |frontend| src/app/services/contrato.service.spec.ts (6 tests) 135ms
+ ✓ |frontend| src/app/services/cliente.service.spec.ts (6 tests) 176ms
+ ✓ |frontend| src/app/services/diaria.service.spec.ts (6 tests) 45ms
+ ✓ |frontend| src/app/services/funcionario.service.spec.ts (5 tests) 48ms
+ ✓ |frontend| src/app/services/alocacao.service.spec.ts (3 tests) 106ms
+ ✓ |frontend| src/app/services/entity-cache-coordinator.service.spec.ts (4 tests) 10ms
+ ✓ |frontend| src/app/services/posto.service.spec.ts (5 tests) 55ms
+ ✓ |frontend| src/app/shared/helpers/contrato-calculo.helper.spec.ts (7 tests) 10ms
+stderr | src/app/features/tags/tag-list/tag-list.component.spec.ts > TagListComponent > exibe mensagem de erro quando o serviço falha
+Error: Erro de servidor
+    at /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.spec.ts:44:44
+    at Observable.init [as _subscribe] (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/observable/throwError.js:8:64)
+    at Observable._trySubscribe (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:41:25)
+    at /home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:35:31
+    at Object.errorContext (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/util/errorContext.js:22:9)
+    at Observable.subscribe (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/rxjs/dist/cjs/internal/Observable.js:26:24)
+    at _TagListComponent.loadTags (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.ts:56:27)
+    at _TagListComponent.ngOnInit (/home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/src/app/features/tags/tag-list/tag-list.component.ts:46:10)
+    at callHookInternal (file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (file:///home/jpcalsavara/projetos/andamento/InterceptorSystem/frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > renderiza o título "Novo Contrato" no modo de criação
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ✓ |frontend| src/app/shared/components/tag-picker/tag-picker.component.spec.ts (7 tests) 1489ms
+     ✓ renderiza os botões de seleção para cada tag  412ms
+     ✓ permite buscar tags por nome  434ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > carrega e exibe a lista de clientes no select
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ✓ |frontend| src/app/features/tags/tag-list/tag-list.component.spec.ts (5 tests) 1516ms
+     ✓ renderiza a lista de tags carregadas  538ms
+     ✓ abre o modal de criação ao clicar em "Nova Tag"  745ms
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > preenche valores padrão nos campos numéricos
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe erros de validação ao submeter o form vazio
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+stderr | src/app/features/contratos/contrato-form/contrato-form.component.spec.ts > ContratoFormComponent > exibe o botão de voltar para a lista de contratos
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ✓ |frontend| src/app/features/contratos/contrato-form/contrato-form.component.spec.ts (5 tests) 2094ms
+     ✓ renderiza o título "Novo Contrato" no modo de criação  1156ms
+     ✓ exibe erros de validação ao submeter o form vazio  333ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/pages/dashboard/dashboard.component.spec.ts > DashboardComponent > Inicialização (ngOnInit) > deve criar o componente
+ FAIL  |frontend| src/app/pages/dashboard/dashboard.component.spec.ts > DashboardComponent > Inicialização (ngOnInit) > deve carregar dados ao inicializar
+ FAIL  |frontend| src/app/pages/dashboard/dashboard.component.spec.ts > DashboardComponent > Tratamento de Erros > deve exibir erro ao carregar clientes falhar
+ReferenceError: jasmine is not defined
+ ❯ src/app/pages/dashboard/dashboard.component.spec.ts:70:5
+     68| 
+     69|   beforeEach(async () => {
+     70|     mockClienteService = jasmine.createSpyObj('ClienteService', ['getA…
+       |     ^
+     71|     mockFuncionarioService = jasmine.createSpyObj('FuncionarioService'…
+     72|     mockPostoService = jasmine.createSpyObj('PostoService', ['getAll',…
+ ❯ new ZoneAwarePromise node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts > ContratoDetailComponent > should create
+ FAIL  |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts > ContratoDetailComponent > should load data on init
+ FAIL  |frontend| src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts > ContratoDetailComponent > should handle error if contrato not found
+ReferenceError: jasmine is not defined
+ ❯ src/app/features/contratos/contrato-detail/contrato-detail.component.spec.ts:61:5
+     59| 
+     60|   beforeEach(async () => {
+     61|     mockContratoService = jasmine.createSpyObj('ContratoService', ['ge…
+       |     ^
+     62|     mockCalculoService = jasmine.createSpyObj('ContratoCalculoService'…
+     63|     mockClienteService = jasmine.createSpyObj('ClienteService', ['getB…
+ ❯ new ZoneAwarePromise node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts > ContratoListComponent > should create
+ FAIL  |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts > ContratoListComponent > should load contracts on init
+ FAIL  |frontend| src/app/features/contratos/contrato-list/contrato-list.component.spec.ts > ContratoListComponent > should call delete service when confirmed
+ReferenceError: jasmine is not defined
+ ❯ src/app/features/contratos/contrato-list/contrato-list.component.spec.ts:72:5
+     70| 
+     71|   beforeEach(async () => {
+     72|     mockContratoService = jasmine.createSpyObj('ContratoService', ['ge…
+       |     ^
+     73|     mockClienteService = jasmine.createSpyObj('ClienteService', ['getA…
+     74|     mockFuncionarioService = jasmine.createSpyObj('FuncionarioService'…
+ ❯ new ZoneAwarePromise node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+
+ Test Files  3 failed | 14 passed (17)
+      Tests  9 failed | 75 passed (84)
+   Start at  21:53:49
+   Duration  8.04s (transform 3.55s, setup 10.87s, import 8.42s, tests 6.25s, environment 37.91s)
+

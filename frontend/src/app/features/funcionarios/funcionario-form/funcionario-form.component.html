@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container form-page">
   <div class="page-header">
     <div class="header-content">
       <button class="btn-back" routerLink="/funcionarios">
@@ -40,23 +40,49 @@
       <h3 class="section-title">Dados Pessoais</h3>
 
       <div class="form-row">
+        <!-- Cliente -->
         <div class="form-group">
-          <label for="condominioId" class="form-label">
-            Condomínio <span class="required">*</span>
+          <label for="clienteId" class="form-label">
+            Cliente <span class="required">*</span>
           </label>
           <select
-            id="condominioId"
-            formControlName="condominioId"
+            id="clienteId"
+            formControlName="clienteId"
             class="form-input"
-            [class.error]="hasError('condominioId')"
+            [class.error]="hasError('clienteId')"
           >
-            <option value="">Selecione um condomínio</option>
-            @for (cond of condominios(); track cond.id) {
+            <option value="">Selecione um cliente</option>
+            @for (cond of clientes(); track cond.id) {
               <option [value]="cond.id">{{ cond.nome }}</option>
             }
           </select>
-          @if (hasError('condominioId')) {
-            <span class="error-message">{{ getErrorMessage('condominioId') }}</span>
+          @if (hasError('clienteId')) {
+            <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
+          }
+        </div>
+
+        <!-- Contrato -->
+        <div class="form-group">
+          <label for="contratoId" class="form-label">
+            Contrato <span class="required">*</span>
+          </label>
+          <select
+            id="contratoId"
+            formControlName="contratoId"
+            class="form-input"
+            [class.error]="hasError('contratoId')"
+            [disabled]="!form.get('clienteId')?.value"
+          >
+            <option value="">Selecione um contrato</option>
+            @for (cont of contratos(); track cont.id) {
+              <option [value]="cont.id">{{ cont.descricao }}</option>
+            }
+          </select>
+          @if (hasError('contratoId')) {
+            <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
+          }
+          @if (form.get('clienteId')?.value && contratos().length === 0) {
+            <span class="help-text warning">Nenhum contrato ativo para este cliente.</span>
           }
         </div>
       </div>
@@ -67,6 +93,7 @@
           id="nome"
           type="text"
           formControlName="nome"
+          data-testid="funcionario-nome"
           class="form-input"
           [class.error]="hasError('nome')"
           placeholder="Ex: João Silva Santos"
@@ -83,6 +110,7 @@
             id="cpf"
             type="text"
             formControlName="cpf"
+            data-testid="funcionario-cpf"
             class="form-input"
             [class.error]="hasError('cpf')"
             placeholder="000.000.000-00"
@@ -100,6 +128,7 @@
             id="celular"
             type="text"
             formControlName="celular"
+            data-testid="funcionario-telefone"
             class="form-input"
             [class.error]="hasError('celular')"
             placeholder="(00) 00000-0000"
@@ -122,6 +151,7 @@
           <select
             id="tipoFuncionario"
             formControlName="tipoFuncionario"
+            data-testid="funcionario-tipo"
             class="form-input"
             [class.error]="hasError('tipoFuncionario')"
           >
@@ -141,6 +171,7 @@
           <select
             id="tipoEscala"
             formControlName="tipoEscala"
+            data-testid="funcionario-tipo-escala"
             class="form-input"
             [class.error]="hasError('tipoEscala')"
           >
@@ -175,13 +206,29 @@
         </div>
       </div>
 
+      <!-- Tags Section -->
+      @if (tags().length > 0) {
+        <h3 class="section-title">Funções / Papéis</h3>
+
+        <app-tag-picker
+          [tags]="tags()"
+          [selectedIds]="form.get('tagIds')?.value || []"
+          [disabled]="loading()"
+          [label]="'Seleção de funções'"
+          [helperText]="
+            'Selecione uma ou mais funções disponíveis nos contratos ativos do cliente.'
+          "
+          (selectionChange)="onTagSelectionChange($event)"
+        />
+      }
+
       <div class="form-footer">
         <p class="required-note"><span class="required">*</span> Campos obrigatórios</p>
         <div class="button-group">
           <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()">
+          <button type="submit" class="btn-primary" [disabled]="loading()" data-testid="btn-save-funcionario">
             @if (loading()) {
               <span class="spinner-small"></span>
               Salvando...

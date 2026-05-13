@@ -2,10 +2,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { PostoDeTrabalhoService } from '../../../services/posto-de-trabalho.service';
-import { CondominioService } from '../../../services/condominio.service';
-import { ContratoService } from '../../../services/contrato.service';
-import { Condominio, Contrato, PostoDeTrabalho, StatusContrato } from '../../../models/index';
+import { finalize } from 'rxjs';
+import { PostoService } from '../../../services/posto.service';
+import { ClienteService } from '../../../services/cliente.service';
+import { CepService } from '../../../services/cep.service';
+import { Cliente, Posto } from '../../../models/index';
 
 @Component({
   selector: 'app-posto-form',
@@ -16,16 +17,16 @@ import { Condominio, Contrato, PostoDeTrabalho, StatusContrato } from '../../../
 })
 export class PostoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private service = inject(PostoDeTrabalhoService);
-  private condominioService = inject(CondominioService);
-  private contratoService = inject(ContratoService);
+  private service = inject(PostoService);
+  private clienteService = inject(ClienteService);
+  private cepService = inject(CepService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   form!: FormGroup;
-  condominios = signal<Condominio[]>([]);
-  contratos = signal<Contrato[]>([]);
+  clientes = signal<Cliente[]>([]);
   loading = signal(false);
+  loadingCep = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
   isEditMode = signal(false);
@@ -36,85 +37,65 @@ export class PostoFormComponent implements OnInit {
     this.isEditMode.set(!!this.postoId);
 
     this.form = this.fb.group({
-      condominioId: ['', Validators.required],
-      contratoId: ['', Validators.required],
-      horarioInicio: [{ value: '', disabled: true }, [Validators.required]],
-      horarioFim: [{ value: '', disabled: true }, [Validators.required]],
-      permiteDobrarEscala: [true],
+      clienteId: ['', Validators.required],
+      nome: ['', [Validators.required, Validators.maxLength(150)]],
+      cep: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
+      endereco: ['', [Validators.required, Validators.maxLength(250)]],
+      numero: ['', [Validators.required, Validators.maxLength(20)]],
+      complemento: ['', [Validators.maxLength(120)]],
+      cidade: ['', [Validators.required, Validators.maxLength(100)]],
+      estado: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(2),
+          Validators.pattern(/^[A-Za-z]{2}$/),
+        ],
+      ],
     });
 
-    this.loadCondominios();
-
-    this.form.get('condominioId')?.valueChanges.subscribe((condominioId) => {
-      if (condominioId) {
-        this.onCondominioChange(condominioId);
-      } else {
-        this.contratos.set([]);
-        this.form.get('contratoId')?.reset('');
-      }
-    });
+    this.setupClienteChange();
+    this.loadClientes();
 
     if (this.isEditMode() && this.postoId) {
       this.loadPosto(this.postoId);
     }
   }
 
-  onCondominioChange(condominioId: string): void {
-    const condominio = this.condominios().find((c) => c.id === condominioId);
-    if (!condominio) return;
-
-    const horarioInicio = condominio.horarioTrocaTurno.substring(0, 5);
-    const horarioFim = this.calcularHorarioFim(horarioInicio);
-
-    this.form.patchValue({ horarioInicio, horarioFim });
-    this.form.get('contratoId')?.reset('');
-    this.loadContratos(condominioId);
-  }
-
-  calcularHorarioFim(horarioInicio: string): string {
-    const [horas, minutos] = horarioInicio.split(':').map(Number);
-    const novaHora = (horas + 12) % 24;
-    return `${String(novaHora).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
-  }
-
-  loadCondominios(): void {
-    this.condominioService.getAll().subscribe({
-      next: (data) => this.condominios.set(data),
-      error: (err) => {
-        this.error.set('Erro ao carregar condomínios.');
-        console.error(err);
-      },
+  private setupClienteChange(): void {
+    this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
+      if (!clienteId) {
+        return;
+      }
     });
   }
 
-  loadContratos(condominioId: string): void {
-    this.contratoService.getAll().subscribe({
-      next: (data) => {
-        const contratosDoCondominio = data.filter(
-          (c) => c.condominioId === condominioId && c.status !== StatusContrato.FINALIZADO,
-        );
-        this.contratos.set(contratosDoCondominio);
+  loadClientes(): void {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes.set(data),
+      error: (err) => {
+        this.error.set('Erro ao carregar clientes.');
+        console.error(err);
       },
-      error: (err) => console.error('Erro ao carregar contratos:', err),
     });
   }
 
   loadPosto(id: string): void {
     this.loading.set(true);
     this.service.getById(id).subscribe({
-      next: (data: PostoDeTrabalho) => {
-        const horarioInicioFormatado = data.horarioInicio.substring(0, 5);
-        const horarioFimFormatado = data.horarioFim.substring(0, 5);
-
+      next: (data: Posto) => {
         this.form.patchValue({
-          horarioInicio: horarioInicioFormatado,
-          horarioFim: horarioFimFormatado,
-          permiteDobrarEscala: data.permiteDobrarEscala,
+          clienteId: data.clienteId,
+          nome: data.nome,
+          cep: this.cepService.formatCep(data.cep),
+          endereco: data.endereco,
+          numero: data.numero,
+          complemento: data.complemento ?? '',
+          cidade: data.cidade,
+          estado: data.estado,
         });
-        this.form.get('condominioId')?.setValue(data.condominioId);
-        this.form.get('condominioId')?.disable();
-        this.form.get('contratoId')?.setValue(data.contratoId);
-        this.form.get('contratoId')?.disable();
+        this.form.get('clienteId')?.disable();
         this.loading.set(false);
       },
       error: (err) => {
@@ -133,48 +114,34 @@ export class PostoFormComponent implements OnInit {
       return;
     }
 
-    if (!this.isEditMode() && this.contratos().length === 0) {
-      this.error.set(
-        'Não há contratos ativos para o condomínio selecionado. Cadastre um contrato primeiro.',
-      );
-      return;
-    }
-
     this.loading.set(true);
     this.error.set(null);
 
     const formValue = this.form.getRawValue();
-
-    const horarioInicio = formValue.horarioInicio.includes(':00', 5)
-      ? formValue.horarioInicio
-      : formValue.horarioInicio + ':00';
-
-    const horarioFim = formValue.horarioFim.includes(':00', 5)
-      ? formValue.horarioFim
-      : formValue.horarioFim + ':00';
+    const cepNormalizado = this.cepService.onlyDigits(formValue.cep);
+    const payload = {
+      nome: (formValue.nome || '').trim(),
+      cep: cepNormalizado,
+      endereco: (formValue.endereco || '').trim(),
+      numero: (formValue.numero || '').trim(),
+      complemento: (formValue.complemento || '').trim() || null,
+      cidade: (formValue.cidade || '').trim(),
+      estado: (formValue.estado || '').trim().toUpperCase(),
+    };
 
     if (this.isEditMode() && this.postoId) {
-      this.service
-        .update(this.postoId, {
-          horarioInicio,
-          horarioFim,
-          permiteDobrarEscala: formValue.permiteDobrarEscala,
-        })
-        .subscribe({
-          next: () => this.router.navigate(['/postos']),
-          error: (err) => {
-            this.error.set(err.error?.error || 'Erro ao atualizar posto.');
-            this.loading.set(false);
-          },
-        });
+      this.service.update(this.postoId, payload).subscribe({
+        next: () => this.router.navigate(['/postos']),
+        error: (err) => {
+          this.error.set(err.error?.error || 'Erro ao atualizar posto.');
+          this.loading.set(false);
+        },
+      });
     } else {
       this.service
         .create({
-          condominioId: formValue.condominioId,
-          contratoId: formValue.contratoId,
-          horarioInicio,
-          horarioFim,
-          permiteDobrarEscala: formValue.permiteDobrarEscala,
+          clienteId: formValue.clienteId,
+          ...payload,
         })
         .subscribe({
           next: () => this.router.navigate(['/postos']),
@@ -186,6 +153,80 @@ export class PostoFormComponent implements OnInit {
     }
   }
 
+  onCepInput(): void {
+    const control = this.form.get('cep');
+    if (!control) return;
+
+    const formatted = this.cepService.formatCep(control.value || '');
+    if (formatted !== control.value) {
+      control.setValue(formatted, { emitEvent: false });
+    }
+
+    this.clearCustomCepError();
+  }
+
+  onCepBlur(): void {
+    const cepControl = this.form.get('cep');
+    if (!cepControl) return;
+
+    const cep = cepControl.value || '';
+    if (!this.cepService.isCepValido(cep)) {
+      return;
+    }
+
+    this.loadingCep.set(true);
+    this.error.set(null);
+
+    this.cepService
+      .buscarCep(cep)
+      .pipe(finalize(() => this.loadingCep.set(false)))
+      .subscribe({
+        next: (endereco) => {
+          this.clearCustomCepError();
+          this.form.patchValue({
+            cep: this.cepService.formatCep(endereco.cep),
+            endereco: endereco.logradouro || this.form.get('endereco')?.value,
+            cidade: endereco.cidade || this.form.get('cidade')?.value,
+            estado: (endereco.estado || this.form.get('estado')?.value || '').toUpperCase(),
+            complemento:
+              this.form.get('complemento')?.value ||
+              endereco.complemento ||
+              this.form.get('complemento')?.value,
+          });
+        },
+        error: () => {
+          this.setCustomCepError();
+          this.error.set('CEP não encontrado ou indisponível no momento.');
+        },
+      });
+  }
+
+  onEstadoBlur(): void {
+    const estadoControl = this.form.get('estado');
+    if (!estadoControl) return;
+
+    const normalized = (estadoControl.value || '').toUpperCase().slice(0, 2);
+    if (normalized !== estadoControl.value) {
+      estadoControl.setValue(normalized);
+    }
+  }
+
+  private setCustomCepError(): void {
+    const cepControl = this.form.get('cep');
+    if (!cepControl) return;
+
+    const errors = cepControl.errors || {};
+    cepControl.setErrors({ ...errors, cepNotFound: true });
+  }
+
+  private clearCustomCepError(): void {
+    const cepControl = this.form.get('cep');
+    if (!cepControl?.errors?.['cepNotFound']) return;
+
+    const { cepNotFound, ...rest } = cepControl.errors;
+    cepControl.setErrors(Object.keys(rest).length ? rest : null);
+  }
+
   hasError(fieldName: string): boolean {
     const field = this.form.get(fieldName);
     return field ? field.invalid && (field.touched || this.submitted()) : false;
@@ -195,6 +236,13 @@ export class PostoFormComponent implements OnInit {
     const field = this.form.get(fieldName);
     if (!field || !field.errors || (!field.touched && !this.submitted())) return '';
     if (field.errors['required']) return 'Este campo é obrigatório';
+    if (field.errors['pattern']) {
+      if (fieldName === 'cep') return 'Informe um CEP válido no formato 00000-000';
+      if (fieldName === 'estado') return 'UF deve conter 2 letras';
+    }
+    if (field.errors['cepNotFound']) return 'CEP não encontrado';
+    if (field.errors['maxlength']) return 'Ultrapassou o limite de caracteres';
+    if (field.errors['minlength']) return 'Mínimo de caracteres não atingido';
     return 'Campo inválido';
   }
 }
