@@ -1,15 +1,12 @@
 name: CD — Deploy Frontend (S3 + CloudFront)
 
 # ================================================
-# Roda automaticamente em push para main quando houver mudanças no frontend
+# Roda automaticamente em push para main
 # e também pode ser disparado manualmente pelo GitHub Actions
 # ================================================
 on:
   push:
     branches: [main, master]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/deploy-frontend.yml"
   workflow_dispatch:
     inputs:
       ref:
