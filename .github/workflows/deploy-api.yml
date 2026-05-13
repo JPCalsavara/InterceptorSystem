@@ -137,6 +137,14 @@ jobs:
             set -e  # Para o script se qualquer comando falhar
 
             echo "📦 Carregando nova imagem Docker..."
+
+            echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
+            docker run --rm \
+              --network host \
+              -e "ConnectionStrings__DefaultConnection=${RDS_CONNECTION_STRING}" \
+              -e "ASPNETCORE_ENVIRONMENT=Production" \
+              interceptor-api:latest \
+              bash -c "cd /app && dotnet ef database update 2>&1 || echo "ℹ️ Migrations já aplicadas""
             docker load < interceptor-api.tar.gz
 
             echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
