@@ -167,16 +167,26 @@ jobs:
              fi
 
              echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
-             docker run --rm \
-               --network host \
-               --env-file .env \
-               -e "ASPNETCORE_ENVIRONMENT=Production" \
-               interceptor-api:latest \
-               bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1" || {
-               echo "⚠️ Migrations falharam. Verificando detalhes..."
-               # Se falhou, tenta fazer skip de migrations apenas para iniciar a API
-               echo "⚠️ Continuando com deploy mesmo assim..."
-             }
+            # Diagnostic: print key env vars inside the container (masked)
+            echo "🔎 Imprimindo variáveis críticas dentro do container (masked)..."
+            docker run --rm \
+              --network host \
+              --env-file .env \
+              interceptor-api:latest \
+              bash -lc 'printenv | grep -E "^(ConnectionStrings__DefaultConnection|Jwt__Key|Jwt__Issuer)=" || true && echo "-- masked values --" && (printenv | grep "ConnectionStrings__DefaultConnection" | sed "s/=.*/=****MASKED****/") || true && (printenv | grep "^Jwt__Key" | sed "s/=.*/=****MASKED****/") || true'
+
+            echo "🟢 Agora rodando migrations (com logs completos)..."
+            docker run --rm \
+              --network host \
+              --env-file .env \
+              -e "ASPNETCORE_ENVIRONMENT=Production" \
+              interceptor-api:latest \
+              bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1" || {
+              echo "⚠️ Migrations falharam. Verificando detalhes..."
+              echo "Mostrar as últimas 200 linhas de logs do processo (se houver):"
+              docker run --rm --network host --env-file .env interceptor-api:latest bash -lc "(if command -v journalctl >/dev/null 2>&1; then journalctl -n 200 --no-pager || true; else echo 'journalctl não disponível'; fi)" || true
+              echo "⚠️ Continuando com deploy mesmo assim..."
+            }
 
             echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
             docker compose -f compose.ec2.yml pull --ignore-pull-failures || true
