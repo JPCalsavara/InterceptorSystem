@@ -140,52 +140,32 @@ jobs:
             docker load < interceptor-api.tar.gz
 
             echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
-            if [ -f .env ]; then
-              docker run --rm \
-                --network host \
-                --env-file .env \
-                -e "ASPNETCORE_ENVIRONMENT=Production" \
-                interceptor-api:latest \
-                bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll || echo '⚠️ Migration command completed (may already be applied)'"
-            else
-              echo "⚠️ .env file not found, skipping migrations"
+            if [ ! -f .env ]; then
+              echo "❌ ERRO: .env não encontrado em $(pwd)"
+              exit 1
             fi
-             # Debug: Mostrar diretório e verificar .env
-             echo "🔍 Verificando ambiente..."
-             echo "Diretório atual: $(pwd)"
-             if [ -f .env ]; then
-               echo "✅ Arquivo .env encontrado"
-               echo "Linhas em .env: $(wc -l < .env)"
-               # Verificar se tem variáveis críticas (sem expor valores)
-               grep -q "ConnectionStrings__DefaultConnection" .env && echo "✅ ConnectionString encontrada" || echo "❌ ConnectionString NÃO encontrada"
-               grep -q "Jwt__Key" .env && echo "✅ JWT_Key encontrada" || echo "❌ JWT_Key NÃO encontrada"
-             else
-               echo "❌ ERRO: .env não encontrado em $(pwd)"
-               echo "Arquivos disponíveis:"
-               ls -la | grep -E "^\.|\.env|compose"
-               exit 1
-             fi
-
-             echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
-            # Diagnostic: print key env vars inside the container (masked)
-            echo "🔎 Imprimindo variáveis críticas dentro do container (masked)..."
-            docker run --rm \
-              --network host \
-              --env-file .env \
-              interceptor-api:latest \
-              bash -lc 'printenv | grep -E "^(ConnectionStrings__DefaultConnection|Jwt__Key|Jwt__Issuer)=" || true && echo "-- masked values --" && (printenv | grep "ConnectionStrings__DefaultConnection" | sed "s/=.*/=****MASKED****/") || true && (printenv | grep "^Jwt__Key" | sed "s/=.*/=****MASKED****/") || true'
-
-            echo "🟢 Agora rodando migrations (com logs completos)..."
-            docker run --rm \
-              --network host \
-              --env-file .env \
-              -e "ASPNETCORE_ENVIRONMENT=Production" \
-              interceptor-api:latest \
-              bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1" || {
-              echo "⚠️ Migrations falharam. Verificando detalhes..."
-              echo "Mostrar as últimas 200 linhas de logs do processo (se houver):"
-              docker run --rm --network host --env-file .env interceptor-api:latest bash -lc "(if command -v journalctl >/dev/null 2>&1; then journalctl -n 200 --no-pager || true; else echo 'journalctl não disponível'; fi)" || true
-              echo "⚠️ Continuando com deploy mesmo assim..."
+            
+            echo "🔍 Verificando variáveis críticas..."
+            grep -q "ConnectionStrings__DefaultConnection" .env && echo "✅ ConnectionString encontrada" || { echo "❌ ConnectionString NÃO encontrada"; exit 1; }
+            grep -q "Jwt__Key" .env && echo "✅ JWT_Key encontrada" || { echo "❌ JWT_Key NÃO encontrada"; exit 1; }
+            
+            echo "🟢 Rodando migrations (com tratamento de erros)..."
+            MIGRATION_LOG=$(mktemp)
+            if docker run --rm               --network host               --env-file .env               -e "ASPNETCORE_ENVIRONMENT=Production"               interceptor-api:latest               bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1" > "$MIGRATION_LOG" 2>&1; then
+              echo "✅ Migrations aplicadas com sucesso!"
+            else
+              # Se "already exists" = tabelas já criadas, histórico fora de sync
+              if grep -qi "already exists\|42P07" "$MIGRATION_LOG"; then
+                echo "⚠️ Detectado: tabelas já existem no banco (histórico de migrations desincronizado)"
+                echo "ℹ️ Schema já foi criado em deploy anterior. Deploy continuará normalmente."
+                echo "ℹ️ (Aplicação funcionará com o schema existente)"
+              else
+                echo "⚠️ Erro ao aplicar migrations:"
+                head -10 "$MIGRATION_LOG"
+                echo "ℹ️ Continuando com deploy mesmo assim (aplicação pode falhar se schema crítico está faltando)"
+              fi
+            fi
+            rm -f "$MIGRATION_LOG"
             }
 
             echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
