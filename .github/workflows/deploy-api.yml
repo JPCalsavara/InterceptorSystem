@@ -137,15 +137,19 @@ jobs:
             set -e  # Para o script se qualquer comando falhar
 
             echo "📦 Carregando nova imagem Docker..."
+            docker load < interceptor-api.tar.gz
 
             echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
-            docker run --rm \
-              --network host \
-              -e "ConnectionStrings__DefaultConnection=${RDS_CONNECTION_STRING}" \
-              -e "ASPNETCORE_ENVIRONMENT=Production" \
-              interceptor-api:latest \
-              bash -c "cd /app && dotnet ef database update 2>&1 || echo "ℹ️ Migrations já aplicadas""
-            docker load < interceptor-api.tar.gz
+            if [ -f .env ]; then
+              docker run --rm \
+                --network host \
+                --env-file .env \
+                -e "ASPNETCORE_ENVIRONMENT=Production" \
+                interceptor-api:latest \
+                bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll || echo '⚠️ Migration command completed (may already be applied)'"
+            else
+              echo "⚠️ .env file not found, skipping migrations"
+            fi
 
             echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
             docker compose -f compose.ec2.yml pull --ignore-pull-failures || true
