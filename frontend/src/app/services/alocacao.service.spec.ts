@@ -9,7 +9,7 @@ describe('AlocacaoService cache behavior', () => {
   let service: AlocacaoService;
   let httpMock: HttpTestingController;
 
-  const apiBase = 'http://localhost';
+  const apiBase = '';
   const mockList = [
     {
       id: 'a1',

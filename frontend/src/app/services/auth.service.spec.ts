@@ -9,7 +9,7 @@ describe('AuthService', () => {
   let httpMock: HttpTestingController;
   let mockNavigate: ReturnType<typeof vi.fn>;
 
-  const apiBase = 'http://localhost';
+  const apiBase = '';
   const mockAuthResult: AuthResult = {
     empresaId: 'emp1',
     nomeEmpresa: 'Empresa Teste',

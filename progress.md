@@ -14,3 +14,6 @@
 - Revalidated the frontend production build after the environment change.
 - Reviewed the GitHub Actions configuration for the frontend and found two issues: the CI test step masked failures, and the deploy workflow was not chained to CI success.
 - Updated the frontend CI test step to fail on test errors and reworked the deploy workflow to trigger from the CI workflow after successful frontend changes only.
+- Fixed the frontend unit test script for Angular 21 by using the supported coverage flag and adding the Vitest coverage package.
+- Aligned the service spec HTTP expectations with the app's relative `/api` URLs.
+- Re-ran `npm run test:ci` and the frontend unit suite passed: 17 files, 84 tests.
