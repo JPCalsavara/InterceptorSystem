@@ -9,7 +9,7 @@ describe('PostoService', () => {
   let service: PostoService;
   let httpMock: HttpTestingController;
 
-  const apiBase = 'http://localhost';
+  const apiBase = '';
   const mockPostos: Posto[] = [
     {
       id: 'p1',

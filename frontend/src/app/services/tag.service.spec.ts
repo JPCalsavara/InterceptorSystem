@@ -9,7 +9,7 @@ describe('TagService', () => {
   let service: TagService;
   let httpMock: HttpTestingController;
 
-  const apiBase = 'http://localhost';
+  const apiBase = '';
   const mockTags: Tag[] = [
     { id: 't1', nome: 'Vigilante', valor: 150, descricao: 'Guarda patrimonial' },
     { id: 't2', nome: 'Supervisor', valor: 200 },

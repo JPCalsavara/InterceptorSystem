@@ -6,8 +6,8 @@ Stabilize the frontend by resolving all failures in unit tests (`.spec.ts`) and 
 ## Phases
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Diagnosis: Run and log all test failures | `todo` |
-| 2 | Fix Unit Tests: Resolve `.spec.ts` errors | `todo` |
+| 1 | Diagnosis: Run and log all test failures | `completed` |
+| 2 | Fix Unit Tests: Resolve `.spec.ts` errors | `completed` |
 | 3 | Fix E2E Tests: Resolve Cypress test failures | `todo` |
 | 4 | Final Verification: Ensure all tests pass | `todo` |
 
