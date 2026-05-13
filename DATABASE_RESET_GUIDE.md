@@ -10,61 +10,76 @@
 
 Existem 2 opções:
 
-### ✅ Opção 1: Via SSH no EC2 (Recomendado)
+### ✅ Opção 1: Via SSH no EC2 → RDS (Recomendado)
 
 ```bash
-# No seu computador local:
-cd /home/jpcalsavara/projetos/andamento/InterceptorSystem
+# No seu computador local
+ssh -i ~/.ssh/ec2_key.pem ubuntu@<seu-ec2-host>
 
-# Fazer push dos scripts atualizados (se não estiverem em prod ainda)
-git add backend/reset_database*.sh
-git commit -m "chore: add database reset scripts"
-git push
+# No EC2 (ubuntu@host)
+cd ~/interceptor-system
 
-# Executar reset remoto via SSH
-bash backend/reset_database_remote.sh
+# Opção 1a: Se tiver psql instalado no EC2
+bash backend/reset_database_rds.sh
+
+# Opção 1b: Usar Docker do EC2 (sem precisar de psql)
+docker run --rm \
+  --network host \
+  --env-file .env \
+  -v $(pwd)/backend:/app \
+  postgres:15 \
+  bash /app/reset_database_rds.sh
+
+# Depois desconecta
+exit
 ```
 
 **O que acontece:**
-1. Conecta via SSH ao EC2
-2. Dentro do container Docker, deleta TODAS as tabelas
-3. Executa `dotnet ef database update` para recriar schema do zero
-4. Valida que tudo foi criado corretamente
+1. SSH conecta ao EC2
+2. Script local (`psql` ou container `postgres:15`) se conecta REMOTAMENTE ao RDS via connection string
+3. Deleta todas as tabelas do RDS
+4. Aplica migrations EF Core no RDS
+5. Valida resultado
 
 **Tempo estimado:** 2-5 minutos
 
 ---
 
-### ✅ Opção 2: Direto via SSH (Manual)
+### ✅ Opção 2: Dentro do Container da API (Alternativa)
 
-Se preferir fazer passo a passo:
+Se o container da API estiver rodando:
 
 ```bash
-# Conectar ao EC2
+# No seu computador local
 ssh -i ~/.ssh/ec2_key.pem ubuntu@<seu-ec2-host>
 
-# Ir para o diretório
+# No EC2
 cd ~/interceptor-system
+docker ps  # Pegar o container ID da API
 
-# Entrar no container Docker
-docker ps  # Pegar o ID da API
+# Entrar no container da API
+docker exec -it <api-container-id> bash
 
-docker exec -it <container-id> bash
-
-# Dentro do container, rodar:
+# Dentro do container (tem psql + dotnet)
 cd /app
-bash reset_database.sh
+bash reset_database_rds.sh
+
+# Sair
+exit
 ```
+
+**Vantagem:** Container da API já tem `psql` + `dotnet ef` instalados
+**Desvantagem:** Precisa do container rodando
 
 ---
 
-### ✅ Opção 3: SQL Direto (Para debug)
+### ✅ Opção 3: SSH Direto no RDS (Para debug apenas)
 
-Se precisar inspecionar ou fazer de forma manual:
+Se precisar fazer query direto no RDS sem migrations:
 
 ```bash
-# Conectar ao banco
-psql "postgresql://user:password@rds-host:5432/database"
+# De qualquer lugar que tenha psql
+psql "postgresql://user:password@rds-endpoint:5432/database"
 
 # Ver todas as tabelas
 \dt
