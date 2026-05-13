@@ -2,14 +2,10 @@ name: CD — Deploy API (.NET → EC2)
 
 # ================================================
 # Roda APENAS em push para main
-# Só dispara quando o backend muda
 # ================================================
 on:
   push:
     branches: [main, master]
-    paths:
-      - "backend/**"
-      - ".github/workflows/deploy-api.yml"
 
 concurrency:
   group: deploy-api-production
