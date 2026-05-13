@@ -89,7 +89,15 @@ public static class DependencyInjection
         services.AddScoped<IOperacoesQueryPort, OperacoesQueryAdapter>();
         services.AddScoped<IWhatsappMessageSender, MetaWhatsappMessageSender>();
         services.AddHttpClient<MetaWhatsappMessageSender>();
-        services.AddHostedService<SessaoExpiradaCleanupService>();
+
+        // Register WhatsApp background cleanup service conditionally.
+        // This allows disabling it in production until DB migrations are confirmed applied
+        // by setting configuration key `Whatsapp:EnableCleanup` to false.
+        var enableWhatsappCleanup = configuration.GetValue<bool?>("Whatsapp:EnableCleanup") ?? true;
+        if (enableWhatsappCleanup)
+        {
+            services.AddHostedService<SessaoExpiradaCleanupService>();
+        }
 
         // 6. Caching & MediatR Handlers
         services.AddMemoryCache();
