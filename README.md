@@ -1,19 +1,36 @@
 # InterceptorSystem
 
-## **Status:** ✅ Backend (EC2) | ✅ Frontend (S3+CloudFront) | ✅ DB (RDS) | ✅ CI/CD | ✅ Auth & SaaS | ✅ WhatsApp Bot | ✅ DDD Refactoring
+> Plataforma SaaS para **gestão operacional de segurança patrimonial** — controle de clientes, contratos, postos, funcionários e diárias em um único sistema multi-tenant.
+
+**Stack:** .NET 8 · Angular 21 · PostgreSQL · AWS (EC2 + S3 + CloudFront + RDS)
+
+**Status em produção:**
+| Serviço | Plataforma | Status |
+| ------- | ---------- | ------ |
+| API Backend | Amazon EC2 (Docker) | ✅ Online |
+| Frontend | Amazon S3 + CloudFront | ✅ Online |
+| Banco de Dados | Amazon RDS (PostgreSQL 15) | ✅ Online |
+| CI/CD | GitHub Actions | ✅ Automatizado |
+
+---
 
 ## 📋 Sobre o Projeto
 
-**InterceptorSystem** é uma plataforma SaaS de gestão de segurança patrimonial para clientes, desenvolvida com **.NET 8** (backend) e **Angular 21** (frontend). Gerencia **clientes, funcionários, postos de trabalho, diárias e contratos** com regras de negócio robustas em **Clean Architecture + DDD** com 3 Bounded Contexts (Operações, Auth e Whatsapp).
+**InterceptorSystem** resolve o desafio de empresas de segurança patrimonial que precisam controlar operacionalmente dezenas de clientes, postos e funcionários ao mesmo tempo. O sistema centraliza:
 
-Inclui **autenticação JWT**, **gestão de contas e assinaturas** (FREE/BASIC/PRO), **notificações por e-mail** (SMTP), **integração WhatsApp** para substituição de diárias via chatbot e um **sistema de cache event-driven** com invalidação automática via Domain Events (MediatR).
+- **Contratos financeiros** com precificação dinâmica por perfil de serviço (Tags)
+- **Diárias operacionais** — designação, registro e histórico por alocação de turno
+- **Substituição via WhatsApp** — chatbot integrado para substituição de plantão sem abrir o sistema
+- **Multi-tenant SaaS** — cada empresa opera isoladamente com seus próprios dados
 
-## 🚀 Quick Start
+Arquitetura baseada em **Clean Architecture + DDD** com 3 Bounded Contexts (Operações, Auth, WhatsApp) e cache event-driven via Domain Events (MediatR).
+
+## 🚀 Quick Start (Local)
 
 ```bash
-git clone https://github.com/seu-usuario/InterceptorSystem.git
+git clone https://github.com/JPCalsavara/InterceptorSystem.git
 cd InterceptorSystem
-cp .env.example .env
+cp .env.example .env   # Preencha as variáveis obrigatórias
 cd backend/src
 docker compose up -d
 ```
@@ -40,6 +57,8 @@ docker compose up -d
 - [Como Executar](#-como-executar)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Testes](#-testes)
+- [Endpoints da API](#-endpoints-da-api)
+- [Próximos Passos](#️-próximos-passos)
 
 ---
 
@@ -281,8 +300,8 @@ META__PHONENUMBERID=seu-phone-number-id
 | Validação de Data     | Impede duplicidade de diária para o mesmo funcionário no mesmo dia |
 
 ```
-✅ Diária REGULAR (ValorDiaria=150) → Criada
-❌ Após DOBRA, nova diária no dia seguinte → "Funcionário deve descansar após dobra" (400)
+✅ Diária REGULAR (ValorDiaria=150) → Criada com snapshot do valor do contrato
+❌ Duplicidade na mesma data → "Funcionário já possui diária neste período" (400)
 ```
 
 ### Contrato
@@ -432,13 +451,15 @@ core/
   guards/            → auth.guard.ts
   interceptors/      → auth.interceptor.ts
 features/
-  clientes/       → list/, form/, detail/, cliente-wizard/
+  clientes/          → list/, form/, detail/, cliente-wizard/
   funcionarios/      → list/, form/, detail/
-  contratos/         → list/, form/
+  contratos/         → list/, form/, detail/
   postos/            → list/, form/, detail/
-  diarias/         → list/, form/, detail/
-services/            → comunicação com API (auth, clientes, contratos, etc.)
-models/              → interfaces TypeScript (alinhados com DTOs)
+  alocacoes/         → list/, form/
+  diarias/           → list/, form/, detail/ (modos: diário, semanal, mensal)
+  tags/              → list/, form/
+services/            → *service.ts com Signal-based cache + EntityCacheCoordinatorService
+models/              → interfaces TypeScript (alinhadas com os DTOs do backend)
 shared/              → navbar, sidebar, layout
 pages/               → landing, login, cadastro, esqueci-senha, nova-senha,
                        verificar-email, dashboard, perfil, conta, plano
@@ -500,15 +521,21 @@ META__PHONENUMBERID=seu-phone-id
 
 ## 🔄 CI/CD
 
-Pipeline GitHub Actions executado em todo PR para `main`:
+Dois pipelines GitHub Actions automatizados:
 
-| Job          | O que testa                                                      |
+### No Pull Request (`.github/workflows/ci.yml`)
+
+| Job          | O que executa                                                    |
 | ------------ | ---------------------------------------------------------------- |
-| **Backend**  | Restore → Build → 167 testes (unit + integration) com PostgreSQL |
+| **Backend**  | Restore → Build → **204 testes** (unit + integration) com PostgreSQL |
 | **Frontend** | `npm ci` → Build produção (`--configuration=production`)         |
-| **Docker**   | `docker compose build` valida Dockerfiles                        |
 
-Arquivo: `.github/workflows/ci.yml`
+### No Merge para `main` (`.github/workflows/deploy-api.yml`)
+
+| Job          | O que executa                                                    |
+| ------------ | ---------------------------------------------------------------- |
+| **Backend**  | Build da imagem Docker → Push para EC2 → Migrations automáticas  |
+| **Frontend** | Build Angular → Upload para S3 → Invalidação do CloudFront      |
 
 ---
 
