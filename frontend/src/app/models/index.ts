@@ -21,9 +21,8 @@ export enum TipoFuncionario {
 export enum TipoEscala {
   DOZE_POR_TRINTA_SEIS = 'DOZE_POR_TRINTA_SEIS',
   SEMANAL_COMERCIAL = 'SEMANAL_COMERCIAL',
-  ALCALA_8H = 'ALCALA_8H',
-  FOLGUISTA = 'FOLGUISTA',
   OITO_HORAS_SEIS_POR_DOIS = 'OITO_HORAS_SEIS_POR_DOIS',
+  FOLGUISTA = 'FOLGUISTA',
 }
 
 export enum StatusDiaria {
