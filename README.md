@@ -436,7 +436,7 @@ BC: Whatsapp
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `StatusContrato`       | `ATIVO`, `PENDENTE`, `FINALIZADO`                                                                                                                                                  |
 | `StatusFuncionario`    | `ATIVO`, `FERIAS`, `AFASTADO`, `DEMITIDO`                                                                                                                                          |
-| `TipoEscala`           | `DOZE_POR_TRINTA_SEIS`, `OITO_HORAS_SEIS_POR_DOIS`, `SEMANAL_COMERCIAL`, `ALCALA_8H`, `FOLGUISTA`                                                                                  |
+| `TipoEscala`           | `DOZE_POR_TRINTA_SEIS`, `OITO_HORAS_SEIS_POR_DOIS`, `SEMANAL_COMERCIAL`, `FOLGUISTA`                                                                                  |
 | `TipoFuncionario`      | `CLT`, `TERCEIRIZADO`, `FREELANCE`                                                                                                                                                 |
 | `StatusDiaria`         | `CONFIRMADA`, `CANCELADA`, `FALTA_REGISTRADA`                                                                                                                                      |
 | `TipoDiaria`           | `REGULAR`, `DOBRA_PROGRAMADA`, `SUBSTITUICAO`                                                                                                                                      |
