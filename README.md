@@ -1,6 +1,6 @@
 # InterceptorSystem
 
-## **Status:** ✅ Backend | ✅ Frontend | ✅ Docker Compose | ✅ CI/CD | ✅ Auth & SaaS | ✅ WhatsApp Bot | ✅ DDD Refactoring
+## **Status:** ✅ Backend (EC2) | ✅ Frontend (S3+CloudFront) | ✅ DB (RDS) | ✅ CI/CD | ✅ Auth & SaaS | ✅ WhatsApp Bot | ✅ DDD Refactoring
 
 ## 📋 Sobre o Projeto
 
@@ -73,13 +73,17 @@ docker compose up -d
 - **Formulários validados por Schema (Zod)** e com máscaras (ngx-mask)
 - **Auth Guard** protegendo rotas autenticadas e **Auth Interceptor** de JWT
 
-### Infraestrutura
+### Infraestrutura & Cloud (AWS)
 
-- **Docker Compose** com 4 serviços orquestrados (DB + API + Frontend + Nginx)
-- **Hot-reload** para backend (`dotnet watch`) e frontend (`ng serve --poll`)
+- **Backend**: Hospedado em **Amazon EC2** (Ubuntu/Docker)
+- **Frontend**: Hospedado em **Amazon S3** com distribuição via **Amazon CloudFront**
+- **Banco de Dados**: **Amazon RDS (PostgreSQL 15)** gerenciado
+- **Docker Compose**: Orquestração local de 4 serviços (DB + API + Frontend + Nginx)
 - **npm 11.10.1** atualizado na imagem Docker do frontend
-- **CI/CD GitHub Actions** testando Backend + Frontend + Docker em cada PR
-- **Nginx** como reverse proxy para a API
+- **CI/CD GitHub Actions**: 
+    - **No PR**: Execução de testes (Unit + Integration)
+    - **No Merge**: Build de produção e deploy automatizado
+- **Nginx**: Atuando como reverse proxy para a API
 
 ---
 
@@ -532,14 +536,17 @@ Arquivo: `.github/workflows/ci.yml`
 | Node.js    | 20 LTS  |
 | npm        | 11.10.1 |
 
-### Infraestrutura
+### Infraestrutura / Cloud
 
-| Ferramenta         | Uso                      |
-| ------------------ | ------------------------ |
-| Docker Compose 2.x | Orquestração             |
-| Nginx Alpine       | Reverse proxy            |
-| GitHub Actions     | CI/CD                    |
-| Meta WhatsApp API  | Chatbot de substituições |
+| Ferramenta         | Uso                             |
+| ------------------ | ------------------------------- |
+| Amazon EC2         | Host da API (Docker)            |
+| Amazon S3          | Hosting de arquivos estáticos   |
+| Amazon CloudFront  | CDN / Distribuição do Frontend  |
+| Amazon RDS         | Banco PostgreSQL Gerenciado     |
+| Docker Compose 2.x | Orquestração Local              |
+| GitHub Actions     | CI/CD Automatizado              |
+| Meta WhatsApp API  | Chatbot de substituições        |
 
 ---
 
@@ -769,10 +776,10 @@ POST   /api/contrato-calculos/calcular-valor-total
 
 ### 💼 UX & Business Logic
 
+- [X] Contratos: Exibição de totais mensais dinâmicos ao invés de anual
+- [X] Preview de escalonamento mensal de diárias baseadas no calendário do funcionário
 - [ ] UX Form Contratos: layout aprimorado para adicionar múltiplas ContratoTags rapidamente
-- [ ] Contratos: Exibição de totais mensais dinâmicos ao invés de anual
 - [ ] Dashboard Super-Admin: Gráficos de receita consolidada, margens e saving do cliente
-- [ ] Preview de escalonamento mensal de diárias baseadas no calendário do funcionário
 
 ### 🧪 Qualidade
 
@@ -781,10 +788,8 @@ POST   /api/contrato-calculos/calcular-valor-total
 
 ### ☁️ Infraestrutura / DevOps
 
-- [ ] Subir na nuvem (AWS Free Tier / VPS Linux)
-- [ ] Integrar Redis como Cache L2 no backend
-- [ ] Rate limiting (login, API pública)
-- [ ] Migração futura BCrypt → Argon2id (quando houver >= 4GB RAM)
+- [x] Subir na nuvem (AWS: EC2, S3, CloudFront, RDS)
+- [x] CI/CD: Pipeline automatizado de testes e build
 
 ### 💰 Módulo Financeiro
 
