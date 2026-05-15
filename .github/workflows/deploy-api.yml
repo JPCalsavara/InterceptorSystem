@@ -139,7 +139,7 @@ jobs:
             echo "📦 Carregando nova imagem Docker..."
             docker load < interceptor-api.tar.gz
 
-            echo "🗄️ Aplicando EF Core migrations ao banco de dados..."
+            echo "🗄️ Verificando arquivo .env..."
             if [ ! -f .env ]; then
               echo "❌ ERRO: .env não encontrado em $(pwd)"
               exit 1
@@ -149,24 +149,7 @@ jobs:
             grep -qiE "ConnectionStrings__DefaultConnection|RDS_CONNECTION_STRING" .env && echo "✅ ConnectionString encontrada" || { echo "❌ ConnectionString NÃO encontrada"; exit 1; }
             grep -qiE "Jwt__Key|JWT_KEY" .env && echo "✅ JWT_Key encontrada" || { echo "❌ JWT_Key NÃO encontrada"; exit 1; }
             
-            echo "🟢 Rodando migrations (com tratamento de erros)..."
-            MIGRATION_LOG=$(mktemp)
-            if docker run --rm               --network host               --env-file .env               -e "ASPNETCORE_ENVIRONMENT=Production"               interceptor-api:latest               bash -c 'if [ -n "$RDS_CONNECTION_STRING" ]; then export ConnectionStrings__DefaultConnection="$RDS_CONNECTION_STRING"; fi; dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1' > "$MIGRATION_LOG" 2>&1; then
-              echo "✅ Migrations aplicadas com sucesso!"
-            else
-              # Se "already exists" = tabelas já criadas, histórico fora de sync
-              if grep -qi "already exists\|42P07" "$MIGRATION_LOG"; then
-                echo "⚠️ Detectado: tabelas já existem no banco (histórico de migrations desincronizado)"
-                echo "ℹ️ Schema já foi criado em deploy anterior. Deploy continuará normalmente."
-                echo "ℹ️ (Aplicação funcionará com o schema existente)"
-              else
-                echo "⚠️ Erro ao aplicar migrations:"
-                head -10 "$MIGRATION_LOG"
-                echo "ℹ️ Continuando com deploy mesmo assim (aplicação pode falhar se schema crítico está faltando)"
-              fi
-            fi
-            rm -f "$MIGRATION_LOG"
-            }
+            echo "ℹ️ Migrations serão aplicadas automaticamente pelo Program.cs no startup da API."
 
             echo "🔄 Reiniciando serviços (zero-downtime via rolling update)..."
             docker compose -f compose.ec2.yml pull --ignore-pull-failures || true
