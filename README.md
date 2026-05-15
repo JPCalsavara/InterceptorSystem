@@ -48,7 +48,7 @@ docker compose up -d
 ### Backend
 
 - **CRUD completo** para Cliente, Funcionário, Posto, Alocação, Diária, Contrato e Tag
-- **Cálculos financeiros via Tags** (novo modelo dinâmico substituindo salário fixo)
+- **Cálculos financeiros precisos**: Baseados no modelo `Custo Total × (1 + Margens) = Faturamento` via sistema de Tags
 - **Lazy Fetching e Cache Coordenador**: queries otimizadas (`/api/clientes/{id}/funcionarios`)
 - **Turnos flexíveis**: suporte completo a Comercial, 8h (Alcalá), Folguista e 12h
 - **Criação em cascata** via `POST /api/clientes-completos` (Cliente + Contrato + Postos + Alocações em 1 request)
@@ -274,8 +274,7 @@ META__PHONENUMBERID=seu-phone-number-id
 | --------------------- | ------------------------------------------------------------------ |
 | Vinculada à Alocação  | Registra a ida do Funcionário a um turno específico (`AlocacaoId`) |
 | Snapshot de Preço     | Recebe `ValorDiaria` no momento da criação com base no acordo/Tag  |
-| Sem dias consecutivos | Bloqueado exceto para `DOBRA_PROGRAMADA`                           |
-| Descanso pós-dobra    | Após dobra programada, obrigatório descansar no dia seguinte       |
+| Validação de Data     | Impede duplicidade de diária para o mesmo funcionário no mesmo dia |
 
 ```
 ✅ Diária REGULAR (ValorDiaria=150) → Criada
@@ -654,10 +653,14 @@ InterceptorSystem/
 │   └── analysis/                     → Análises arquiteturais geradas
 │
 ├── docs/
-│   ├── design-system/
-│   ├── guias/
-│   ├── refactory/                    → ddd-refactory.md (plano de 6 fases)
-│   └── INDEX.md
+│   ├── architecture/        # Diagramas e decisões técnicas (EC2, RDS, etc)
+│   ├── design-system/       # Tokens visuais, regras e padrões de refatoração do UI
+│   ├── features/            # Detalhes de funcionalidades (Tags, Feriados, etc)
+│   ├── guias/               # Referências de setup e manuais operacionais
+│   ├── history/             # Histórico de tarefas, reviews e refatorações legadas
+│   ├── refactory/           # Planos de refatoração em andamento
+│   ├── GUIA_ORGANIZACAO_DOCUMENTOS.md # Regras para manutenção do projeto
+│   └── INDEX.md             # Índice central da documentação
 │
 ├── .env.example
 ├── .github/workflows/ci.yml
