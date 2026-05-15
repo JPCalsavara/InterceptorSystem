@@ -150,10 +150,10 @@ root@container:/app$ bash reset_database_rds.sh
 
 ## ✅ Resumo
 
-| Onde Está | Onde Conecta | Como |
-|-----------|------------|------|
+| Onde Está                    | Onde Conecta                 | Como                              |
+| ---------------------------- | ---------------------------- | --------------------------------- |
 | **EC2** (sua máquina na AWS) | **RDS** (outro servidor AWS) | `psql` ou `postgres:15` container |
-| Script roda no EC2 | Banco fica no RDS | via connection string TCP |
-| Container da API no EC2 | RDS remoto | via .env connection string |
+| Script roda no EC2           | Banco fica no RDS            | via connection string TCP         |
+| Container da API no EC2      | RDS remoto                   | via .env connection string        |
 
 **Importante:** RDS NÃO é um container, é um serviço gerenciado da AWS em outro servidor!

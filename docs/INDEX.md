@@ -8,10 +8,13 @@
 
 ```
 docs/
+├── architecture/        # Diagramas e decisões técnicas (EC2, RDS, etc)
 ├── design-system/       # Tokens visuais, regras e padrões de refatoração do UI
 ├── guias/               # Referências de desenvolvimento e regras de negócio
+├── history/             # Histórico de tarefas concluídas e logs de agentes
 ├── refactory/           # Planos e tarefas de refatoração em andamento
 ├── reviews/             # Code reviews e análises de qualidade
+├── GUIA_ORGANIZACAO_DOCUMENTOS.md # Regras para manter o projeto limpo
 └── INDEX.md             # Este arquivo
 ```
 

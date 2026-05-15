@@ -146,12 +146,12 @@ jobs:
             fi
             
             echo "🔍 Verificando variáveis críticas..."
-            grep -q "ConnectionStrings__DefaultConnection" .env && echo "✅ ConnectionString encontrada" || { echo "❌ ConnectionString NÃO encontrada"; exit 1; }
-            grep -q "Jwt__Key" .env && echo "✅ JWT_Key encontrada" || { echo "❌ JWT_Key NÃO encontrada"; exit 1; }
+            grep -qiE "ConnectionStrings__DefaultConnection|RDS_CONNECTION_STRING" .env && echo "✅ ConnectionString encontrada" || { echo "❌ ConnectionString NÃO encontrada"; exit 1; }
+            grep -qiE "Jwt__Key|JWT_KEY" .env && echo "✅ JWT_Key encontrada" || { echo "❌ JWT_Key NÃO encontrada"; exit 1; }
             
             echo "🟢 Rodando migrations (com tratamento de erros)..."
             MIGRATION_LOG=$(mktemp)
-            if docker run --rm               --network host               --env-file .env               -e "ASPNETCORE_ENVIRONMENT=Production"               interceptor-api:latest               bash -c "dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1" > "$MIGRATION_LOG" 2>&1; then
+            if docker run --rm               --network host               --env-file .env               -e "ASPNETCORE_ENVIRONMENT=Production"               interceptor-api:latest               bash -c 'if [ -n "$RDS_CONNECTION_STRING" ]; then export ConnectionStrings__DefaultConnection="$RDS_CONNECTION_STRING"; fi; dotnet ef database update --assembly InterceptorSystem.Infrastructure.dll --startup-assembly InterceptorSystem.Api.dll 2>&1' > "$MIGRATION_LOG" 2>&1; then
               echo "✅ Migrations aplicadas com sucesso!"
             else
               # Se "already exists" = tabelas já criadas, histórico fora de sync

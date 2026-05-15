@@ -31,8 +31,12 @@ source .env
 set +a
 
 if [ -z "$ConnectionStrings__DefaultConnection" ]; then
-    echo "❌ ERRO: ConnectionStrings__DefaultConnection não está em .env"
-    exit 1
+    if [ -n "$RDS_CONNECTION_STRING" ]; then
+        ConnectionStrings__DefaultConnection="$RDS_CONNECTION_STRING"
+    else
+        echo "❌ ERRO: ConnectionStrings__DefaultConnection ou RDS_CONNECTION_STRING não estão em .env"
+        exit 1
+    fi
 fi
 
 echo "✅ Arquivo .env carregado"
