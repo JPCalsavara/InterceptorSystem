@@ -98,7 +98,6 @@ export class AlocacaoDetailComponent implements OnInit {
     const labels = {
       [TipoEscala.DOZE_POR_TRINTA_SEIS]: '12x36',
       [TipoEscala.SEMANAL_COMERCIAL]: 'Comercial',
-      [TipoEscala.ALCALA_8H]: '8 Horas',
       [TipoEscala.FOLGUISTA]: 'Folguista',
       [TipoEscala.OITO_HORAS_SEIS_POR_DOIS]: '8h (6x2)',
     };

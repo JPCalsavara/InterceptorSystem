@@ -35,6 +35,7 @@ exit
 ```
 
 **O que acontece:**
+
 1. SSH conecta ao EC2
 2. Script local (`psql` ou container `postgres:15`) se conecta REMOTAMENTE ao RDS via connection string
 3. Deleta todas as tabelas do RDS
@@ -94,7 +95,7 @@ BEGIN
     FOR r IN (SELECT constraint_name, table_name FROM information_schema.table_constraints WHERE constraint_type = 'FOREIGN KEY' AND table_schema = 'public') LOOP
         EXECUTE 'ALTER TABLE ' || r.table_name || ' DROP CONSTRAINT ' || r.constraint_name || ' CASCADE';
     END LOOP;
-    
+
     FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
         EXECUTE 'DROP TABLE IF EXISTS ' || r.tablename || ' CASCADE';
     END LOOP;
@@ -106,32 +107,38 @@ END $$;
 ## Próximos Passos Depois do Reset
 
 1. **Verificar que tudo foi deletado:**
+
    ```bash
    psql <connection-string> -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';"
    ```
+
    Deve retornar um número pequeno (apenas tabelas do sistema)
 
 2. **Verificar que migrations foram aplicadas:**
+
    ```bash
    psql <connection-string> -c "SELECT COUNT(*) FROM \"__EFMigrationsHistory\";"
    ```
+
    Deve retornar ~15+ (todas as migrations aplicadas)
 
 3. **Re-ativar WhatsApp Service** (no `.env` do EC2):
+
    ```bash
    # SSH no EC2
    ssh ubuntu@<host>
    cd ~/interceptor-system
-   
+
    # Editar ou criar .env com:
    Whatsapp__EnableCleanup=true
    ```
 
 4. **Fazer redeploy da API:**
+
    ```bash
    # Via GitHub Actions (recomendado)
    gh workflow run "CD — Deploy API (Docker Compose)" --ref main
-   
+
    # Ou manual no EC2:
    docker-compose down && docker-compose up -d
    ```
@@ -141,6 +148,7 @@ END $$;
 ## ⚠️ Considerações Importantes
 
 - **Backup:** Antes de deletar, considere fazer um backup do RDS:
+
   ```bash
   pg_dump "postgresql://user:password@rds-host/database" > backup_$(date +%Y%m%d_%H%M%S).sql
   ```

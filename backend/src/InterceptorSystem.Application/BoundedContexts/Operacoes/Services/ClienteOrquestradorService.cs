@@ -265,10 +265,10 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
                 : new AlocacaoPadrao(new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), TipoEscala.DOZE_POR_TRINTA_SEIS, true),
 
             "ESCALA_8H_3TURNOS" => isNoturna
-                ? new AlocacaoPadrao(new TimeSpan(22, 0, 0), new TimeSpan(6, 0, 0), TipoEscala.ALCALA_8H, false)
+                ? new AlocacaoPadrao(new TimeSpan(22, 0, 0), new TimeSpan(6, 0, 0), TipoEscala.OITO_HORAS_SEIS_POR_DOIS, false)
                 : indiceAlocacao % 2 == 0
-                    ? new AlocacaoPadrao(new TimeSpan(6, 0, 0), new TimeSpan(14, 0, 0), TipoEscala.ALCALA_8H, false)
-                    : new AlocacaoPadrao(new TimeSpan(14, 0, 0), new TimeSpan(22, 0, 0), TipoEscala.ALCALA_8H, false),
+                    ? new AlocacaoPadrao(new TimeSpan(6, 0, 0), new TimeSpan(14, 0, 0), TipoEscala.OITO_HORAS_SEIS_POR_DOIS, false)
+                    : new AlocacaoPadrao(new TimeSpan(14, 0, 0), new TimeSpan(22, 0, 0), TipoEscala.OITO_HORAS_SEIS_POR_DOIS, false),
 
             "ESCALA_5X2_DIURNO" or "ESCALA_5X2" =>
                 new AlocacaoPadrao(new TimeSpan(6, 0, 0), new TimeSpan(14, 0, 0), TipoEscala.SEMANAL_COMERCIAL, false),
@@ -276,8 +276,8 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
             "ESCALA_24H_UNICO" => new AlocacaoPadrao(new TimeSpan(0, 0, 0), new TimeSpan(12, 0, 0), TipoEscala.DOZE_POR_TRINTA_SEIS, true),
 
             _ => (isNoturna || postoIndex % 2 == 0)
-                ? new AlocacaoPadrao(new TimeSpan(22, 0, 0), new TimeSpan(6, 0, 0), TipoEscala.ALCALA_8H, false)
-                : new AlocacaoPadrao(new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), TipoEscala.ALCALA_8H, false)
+                ? new AlocacaoPadrao(new TimeSpan(22, 0, 0), new TimeSpan(6, 0, 0), TipoEscala.OITO_HORAS_SEIS_POR_DOIS, false)
+                : new AlocacaoPadrao(new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0), TipoEscala.OITO_HORAS_SEIS_POR_DOIS, false)
         };
     }
 
@@ -287,7 +287,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
         return tipo switch
         {
             "ESCALA_5X2_DIURNO" or "ESCALA_5X2" => TipoEscala.SEMANAL_COMERCIAL,
-            "ESCALA_8H_3TURNOS" => TipoEscala.ALCALA_8H,
+            "ESCALA_8H_3TURNOS" => TipoEscala.OITO_HORAS_SEIS_POR_DOIS,
             _ => TipoEscala.DOZE_POR_TRINTA_SEIS
         };
     }

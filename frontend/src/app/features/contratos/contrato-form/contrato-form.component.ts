@@ -59,7 +59,7 @@ export const TIPO_POSTO_CONFIGS: Record<TipoPosto, TipoPostoConfig> = {
     operaFimDeSemana: true,
   },
   [TipoPosto.ESCALA_8H_3TURNOS]: {
-    label: '8h (Manhã / Tarde / Noite) — 1 func./turno',
+    label: '8h (6x2) — 1 func./turno',
     alocacoes: 3,
     funcionariosPorAlocacao: 1,
     alocacoesNoturnas: 1,
@@ -560,7 +560,7 @@ export class ContratoFormComponent implements OnInit {
           const tipoEscalaParaTipoPosto: Record<string, TipoPosto> = {
             [TipoEscala.DOZE_POR_TRINTA_SEIS]: TipoPosto.ESCALA_12X36,
             [TipoEscala.SEMANAL_COMERCIAL]: TipoPosto.ESCALA_5X2_DIURNO,
-            [TipoEscala.ALCALA_8H]: TipoPosto.ESCALA_8H_3TURNOS,
+            [TipoEscala.OITO_HORAS_SEIS_POR_DOIS]: TipoPosto.ESCALA_8H_3TURNOS,
           };
           const tipoBackend = alocacoes[0]?.tipoEscala ?? '';
           const tipoInferido: TipoPosto =

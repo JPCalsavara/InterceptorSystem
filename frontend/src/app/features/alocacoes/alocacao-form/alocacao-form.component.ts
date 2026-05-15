@@ -48,7 +48,6 @@ export class AlocacaoFormComponent implements OnInit {
     { value: TipoEscala.DOZE_POR_TRINTA_SEIS, label: '12x36' },
     { value: TipoEscala.SEMANAL_COMERCIAL, label: 'Comercial' },
     { value: TipoEscala.OITO_HORAS_SEIS_POR_DOIS, label: '8h (6x2)' },
-    { value: TipoEscala.ALCALA_8H, label: '8 Horas (Diário)' },
     { value: TipoEscala.FOLGUISTA, label: 'Folguista' },
   ];
 

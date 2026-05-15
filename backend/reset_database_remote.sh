@@ -31,8 +31,12 @@ echo "✅ Arquivo .env carregado"
 
 # Verificar se connection string foi carregada
 if [ -z "$ConnectionStrings__DefaultConnection" ]; then
-    echo "❌ ConnectionStrings__DefaultConnection não definida em .env"
-    exit 1
+    if [ -n "$RDS_CONNECTION_STRING" ]; then
+        ConnectionStrings__DefaultConnection="$RDS_CONNECTION_STRING"
+    else
+        echo "❌ ConnectionStrings__DefaultConnection ou RDS_CONNECTION_STRING não definida em .env"
+        exit 1
+    fi
 fi
 
 # Tentar usar psql do EC2 ou container postgres
