@@ -184,7 +184,6 @@ export class FuncionarioListComponent implements OnInit {
     const labels = {
       [TipoEscala.DOZE_POR_TRINTA_SEIS]: '12x36',
       [TipoEscala.SEMANAL_COMERCIAL]: 'Semanal',
-      [TipoEscala.ALCALA_8H]: 'Alcalá 8h',
       [TipoEscala.FOLGUISTA]: 'Folguista',
       [TipoEscala.OITO_HORAS_SEIS_POR_DOIS]: '8h (6x2)',
     };

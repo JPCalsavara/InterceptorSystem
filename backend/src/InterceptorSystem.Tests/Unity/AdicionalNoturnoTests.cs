@@ -97,7 +97,7 @@ public class AdicionalNoturnoTests
             _empresaId,
             new TimeSpan(7, 0, 0),  // 7h
             new TimeSpan(15, 0, 0), // 15h (8 horas)
-            tipoEscala: TipoEscala.ALCALA_8H,
+            tipoEscala: TipoEscala.OITO_HORAS_SEIS_POR_DOIS,
             permiteDobrarEscala: false
         );
 

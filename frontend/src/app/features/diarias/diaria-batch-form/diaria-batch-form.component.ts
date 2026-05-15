@@ -204,7 +204,7 @@ export class DiariaBatchFormComponent implements OnInit {
         }
         dataAtual.setDate(dataAtual.getDate() + 1);
       }
-    } else if (funcionario.tipoEscala === TipoEscala.ALCALA_8H) {
+    } else if (funcionario.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) {
       while (dataAtual <= dataFim) {
         const diaSemana = dataAtual.getDay();
         if (diaSemana >= 1 && diaSemana <= 6) {
