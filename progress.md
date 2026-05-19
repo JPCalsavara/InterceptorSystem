@@ -1,14 +1,9 @@
-# Progress Log: Quick Fixes Prod Version
+# Progress Log: Correções de Estado Frontend
 
 ## Sessão 2026-05-19
 
-- [16:35] Planejamento iniciado com a skill `plan`.
-- [16:35] Investigação do código frontend concluída: Mapeado `cliente-wizard.component.ts` e `sidebar.component.ts`.
-- [16:35] Investigação do código backend concluída: Mapeado erro de validação em `ContratoCalculosController.cs` e a necessidade de atualizar `ClienteOrquestradorService.cs`.
-- [16:35] `task_plan.md` e `findings.md` criados.
-- [16:35] Planejamento finalizado — pronto para execução com a skill `execute`.
-- [19:05] Fase 1 concluída — Corrigido erro de FK ao criar posto de trabalho (DTO, AppService e posto-form.component.ts)
-- [19:06] Fase 2 concluída — Sidebar reativa configurada utilizando EntityCacheCoordinatorService
-- [19:07] Fase 3 concluída — Exibição de Relatório Simulado configurada no cliente-wizard
-- [19:09] Fase 4 e 5 concluídas — Backend agora orquestra criação de funcionários recebidos do frontend via wizard
-- [19:12] Fase 6 concluída — Build backend e frontend completo sem erros
+- [20:09] Planejamento iniciado para investigar ausência de contrato na sidebar e clientes não desaparecendo da tela
+- [20:10] Investigação concluída — Identificada causa raiz baseada em "HTTP Flood" no disparo assíncrono não debounced.
+- [20:11] task_plan.md atualizado com 3 novas fases para correção
+- [20:11] Planejamento finalizado — pronto para execução com a skill `execute`
+- [20:19] Fases 1, 2 e 3 concluídas — Commit e Push realizados.
