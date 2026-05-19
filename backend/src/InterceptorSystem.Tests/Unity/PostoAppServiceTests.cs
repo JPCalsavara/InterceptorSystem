@@ -47,7 +47,7 @@ public class PostoAppServiceTests
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
         var cliente = new Cliente(empresaId, "Cliente Teste", "11222333000181", "São Paulo", "SP");
-        var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua das Flores", "123", null, "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua das Flores", "123", null, "São Paulo", "SP");
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(cliente);
@@ -86,7 +86,7 @@ public class PostoAppServiceTests
         // Arrange
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
-        var input = new CreatePostoInput(clienteId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
         _mockClienteRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
@@ -102,7 +102,7 @@ public class PostoAppServiceTests
     public async Task CreateAsync_DeveFalhar_QuandoTenantNaoDefinido()
     {
         // Arrange
-        var input = new CreatePostoInput(Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+        var input = new CreatePostoInput(Guid.NewGuid(), Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
         _mockTenant.Setup(t => t.EmpresaId).Returns((Guid?)null);
 
         // Act & Assert

@@ -41,6 +41,14 @@ export interface CriarClienteCompletoInput {
     valorDiariaCobrada: number;
     valorBeneficiosExtrasMensal: number;
   }>;
+  funcionarios?: Array<{
+    nome: string;
+    cpf: string;
+    celular: string;
+    statusFuncionario: string;
+    tipoEscala: string;
+    tipoFuncionario: string;
+  }>;
 }
 
 // Espelha: ClienteCompletoDtoOutput (backend)

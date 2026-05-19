@@ -10,7 +10,8 @@ public record CreateClienteCompletoDtoInput(
     CreateContratoCompletoDtoInput Contrato,
     bool CriarPostosAutomaticamente = true,
     int NumeroDePostos = 2,  // Padrão: 2 turnos (diurno e noturno)
-    IReadOnlyList<CreatePostoConfigInput>? PostoConfigs = null
+    IReadOnlyList<CreatePostoConfigInput>? PostoConfigs = null,
+    IReadOnlyList<CreateFuncionarioDtoInput>? Funcionarios = null
 );
 
 public record CreatePostoConfigInput(
@@ -57,6 +58,7 @@ public record CreateContratoCompletoDtoInput(
 public record ClienteCompletoDtoOutput(
     ClienteDtoOutput Cliente,
     ContratoDtoOutput Contrato,
-    IEnumerable<PostoDto> Postos
+    IEnumerable<PostoDto> Postos,
+    IEnumerable<FuncionarioDtoOutput>? Funcionarios = null
 );
 

@@ -199,8 +199,7 @@ public class ClienteScopedEndpointsIntegrationTests : IntegrationTestBase
 
     private async Task<Guid> CriarPostoAsync(Guid clienteId)
     {
-        var input = new CreatePostoInput(
-            clienteId,
+        var input = new CreatePostoInput(clienteId, Guid.NewGuid(),
             $"Posto {Guid.NewGuid().ToString()[..8]}",
             "01310-100",
             "Rua Teste",

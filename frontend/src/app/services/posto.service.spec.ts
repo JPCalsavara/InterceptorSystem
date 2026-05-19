@@ -14,6 +14,7 @@ describe('PostoService', () => {
     {
       id: 'p1',
       clienteId: 'c1',
+      contratoId: 'ct1',
       nome: 'Portaria Principal',
       cep: '01310-100',
       endereco: 'Av. Paulista',
@@ -51,7 +52,7 @@ describe('PostoService', () => {
     service.getAll().subscribe();
     httpMock.expectOne(`${apiBase}/api/postos`).flush(mockPostos);
 
-    service.create({ clienteId: 'c1', nome: 'Novo Posto', endereco: 'Rua X' } as any).subscribe();
+    service.create({ clienteId: 'c1', contratoId: 'ct1', nome: 'Novo Posto', endereco: 'Rua X' } as any).subscribe();
 
     const createReq = httpMock.expectOne(`${apiBase}/api/postos`);
     expect(createReq.request.method).toBe('POST');

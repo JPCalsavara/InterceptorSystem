@@ -11,6 +11,7 @@ import { LayoutStateService } from '../services/layout-state.service';
 import { AlocacaoService } from '../../services/alocacao.service';
 import { TagService } from '../../services/tag.service';
 import { AuthService } from '../../services/auth.service';
+import { EntityCacheCoordinatorService } from '../../services/entity-cache-coordinator.service';
 
 interface NavItem {
   label: string;
@@ -422,6 +423,7 @@ export class SidebarComponent implements OnInit {
   private contratoService = inject(ContratoService);
   private alocacaoService = inject(AlocacaoService);
   private tagService = inject(TagService);
+  private cacheCoordinator = inject(EntityCacheCoordinatorService);
 
   counts = signal<Record<string, number | null>>({
     clientes: null,
@@ -445,6 +447,15 @@ export class SidebarComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.loadCounts();
+    
+    // Atualiza a sidebar de forma reativa quando entidades forem criadas, atualizadas ou deletadas
+    this.cacheCoordinator.cacheInvalidated$.subscribe(() => {
+      this.loadCounts();
+    });
+  }
+
+  loadCounts() {
     this.clienteService.getAll().subscribe({
       next: (data) =>
         this.counts.update((c) => ({ ...c, clientes: data.filter((x: any) => x.ativo).length })),

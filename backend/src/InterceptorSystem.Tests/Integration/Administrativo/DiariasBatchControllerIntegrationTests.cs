@@ -228,8 +228,7 @@ public class DiariasBatchControllerIntegrationTests : IntegrationTestBase
 
     private async Task<Guid> CriarPostoAsync(Guid clienteId)
     {
-        var input = new CreatePostoInput(
-            ClienteId: clienteId,
+        var input = new CreatePostoInput(ClienteId: clienteId, Guid.NewGuid(),
             Nome: $"Posto Teste {Guid.NewGuid().ToString()[..8]}",
             Cep: "01310-100",
             Endereco: "Rua Teste",

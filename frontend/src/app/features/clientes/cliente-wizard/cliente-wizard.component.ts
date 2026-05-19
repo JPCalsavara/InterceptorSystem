@@ -378,6 +378,27 @@ export class ClienteWizardComponent implements OnInit {
               margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
               margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100,
             }, TIPO_POSTO_CONFIGS);
+            
+            if (input.diariasTotaisMes <= 0) {
+              const simulacaoInput = {
+                valorDiaria: posto.valorDiariaCobrada || 0,
+                numeroDePostos: 1,
+                percentualAdicionalNoturno: (valores.percentualAdicionalNoturno || 0) / 100,
+                percentualAdicionalFimSemana: (valores.percentualAdicionalFimSemana || 100) / 100,
+                alocacoesPorPosto: posto.quantidadeAlocacoes || 1,
+                funcionariosPorAlocacao: posto.quantidadeFuncionariosPorAlocacao || 1,
+                diasUteisMes: 22,
+                diasFimSemanaMes: 8,
+                feriadosAno: 11,
+                diasTrabalhadosPorFuncionarioMes: 15,
+                valorBeneficioMensalPorFuncionario: posto.valorBeneficiosExtrasMensal || 0,
+                percentualEncargosProvisoes: (valores.percentualImpostos || 0) / 100,
+                margemLucroPercentual: (valores.percentualMargemLucro || 0) / 100,
+                margemCoberturaFaltasPercentual: (valores.percentualMargemFaltas || 0) / 100
+              };
+              return this.calculoService.simularSemAlocacoes(simulacaoInput);
+            }
+            
             return this.calculoService.calcularValorTotal(input);
           });
 
@@ -400,7 +421,7 @@ export class ClienteWizardComponent implements OnInit {
             };
             resultados.forEach((res: any) => {
               if (res) {
-                combined.valorTotalMensal += res.valorTotalMensal || 0;
+                combined.valorTotalMensal += (res.valorTotalMensal ?? res.faturamentoSimulado) || 0;
                 combined.custoBaseMensal += res.custoBaseMensal || 0;
                 combined.valorMargemLucro += res.valorMargemLucro || 0;
                 combined.valorMargemFaltas += res.valorMargemFaltas || 0;
@@ -782,32 +803,7 @@ export class ClienteWizardComponent implements OnInit {
         next: async (response: CriarClienteCompletoOutput) => {
           console.log('Resposta recebida:', response);
 
-          // Criar funcionários do Step 3, se houver
-          const funcionariosParaCriar = this.funcionarios.controls;
-          if (funcionariosParaCriar.length > 0) {
-            const contratoId = response.contrato.id;
-            const clienteId = response.cliente.id;
-
-            for (const funcControl of funcionariosParaCriar) {
-              const func = funcControl.value;
-              try {
-                await firstValueFrom(
-                  this.funcionarioService.create({
-                    clienteId,
-                    contratoId,
-                    nome: func.nome,
-                    cpf: func.cpf,
-                    celular: func.celular || '',
-                    tipoFuncionario: func.tipoFuncionario,
-                    statusFuncionario: func.statusFuncionario,
-                    tipoEscala: func.tipoEscala,
-                  }),
-                );
-              } catch (funcErr: any) {
-                console.error('Erro ao criar funcionário:', func.nome, funcErr);
-              }
-            }
-          }
+          // Funcionários já foram criados pelo orquestrador no backend
 
           this.loading.set(false);
           this.router.navigate(['/clientes', response.cliente.id]);
@@ -889,6 +885,14 @@ export class ClienteWizardComponent implements OnInit {
         valorDiariaCobrada: posto.valorDiariaCobrada,
         valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal,
       })),
+      funcionarios: this.funcionarios.value.map((func: any) => ({
+        nome: func.nome,
+        cpf: func.cpf,
+        celular: func.celular || '',
+        tipoFuncionario: func.tipoFuncionario,
+        statusFuncionario: func.statusFuncionario,
+        tipoEscala: func.tipoEscala
+      }))
     };
   }
 

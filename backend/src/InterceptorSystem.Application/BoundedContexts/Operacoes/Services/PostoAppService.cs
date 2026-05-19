@@ -32,7 +32,7 @@ public class PostoAppService : IPostoAppService
 
         var posto = new Posto(
             input.ClienteId,
-            empresaId,
+            input.ContratoId,
             input.Nome,
             input.Cep,
             input.Endereco,
