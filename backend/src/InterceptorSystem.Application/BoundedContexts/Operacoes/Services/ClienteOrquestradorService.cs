@@ -87,6 +87,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
 
                         var postoInput = new CreatePostoInput(
                             cliente.Id,
+                            contrato.Id,
                             $"Posto {i + 1} - {tipoLabel}",
                             "00000000",
                             "Endereço Base (A Atualizar)",
@@ -121,6 +122,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
                         string turnoLabel = i == 1 ? "Diurno" : (i == 2 ? "Noturno" : $"Turno {i}");
                         var postoInput = new CreatePostoInput(
                             cliente.Id,
+                            contrato.Id,
                             $"Posto Base - {turnoLabel}",
                             "00000000",
                             "Endereço Base (A Atualizar)",
