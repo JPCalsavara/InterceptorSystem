@@ -26,13 +26,7 @@ public class ClienteOrquestradorServiceTests
 		_clienteRepository.SetupGet(r => r.UnitOfWork).Returns(_unitOfWork.Object);
 		_tenantService.SetupGet(t => t.EmpresaId).Returns(Guid.NewGuid());
 
-		_sut = new ClienteOrquestradorService(
-			_clienteService.Object,
-			_contratoService.Object,
-			_postoService.Object,
-			_alocacaoService.Object,
-			_tenantService.Object,
-			_clienteRepository.Object);
+		_sut = new ClienteOrquestradorService(_clienteService.Object, _contratoService.Object, _postoService.Object, _alocacaoService.Object, new Moq.Mock<InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces.IFuncionarioAppService>().Object, _tenantService.Object, _clienteRepository.Object);
 	}
 
 	[Fact]

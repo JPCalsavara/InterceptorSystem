@@ -43,7 +43,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
 
     private async Task<PostoDto> CriarPostoTeste(Guid clienteId, string nome = "Portaria A")
     {
-        var input = new CreatePostoInput(clienteId, nome, "01310-100", "Rua Teste", "123", null, "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, Guid.NewGuid(), nome, "01310-100", "Rua Teste", "123", null, "São Paulo", "SP");
         var response = await _client.PostAsJsonAsync("/api/postos", input);
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<PostoDto>(_jsonOptions))!;
@@ -58,7 +58,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
     {
         // Arrange
         var clienteId = await CriarClienteTeste();
-        var input = new CreatePostoInput(clienteId, "Portaria Principal", "01310-100", "Av. Paulista", "1000", "Conj. 10", "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteId, Guid.NewGuid(), "Portaria Principal", "01310-100", "Av. Paulista", "1000", "Conj. 10", "São Paulo", "SP");
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/postos", input);
@@ -85,7 +85,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
     {
         // Arrange
         var clienteInexistente = Guid.NewGuid();
-        var input = new CreatePostoInput(clienteInexistente, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+        var input = new CreatePostoInput(clienteInexistente, Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/postos", input);
@@ -277,7 +277,7 @@ public class PostosControllerIntegrationTests : IClassFixture<CustomWebApplicati
         var clienteId = await CriarClienteTeste();
 
         // 1. CREATE
-        var createInput = new CreatePostoInput(clienteId, "Portaria Fluxo", "01310-100", "Rua A", "100", null, "São Paulo", "SP");
+        var createInput = new CreatePostoInput(clienteId, Guid.NewGuid(), "Portaria Fluxo", "01310-100", "Rua A", "100", null, "São Paulo", "SP");
         var createResponse = await _client.PostAsJsonAsync("/api/postos", createInput);
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var created = await createResponse.Content.ReadFromJsonAsync<PostoDto>(_jsonOptions);
