@@ -56,7 +56,7 @@ describe('DashboardComponent', () => {
   ];
 
   const mockPostos: Posto[] = [
-    { id: 'p1', clienteId: 'c1', nome: 'Posto 1', cep: '01001-000', endereco: 'Rua A', numero: '1', cidade: 'SP', estado: 'SP', ativo: true },
+    { id: 'p1', clienteId: 'c1', contratoId: 'ct1', nome: 'Posto 1', cep: '01001-000', endereco: 'Rua A', numero: '1', cidade: 'SP', estado: 'SP', ativo: true },
   ];
 
   const mockDiarias: Diaria[] = [
