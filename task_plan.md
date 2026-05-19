@@ -15,7 +15,7 @@
 | 3 | Exibição de Relatório Simulado no Cliente-Wizard | `frontend/.../clientes/cliente-wizard/cliente-wizard.component.ts` | ✅ Concluído |
 | 4 | Backend: Orquestrar Criação de Funcionários | `backend/.../DTOs/CreateClienteCompletoDtoInput.cs`, `backend/.../Services/ClienteOrquestradorService.cs` | ✅ Concluído |
 | 5 | Frontend: Passar Funcionários no Payload do Wizard | `frontend/.../services/cliente-completo.service.ts`, `frontend/.../cliente-wizard/cliente-wizard.component.ts` | ✅ Concluído |
-| 6 | Build e validação | — | ⏳ Pendente |
+| 6 | Build e validação | — | ✅ Concluído |
 
 ---
 

@@ -227,6 +227,7 @@ export interface UpdateAlocacaoDto {
 export interface Posto {
   id: string;
   clienteId: string;
+  contratoId: string;
   nome: string;
   cep: string;
   endereco: string;
@@ -240,6 +241,7 @@ export interface Posto {
 
 export interface CreatePostoDto {
   clienteId: string;
+  contratoId: string;
   nome: string;
   cep: string;
   endereco: string;
