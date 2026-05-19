@@ -8,3 +8,4 @@
 - [16:35] `task_plan.md` e `findings.md` criados.
 - [16:35] Planejamento finalizado — pronto para execução com a skill `execute`.
 - [19:05] Fase 1 concluída — Corrigido erro de FK ao criar posto de trabalho (DTO, AppService e posto-form.component.ts)
+- [19:06] Fase 2 concluída — Sidebar reativa configurada utilizando EntityCacheCoordinatorService

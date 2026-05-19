@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 export const ENTITY_CACHE_KEYS = [
   'cliente',
@@ -18,6 +19,9 @@ type InvalidatorFn = () => void;
 })
 export class EntityCacheCoordinatorService {
   private invalidators = new Map<EntityCacheKey, Set<InvalidatorFn>>();
+  private invalidateSubject = new Subject<EntityCacheKey | 'all'>();
+  
+  public cacheInvalidated$ = this.invalidateSubject.asObservable();
 
   private readonly dependencyMap: Record<EntityCacheKey, readonly EntityCacheKey[]> = {
     cliente: ['posto', 'alocacao', 'diaria', 'contrato', 'funcionario'],
@@ -48,6 +52,7 @@ export class EntityCacheCoordinatorService {
     for (const invalidator of entityInvalidators) {
       invalidator();
     }
+    this.invalidateSubject.next(entityKey);
   }
 
   invalidateWithDependencies(entityKey: EntityCacheKey): void {
@@ -65,6 +70,7 @@ export class EntityCacheCoordinatorService {
     for (const key of ENTITY_CACHE_KEYS) {
       this.invalidate(key);
     }
+    this.invalidateSubject.next('all');
   }
 
   private resolveInvalidationKeys(rootEntityKey: EntityCacheKey): EntityCacheKey[] {
