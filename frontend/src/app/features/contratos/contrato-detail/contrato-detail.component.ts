@@ -623,10 +623,20 @@ export class ContratoDetailComponent implements OnInit {
         });
       },
       error: (err) => {
-        this.calculando.set(false);
         this.erroCalculo.set(err.error?.error || 'Erro ao calcular valor total');
         this.breakdown.set(null);
-        this.simulacaoBreakdown.set(null);
+        
+        // Tenta carregar a simulação mesmo se o cálculo com alocações falhar (ex: sem diárias)
+        this.calculoService.simularSemAlocacoes(simulacaoInput).subscribe({
+          next: (resultadoSimulado) => {
+            this.simulacaoBreakdown.set(resultadoSimulado);
+            this.calculando.set(false);
+          },
+          error: (simErr) => {
+            this.calculando.set(false);
+            this.simulacaoBreakdown.set(null);
+          },
+        });
       },
     });
   }

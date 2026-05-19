@@ -12,6 +12,7 @@ import { AlocacaoService } from '../../services/alocacao.service';
 import { TagService } from '../../services/tag.service';
 import { AuthService } from '../../services/auth.service';
 import { EntityCacheCoordinatorService } from '../../services/entity-cache-coordinator.service';
+import { debounceTime } from 'rxjs/operators';
 
 interface NavItem {
   label: string;
@@ -450,9 +451,12 @@ export class SidebarComponent implements OnInit {
     this.loadCounts();
     
     // Atualiza a sidebar de forma reativa quando entidades forem criadas, atualizadas ou deletadas
-    this.cacheCoordinator.cacheInvalidated$.subscribe(() => {
-      this.loadCounts();
-    });
+    // Usa debounceTime para evitar Http Flood caso invalidateAll dispare múltiplos eventos simultâneos
+    this.cacheCoordinator.cacheInvalidated$
+      .pipe(debounceTime(300))
+      .subscribe(() => {
+        this.loadCounts();
+      });
   }
 
   loadCounts() {
@@ -485,7 +489,9 @@ export class SidebarComponent implements OnInit {
       next: (data) =>
         this.counts.update((c) => ({
           ...c,
-          contratos: data.filter((x: any) => x.status === StatusContrato.ATIVO).length,
+          contratos: data.filter((x: any) => 
+            x.status === StatusContrato.ATIVO || x.status === 'ATIVO' || x.status === 0
+          ).length,
         })),
     });
     this.tagService.getAll().subscribe({

@@ -161,9 +161,11 @@ public class ApplicationDbContext : DbContext, IUnitOfWork
         var current = ex.InnerException as Exception;
         while (current != null)
         {
-            if (current.Message.Contains("23503") ||
-                current.Message.Contains("FOREIGN KEY") ||
-                current.Message.Contains("FK_"))
+            var message = current.Message ?? string.Empty;
+            if (message.Contains("23503") ||
+                message.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("foreign key constraint", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("FK_", StringComparison.OrdinalIgnoreCase))
                 return true;
             current = current.InnerException;
         }
