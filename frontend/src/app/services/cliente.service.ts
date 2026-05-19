@@ -31,6 +31,12 @@ export class ClienteService {
     return this.http.get<Cliente[]>(this.apiUrl).pipe(tap((data) => this._cache.set(data)));
   }
 
+  /** Força busca via HTTP ignorando o cache local. Usar após operações de delete. */
+  forceRefresh(): Observable<Cliente[]> {
+    this._cache.set(null);
+    return this.http.get<Cliente[]>(this.apiUrl).pipe(tap((data) => this._cache.set(data)));
+  }
+
   getById(id: string): Observable<Cliente> {
     return this.http.get<Cliente>(`${this.apiUrl}/${id}`);
   }
