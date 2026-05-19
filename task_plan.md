@@ -12,9 +12,9 @@
 |---|------|-------------------|---------|
 | 1 | 🔴 **[CRÍTICO] Erro FK ao criar Posto de Trabalho** | `backend/.../DTOs/PostoDto.cs` (CreatePostoInput), `backend/.../Services/PostoAppService.cs`, `frontend/.../posto-form/posto-form.component.ts` | ✅ Concluído |
 | 2 | Atualização da Sidebar (Reatividade) | `frontend/.../core/services/app-sync.service.ts` (novo), `frontend/.../core/layout/sidebar.component.ts` e demais forms que criam entidades | ✅ Concluído |
-| 3 | Exibição de Relatório Simulado no Cliente-Wizard | `frontend/.../clientes/cliente-wizard/cliente-wizard.component.ts` | ⏳ Pendente |
-| 4 | Backend: Orquestrar Criação de Funcionários | `backend/.../DTOs/CreateClienteCompletoDtoInput.cs`, `backend/.../Services/ClienteOrquestradorService.cs` | ⏳ Pendente |
-| 5 | Frontend: Passar Funcionários no Payload do Wizard | `frontend/.../services/cliente-completo.service.ts`, `frontend/.../cliente-wizard/cliente-wizard.component.ts` | ⏳ Pendente |
+| 3 | Exibição de Relatório Simulado no Cliente-Wizard | `frontend/.../clientes/cliente-wizard/cliente-wizard.component.ts` | ✅ Concluído |
+| 4 | Backend: Orquestrar Criação de Funcionários | `backend/.../DTOs/CreateClienteCompletoDtoInput.cs`, `backend/.../Services/ClienteOrquestradorService.cs` | ✅ Concluído |
+| 5 | Frontend: Passar Funcionários no Payload do Wizard | `frontend/.../services/cliente-completo.service.ts`, `frontend/.../cliente-wizard/cliente-wizard.component.ts` | ✅ Concluído |
 | 6 | Build e validação | — | ⏳ Pendente |
 
 ---

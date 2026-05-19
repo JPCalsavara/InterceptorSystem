@@ -803,32 +803,7 @@ export class ClienteWizardComponent implements OnInit {
         next: async (response: CriarClienteCompletoOutput) => {
           console.log('Resposta recebida:', response);
 
-          // Criar funcionários do Step 3, se houver
-          const funcionariosParaCriar = this.funcionarios.controls;
-          if (funcionariosParaCriar.length > 0) {
-            const contratoId = response.contrato.id;
-            const clienteId = response.cliente.id;
-
-            for (const funcControl of funcionariosParaCriar) {
-              const func = funcControl.value;
-              try {
-                await firstValueFrom(
-                  this.funcionarioService.create({
-                    clienteId,
-                    contratoId,
-                    nome: func.nome,
-                    cpf: func.cpf,
-                    celular: func.celular || '',
-                    tipoFuncionario: func.tipoFuncionario,
-                    statusFuncionario: func.statusFuncionario,
-                    tipoEscala: func.tipoEscala,
-                  }),
-                );
-              } catch (funcErr: any) {
-                console.error('Erro ao criar funcionário:', func.nome, funcErr);
-              }
-            }
-          }
+          // Funcionários já foram criados pelo orquestrador no backend
 
           this.loading.set(false);
           this.router.navigate(['/clientes', response.cliente.id]);
@@ -910,6 +885,14 @@ export class ClienteWizardComponent implements OnInit {
         valorDiariaCobrada: posto.valorDiariaCobrada,
         valorBeneficiosExtrasMensal: posto.valorBeneficiosExtrasMensal,
       })),
+      funcionarios: this.funcionarios.value.map((func: any) => ({
+        nome: func.nome,
+        cpf: func.cpf,
+        celular: func.celular || '',
+        tipoFuncionario: func.tipoFuncionario,
+        statusFuncionario: func.statusFuncionario,
+        tipoEscala: func.tipoEscala
+      }))
     };
   }
 

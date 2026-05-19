@@ -12,6 +12,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
     private readonly IContratoAppService _contratoService;
     private readonly IPostoAppService _postoService;
     private readonly IAlocacaoAppService _alocacaoService;
+    private readonly IFuncionarioAppService _funcionarioService;
     private readonly ICurrentTenantService _tenantService;
     private readonly IClienteRepository _clienteRepository;
 
@@ -20,6 +21,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
         IContratoAppService contratoService,
         IPostoAppService postoService,
         IAlocacaoAppService alocacaoService,
+        IFuncionarioAppService funcionarioService,
         ICurrentTenantService tenantService,
         IClienteRepository clienteRepository)
     {
@@ -27,6 +29,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
         _contratoService = contratoService;
         _postoService = postoService;
         _alocacaoService = alocacaoService;
+        _funcionarioService = funcionarioService;
         _tenantService = tenantService;
         _clienteRepository = clienteRepository;
     }
@@ -144,12 +147,24 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
                 }
             }
 
+            var funcionariosCriados = new List<FuncionarioDtoOutput>();
+            if (input.Funcionarios is { Count: > 0 })
+            {
+                foreach (var funcionario in input.Funcionarios)
+                {
+                    var funcInput = funcionario with { ClienteId = cliente.Id, ContratoId = contrato.Id };
+                    var func = await _funcionarioService.CreateAsync(funcInput, ct);
+                    funcionariosCriados.Add(func);
+                }
+            }
+
             await unitOfWork.CommitTransactionAsync();
 
             return new ClienteCompletoDtoOutput(
                 cliente,
                 contrato,
-                postosCriados
+                postosCriados,
+                funcionariosCriados
             );
         }
         catch (Exception ex)
