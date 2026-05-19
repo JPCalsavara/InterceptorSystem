@@ -52,7 +52,8 @@ export class EntityCacheCoordinatorService {
     for (const invalidator of entityInvalidators) {
       invalidator();
     }
-    this.invalidateSubject.next(entityKey);
+    // Nota: NÃO emitimos no Subject aqui para evitar race condition.
+    // A emissão é feita uma única vez pelo chamador (invalidateAll ou invalidateWithDependencies).
   }
 
   invalidateWithDependencies(entityKey: EntityCacheKey): void {
@@ -60,6 +61,8 @@ export class EntityCacheCoordinatorService {
     for (const key of keysToInvalidate) {
       this.invalidate(key);
     }
+    // Emite uma única vez após invalidar todas as dependências
+    this.invalidateSubject.next(entityKey);
   }
 
   /**
@@ -70,6 +73,7 @@ export class EntityCacheCoordinatorService {
     for (const key of ENTITY_CACHE_KEYS) {
       this.invalidate(key);
     }
+    // Emite uma única vez após todos os caches serem limpos
     this.invalidateSubject.next('all');
   }
 

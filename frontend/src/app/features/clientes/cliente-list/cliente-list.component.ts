@@ -57,7 +57,15 @@ export class ClienteListComponent implements OnInit {
     this.service.delete(id).subscribe({
       next: () => {
         this.successMessage.set('Cliente excluído com sucesso!');
-        this.loadClientes();
+        // Usa forceRefresh para ignorar o cache e garantir lista atualizada,
+        // evitando race condition com a sidebar que também re-busca via cache.
+        this.service.forceRefresh().subscribe({
+          next: (data) => {
+            this.clientes.set(data);
+            this.loading.set(false);
+          },
+          error: () => this.loading.set(false),
+        });
         setTimeout(() => this.successMessage.set(null), 3000);
       },
       error: (err) => {
