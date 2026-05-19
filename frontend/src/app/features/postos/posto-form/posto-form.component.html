@@ -58,6 +58,25 @@
             <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
           }
         </div>
+        <div class="form-group">
+          <label for="contratoId" class="form-label">
+            Contrato <span class="required">*</span>
+          </label>
+          <select
+            id="contratoId"
+            formControlName="contratoId"
+            class="form-input"
+            [class.error]="hasError('contratoId')"
+          >
+            <option value="">Selecione um contrato</option>
+            @for (contrato of contratos(); track contrato.id) {
+              <option [value]="contrato.id">{{ contrato.descricao }}</option>
+            }
+          </select>
+          @if (hasError('contratoId')) {
+            <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
+          }
+        </div>
       </div>
 
       <h3 class="section-title">Dados do Posto</h3>

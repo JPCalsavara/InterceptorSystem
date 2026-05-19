@@ -2,6 +2,7 @@ namespace InterceptorSystem.Application.BoundedContexts.Operacoes.DTOs;
 
 public record CreatePostoInput(
     Guid ClienteId,
+    Guid ContratoId,
     string Nome,
     string Cep,
     string Endereco,

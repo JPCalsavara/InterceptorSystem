@@ -5,8 +5,9 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PostoService } from '../../../services/posto.service';
 import { ClienteService } from '../../../services/cliente.service';
+import { ContratoService } from '../../../services/contrato.service';
 import { CepService } from '../../../services/cep.service';
-import { Cliente, Posto } from '../../../models/index';
+import { Cliente, Posto, Contrato } from '../../../models/index';
 
 @Component({
   selector: 'app-posto-form',
@@ -19,12 +20,14 @@ export class PostoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(PostoService);
   private clienteService = inject(ClienteService);
+  private contratoService = inject(ContratoService);
   private cepService = inject(CepService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   form!: FormGroup;
   clientes = signal<Cliente[]>([]);
+  contratos = signal<Contrato[]>([]);
   loading = signal(false);
   loadingCep = signal(false);
   error = signal<string | null>(null);
@@ -38,6 +41,7 @@ export class PostoFormComponent implements OnInit {
 
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
+      contratoId: [{value: '', disabled: true}, Validators.required],
       nome: ['', [Validators.required, Validators.maxLength(150)]],
       cep: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
       endereco: ['', [Validators.required, Validators.maxLength(250)]],
@@ -66,8 +70,19 @@ export class PostoFormComponent implements OnInit {
   private setupClienteChange(): void {
     this.form.get('clienteId')?.valueChanges.subscribe((clienteId) => {
       if (!clienteId) {
+        this.contratos.set([]);
+        this.form.get('contratoId')?.setValue('');
+        this.form.get('contratoId')?.disable();
         return;
       }
+      this.form.get('contratoId')?.enable();
+      this.contratoService.getByClienteId(clienteId).subscribe({
+        next: (data) => this.contratos.set(data),
+        error: (err) => {
+          this.error.set('Erro ao carregar contratos.');
+          console.error(err);
+        }
+      });
     });
   }
 
@@ -87,6 +102,7 @@ export class PostoFormComponent implements OnInit {
       next: (data: Posto) => {
         this.form.patchValue({
           clienteId: data.clienteId,
+          contratoId: data.contratoId,
           nome: data.nome,
           cep: this.cepService.formatCep(data.cep),
           endereco: data.endereco,
@@ -96,6 +112,7 @@ export class PostoFormComponent implements OnInit {
           estado: data.estado,
         });
         this.form.get('clienteId')?.disable();
+        this.form.get('contratoId')?.disable();
         this.loading.set(false);
       },
       error: (err) => {
@@ -141,6 +158,7 @@ export class PostoFormComponent implements OnInit {
       this.service
         .create({
           clienteId: formValue.clienteId,
+          contratoId: formValue.contratoId,
           ...payload,
         })
         .subscribe({
