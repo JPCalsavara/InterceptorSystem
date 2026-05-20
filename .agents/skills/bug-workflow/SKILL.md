@@ -35,7 +35,11 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
 
 ### FASE 3: Correção Cirúrgica (Skill Relacionada: `execute`)
 - **Com a falha reproduzida:**
-  1. Crie uma branch de correção via `git-flow` (ex: `fix/nome-do-bug`).
+  1. **[OBRIGATÓRIO]** Crie uma branch de hotfix a partir da `main`. **NUNCA commite direto na main** — ela está protegida e requer CI/CD via PR:
+     ```bash
+     git checkout main && git pull
+     git checkout -b hotfix/nome-do-bug
+     ```
   2. Implemente a alteração no código principal conforme o `task_plan.md`.
   3. Faça alterações focadas, evitando mexer em arquivos não relacionados ao bug.
   4. Atualize o `progress.md` e marque a fase de correção com ✅ no `task_plan.md`.
