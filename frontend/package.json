@@ -8,7 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --no-watch --coverage",
-    "test:ci": "ng test --watch=false --coverage"
+    "test:ci": "ng test --watch=false --coverage",
+    "test:e2e": "cypress run",
+    "test:component": "cypress run --component"
   },
   "prettier": {
     "printWidth": 100,
@@ -37,9 +39,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^21.2.11",
     "@angular/build": "^21.0.4",
     "@angular/cli": "^21.0.4",
     "@angular/compiler-cli": "^21.0.0",
+    "@angular/platform-browser-dynamic": "^21.2.13",
     "@testing-library/angular": "^19.2.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",

@@ -2,11 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ContaAlterarSenhaComponent } from './components/conta-alterar-senha/conta-alterar-senha.component';
 
 @Component({
   selector: 'app-conta',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ContaAlterarSenhaComponent],
   template: `
     <div class="page-container">
       <div class="page-header">
@@ -44,56 +45,8 @@ import { AuthService } from '../../services/auth.service';
         </div>
       </section>
 
-      <!-- Alterar senha -->
-      <section class="card">
-        <div class="card-header">
-          <h2>Alterar Senha</h2>
-        </div>
-        <div class="card-body">
-          <form class="form" (ngSubmit)="alterarSenha()">
-            <div class="form-group">
-              <label>Senha atual</label>
-              <input
-                type="password"
-                [(ngModel)]="senhaAtual"
-                name="senhaAtual"
-                placeholder="••••••••"
-              />
-            </div>
-            <div class="form-group">
-              <label>Nova senha</label>
-              <input
-                type="password"
-                [(ngModel)]="novaSenha"
-                name="novaSenha"
-                placeholder="••••••••"
-              />
-            </div>
-            <div class="form-group">
-              <label>Confirmar nova senha</label>
-              <input
-                type="password"
-                [(ngModel)]="confirmarSenha"
-                name="confirmarSenha"
-                placeholder="••••••••"
-              />
-            </div>
-            @if (erroSenha()) {
-              <div class="error-msg">{{ erroSenha() }}</div>
-            }
-            @if (sucesso('senha')) {
-              <div class="success-msg">Senha alterada com sucesso!</div>
-            }
-            <button type="submit" class="btn-primary" [disabled]="salvandoSenha()">
-              @if (salvandoSenha()) {
-                Salvando...
-              } @else {
-                Salvar senha
-              }
-            </button>
-          </form>
-        </div>
-      </section>
+      <!-- Alterar senha Componentizado -->
+      <app-conta-alterar-senha></app-conta-alterar-senha>
 
       <!-- Alterar e-mail -->
       <section class="card">
@@ -357,22 +310,14 @@ export class ContaComponent {
   enviandoVerificacao = signal(false);
   msgVerificacao = signal<string | null>(null);
 
-  // Alterar senha
-  senhaAtual = '';
-  novaSenha = '';
-  confirmarSenha = '';
-  salvandoSenha = signal(false);
-  erroSenha = signal<string | null>(null);
-  _sucessoSenha = signal(false);
-
   // Alterar e-mail
   novoEmail = '';
   salvandoEmail = signal(false);
   erroEmail = signal<string | null>(null);
   _sucessoEmail = signal(false);
 
-  sucesso(tipo: 'senha' | 'email'): boolean {
-    return tipo === 'senha' ? this._sucessoSenha() : this._sucessoEmail();
+  sucesso(tipo: 'email'): boolean {
+    return this._sucessoEmail();
   }
 
   reenviarVerificacao(): void {
@@ -391,38 +336,7 @@ export class ContaComponent {
     });
   }
 
-  alterarSenha(): void {
-    if (!this.senhaAtual || !this.novaSenha || !this.confirmarSenha) return;
-    if (this.novaSenha !== this.confirmarSenha) {
-      this.erroSenha.set('As senhas não coincidem.');
-      return;
-    }
-
-    this.erroSenha.set(null);
-    this._sucessoSenha.set(false);
-    this.salvandoSenha.set(true);
-
-    // Via ContaController que já existe
-    const empresaId = this.authService.currentUser()?.empresaId;
-    this.authService['http']
-      .put(`${this.authService['apiUrl'].replace('/auth', '/conta')}`, {
-        senhaAtual: this.senhaAtual,
-        novaSenha: this.novaSenha,
-      })
-      .subscribe({
-        next: () => {
-          this.salvandoSenha.set(false);
-          this._sucessoSenha.set(true);
-          this.senhaAtual = '';
-          this.novaSenha = '';
-          this.confirmarSenha = '';
-        },
-        error: (err: any) => {
-          this.salvandoSenha.set(false);
-          this.erroSenha.set(err?.error?.mensagem ?? 'Erro ao alterar senha.');
-        },
-      });
-  }
+  // alterarSenha() foi movido para o subcomponente
 
   solicitarAlteracaoEmail(): void {
     if (!this.novoEmail) return;
