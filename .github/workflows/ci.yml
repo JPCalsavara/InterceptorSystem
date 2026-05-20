@@ -102,6 +102,10 @@ jobs:
         working-directory: frontend
         run: npm run test:ci
 
+      - name: Run Cypress Component Tests (Responsiveness Check)
+        working-directory: frontend
+        run: npm run test:component
+
       # 7. Upload dos arquivos de build (artefato)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

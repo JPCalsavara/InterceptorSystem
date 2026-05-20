@@ -1,76 +1,52 @@
 ---
 name: generate-tests
-description: Automatically generates Unit or Integration tests for C# components based on project standards.
+description: Automatically generates Unit, Component, and E2E tests for both Backend (C#) and Frontend (Angular/Cypress) enforcing project standards and visual responsiveness.
 ---
 
 # Generate Tests Skill
 
-When creating or updating tests, enforce the following InterceptorSystem standards:
+When creating or updating tests, enforce the following InterceptorSystem standards across the stack.
 
-## 1. Test Coverage Requirement
+## 1. A Estratégia da Pirâmide de Testes (Por que precisamos de todos?)
+- **Backend Unit/Integration (xUnit)**: Garante que a regra de negócio, cálculos e banco de dados funcionam. Mas o backend não sabe se o botão na tela está clicável ou invisível.
+- **Frontend Component Tests (Cypress Component)**: Isola um componente de UI (ex: um botão ou card) e testa se ele está responsivo e quebrando o CSS corretamente em telas pequenas.
+- **Frontend E2E Tests (Cypress E2E)**: Simula o usuário real abrindo o navegador, navegando nas rotas, preenchendo formulários e vendo se a união (Front + Back) funciona. Se a API mudou o nome de um campo e quebrou o Frontend, apenas o E2E vai pegar isso.
 
-- Every functionality must have **at least 3 test cases**:
-  1. **Good Case** (Valid input, expected success result).
-  2. **Incomplete/Edge Case** (Missing non-required fields, boundary values).
-  3. **Bad Case** (Invalid input, expected exception or bad request).
-- Every endpoint must have exactly these **3 test cases** minimally implemented.
+---
 
-## 2. Framework & Tooling
+## 2. Frontend Component & Responsive Tests (Cypress Component)
 
-- Use **xUnit** as the test framework.
-- Use **Moq** for mocking dependencies.
-- Arrange, Act, Assert (AAA) pattern must be visibly separated by blank lines or comments.
+Quando gerar testes para componentes de UI Angular (dentro das pastas `components/`), foque em **Responsividade** e **Estado**.
 
-## 3. Mocking Dependencies
-
-- Always mock `ICurrentTenantService` to return a consistent `EmpresaId` since the system is strictly Multi-Tenant.
-- Use constructor injection (`new MyService(mockRepo.Object, mockTenant.Object)`).
-- Pass `CancellationToken.None` explicitly in all async mock setups and act calls.
-
-## 4. Testing Domain Entities
-
-- Verify that state modifications happen exclusively through the domain entity's behavioral methods (e.g., `AtualizarDados()`), not direct setters.
-- Verify `EmpresaId` remains untouched.
-- Verify `Enforce` invariants: calling a behavioral method with invalid data must throw `DomainException`.
-
-## 5. Testing Value Objects
-
-- Every Value Object must have at minimum:
-  1. **Good Case**: valid input creates the VO successfully.
-  2. **Bad Case**: invalid input (e.g., CPF with 10 digits, CNPJ with letters) throws `DomainException`.
-  3. **Edge Case**: boundary value (e.g., 11 vs 12 digit CPF).
-- Example:
-  ```csharp
-  [Fact]
-  public void Cpf_ComFormatoInvalido_DeveLancarDomainException()
-  {
-      // Act & Assert
-      Assert.Throws<DomainException>(() => Cpf.Criar("1234567890")); // 10 digits
-  }
+- **Viewport Testing**: Teste obrigatoriamente os componentes nas resoluções `mobile` (320px) e `desktop` (1024px).
+- **CSS Assertions**: Afirme matematicamente que as propriedades Flexbox/Grid se adaptaram.
+  ```typescript
+  it('deve empilhar os elementos verticalmente no mobile', () => {
+    cy.viewport(320, 568);
+    cy.mount(MeuCardComponent);
+    cy.get('.container').should('have.css', 'flex-direction', 'column');
+  });
   ```
+- **Acessibilidade e Interação**: Teste se botões disparam os eventos (`@Output`) corretos e se estados de erro (como bordas vermelhas) aparecem quando o form é inválido.
 
-## 6. Testing Domain Events
+---
 
-- After calling a behavioral method, verify the aggregate raised the expected Domain Event:
-  ```csharp
-  [Fact]
-  public void Cliente_AoSerCriado_DeveRegistrarClienteCreatedEvent()
-  {
-      var cliente = new Cliente(empresaId, "Nome", "00000000000191", ...);
-      Assert.Single(cliente.DomainEvents);
-      Assert.IsType<ClienteCreatedEvent>(cliente.DomainEvents.First());
-  }
-  ```
+## 3. Frontend E2E Tests (Cypress E2E)
 
-## 7. Testing CommandHandlers
+Utilizado para a jornada completa do usuário na tela principal.
+- **Mock vs Real**: Utilize `cy.intercept()` para isolar falhas de front, mas mantenha testes críticos consumindo a API real.
+- **Seletores Resilientes**: Nunca selecione elementos por classes de estilização (ex: `.btn-blue`). Sempre crie e utilize `data-cy="submit-button"`.
 
-- CommandHandlers replace AppServices as the primary unit under test for write operations.
-- Required 3 cases for each handler:
-  1. **Good Case**: valid command → entity created/updated, `CommitAsync` called once.
-  2. **Not Found Case**: entity doesn't exist → `KeyNotFoundException` thrown.
-  3. **Invalid Input Case**: domain invariant violated → `DomainException` thrown.
-- Example mock setup:
-  ```csharp
-  _repo.Setup(r => r.UnitOfWork).Returns(_uow.Object);
-  _uow.Setup(u => u.CommitAsync(CancellationToken.None)).ReturnsAsync(true);
-  ```
+---
+
+## 4. Backend Tests (Cypress) ➡️ C# / xUnit
+
+Regras estritas para testes do .NET:
+- **Regra de Cobertura**: Toda funcionalidade exige **3 casos de teste** no mínimo:
+  1. **Good Case** (Valores válidos, sucesso).
+  2. **Edge Case** (Valores limitrofes ou campos opcionais faltando).
+  3. **Bad Case** (Input inválido, deve lançar exceção).
+- **Moq**: Sempre mocke o `ICurrentTenantService` para garantir o `EmpresaId` fixo, pois o sistema é Multi-Tenant.
+- **AppServices**: São o alvo primário de testes de escrita/orquestração. Teste o Sucesso, o Not Found (lança KeyNotFoundException) e a Violação de Domínio (lança DomainException).
+- **Domain Entities & Value Objects**: Garanta que as mudanças de estado ocorram apenas por métodos comportamentais (ex: `AtualizarDados()`). Teste se entradas ruins (ex: CPF com 10 dígitos) disparam erro no VO imediatamente.
+- **Domain Events**: Sempre teste se a entidade emitiu o evento correto após uma ação importante (ex: `Assert.IsType<ClienteCreatedEvent>(cliente.DomainEvents.First());`).

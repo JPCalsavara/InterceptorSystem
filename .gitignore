@@ -178,3 +178,10 @@ Thumbs.db
 *.swo
 *~
 .history/
+
+## ==================================================
+## AI Agents Workspace (Memória de Tarefas)
+## ==================================================
+task_plan.md
+findings.md
+progress.md
