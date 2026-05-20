@@ -29,11 +29,11 @@ public class ContratoCalculosController : ControllerBase
     {
         try
         {
-            if (input.ValorDiariaCobrada <= 0)
-                return BadRequest(new { error = "Valor da diária deve ser maior que zero." });
+            if (input.ValorDiariaCobrada < 0)
+                return BadRequest(new { error = "Valor da diária não pode ser negativo." });
             
-            if (input.DiariasTotaisMes <= 0)
-                return BadRequest(new { error = "Diárias totais deve ser maior que zero." });
+            if (input.DiariasTotaisMes < 0)
+                return BadRequest(new { error = "Diárias totais não pode ser negativo." });
 
             if (input.FuncionariosEstimados < 0)
                 return BadRequest(new { error = "Funcionários estimados não pode ser negativo." });
