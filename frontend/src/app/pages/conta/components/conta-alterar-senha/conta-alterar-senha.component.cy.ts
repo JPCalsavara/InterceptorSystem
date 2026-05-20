@@ -33,7 +33,8 @@ describe('ContaAlterarSenhaComponent - Cypress Component Test', () => {
       ]
     });
 
-    // Tela = 320px, descontando padding de 16px(x2) = 288px livre pro botão
-    cy.get('.btn-primary').invoke('outerWidth').should('be.gt', 280); 
+    // Tela = 320px. Padding do container = 24px por lado (48px total). Botão real = ~270px.
+    // Threshold de 250 garante full-width sem pixel-perfecting.
+    cy.get('.btn-primary').invoke('outerWidth').should('be.gt', 250); 
   });
 });

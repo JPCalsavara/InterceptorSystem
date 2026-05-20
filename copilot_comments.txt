@@ -1,0 +1,166 @@
+frontend/cypress.config.ts
+Outdated
+      framework: "angular",
+      bundler: "webpack",
+    },
+    specPattern: "**/*.cy.ts",
+Copilot commented 23 minutes ago
+Copilot
+Copilot
+AI
+23 minutes ago
+High
+The component test specPattern is too broad ("/*.cy.ts") and will also match existing E2E specs under src/e2e (e.g., src/e2e/critical-journeys-v2.cy.ts). This will make cypress run --component try to run E2E tests in component mode and likely fail. Restrict the component specPattern to where component specs live (e.g., src/app//.cy.ts or **/.component.cy.ts) and/or explicitly exclude src/e2e.
+
+frontend/cypress.config.ts
+import { defineConfig } from "cypress";
+
+export default defineConfig({
+  allowCypressEnv: false,
+Copilot commented 24 minutes ago
+Copilot
+Copilot
+AI
+24 minutes ago
+Medium
+allowCypressEnv is not a standard Cypress config option and appears unused elsewhere in the repo. Keeping unknown config keys can be misleading; consider removing it unless it's required by a specific plugin/version and documented.
+
+Suggested changeset 1 (1)
+frontend/cypress.config.ts
+Original file line number	Diff line number	Diff line change
+ import { defineConfig } from "cypress";
+ export default defineConfig({
+   allowCypressEnv: false,
+   e2e: {
+     baseUrl: "http://localhost:4201",
+     specPattern: "src/e2e/**/*.cy.{js,jsx,ts,tsx}",
+
+frontend/cypress.config.ts
+import { defineConfig } from "cypress";
+
+export default defineConfig({
+  allowCypressEnv: false,
+Copilot commented 24 minutes ago
+Copilot
+Copilot
+AI
+24 minutes ago
+Medium
+allowCypressEnv is not a standard Cypress config option and appears unused elsewhere in the repo. Keeping unknown config keys can be misleading; consider removing it unless it's required by a specific plugin/version and documented.
+
+Suggested changeset 1 (1)
+frontend/cypress.config.ts
+Original file line number	Diff line number	Diff line change
+ import { defineConfig } from "cypress";
+ export default defineConfig({
+   allowCypressEnv: false,
+   e2e: {
+     baseUrl: "http://localhost:4201",
+     specPattern: "src/e2e/**/*.cy.{js,jsx,ts,tsx}",
+
+frontend/src/app/pages/conta/conta.component.ts
+  sucesso(tipo: 'senha' | 'email'): boolean {
+    return tipo === 'senha' ? this._sucessoSenha() : this._sucessoEmail();
+  sucesso(tipo: 'email'): boolean {
+    return this._sucessoEmail();
+Copilot commented 24 minutes ago
+Copilot
+Copilot
+AI
+24 minutes ago
+Low
+sucesso() now accepts a tipo parameter but the implementation ignores it and always returns _sucessoEmail(). Consider removing the parameter and renaming to something like sucessoEmail() (or use the parameter) to avoid dead/unused API surface.
+
+Suggested changeset 1 (1)
+frontend/src/app/pages/conta/conta.component.ts
+Original file line number	Diff line number	Diff line change
+   _sucessoEmail = signal(false);
+   sucesso(tipo: 'email'): boolean {
+     return this._sucessoEmail();
+     switch (tipo) {
+       case 'email':
+         return this._sucessoEmail();
+     }
+   }
+   reenviarVerificacao(): void {
+
+frontend/src/app/pages/conta/components/conta-alterar-senha/conta-alterar-senha.component.ts
+    this._sucessoSenha.set(false);
+    this.salvandoSenha.set(true);
+
+    const empresaId = this.authService.currentUser()?.empresaId;
+Copilot commented 24 minutes ago
+Copilot
+Copilot
+AI
+24 minutes ago
+Low
+empresaId is computed but never used. This is dead code and may trigger lint/TS unused-variable warnings; remove it or use it if needed for the request.
+
+Suggested changeset 1 (1)
+frontend/src/app/pages/conta/components/conta-alterar-senha/conta-alterar-senha.component.ts
+Original file line number	Diff line number	Diff line change
+     this._sucessoSenha.set(false);
+     this.salvandoSenha.set(true);
+     const empresaId = this.authService.currentUser()?.empresaId;
+     this.authService['http']
+       .put(`${this.authService['apiUrl'].replace('/auth', '/conta')}`, {
+         senhaAtual: this.senhaAtual,
+
+frontend/src/app/pages/conta/components/conta-alterar-senha/conta-alterar-senha.component.ts
+Comment on lines +206 to +210
+    this.authService['http']
+      .put(`${this.authService['apiUrl'].replace('/auth', '/conta')}`, {
+        senhaAtual: this.senhaAtual,
+        novaSenha: this.novaSenha,
+      })
+Copilot commented 24 minutes ago
+Copilot
+Copilot
+AI
+24 minutes ago
+Medium
+This component reaches into AuthService private fields via bracket indexing (this.authService['http'] / ['apiUrl']). This breaks encapsulation and will be brittle if AuthService internals change. Prefer adding a public method on AuthService (or a dedicated ContaService) for password change and call it from the component.
+
+docs/ARCHITECTURE_MAP.md
+
+Este documento serve como mapa mental **base** para o agente de IA e desenvolvedores. Antes de propor qualquer alteração ou novo plano, consulte este mapa para garantir consistência estrutural.
+
+## 1. Backend (C# .NET 9) - Clean Architecture & CQRS
+Copilot commented 25 minutes ago
+Copilot
+Copilot
+AI
+25 minutes ago
+Medium
+The section header says "Clean Architecture & CQRS", but the rest of the document (and this PR description) describes moving away from CQRS in favor of AppServices. Update this header (and any remaining CQRS mentions) to avoid contradicting the intended architecture guidance.
+
+Suggested changeset 1 (1)
+docs/ARCHITECTURE_MAP.md
+Original file line number	Diff line number	Diff line change
+ Este documento serve como mapa mental **base** para o agente de IA e desenvolvedores. Antes de propor qualquer alteração ou novo plano, consulte este mapa para garantir consistência estrutural.
+ ## 1. Backend (C# .NET 9) - Clean Architecture & CQRS
+ ## 1. Backend (C# .NET 9) - Clean Architecture & AppServices
+ O backend está dividido rigorosamente em 4 camadas (`src/`):
+
+.agents/skills/create-endpoint/SKILL.md
+---
+name: create-endpoint
+description: Guides the creation of a new Backend API endpoint following Clean Architecture and DDD standards.
+description: Guides the creation of a new Backend API endpoint following Clean Architecture, CQRS, and DDD standards.
+Copilot commented 25 minutes ago
+Copilot
+Copilot
+AI
+25 minutes ago
+Medium
+The front-matter description says the endpoint guide follows CQRS, but the body of this skill is AppService/vertical-slice oriented (and the PR description states CQRS was removed). Update the description to avoid conflicting guidance.
+
+Suggested changeset 1 (1)
+.agents/skills/create-endpoint/SKILL.md
+Original file line number	Diff line number	Diff line change
+ ---
+ name: create-endpoint
+ description: Guides the creation of a new Backend API endpoint following Clean Architecture, CQRS, and DDD standards.
+ description: Guides the creation of a new Backend API endpoint following Clean Architecture, vertical-slice/AppService, and DDD standards.
+ ---
