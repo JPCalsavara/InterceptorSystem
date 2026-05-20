@@ -17,11 +17,18 @@ import { CommonModule } from '@angular/common';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
     .action-card-container {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
+      box-sizing: border-box;
       /* Usamos variáveis CSS (Tokens) para suportar Dark Mode e temas */
       background-color: var(--surface-color, #ffffff);
       border-radius: 12px;
