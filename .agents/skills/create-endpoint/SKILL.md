@@ -1,6 +1,6 @@
 ---
 name: create-endpoint
-description: Guides the creation of a new Backend API endpoint following Clean Architecture, CQRS, and DDD standards.
+description: Guides the creation of a new Backend API endpoint following Clean Architecture, vertical-slice/AppService, and DDD standards.
 ---
 
 # Create Endpoint Skill

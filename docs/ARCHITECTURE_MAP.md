@@ -2,7 +2,7 @@
 
 Este documento serve como mapa mental **base** para o agente de IA e desenvolvedores. Antes de propor qualquer alteração ou novo plano, consulte este mapa para garantir consistência estrutural.
 
-## 1. Backend (C# .NET 9) - Clean Architecture & CQRS
+## 1. Backend (C# .NET 9) - Clean Architecture & AppServices
 
 O backend está dividido rigorosamente em 4 camadas (`src/`):
 
@@ -25,7 +25,7 @@ Onde vive o coração do negócio.
 ### 1.4 `InterceptorSystem.Api` (Presentation)
 - **Controllers**: Devem ser estritamente **Thin Controllers**. 
   - ❌ Proibido: Validação de regras de negócio, `try-catch`, injeção do DbContext.
-  - ✅ Correto: Apenas injeção do `MediatR/Service`, anotações de Swagger e devolução do `Ok(result)`.
+  - ✅ Correto: Apenas injeção de `AppService`, anotações de Swagger e devolução do `Ok(result)`.
 - **Middlewares**: Exceções como `DomainException` são capturadas pelo Global Exception Handler e convertidas em `400 BadRequest` automaticamente.
 
 ---

@@ -70,7 +70,7 @@ import { ContaAlterarSenhaComponent } from './components/conta-alterar-senha/con
             @if (erroEmail()) {
               <div class="error-msg">{{ erroEmail() }}</div>
             }
-            @if (sucesso('email')) {
+            @if (sucessoEmail()) {
               <div class="success-msg">
                 Um e-mail de confirmação foi enviado para {{ novoEmail }}. Acesse o link para
                 confirmar a troca.
@@ -316,7 +316,7 @@ export class ContaComponent {
   erroEmail = signal<string | null>(null);
   _sucessoEmail = signal(false);
 
-  sucesso(tipo: 'email'): boolean {
+  sucessoEmail(): boolean {
     return this._sucessoEmail();
   }
 

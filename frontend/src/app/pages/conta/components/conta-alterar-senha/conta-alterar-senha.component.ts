@@ -202,7 +202,7 @@ export class ContaAlterarSenhaComponent {
     this._sucessoSenha.set(false);
     this.salvandoSenha.set(true);
 
-    const empresaId = this.authService.currentUser()?.empresaId;
+    // TODO: Mover para ContaService quando for criado (evitar acesso a campos privados via bracket)
     this.authService['http']
       .put(`${this.authService['apiUrl'].replace('/auth', '/conta')}`, {
         senhaAtual: this.senhaAtual,
