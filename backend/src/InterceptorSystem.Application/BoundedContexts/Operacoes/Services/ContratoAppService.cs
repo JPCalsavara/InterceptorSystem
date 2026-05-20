@@ -5,6 +5,7 @@ using InterceptorSystem.Application.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Enums;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
+using InterceptorSystem.Domain.SharedKernel.Exceptions;
 
 namespace InterceptorSystem.Application.BoundedContexts.Operacoes.Services;
 
@@ -16,6 +17,7 @@ public class ContratoAppService : IContratoAppService
     private readonly ICurrentTenantService _tenantService;
     private readonly IContratoCalculoService _calculoService;
     private readonly IDiariaAppService _diariaAppService;
+    private readonly IFuncionarioRepository _funcionarioRepository;
 
     public ContratoAppService(
         IContratoRepository repository,
@@ -23,7 +25,8 @@ public class ContratoAppService : IContratoAppService
         IContratoTagService tagService,
         ICurrentTenantService tenantService,
         IContratoCalculoService calculoService,
-        IDiariaAppService diariaAppService)
+        IDiariaAppService diariaAppService,
+        IFuncionarioRepository funcionarioRepository)
     {
         _repository = repository;
         _clienteRepository = clienteRepository;
@@ -31,6 +34,7 @@ public class ContratoAppService : IContratoAppService
         _tenantService = tenantService;
         _calculoService = calculoService;
         _diariaAppService = diariaAppService;
+        _funcionarioRepository = funcionarioRepository;
     }
 
     public async Task<ContratoDtoOutput> CreateAsync(CreateContratoDtoInput input, CancellationToken ct = default)
@@ -134,6 +138,18 @@ public class ContratoAppService : IContratoAppService
     {
         var contrato = await _repository.GetByIdAsync(id, ct)
             ?? throw new KeyNotFoundException("Contrato não encontrado.");
+
+        // Valida explicitamente se há funcionários vinculados antes de tentar o DELETE
+        // Evita que a FK violation do Postgres suba como erro genérico de banco
+        var funcionariosVinculados = await _funcionarioRepository.GetByClienteAsync(contrato.ClienteId, ct);
+        var temFuncionariosNoContrato = funcionariosVinculados.Any(f => f.ContratoId == id);
+        if (temFuncionariosNoContrato)
+        {
+            throw new DomainException(
+                "Não é possível excluir o contrato pois existem funcionários vinculados a ele. " +
+                "Transfira ou remova os funcionários antes de excluir o contrato.",
+                "CONTRATO_COM_FUNCIONARIOS");
+        }
 
         contrato.PrepararExclusao();
         _repository.Remove(contrato);
