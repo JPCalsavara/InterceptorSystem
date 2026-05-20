@@ -60,7 +60,7 @@ export class ClienteListComponent implements OnInit {
         // Usa forceRefresh para ignorar o cache e garantir lista atualizada,
         // evitando race condition com a sidebar que também re-busca via cache.
         this.service.forceRefresh().subscribe({
-          next: (data) => {
+          next: (data: Cliente[]) => {
             this.clientes.set(data);
             this.loading.set(false);
           },
