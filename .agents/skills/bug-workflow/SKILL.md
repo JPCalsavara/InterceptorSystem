@@ -40,12 +40,46 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
   3. Faça alterações focadas, evitando mexer em arquivos não relacionados ao bug.
   4. Atualize o `progress.md` e marque a fase de correção com ✅ no `task_plan.md`.
 
-### FASE 4: Validação de Regressão
-- **Após aplicar a correção:**
-  1. **[TOKEN EFFICIENCY]** Rode a suíte de testes de backend usando redirecionamento para isolar apenas os erros: `dotnet test --logger "console;verbosity=quiet" > temp_test_errors.log`.
-  2. Verifique o arquivo temporário (`temp_test_errors.log`) com a tool de view_file para confirmar se o teste da Fase 2 passou.
-  3. Faça o Build jogando possíveis erros num log temporário: `ng build > temp_build_errors.log 2>&1`. Se não quebrou nada, tudo certo.
-  4. Se algo falhar, anote a causa resumida no `findings.md`, apague os arquivos `temp_*.log` e desfaça ou elabore um novo plano.
+### FASE 4: Validação de Regressão (Suíte Completa)
+- **Após aplicar a correção, execute a validação em cascata, parando ao primeiro erro:**
+
+  #### 4.1 — Backend (Unitários + Integração)
+  ```bash
+  cd backend/src
+  dotnet test --logger "console;verbosity=quiet" > ../../temp_backend_test.log 2>&1
+  ```
+  Leia o log resumido para confirmar que o teste da Fase 2 passou e que nenhum outro quebrou.
+
+  #### 4.2 — Frontend: Build de Produção
+  ```bash
+  cd frontend
+  npm run build -- --configuration=production > ../temp_build.log 2>&1
+  ```
+  Confirma que os arquivos `.cy.ts` não estão contaminando o build.
+
+  #### 4.3 — Frontend: Testes Unitários (Vitest)
+  ```bash
+  cd frontend
+  npm run test:ci > ../temp_unit_test.log 2>&1
+  ```
+  Valida os specs `.spec.ts` de todos os componentes/serviços.
+
+  #### 4.4 — Frontend: Cypress Component Tests (Responsividade)
+  ```bash
+  cd frontend
+  npm run test:component > ../temp_component_test.log 2>&1
+  ```
+  Valida visualmente que nenhuma media query ou layout CSS quebrou.
+
+  #### 4.5 — Frontend: E2E (Jornadas Críticas) ⚠️ Requer app rodando
+  ```bash
+  # Pré-requisito: docker compose up -d (ambiente local)
+  cd frontend
+  npm run test:e2e > ../temp_e2e_test.log 2>&1
+  ```
+  Roda as jornadas de usuário end-to-end. Execute apenas se o ambiente Docker estiver ativo.
+
+  - **Se qualquer fase falhar:** Anote a causa no `findings.md`, apague todos os `temp_*.log` e retorne para a Fase 3.
 
 ### FASE 5: Versionamento e Code Review (Skills Relacionadas: `git-flow`, `code-review`)
 - **Quando o bug estiver resolvido e testes passando:**
