@@ -37,7 +37,7 @@ public class ContratoConfiguration : IEntityTypeConfiguration<Contrato>
         builder.HasOne(c => c.Cliente)
             .WithMany(c => c.Contratos)
             .HasForeignKey(c => c.ClienteId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(c => c.EmpresaId);
         builder.HasIndex(c => new { c.ClienteId, c.Status });

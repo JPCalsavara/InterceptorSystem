@@ -1,10 +1,13 @@
 name: CD — Deploy API (.NET → EC2)
 
 # ================================================
-# Roda APENAS em push para main
+# Roda APENAS após o workflow de E2E ser concluído
+# com sucesso (gate de qualidade antes do deploy)
 # ================================================
 on:
-  push:
+  workflow_run:
+    workflows: ["E2E — Full Stack Gate (pre-deploy)"]
+    types: [completed]
     branches: [main, master]
 
 concurrency:
@@ -19,6 +22,8 @@ jobs:
   test:
     name: Test Backend (pre-deploy gate)
     runs-on: ubuntu-latest
+    # Só executa se o E2E passou. Se o E2E falhou, cancela tudo.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     services:
       postgres:

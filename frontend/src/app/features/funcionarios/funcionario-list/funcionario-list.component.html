@@ -179,7 +179,7 @@
 
     <div class="cards-grid">
       @for (func of funcionariosFiltrados(); track func.id) {
-        <div class="employee-card">
+        <div class="employee-card" [attr.data-cy]="'funcionario-card-' + func.id">
           <div class="card-header">
             <div class="employee-avatar">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -192,7 +192,7 @@
               </svg>
             </div>
             <div class="employee-info">
-              <h3 class="employee-name">{{ func.nome }}</h3>
+              <h3 class="employee-name" data-cy="funcionario-card-title">{{ func.nome }}</h3>
               <p class="employee-cliente">{{ getClienteNome(func.clienteId) }}</p>
             </div>
           </div>

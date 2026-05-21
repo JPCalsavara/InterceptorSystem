@@ -93,7 +93,7 @@
           id="nome"
           type="text"
           formControlName="nome"
-          data-testid="funcionario-nome"
+          data-cy="funcionario-nome"
           class="form-input"
           [class.error]="hasError('nome')"
           placeholder="Ex: João Silva Santos"
@@ -110,7 +110,7 @@
             id="cpf"
             type="text"
             formControlName="cpf"
-            data-testid="funcionario-cpf"
+            data-cy="funcionario-cpf"
             class="form-input"
             [class.error]="hasError('cpf')"
             placeholder="000.000.000-00"
@@ -128,7 +128,7 @@
             id="celular"
             type="text"
             formControlName="celular"
-            data-testid="funcionario-telefone"
+            data-cy="funcionario-telefone"
             class="form-input"
             [class.error]="hasError('celular')"
             placeholder="(00) 00000-0000"
@@ -151,7 +151,7 @@
           <select
             id="tipoFuncionario"
             formControlName="tipoFuncionario"
-            data-testid="funcionario-tipo"
+            data-cy="funcionario-tipo"
             class="form-input"
             [class.error]="hasError('tipoFuncionario')"
           >
@@ -171,7 +171,7 @@
           <select
             id="tipoEscala"
             formControlName="tipoEscala"
-            data-testid="funcionario-tipo-escala"
+            data-cy="funcionario-tipo-escala"
             class="form-input"
             [class.error]="hasError('tipoEscala')"
           >
@@ -228,7 +228,7 @@
           <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()" data-testid="btn-save-funcionario">
+          <button type="submit" class="btn-primary" [disabled]="loading()" data-cy="btn-save-funcionario">
             @if (loading()) {
               <span class="spinner-small"></span>
               Salvando...

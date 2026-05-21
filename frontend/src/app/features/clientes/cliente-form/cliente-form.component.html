@@ -81,7 +81,7 @@
           id="nome"
           type="text"
           formControlName="nome"
-          data-testid="cliente-nome"
+          data-cy="cliente-nome"
           class="form-input"
           [class.error]="hasError('nome')"
           placeholder="Ex: Cliente Horizonte Verde"
@@ -97,7 +97,7 @@
           id="cnpj"
           type="text"
           formControlName="cnpj"
-          data-testid="cliente-cnpj"
+          data-cy="cliente-cnpj"
           class="form-input"
           [class.error]="hasError('cnpj')"
           placeholder="12.345.678/0001-90"
@@ -117,6 +117,7 @@
           <select
             id="estado"
             formControlName="estado"
+            data-cy="cliente-estado"
             class="form-input"
             [class.error]="hasError('estado')"
           >
@@ -135,6 +136,7 @@
           <select
             id="cidade"
             formControlName="cidade"
+            data-cy="cliente-cidade"
             class="form-input"
             [class.error]="hasError('cidade')"
             [disabled]="!selectedEstado()"
@@ -177,7 +179,7 @@
             id="emailGestor"
             type="email"
             formControlName="emailGestor"
-            data-testid="cliente-email"
+            data-cy="cliente-email"
             class="form-input"
             [class.error]="hasError('emailGestor')"
             placeholder="gestor@cliente.com.br"
@@ -193,7 +195,7 @@
             id="telefoneEmergencia"
             type="tel"
             formControlName="telefoneEmergencia"
-            data-testid="cliente-telefone"
+            data-cy="cliente-telefone"
             class="form-input"
             [class.error]="hasError('telefoneEmergencia')"
             placeholder="(11) 98765-4321"
@@ -213,7 +215,7 @@
           <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()" data-testid="btn-save-cliente">
+          <button type="submit" class="btn-primary" [disabled]="loading()" data-cy="btn-save-cliente">
             @if (loading()) {
               <span class="spinner-small"></span>
               Salvando...

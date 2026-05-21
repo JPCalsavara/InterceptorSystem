@@ -37,6 +37,7 @@ function senhasIguaisValidator(control: AbstractControl): ValidationErrors | nul
                   id="novaSenha"
                   [type]="mostrarSenha() ? 'text' : 'password'"
                   formControlName="novaSenha"
+                  data-cy="nova-senha-input"
                   [class.input-error]="hasError('novaSenha')"
                   placeholder="8+ carac., 1 maiúscula, 1 num."
                   autocomplete="new-password"
@@ -71,6 +72,7 @@ function senhasIguaisValidator(control: AbstractControl): ValidationErrors | nul
                   id="confirmarSenha"
                   [type]="mostrarConfirmar() ? 'text' : 'password'"
                   formControlName="confirmarSenha"
+                  data-cy="confirmar-senha-input"
                   [class.input-error]="hasError('confirmarSenha')"
                   placeholder="••••••••"
                   autocomplete="new-password"
@@ -102,7 +104,7 @@ function senhasIguaisValidator(control: AbstractControl): ValidationErrors | nul
               <div class="error-message">{{ erro() }}</div>
             }
 
-            <button type="submit" class="btn-primary btn-lg submit-btn" [disabled]="carregando()">
+            <button type="submit" class="btn-primary btn-lg submit-btn" data-cy="nova-senha-submit" [disabled]="carregando()">
               @if (carregando()) {
                 <span class="spinner"></span> Salvando...
               } @else {
@@ -116,7 +118,7 @@ function senhasIguaisValidator(control: AbstractControl): ValidationErrors | nul
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
             <p>Senha redefinida com sucesso! Faça login com sua nova senha.</p>
-            <a routerLink="/login" class="btn-primary btn-lg submit-btn link-btn">Ir para o login</a>
+            <a routerLink="/login" class="btn-primary btn-lg submit-btn link-btn" data-cy="nova-senha-login">Ir para o login</a>
           </div>
         }
       </div>
