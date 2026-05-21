@@ -97,10 +97,10 @@ export class ContratoFinanceiroUiService {
       {
         postos: [
           {
-            tipoPosto,
+            tipoPosto: 'PERSONALIZADO',
             quantidadeAlocacoes: numeroDePostos,
-            quantidadeFuncionariosPorAlocacao: funcionariosContrato,
-            alocacoesNoturnas: tipoPostoConfig.alocacoesNoturnas,
+            quantidadeFuncionariosPorAlocacao: 1,
+            alocacoesNoturnas: 0,
           },
         ],
         valorDiariaCobrada: contrato.valorDiariaCobrada || 0,
@@ -118,7 +118,14 @@ export class ContratoFinanceiroUiService {
         ),
       },
       {
-        ...this.TIPO_POSTO_CONFIGS,
+        PERSONALIZADO: {
+          label: 'Personalizado',
+          alocacoes: Math.max(1, contrato.numeroDePostos || 1),
+          funcionariosPorAlocacao: 1,
+          alocacoesNoturnas: 0,
+          diasTrabalhadosPorFuncMes: this.DIARIAS_POR_FUNCIONARIO_MES_BASE,
+          operaFimDeSemana: true,
+        },
       },
     );
 
