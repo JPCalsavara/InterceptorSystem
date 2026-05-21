@@ -6,7 +6,7 @@ export default defineConfig({
     specPattern: "src/e2e/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "src/e2e/support.ts",
     video: false,
-    screenshotOnRunFailure: false,
+    screenshotOnRunFailure: true,
   },
 
   component: {

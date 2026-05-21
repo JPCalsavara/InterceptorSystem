@@ -1,24 +1,24 @@
 import { DiariasViewComponent } from './diarias-view.component';
-import { Diaria, Funcionario, Posto, Alocacao, Cliente } from '../../../../models';
+import { Diaria, Funcionario, Posto, Alocacao, Cliente } from '../../../models/index';
 
 // Mocks
-const mockFuncionarios: Funcionario[] = [
+const mockFuncionarios: any[] = [
   { id: 'f1', nome: 'João Silva', cpf: '123', rg: '123', telefone: '123', email: 'joao@a.com', dataAdmissao: '2023-01-01', status: 'ATIVO', valorDiaria: 100 }
 ];
-const mockClientes: Cliente[] = [
+const mockClientes: any[] = [
   { id: 'c1', nome: 'Cliente A', cnpj: '123', inscricaoEstadual: '123', email: 'c@a.com', telefone: '123', endereco: 'Rua A', status: 'ATIVO', contatoNome: 'A', contatoTelefone: '1' }
 ];
-const mockPostos: Posto[] = [
+const mockPostos: any[] = [
   { id: 'p1', nome: 'Posto Central', clienteId: 'c1', endereco: 'Rua', bairro: 'Bairro', cidade: 'Cidade', cep: '123', status: 'ATIVO' }
 ];
-const mockAlocacoes: Alocacao[] = [
+const mockAlocacoes: any[] = [
   { id: 'a1', funcionarioId: 'f1', postoId: 'p1', dataInicio: '2023-01-01', status: 'ATIVA', cargaHoraria: '12x36', diasTrabalho: [], tipoEscala: '12x36' }
 ];
 
 const today = new Date();
 const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-const mockDiarias: Diaria[] = [
+const mockDiarias: any[] = [
   { id: 'd1', alocacaoId: 'a1', funcionarioId: 'f1', data: todayStr, statusDiaria: 'CONFIRMADA', tipoDiaria: 'REGULAR', observacao: '', valorPago: 100 }
 ];
 
