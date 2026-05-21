@@ -70,16 +70,16 @@ describe('LoginComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountLogin();
 
-    cy.get('[data-testid="login-email"]').should('exist');
-    cy.get('[data-testid="login-password"]').should('exist');
-    cy.get('[data-testid="login-submit"]').should('exist');
+    cy.get('[data-cy="login-email"]').should('exist');
+    cy.get('[data-cy="login-password"]').should('exist');
+    cy.get('[data-cy="login-submit"]').should('exist');
   });
 
   it('Deve mostrar erro de validacao ao submeter com campos vazios', () => {
     cy.viewport(1024, 768);
     mountLogin();
 
-    cy.get('[data-testid="login-submit"]').click();
+    cy.get('[data-cy="login-submit"]').click();
 
     cy.get('.field-error').should('have.length.gte', 1);
     cy.get('.field-error').first().should('contain', 'obrigatório');
@@ -89,7 +89,7 @@ describe('LoginComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountLogin();
 
-    cy.get('[data-testid="login-email"]').type('emailinvalido').blur();
+    cy.get('[data-cy="login-email"]').type('emailinvalido').blur();
     cy.get('.field-error').should('contain', 'E-mail inválido');
   });
 
@@ -97,9 +97,9 @@ describe('LoginComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountLogin();
 
-    cy.get('[data-testid="login-password"]').should('have.attr', 'type', 'password');
+    cy.get('[data-cy="login-password"]').should('have.attr', 'type', 'password');
     cy.get('.toggle-senha').click();
-    cy.get('[data-testid="login-password"]').should('have.attr', 'type', 'text');
+    cy.get('[data-cy="login-password"]').should('have.attr', 'type', 'text');
   });
 
   it('Mobile (375px): O botao de submit deve ocupar a largura disponivel do card', () => {
@@ -107,7 +107,7 @@ describe('LoginComponent - Cypress Component Test', () => {
     mountLogin();
 
     cy.get('.auth-card').invoke('innerWidth').then((cardWidth) => {
-      cy.get('[data-testid="login-submit"]').invoke('outerWidth').should('be.gte', (cardWidth as number) * 0.7);
+      cy.get('[data-cy="login-submit"]').invoke('outerWidth').should('be.gte', (cardWidth as number) * 0.7);
     });
   });
 });

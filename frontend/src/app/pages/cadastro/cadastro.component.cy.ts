@@ -71,18 +71,18 @@ describe('CadastroComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountCadastro();
 
-    cy.get('[data-testid="register-name"]').should('exist');
-    cy.get('[data-testid="cnpj"]').should('exist');
-    cy.get('[data-testid="register-email"]').should('exist');
-    cy.get('[data-testid="register-password"]').should('exist');
-    cy.get('[data-testid="register-submit"]').should('exist');
+    cy.get('[data-cy="register-name"]').should('exist');
+    cy.get('[data-cy="cnpj"]').should('exist');
+    cy.get('[data-cy="register-email"]').should('exist');
+    cy.get('[data-cy="register-password"]').should('exist');
+    cy.get('[data-cy="register-submit"]').should('exist');
   });
 
   it('Deve mostrar erros de validacao ao submeter com campos vazios', () => {
     cy.viewport(1024, 768);
     mountCadastro();
 
-    cy.get('[data-testid="register-submit"]').click();
+    cy.get('[data-cy="register-submit"]').click();
 
     cy.get('.field-error').should('have.length.gte', 1);
     cy.get('.field-error').first().should('contain', 'obrigatório');
@@ -92,7 +92,7 @@ describe('CadastroComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountCadastro();
 
-    cy.get('[data-testid="register-email"]').type('nao-e-email').blur();
+    cy.get('[data-cy="register-email"]').type('nao-e-email').blur();
     cy.get('.field-error').should('contain', 'E-mail inválido');
   });
 
@@ -100,7 +100,7 @@ describe('CadastroComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountCadastro();
 
-    cy.get('[data-testid="register-password"]').type('senhafraca').blur();
+    cy.get('[data-cy="register-password"]').type('senhafraca').blur();
     cy.get('.field-error').should('contain', 'pelo menos 8 caracteres');
   });
 
@@ -108,9 +108,9 @@ describe('CadastroComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountCadastro();
 
-    cy.get('[data-testid="register-password"]').should('have.attr', 'type', 'password');
+    cy.get('[data-cy="register-password"]').should('have.attr', 'type', 'password');
     cy.get('.toggle-senha').click();
-    cy.get('[data-testid="register-password"]').should('have.attr', 'type', 'text');
+    cy.get('[data-cy="register-password"]').should('have.attr', 'type', 'text');
   });
 
   it('Mobile (320px): O card de registro deve ocupar a tela sem overflow', () => {
