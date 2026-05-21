@@ -53,7 +53,7 @@ export class DiariaBatchFormComponent implements OnInit {
   error = signal<string | null>(null);
   submitted = signal(false);
 
-  summary = computed(() => {
+  getSummary(): string {
     const contrato = this.contratos().find((c) => c.id === this.form.get('contratoId')?.value);
     const funcionario = this.funcionarios().find(
       (f) => f.id === this.form.get('funcionarioId')?.value,
@@ -65,7 +65,7 @@ export class DiariaBatchFormComponent implements OnInit {
 
     const diarias = this.generateDiariasPreview();
     return `Serão geradas ${diarias.length} diárias para ${funcionario.nome} entre ${new Date(contrato.dataInicio + 'T12:00:00').toLocaleDateString()} e ${new Date(contrato.dataFim + 'T12:00:00').toLocaleDateString()}.`;
-  });
+  }
 
   ngOnInit(): void {
     this.buildForm();

@@ -23,7 +23,7 @@
       </h1>
       <p class="subtitle">Gerencie todos os contratos cadastrados</p>
     </div>
-    <button class="btn-primary btn-md" routerLink="/contratos/novo" data-testid="btn-new-contrato">
+    <button class="btn-primary btn-md" routerLink="/contratos/novo" data-cy="btn-new-contrato">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path
           fill-rule="evenodd"
@@ -86,7 +86,7 @@
       </svg>
       <h3>Nenhum contrato cadastrado</h3>
       <p>Comece criando seu primeiro contrato</p>
-      <button class="btn-primary btn-md" routerLink="/contratos/novo" data-testid="btn-new-contrato">+ Novo Contrato</button>
+      <button class="btn-primary btn-md" routerLink="/contratos/novo" data-cy="btn-new-contrato">+ Novo Contrato</button>
     </div>
   }
 
@@ -175,9 +175,9 @@
         </div>
         <div class="column-content">
           @for (contrato of contratosPendentes(); track contrato.id) {
-            <div class="contract-card" [attr.data-testid]="'contrato-card-' + contrato.id">
-              <h4 class="card-title" data-testid="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
-              <p class="card-description" data-testid="contrato-card-desc">{{ contrato.descricao }}</p>
+            <div class="contract-card" [attr.data-cy]="'contrato-card-' + contrato.id">
+              <h4 class="card-title" data-cy="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
+              <p class="card-description" data-cy="contrato-card-desc">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
                   <span class="metric-label">Faturamento</span>
@@ -229,7 +229,7 @@
                   class="action-btn btn-action btn-danger"
                   (click)="confirmDelete(contrato.id, contrato.descricao)"
                   title="Excluir"
-                  [attr.data-testid]="'btn-delete-contrato-' + contrato.id"
+                  [attr.data-cy]="'btn-delete-contrato-' + contrato.id"
                 >
                   <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                     <path
@@ -257,9 +257,9 @@
         </div>
         <div class="column-content">
           @for (contrato of contratosVerde(); track contrato.id) {
-            <div class="contract-card" [attr.data-testid]="'contrato-card-' + contrato.id">
-              <h4 class="card-title" data-testid="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
-              <p class="card-description" data-testid="contrato-card-desc">{{ contrato.descricao }}</p>
+            <div class="contract-card" [attr.data-cy]="'contrato-card-' + contrato.id">
+              <h4 class="card-title" data-cy="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
+              <p class="card-description" data-cy="contrato-card-desc">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
                   <span class="metric-label">Faturamento</span>
@@ -338,9 +338,9 @@
         </div>
         <div class="column-content">
           @for (contrato of contratosAmarelo(); track contrato.id) {
-            <div class="contract-card" [attr.data-testid]="'contrato-card-' + contrato.id">
-              <h4 class="card-title" data-testid="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
-              <p class="card-description" data-testid="contrato-card-desc">{{ contrato.descricao }}</p>
+            <div class="contract-card" [attr.data-cy]="'contrato-card-' + contrato.id">
+              <h4 class="card-title" data-cy="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
+              <p class="card-description" data-cy="contrato-card-desc">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
                   <span class="metric-label">Faturamento</span>
@@ -419,9 +419,9 @@
         </div>
         <div class="column-content">
           @for (contrato of contratosVermelho(); track contrato.id) {
-            <div class="contract-card" [attr.data-testid]="'contrato-card-' + contrato.id">
-              <h4 class="card-title" data-testid="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
-              <p class="card-description" data-testid="contrato-card-desc">{{ contrato.descricao }}</p>
+            <div class="contract-card" [attr.data-cy]="'contrato-card-' + contrato.id">
+              <h4 class="card-title" data-cy="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
+              <p class="card-description" data-cy="contrato-card-desc">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
                   <span class="metric-label">Faturamento</span>
@@ -500,9 +500,9 @@
         </div>
         <div class="column-content">
           @for (contrato of contratosFinalizados(); track contrato.id) {
-            <div class="contract-card" [attr.data-testid]="'contrato-card-' + contrato.id">
-              <h4 class="card-title" data-testid="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
-              <p class="card-description" data-testid="contrato-card-desc">{{ contrato.descricao }}</p>
+            <div class="contract-card" [attr.data-cy]="'contrato-card-' + contrato.id">
+              <h4 class="card-title" data-cy="contrato-card-title">{{ getClienteNome(contrato.clienteId) }}</h4>
+              <p class="card-description" data-cy="contrato-card-desc">{{ contrato.descricao }}</p>
               <div class="card-metrics">
                 <div class="metric">
                   <span class="metric-label">Faturamento</span>
