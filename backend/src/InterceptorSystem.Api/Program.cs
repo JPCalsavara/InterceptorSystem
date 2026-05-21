@@ -59,6 +59,7 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHealthChecks();
 
 // 4. SEC-4: CORS — Lê origens permitidas da configuração
 var allowedOrigins = builder.Configuration.GetSection("App:AllowedOrigins").Get<string[]>()
@@ -161,6 +162,9 @@ app.UseAuthorization();
 
 // SEC-6: Rate limiting
 app.UseRateLimiter();
+
+app.MapHealthChecks("/api/health");
+app.MapHealthChecks("/health");
 
 app.MapControllers();
 

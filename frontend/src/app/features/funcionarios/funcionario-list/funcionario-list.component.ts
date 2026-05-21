@@ -6,6 +6,8 @@ import { FuncionarioService } from '../../../services/funcionario.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { TagService } from '../../../services/tag.service';
+import { DiariaService } from '../../../services/diaria.service';
+import { AlocacaoService } from '../../../services/alocacao.service';
 import {
   Funcionario,
   StatusFuncionario,
@@ -14,6 +16,9 @@ import {
   Cliente,
   Contrato,
   Tag,
+  Diaria,
+  Alocacao,
+  StatusDiaria,
 } from '../../../models/index';
 
 @Component({
@@ -28,11 +33,15 @@ export class FuncionarioListComponent implements OnInit {
   private clienteService = inject(ClienteService);
   private contratoService = inject(ContratoService);
   private tagService = inject(TagService);
+  private diariaService = inject(DiariaService);
+  private alocacaoService = inject(AlocacaoService);
 
   funcionarios = signal<Funcionario[]>([]);
   clientes = signal<Cliente[]>([]);
   contratos = signal<Contrato[]>([]);
   tags = signal<Tag[]>([]);
+  diarias = signal<Diaria[]>([]);
+  alocacoes = signal<Alocacao[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -80,6 +89,22 @@ export class FuncionarioListComponent implements OnInit {
     this.loadClientes();
     this.loadContratos();
     this.loadTags();
+    this.loadDiarias();
+    this.loadAlocacoes();
+  }
+
+  loadDiarias(): void {
+    this.diariaService.getAll().subscribe({
+      next: (data) => this.diarias.set(data),
+      error: (err) => console.error('Erro ao carregar diárias:', err),
+    });
+  }
+
+  loadAlocacoes(): void {
+    this.alocacaoService.getAll().subscribe({
+      next: (data) => this.alocacoes.set(data),
+      error: (err) => console.error('Erro ao carregar alocações:', err),
+    });
   }
 
   loadTags(): void {
@@ -215,16 +240,54 @@ export class FuncionarioListComponent implements OnInit {
     this.filtroTag.set('');
   }
 
+  private calcularProporcaoNoturna(alocacaoId: string): number {
+    const aloc = this.alocacoes().find(a => a.id === alocacaoId);
+    if (!aloc) return 0;
+    return aloc.temHorarioNoturno ? 1.0 : 0;
+  }
+
   getSalarioSimuladoMensal(func: Funcionario): number {
     const contrato = this.contratos().find((c) => c.id === func.contratoId);
     if (!contrato) return 0;
-    let diasMedio = 22;
-    if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
-    else if (func.tipoEscala === TipoEscala.FOLGUISTA)
-      diasMedio = 8; // Arbitrary for simulation
-    else if (func.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) diasMedio = 26;
-    return (
-      diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
+
+    const agora = new Date();
+    const mesAtual = agora.getMonth();
+    const anoAtual = agora.getFullYear();
+
+    const diariasConfirmadas = this.diarias().filter(
+      (a) =>
+        a.funcionarioId === func.id &&
+        a.statusDiaria === StatusDiaria.CONFIRMADA &&
+        new Date(a.data + 'T12:00:00').getMonth() === mesAtual &&
+        new Date(a.data + 'T12:00:00').getFullYear() === anoAtual
     );
+
+    if (diariasConfirmadas.length === 0) {
+      let diasMedio = 22;
+      if (func.tipoEscala === TipoEscala.DOZE_POR_TRINTA_SEIS) diasMedio = 15;
+      else if (func.tipoEscala === TipoEscala.FOLGUISTA) diasMedio = 8;
+      else if (func.tipoEscala === TipoEscala.OITO_HORAS_SEIS_POR_DOIS) diasMedio = 26;
+      return (
+        diasMedio * (contrato.valorDiariaCobrada || 0) + (contrato.valorBeneficiosExtrasMensal || 0)
+      );
+    }
+
+    let total = 0;
+    for (const aloc of diariasConfirmadas) {
+      let valor = contrato.valorDiariaCobrada || 0;
+      const data = new Date(aloc.data + 'T12:00:00');
+      const diaSemana = data.getDay();
+
+      if (diaSemana === 0) valor *= 2.0;
+      else if (diaSemana === 6) valor *= 1.5;
+
+      const proporcaoNoturna = this.calcularProporcaoNoturna(aloc.alocacaoId);
+      if (proporcaoNoturna > 0) {
+        valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
+      }
+      total += valor;
+    }
+
+    return total + (contrato.valorBeneficiosExtrasMensal || 0);
   }
 }
