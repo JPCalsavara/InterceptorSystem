@@ -1,0 +1,157 @@
+interceptor_api  | fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+interceptor_api  |       Failed executing DbCommand (9ms) [Parameters=[@p0='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+interceptor_api  |       DELETE FROM "Contratos"
+interceptor_api  |       WHERE "Id" = @p0;
+interceptor_api  | fail: Microsoft.EntityFrameworkCore.Update[10000]
+interceptor_api  |       An exception occurred in the database while saving changes for context type 'InterceptorSystem.Infrastructure.Persistence.Contexts.ApplicationDbContext'.
+interceptor_api  |       Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+interceptor_api  |        ---> Npgsql.PostgresException (0x80004005): 23503: update or delete on table "Contratos" violates foreign key constraint "FK_Funcionarios_Contratos_ContratoId" on table "Funcionarios"
+interceptor_api  |
+interceptor_api  |       DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+interceptor_api  |          at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+interceptor_api  |          at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+interceptor_api  |          at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |         Exception data:
+interceptor_api  |           Severity: ERROR
+interceptor_api  |           SqlState: 23503
+interceptor_api  |           MessageText: update or delete on table "Contratos" violates foreign key constraint "FK_Funcionarios_Contratos_ContratoId" on table "Funcionarios"
+interceptor_api  |           Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+interceptor_api  |           SchemaName: public
+interceptor_api  |           TableName: Funcionarios
+interceptor_api  |           ConstraintName: FK_Funcionarios_Contratos_ContratoId
+interceptor_api  |           File: ri_triggers.c
+interceptor_api  |           Line: 2612
+interceptor_api  |           Routine: ri_ReportViolation
+interceptor_api  |          --- End of inner exception stack trace ---
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+interceptor_api  |       Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+interceptor_api  |        ---> Npgsql.PostgresException (0x80004005): 23503: update or delete on table "Contratos" violates foreign key constraint "FK_Funcionarios_Contratos_ContratoId" on table "Funcionarios"
+interceptor_api  |
+interceptor_api  |       DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+interceptor_api  |          at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+interceptor_api  |          at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+interceptor_api  |          at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |         Exception data:
+interceptor_api  |           Severity: ERROR
+interceptor_api  |           SqlState: 23503
+interceptor_api  |           MessageText: update or delete on table "Contratos" violates foreign key constraint "FK_Funcionarios_Contratos_ContratoId" on table "Funcionarios"
+interceptor_api  |           Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+interceptor_api  |           SchemaName: public
+interceptor_api  |           TableName: Funcionarios
+interceptor_api  |           ConstraintName: FK_Funcionarios_Contratos_ContratoId
+interceptor_api  |           File: ri_triggers.c
+interceptor_api  |           Line: 2612
+interceptor_api  |           Routine: ri_ReportViolation
+interceptor_api  |          --- End of inner exception stack trace ---
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+interceptor_api  |          at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+interceptor_api  |          at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+interceptor_api  | warn: InterceptorSystem.Api.Middleware.GlobalExceptionMiddleware[0]
+interceptor_api  |       Erro de negócio (400): Não é possível remover a entidade pois está vinculada a outros registros.
+
+spoken-word.js:958 [Violation] Permissions policy violation: unload is not allowed in this document.
+l @ spoken-word.js:958Understand this error
+api/contratos/calculos/calcular-valor-total:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+api/contratos/calculos/calcular-valor-total:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+api/contratos/calculos/calcular-valor-total:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+api/contratos/calculos/calcular-valor-total:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+api/contratos/a655899d-302c-47b7-a2e7-160944858d6e:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+chunk-3S5FHNXH.js:1 Erro: Nn
+error @ chunk-3S5FHNXH.js:1Understand this error
+chunk-UOD4MJCT.js:5  POST https://d1wq60pm5w8m2y.cloudfront.net/api/auth/login 401 (Unauthorized)
+(anonymous) @ chunk-UOD4MJCT.js:5
+_trySubscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+n.subscribe.s @ chunk-UOD4MJCT.js:3
+_next @ chunk-UOD4MJCT.js:3
+next @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+_trySubscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+h @ chunk-UOD4MJCT.js:3
+f @ chunk-UOD4MJCT.js:3
+_next @ chunk-UOD4MJCT.js:3
+next @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+_trySubscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+Wu @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+subscribe @ chunk-UOD4MJCT.js:3
+onSubmit @ chunk-AK4EHGE4.js:1
+(anonymous) @ chunk-AK4EHGE4.js:1
+Cd @ chunk-UOD4MJCT.js:4
+r @ chunk-UOD4MJCT.js:4
+next @ chunk-UOD4MJCT.js:3
+_next @ chunk-UOD4MJCT.js:3
+next @ chunk-UOD4MJCT.js:3
+(anonymous) @ chunk-UOD4MJCT.js:3
+Jt @ chunk-UOD4MJCT.js:3
+next @ chunk-UOD4MJCT.js:3
+emit @ chunk-UOD4MJCT.js:4
+onSubmit @ chunk-33DAZ4LF.js:1
+(anonymous) @ chunk-33DAZ4LF.js:1
+Cd @ chunk-UOD4MJCT.js:4
+r @ chunk-UOD4MJCT.js:4
+(anonymous) @ chunk-X33ADHOY.js:1Understand this error
+chunk-UOD4MJCT.js:5  POST https://d1wq60pm5w8m2y.cloudfront.net/api/contratos/calculos/calcular-valor-total 400 (Bad Request)

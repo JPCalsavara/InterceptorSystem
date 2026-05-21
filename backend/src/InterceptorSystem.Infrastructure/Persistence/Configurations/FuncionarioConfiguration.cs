@@ -58,13 +58,12 @@ public class FuncionarioConfiguration : IEntityTypeConfiguration<Funcionario>
         builder.HasOne(f => f.Cliente)
             .WithMany(c => c.Funcionarios)
             .HasForeignKey(f => f.ClienteId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
         
-        // FASE 2: Relacionamento com Contrato
         builder.HasOne(f => f.Contrato)
             .WithMany(c => c.Funcionarios)
             .HasForeignKey(f => f.ContratoId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(f => f.EmpresaId);
         builder.HasIndex(f => f.ClienteId);

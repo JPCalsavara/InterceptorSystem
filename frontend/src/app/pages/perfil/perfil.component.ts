@@ -31,12 +31,19 @@ import { AuthService } from '../../services/auth.service';
           </div>
         }
 
+        @if (erro()) {
+          <div class="error-message" style="margin-bottom: 1rem">{{ erro() }}</div>
+        }
+        @if (sucesso()) {
+          <div class="success-message" style="margin-bottom: 1rem">{{ sucesso() }}</div>
+        }
+
         <!-- Visualização -->
         @if (!modoEdicao()) {
           <div class="card">
             <div class="card-header">
               <h2>Informações da Conta</h2>
-              <button class="btn-secondary" (click)="iniciarEdicao()">Editar</button>
+              <button class="btn-secondary" data-cy="perfil-editar-btn" (click)="iniciarEdicao()">Editar</button>
             </div>
             <div class="card-body">
               <div class="info-grid">
@@ -78,12 +85,6 @@ import { AuthService } from '../../services/auth.service';
               <h2>Editar Informações</h2>
             </div>
             <div class="card-body">
-              @if (erro()) {
-                <div class="error-message">{{ erro() }}</div>
-              }
-              @if (sucesso()) {
-                <div class="success-message">{{ sucesso() }}</div>
-              }
 
               <form class="form" (ngSubmit)="salvar()">
                 <div class="form-group">
@@ -93,6 +94,7 @@ import { AuthService } from '../../services/auth.service';
                     type="text"
                     [(ngModel)]="editNomeEmpresa"
                     name="nomeEmpresa"
+                    data-cy="perfil-nome-input"
                     placeholder="Nome da empresa"
                   />
                 </div>
@@ -209,7 +211,7 @@ import { AuthService } from '../../services/auth.service';
                   <button type="button" class="btn-secondary" (click)="cancelarEdicao()">
                     Cancelar
                   </button>
-                  <button type="submit" class="btn-primary" [disabled]="salvando()">
+                  <button type="submit" class="btn-primary" data-cy="perfil-salvar-btn" [disabled]="salvando()">
                     @if (salvando()) {
                       Salvando...
                     } @else {

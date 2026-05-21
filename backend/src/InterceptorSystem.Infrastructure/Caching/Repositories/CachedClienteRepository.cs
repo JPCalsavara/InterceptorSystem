@@ -64,4 +64,19 @@ public class CachedClienteRepository : IClienteRepository
 
         return cachedList ?? Enumerable.Empty<Cliente>();
     }
+
+    public async Task<int> DeleteDirectlyAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var affected = await _decorated.DeleteDirectlyAsync(id, cancellationToken);
+        if (affected > 0)
+        {
+            var empresaId = _tenantService.EmpresaId;
+            if (empresaId != null)
+            {
+                _cache.Remove($"Cliente_{empresaId}_{id}");
+                _cache.Remove($"Clientes_{empresaId}");
+            }
+        }
+        return affected;
+    }
 }

@@ -32,7 +32,7 @@
         </svg>
         Criar Completo (Wizard)
       </button>
-      <button class="btn-primary btn-md" routerLink="/clientes/novo" data-testid="btn-new-cliente">
+      <button class="btn-primary btn-md" routerLink="/clientes/novo" data-cy="btn-new-cliente">
         <svg viewBox="0 0 20 20" fill="currentColor" style="width: 1em; height: 1em">
           <path
             fill-rule="evenodd"
@@ -93,7 +93,7 @@
       </svg>
       <h3>Nenhum cliente cadastrado</h3>
       <p>Comece cadastrando o primeiro cliente</p>
-      <button class="btn-primary btn-md" routerLink="/clientes/novo" data-testid="btn-new-cliente">+ Novo Cliente</button>
+      <button class="btn-primary btn-md" routerLink="/clientes/novo" data-cy="btn-new-cliente">+ Novo Cliente</button>
     </div>
   }
 
@@ -101,9 +101,9 @@
   @if (!loading() && clientes().length > 0) {
     <div class="cards-grid">
       @for (cond of clientes(); track cond.id) {
-        <div class="card" (click)="navigateToDetail(cond.id)">
+        <div class="card" (click)="navigateToDetail(cond.id)" [attr.data-cy]="'cliente-card-' + cond.id">
           <div class="card-header">
-            <h3 class="card-title">{{ cond.nome }}</h3>
+            <h3 class="card-title" data-cy="cliente-card-title">{{ cond.nome }}</h3>
           </div>
 
           <div class="card-body">
@@ -152,6 +152,7 @@
               class="action-btn btn-icon btn-danger"
               (click)="confirmDelete(cond.id, cond.nome)"
               title="Excluir"
+              [attr.data-cy]="'btn-delete-cliente-' + cond.id"
             >
               <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
                 <path

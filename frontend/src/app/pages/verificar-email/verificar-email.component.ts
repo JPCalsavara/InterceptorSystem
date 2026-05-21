@@ -28,7 +28,7 @@ import { AuthService } from '../../services/auth.service';
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
             <p>E-mail verificado com sucesso!</p>
-            <a routerLink="/dashboard" class="btn-primary btn-lg action-btn">Ir para o painel</a>
+            <a routerLink="/dashboard" class="btn-primary btn-lg action-btn" data-cy="verificar-dashboard-btn">Ir para o painel</a>
           </div>
         }
 
@@ -38,7 +38,7 @@ import { AuthService } from '../../services/auth.service';
               <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
             <p>{{ erro() }}</p>
-            <a routerLink="/dashboard" class="btn-secondary action-btn" style="padding: var(--space-3) var(--space-6); text-align: center; display: inline-block;">Voltar ao painel</a>
+            <a routerLink="/dashboard" class="btn-secondary action-btn" data-cy="verificar-dashboard-btn-error" style="padding: var(--space-3) var(--space-6); text-align: center; display: inline-block;">Voltar ao painel</a>
           </div>
         }
       </div>

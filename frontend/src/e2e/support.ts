@@ -7,9 +7,9 @@ declare namespace Cypress {
 
 Cypress.Commands.add('login', (email, password) => {
   cy.visit('/login');
-  cy.get('[data-testid="login-email"]').type(email);
-  cy.get('[data-testid="login-password"]').type(password);
-  cy.get('[data-testid="login-submit"]').click();
+  cy.get('[data-cy="login-email"]').type(email, { force: true });
+  cy.get('[data-cy="login-password"]').type(password, { force: true });
+  cy.get('[data-cy="login-submit"]').click({ force: true });
   cy.url().should('include', '/dashboard');
 });
 
@@ -20,15 +20,15 @@ Cypress.Commands.add('createCliente', (cliente) => {
   // Interceptar a requisição para garantir sincronismo
   cy.intercept('POST', '**/api/clientes').as('createClienteReq');
 
-  cy.get('[data-testid="cliente-nome"]').type(nomeComGuto);
-  cy.get('[data-testid="cliente-cnpj"]').type(cliente.cnpj);
+  cy.get('[data-cy="cliente-nome"]').type(nomeComGuto);
+  cy.get('[data-cy="cliente-cnpj"]').type(cliente.cnpj);
   
   // Selecionar Localização (Obrigatório)
   cy.get('#estado').select('SP');
   cy.get('#cidade', { timeout: 15000 }).should('not.be.disabled');
   cy.get('#cidade').select('São Paulo');
 
-  cy.get('[data-testid="btn-save-cliente"]').click();
+  cy.get('[data-cy="btn-save-cliente"]').click();
   
   // Aguardar a requisição terminar com sucesso antes de prosseguir
   cy.wait('@createClienteReq', { timeout: 15000 }).then((interception) => {
