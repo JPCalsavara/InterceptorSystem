@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="auth-page">
       <div class="auth-card">
-        <a routerLink="/login" class="back-link">
+        <a routerLink="/login" class="back-link" data-cy="esqueci-back">
           <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
           </svg>
@@ -31,6 +31,7 @@ import { AuthService } from '../../services/auth.service';
                 id="email"
                 type="email"
                 formControlName="email"
+                data-cy="esqueci-email"
                 [class.input-error]="hasError('email')"
                 placeholder="sua@empresa.com"
                 autocomplete="email"
@@ -40,7 +41,7 @@ import { AuthService } from '../../services/auth.service';
               }
             </div>
 
-            <button type="submit" class="btn-primary btn-lg submit-btn" [disabled]="carregando()">
+            <button type="submit" class="btn-primary btn-lg submit-btn" data-cy="esqueci-submit" [disabled]="carregando()">
               @if (carregando()) {
                 <span class="spinner"></span> Enviando...
               } @else {

@@ -23,6 +23,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         <!-- Sidebar toggle: mobile opens drawer, desktop collapses sidebar -->
         <button
           class="menu-toggle"
+          data-cy="menu-toggle"
           (click)="handleSidebarToggle()"
           [attr.aria-label]="
             isMobileView()
@@ -50,7 +51,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         </button>
 
         <div class="navbar-brand">
-          <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img" />
+          <img [src]="logoSrc()" alt="Logo da Empresa" class="logo-img" data-cy="navbar-logo" />
         </div>
       </div>
 
@@ -58,6 +59,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         <!-- Dark Mode Toggle -->
         <button
           class="theme-toggle"
+          data-cy="theme-toggle"
           (click)="toggleTheme()"
           [attr.aria-label]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
           [title]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
@@ -86,7 +88,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         <!-- Profile -->
         <div class="navbar-profile">
           <!-- Desktop trigger: opens dropdown -->
-          <div class="profile-trigger desktop-trigger" (click)="toggleDropdown()" data-testid="user-menu-button">
+          <div class="profile-trigger desktop-trigger" data-cy="user-menu-desktop" (click)="toggleDropdown()" data-testid="user-menu-button">
             <div class="avatar">
               <span>{{ getInitials() }}</span>
             </div>
@@ -108,7 +110,7 @@ import { LayoutStateService } from '../services/layout-state.service';
           </div>
 
           <!-- Mobile trigger: opens right drawer -->
-          <div class="profile-trigger mobile-trigger" (click)="toggleRightDrawer()">
+          <div class="profile-trigger mobile-trigger" data-cy="user-menu-mobile" (click)="toggleRightDrawer()">
             <div class="avatar">
               <span>{{ getInitials() }}</span>
             </div>
@@ -116,7 +118,7 @@ import { LayoutStateService } from '../services/layout-state.service';
 
           <!-- Desktop dropdown -->
           @if (isDropdownOpen()) {
-            <div class="dropdown-menu">
+            <div class="dropdown-menu" data-cy="dropdown-menu">
               <a routerLink="/perfil" class="dropdown-item" (click)="isDropdownOpen.set(false)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path
@@ -153,7 +155,7 @@ import { LayoutStateService } from '../services/layout-state.service';
                 Plano
               </a>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item danger" (click)="logout()" data-testid="logout-button">
+              <button class="dropdown-item danger" data-cy="logout-btn" (click)="logout()" data-testid="logout-button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path
                     stroke-linecap="round"
@@ -170,7 +172,7 @@ import { LayoutStateService } from '../services/layout-state.service';
     </nav>
 
     <!-- Right profile drawer: mobile only -->
-    <div class="profile-drawer" [class.open]="layoutState.rightDrawerOpen()">
+    <div class="profile-drawer" data-cy="profile-drawer" [class.open]="layoutState.rightDrawerOpen()">
       <div class="profile-drawer-header">
         <div class="profile-drawer-user">
           <div class="avatar avatar-lg">
@@ -180,6 +182,7 @@ import { LayoutStateService } from '../services/layout-state.service';
         </div>
         <button
           class="drawer-close"
+          data-cy="drawer-close"
           (click)="layoutState.rightDrawerOpen.set(false)"
           aria-label="Fechar perfil"
         >

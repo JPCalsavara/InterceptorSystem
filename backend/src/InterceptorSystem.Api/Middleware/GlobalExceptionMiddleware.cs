@@ -27,6 +27,11 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
+            System.IO.File.AppendAllText("backend_logs.txt", $"\n[MIDDLEWARE] {DateTime.UtcNow} - {ex.GetType().Name}: {ex.Message}\nStackTrace: {ex.StackTrace}\n");
+            if (ex.InnerException != null)
+            {
+                System.IO.File.AppendAllText("backend_logs.txt", $"[INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}\nStackTrace: {ex.InnerException.StackTrace}\n");
+            }
             await HandleExceptionAsync(context, ex);
         }
     }

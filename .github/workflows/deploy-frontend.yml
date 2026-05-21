@@ -1,19 +1,14 @@
 name: CD — Deploy Frontend (S3 + CloudFront)
 
 # ================================================
-# Roda automaticamente em push para main
-# e também pode ser disparado manualmente pelo GitHub Actions
+# Roda APENAS após o workflow de E2E ser concluído
+# com sucesso (gate de qualidade antes do deploy)
 # ================================================
 on:
-  push:
+  workflow_run:
+    workflows: ["E2E — Full Stack Gate (pre-deploy)"]
+    types: [completed]
     branches: [main, master]
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: Branch, tag, or commit SHA to deploy
-        required: true
-        default: main
-        type: string
 
 # Garante que só 1 deploy roda por vez no mesmo ambiente
 concurrency:
@@ -27,6 +22,8 @@ jobs:
   build:
     name: Build Angular (Production)
     runs-on: ubuntu-latest
+    # Só executa se o E2E passou. Se o E2E falhou, cancela tudo.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     outputs:
       dist-path: frontend/dist/frontend/browser
 

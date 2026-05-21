@@ -76,7 +76,10 @@ public class ClientesController : TenantControllerBase
             return NoContent();
         }
         catch (KeyNotFoundException) { return NotFound(); }
-        catch (InvalidOperationException ex) { return Conflict(new { error = ex.Message }); }
+        catch (InvalidOperationException ex) 
+        { 
+            return Conflict(new { error = ex.Message }); 
+        }
     }
 }
 

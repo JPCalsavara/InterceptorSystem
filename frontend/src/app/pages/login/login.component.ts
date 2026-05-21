@@ -30,7 +30,7 @@ import { AuthService } from '../../services/auth.service';
               id="email"
               type="email"
               formControlName="email"
-              data-testid="login-email"
+              data-cy="login-email"
               [class.input-error]="hasError('email')"
               placeholder="seu@email.com"
               autocomplete="username"
@@ -47,7 +47,7 @@ import { AuthService } from '../../services/auth.service';
                 id="senha"
                 [type]="mostrarSenha() ? 'text' : 'password'"
                 formControlName="senha"
-                data-testid="login-password"
+                data-cy="login-password"
                 [class.input-error]="hasError('senha')"
                 placeholder="Sua senha segura"
                 autocomplete="current-password"
@@ -82,7 +82,7 @@ import { AuthService } from '../../services/auth.service';
           <button
             type="submit"
             class="btn-primary btn-lg"
-            data-testid="login-submit"
+            data-cy="login-submit"
             [disabled]="carregando()"
             style="width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-1);"
           >

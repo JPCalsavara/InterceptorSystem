@@ -34,7 +34,7 @@ import { environment } from '../../../environments/environment';
             <a href="#lideranca" class="nav-link hide-mobile">Liderança</a>
             <a href="#contato" class="nav-link hide-mobile">Contato</a>
 
-            <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Menu">
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Menu" data-cy="landing-mobile-menu">
               @if (isMobileMenuOpen()) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -53,6 +53,7 @@ import { environment } from '../../../environments/environment';
             <button
               class="theme-toggle"
               (click)="toggleTheme()"
+              data-cy="landing-theme-toggle"
               [title]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
             >
               @if (isDarkMode()) {
@@ -70,8 +71,8 @@ import { environment } from '../../../environments/environment';
               }
             </button>
 
-            <a routerLink="/login" class="btn-outline hide-on-mobile btn-login-mobile">Entrar</a>
-            <a routerLink="/cadastro" class="btn-primary hide-on-mobile">Criar conta</a>
+            <a routerLink="/login" class="btn-outline hide-on-mobile btn-login-mobile" data-cy="landing-login-nav">Entrar</a>
+            <a routerLink="/cadastro" class="btn-primary hide-on-mobile" data-cy="landing-cadastro-nav">Criar conta</a>
           </nav>
         </div>
       </header>
@@ -87,10 +88,10 @@ import { environment } from '../../../environments/environment';
             <a href="#lideranca" class="mobile-link" (click)="toggleMobileMenu()">Liderança</a>
             <a href="#contato" class="mobile-link" (click)="toggleMobileMenu()">Contato</a>
             <div class="mobile-actions">
-              <a routerLink="/login" class="btn-outline mobile-btn" (click)="toggleMobileMenu()"
+              <a routerLink="/login" class="btn-outline mobile-btn" data-cy="landing-login-mobile" (click)="toggleMobileMenu()"
                 >Entrar</a
               >
-              <a routerLink="/cadastro" class="btn-primary mobile-btn" (click)="toggleMobileMenu()"
+              <a routerLink="/cadastro" class="btn-primary mobile-btn" data-cy="landing-cadastro-mobile" (click)="toggleMobileMenu()"
                 >Criar conta</a
               >
             </div>

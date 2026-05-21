@@ -6,4 +6,5 @@ namespace InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 // Herda do genérico e permite adicionar métodos específicos se necessário
 public interface IClienteRepository : IRepository<Cliente>
 {
+    Task<int> DeleteDirectlyAsync(Guid id, CancellationToken cancellationToken = default);
 }

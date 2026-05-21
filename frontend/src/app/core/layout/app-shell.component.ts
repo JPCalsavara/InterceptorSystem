@@ -18,18 +18,18 @@ import { CommonModule } from '@angular/common';
     EmailVerificationBannerComponent,
   ],
   template: `
-    <app-navbar />
-    <div class="overlay" [class.visible]="overlayVisible()" (click)="layoutState.closeAll()"></div>
-    <div class="app-layout" [class.sidebar-collapsed]="layoutState.sidebarCollapsed()">
-      <app-sidebar />
-      <main class="main-content">
+    <app-navbar data-cy="app-navbar" />
+    <div class="overlay" data-cy="layout-overlay" [class.visible]="overlayVisible()" (click)="layoutState.closeAll()"></div>
+    <div class="app-layout" data-cy="app-layout" [class.sidebar-collapsed]="layoutState.sidebarCollapsed()">
+      <app-sidebar data-cy="app-sidebar" />
+      <main class="main-content" data-cy="main-content">
         <div class="main-content-inner">
           <app-email-verification-banner />
-          <div class="page-router-slot">
+          <div class="page-router-slot" data-cy="router-slot">
             <router-outlet />
           </div>
 
-          <footer class="system-footer">
+          <footer class="system-footer" data-cy="system-footer">
             <div class="footer-main">
               <div class="footer-links-grid">
                 <div class="footer-link-group">

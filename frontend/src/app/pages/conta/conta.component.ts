@@ -29,6 +29,7 @@ import { ContaAlterarSenhaComponent } from './components/conta-alterar-senha/con
             <div class="badge badge-warning">E-mail não verificado</div>
             <button
               class="btn-secondary"
+              data-cy="conta-reenviar-verificacao"
               (click)="reenviarVerificacao()"
               [disabled]="enviandoVerificacao()"
             >
@@ -64,6 +65,7 @@ import { ContaAlterarSenhaComponent } from './components/conta-alterar-senha/con
                 type="email"
                 [(ngModel)]="novoEmail"
                 name="novoEmail"
+                data-cy="conta-novo-email"
                 placeholder="novo@empresa.com"
               />
             </div>
@@ -76,7 +78,7 @@ import { ContaAlterarSenhaComponent } from './components/conta-alterar-senha/con
                 confirmar a troca.
               </div>
             }
-            <button type="submit" class="btn-primary" [disabled]="salvandoEmail()">
+            <button type="submit" class="btn-primary" data-cy="conta-email-submit" [disabled]="salvandoEmail()">
               @if (salvandoEmail()) {
                 Enviando...
               } @else {

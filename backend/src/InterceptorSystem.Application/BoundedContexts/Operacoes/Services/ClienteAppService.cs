@@ -65,20 +65,21 @@ public class ClienteAppService : IClienteAppService
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var cliente = await _repository.GetByIdAsync(id, ct);
-        if (cliente == null)
-            throw new KeyNotFoundException("Cliente não encontrado.");
-
-        _repository.Remove(cliente);
         try
         {
-            await _repository.UnitOfWork.CommitAsync(ct);
+            var affected = await _repository.DeleteDirectlyAsync(id, ct);
+            if (affected == 0)
+                throw new KeyNotFoundException("Cliente não encontrado.");
         }
-        catch (EntityInUseException ex)
+        catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                "Não é possível excluir este cliente porque existem registros vinculados (ex.: contratos). Remova os vínculos antes de excluir.",
-                ex);
+            if (ex.Message.Contains("23503") || ex.InnerException?.Message.Contains("23503") == true || ex.Message.Contains("FK_") || ex.InnerException?.Message.Contains("FK_") == true)
+            {
+                throw new InvalidOperationException(
+                    "Não é possível excluir este cliente porque existem registros vinculados (ex.: contratos). Remova os vínculos antes de excluir.",
+                    ex);
+            }
+            throw;
         }
     }
 

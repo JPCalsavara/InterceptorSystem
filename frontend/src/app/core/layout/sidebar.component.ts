@@ -28,6 +28,7 @@ interface NavItem {
   template: `
     <aside
       class="sidebar"
+      data-cy="sidebar"
       [class.open]="layoutState.leftDrawerOpen()"
       [class.collapsed]="layoutState.sidebarCollapsed()"
     >
@@ -39,6 +40,7 @@ interface NavItem {
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             class="nav-item"
+            data-cy="nav-item"
             [attr.title]="layoutState.sidebarCollapsed() ? item.label : null"
             (click)="layoutState.leftDrawerOpen.set(false)"
           >
@@ -145,7 +147,7 @@ interface NavItem {
         </a>
 
         <!-- Sair -->
-        <button type="button" class="nav-item btn-logout" (click)="logout()" [attr.title]="layoutState.sidebarCollapsed() ? 'Sair' : null">
+        <button type="button" class="nav-item btn-logout" data-cy="sidebar-logout" (click)="logout()" [attr.title]="layoutState.sidebarCollapsed() ? 'Sair' : null">
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
@@ -160,6 +162,7 @@ interface NavItem {
         <button
           type="button"
           class="collapse-toggle"
+          data-cy="collapse-toggle"
           (click)="layoutState.toggleSidebarCollapsed()"
           [attr.aria-label]="
             layoutState.sidebarCollapsed() ? 'Expandir menu lateral' : 'Colapsar menu lateral'
