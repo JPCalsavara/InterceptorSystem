@@ -47,4 +47,9 @@ public class ClienteRepository : IClienteRepository
     public void Update(Cliente entity) => _context.Clientes.Update(entity);
 
     public void Remove(Cliente entity) => _context.Clientes.Remove(entity);
+
+    public async Task<int> DeleteDirectlyAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM \"Clientes\" WHERE \"Id\" = {id}", cancellationToken);
+    }
 }
