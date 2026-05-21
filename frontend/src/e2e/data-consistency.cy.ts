@@ -67,7 +67,7 @@ describe('Data Consistency Between List and Detail Views', () => {
 
     cy.url({ timeout: 15000 }).should('not.include', '/novo');
     cy.url({ timeout: 15000 }).should('include', '/contratos');
-    cy.contains(contratoDesc).should('exist');
+    cy.contains(descricaoAtualizada).should('exist');
 
     // 3. Criar Posto
     cy.visit('/postos/novo');
@@ -95,7 +95,7 @@ describe('Data Consistency Between List and Detail Views', () => {
     cy.get('select[formControlName="clienteId"]').select(testCliente.nome);
     
     // Aguardar o dropdown de contrato atualizar após selecionar cliente
-    cy.get('select[formControlName="contratoId"]').should('contain', contratoDesc);
+    cy.get('select[formControlName="contratoId"]').should('contain', descricaoAtualizada);
     cy.get('select[formControlName="contratoId"]').select(descricaoAtualizada);
     
     cy.get('select[formControlName="tipoFuncionario"]').select('CLT');
@@ -112,7 +112,6 @@ describe('Data Consistency Between List and Detail Views', () => {
     cy.get('app-contrato-list').should('be.visible');
     cy.wait('@calcularLista');
     cy.get('.loading-indicator', { timeout: 15000 }).should('not.exist');
-    cy.wait(1000); // Dar um respiro final de renderização
     // Encontrar o contrato na lista e ler o faturamento
     cy.contains('.contract-card', descricaoAtualizada).within(() => {
       cy.contains('.metric-label', 'Faturamento').then(($el) => {
@@ -130,12 +129,6 @@ describe('Data Consistency Between List and Detail Views', () => {
     });
 
     cy.url().should('include', '/contratos/');
-    cy.wait(2000); // Aguardar cálculo estabilizar
-
-    // Validar no detalhe
-    cy.get('body').invoke('text').then((text) => {
-      cy.log('BODY TEXT:', text.substring(0, 500));
-    });
 
     cy.get('.alert-error').should('not.exist');
 
@@ -152,7 +145,6 @@ describe('Data Consistency Between List and Detail Views', () => {
     // Validação 2: Consistência de Funcionário
     // ==========================================
     cy.visit('/funcionarios');
-    cy.wait(2000); // Aguardar renderização estabilizar
 
     cy.contains('.employee-card', funcNome).within(() => {
       cy.contains('.detail-label', 'Salário Simulado (Mês)').then(($el) => {
@@ -165,7 +157,6 @@ describe('Data Consistency Between List and Detail Views', () => {
     });
 
     cy.url().should('include', '/funcionarios/');
-    cy.wait(2000); // Aguardar renderização estabilizar
 
     // Validar no detalhe comparando apenas os números
     cy.get('@salarioLista').then((salarioLista) => {

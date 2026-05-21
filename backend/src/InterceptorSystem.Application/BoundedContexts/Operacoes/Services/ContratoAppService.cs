@@ -234,6 +234,7 @@ public class ContratoAppService : IContratoAppService
     {
         var contratos = await _repository.GetByClienteIdAsync(clienteId, ct);
         return contratos
+            .Where(c => c.Status == StatusContrato.ATIVO || c.Status == StatusContrato.PENDENTE)
             .Select(ContratoDtoOutput.FromEntity)
             .Where(dto => dto != null)
             .Select(dto => dto!);

@@ -67,7 +67,7 @@ export interface PostoConfigAutoGerado {
 
 type ConfigMap = Record<string, TipoPostoCalculoConfig>;
 
-function normalizarNumero(valor: any, fallback = 0): number {
+function normalizarNumero(valor: unknown, fallback = 0): number {
   if (valor === null || valor === undefined || valor === '') return fallback;
   const num = typeof valor === 'string' ? parseFloat(valor.replace(',', '.')) : Number(valor);
   return Number.isFinite(num) ? num : fallback;
