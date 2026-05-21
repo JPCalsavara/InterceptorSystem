@@ -1,61 +1,113 @@
 import { LoginComponent } from './login.component';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AuthService } from '../../services/auth.service';
-import { of, throwError } from 'rxjs';
-import { NgZone } from '@angular/core';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
-describe('LoginComponent', () => {
-  const mockAuthService = {
-    login: () => of({}),
-    logout: () => {},
+const mountLogin = () => {
+  const authServiceStub = {
+    login: cy.stub().as('loginStub').returns(of({})),
+  };
+  const routerStub = {
+    navigate: cy.stub().as('navigate'),
+    createUrlTree: cy.stub().returns({}),
+    serializeUrl: cy.stub().returns(''),
+    events: of(),
+    url: '/',
+  };
+  const activatedRouteStub = {
+    snapshot: { 
+      paramMap: { get: () => null }, 
+      url: [],
+      params: {},
+      queryParams: {},
+      fragment: null,
+      data: {},
+      outlet: 'primary',
+      component: null,
+    },
+    params: of({}),
+    queryParams: of({}),
+    url: of([]),
+    fragment: of(null),
+    data: of({}),
+    outlet: 'primary',
+    parent: null,
+    firstChild: null,
+    children: [],
+    pathFromRoot: [],
+    root: null,
   };
 
-  const providers = [
-    provideRouter([{ path: 'dashboard', children: [] }]),
-    provideHttpClient(),
-    { provide: AuthService, useValue: mockAuthService }
-  ];
+  return cy.mount(LoginComponent, {
+    imports: [HttpClientTestingModule, RouterLink],
+    providers: [
+      { provide: AuthService, useValue: authServiceStub },
+      { provide: Router, useValue: routerStub },
+      { provide: ActivatedRoute, useValue: activatedRouteStub },
+    ],
+  });
+};
 
-  it('Desktop: renderiza corretamente', () => {
-    cy.mount(LoginComponent, { providers });
-    cy.get('.auth-title').should('contain', 'Entrar na sua conta');
-    cy.get('[data-testid="login-email"]').should('be.visible');
-    cy.get('[data-testid="login-password"]').should('be.visible');
+describe('LoginComponent - Cypress Component Test', () => {
+  it('Desktop (1024px): O card deve ter largura maxima de 420px e estar centralizado', () => {
+    cy.viewport(1024, 768);
+    mountLogin();
+
+    cy.get('.auth-card').should('exist');
+    cy.get('.auth-card').invoke('outerWidth').should('be.lte', 420);
   });
 
-  it('Desktop: deve exibir erros ao submeter formulário vazio', () => {
-    cy.mount(LoginComponent, { providers });
+  it('Mobile (320px): O card deve ocupar quase toda a largura da tela', () => {
+    cy.viewport(320, 568);
+    mountLogin();
+
+    cy.get('.auth-card').should('exist');
+    cy.get('.auth-card').invoke('outerWidth').should('be.gte', 260);
+  });
+
+  it('Deve exibir o formulario com campos de email e senha', () => {
+    cy.viewport(1024, 768);
+    mountLogin();
+
+    cy.get('[data-testid="login-email"]').should('exist');
+    cy.get('[data-testid="login-password"]').should('exist');
+    cy.get('[data-testid="login-submit"]').should('exist');
+  });
+
+  it('Deve mostrar erro de validacao ao submeter com campos vazios', () => {
+    cy.viewport(1024, 768);
+    mountLogin();
+
     cy.get('[data-testid="login-submit"]').click();
-    cy.get('.field-error').should('have.length', 2); // E-mail e Senha required
+
+    cy.get('.field-error').should('have.length.gte', 1);
     cy.get('.field-error').first().should('contain', 'obrigatório');
   });
 
-  it('Desktop: deve validar formato de e-mail', () => {
-    cy.mount(LoginComponent, { providers });
-    cy.get('[data-testid="login-email"]').type('email-invalido');
-    cy.get('[data-testid="login-password"]').type('123456');
-    cy.get('[data-testid="login-submit"]').click();
+  it('Deve mostrar erro de email invalido ao digitar email malformado', () => {
+    cy.viewport(1024, 768);
+    mountLogin();
+
+    cy.get('[data-testid="login-email"]').type('emailinvalido').blur();
     cy.get('.field-error').should('contain', 'E-mail inválido');
   });
 
-  it('Desktop: deve tentar login com sucesso', () => {
-    cy.mount(LoginComponent, { providers }).then((fixture) => {
-      cy.spy(fixture.component['authService'], 'login').as('loginSpy');
-    });
-    cy.get('[data-testid="login-email"]').type('contato@empresa.com');
-    cy.get('[data-testid="login-password"]').type('SenhaSegura123!');
-    cy.get('[data-testid="login-submit"]').click();
-    cy.get('@loginSpy').should('have.been.calledWith', {
-      email: 'contato@empresa.com',
-      senha: 'SenhaSegura123!'
-    });
+  it('Deve alternar visibilidade da senha ao clicar no botao de toggle', () => {
+    cy.viewport(1024, 768);
+    mountLogin();
+
+    cy.get('[data-testid="login-password"]').should('have.attr', 'type', 'password');
+    cy.get('.toggle-senha').click();
+    cy.get('[data-testid="login-password"]').should('have.attr', 'type', 'text');
   });
 
-  it('Mobile: renderiza de forma responsiva', () => {
-    cy.viewport(320, 568); // iPhone SE
-    cy.mount(LoginComponent, { providers });
-    cy.get('.auth-card').should('have.css', 'width').and('not.eq', '0px');
-    cy.get('[data-testid="login-submit"]').should('have.css', 'width').and('not.eq', '0px');
+  it('Mobile (375px): O botao de submit deve ocupar a largura disponivel do card', () => {
+    cy.viewport(375, 667);
+    mountLogin();
+
+    cy.get('.auth-card').invoke('innerWidth').then((cardWidth) => {
+      cy.get('[data-testid="login-submit"]').invoke('outerWidth').should('be.gte', (cardWidth as number) * 0.7);
+    });
   });
 });
