@@ -9,6 +9,7 @@
   <input
     type="text"
     class="search-input"
+    data-cy="tag-picker-search"
     [placeholder]="searchPlaceholder()"
     [ngModel]="searchTerm()"
     (ngModelChange)="searchTerm.set($event)"
@@ -16,9 +17,9 @@
   />
 
   @if (selectedTags().length > 0) {
-    <div class="selected-chips">
+    <div class="selected-chips" data-cy="selected-chips">
       @for (tag of selectedTags(); track tag.id) {
-        <span class="tag-chip" [class.locked]="isLocked(tag.id)">
+        <span class="tag-chip" [class.locked]="isLocked(tag.id)" data-cy="tag-chip">
           {{ tag.nome }}
           @if (isLocked(tag.id)) {
             <small class="chip-note">fixa</small>
@@ -29,13 +30,14 @@
   }
 
   @if (filteredTags().length === 0) {
-    <div class="empty-state">{{ emptyText() }}</div>
+    <div class="empty-state" data-cy="tag-picker-empty">{{ emptyText() }}</div>
   } @else {
-    <div class="tag-list">
+    <div class="tag-list" data-cy="tag-list">
       @for (tag of filteredTags(); track tag.id) {
         <button
           type="button"
           class="tag-option"
+          data-cy="tag-option"
           [class.selected]="isSelected(tag.id)"
           [class.locked]="isLocked(tag.id)"
           [disabled]="disabled()"

@@ -6,7 +6,7 @@
  */
 
 describe('InterceptorSystem E2E - Critical User Journeys', () => {
-  const baseUrl = 'http://localhost:4201';
+  const baseUrl = Cypress.config().baseUrl || 'http://localhost:4200';
   const testUser = {
     email: 'test@example.com',
     password: 'TestPassword123!',

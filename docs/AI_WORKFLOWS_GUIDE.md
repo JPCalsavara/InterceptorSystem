@@ -20,6 +20,16 @@ Sempre que iniciar uma tarefa, comece pedindo para a IA executar um destes três
   5. Cria Pull Request via `git-flow`.
 - **Como pedir:** *"Inicie a full-workflow para construir a funcionalidade de exclusão de clientes."*
 
+### 🧪 `cypress-workflow`
+- **Para que serve:** Criação guiada e estabilização de testes E2E e de Componentes no Frontend.
+- **O que ele faz:**
+  1. Analisa os arquivos HTML/TS do Angular e planeja casos de teste no `task_plan.md`;
+  2. Adiciona seletores resilientes (`data-cy`) na tela;
+  3. Escreve os scripts Cypress (`.cy.ts`) utilizando Intercepts em vez de Waits fixos;
+  4. Roda testes headless isolando erros em logs temporários;
+  5. Cria Pull Request via `git-flow`.
+- **Como pedir:** *"Inicie a cypress-workflow para criar os testes E2E do cadastro de contratos."*
+
 ### 🐞 `bug-workflow`
 - **Para que serve:** Investigação e correção cirúrgica de bugs.
 - **O que ele faz:**
