@@ -1,0 +1,213 @@
+name: E2E — Full Stack Gate (pre-deploy)
+
+# ================================================
+# Roda em push para main, ANTES dos deploys.
+# Os workflows de deploy dependem deste via workflow_run.
+# ================================================
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  e2e:
+    name: Cypress E2E (Full Stack)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------
+      # 1. Criar .env mínimo para o Docker Compose de CI
+      # -----------------------------------------------
+      - name: Create CI .env file
+        run: |
+          cat > .env << 'EOF'
+          POSTGRES_USER=admin
+          POSTGRES_PASSWORD=password123
+          POSTGRES_DB=interceptor_db
+          JWT_KEY=ci-only-jwt-key-interceptor-system-32chars-min!!
+          JWT_ISSUER=InterceptorSystem
+          JWT_AUDIENCE=InterceptorSystem
+          JWT_EXPIRESIN=24
+          ASPNETCORE_ENVIRONMENT=Development
+          META__PHONENUMBERID=ci-phone-id
+          META__ACCESSTOKEN=ci-access-token
+          META__WEBHOOKVERIFYTOKEN=ci-verify-token
+          EOF
+
+      # -----------------------------------------------
+      # 2. Criar compose.ci.yml com configurações de CI
+      #    (sem volumes locais, sem hot-reload, portas expostas)
+      # -----------------------------------------------
+      - name: Create compose.ci.yml
+        working-directory: backend/src
+        run: |
+          cat > compose.ci.yml << 'EOF'
+          services:
+            db:
+              image: postgres:15-alpine
+              environment:
+                POSTGRES_USER: admin
+                POSTGRES_PASSWORD: password123
+                POSTGRES_DB: interceptor_db
+              healthcheck:
+                test: ["CMD-SHELL", "pg_isready -U admin -d interceptor_db"]
+                interval: 5s
+                timeout: 5s
+                retries: 10
+              networks:
+                - interceptor-network
+
+            mailhog:
+              image: mailhog/mailhog:latest
+              networks:
+                - interceptor-network
+
+            api:
+              build:
+                context: .
+                dockerfile: InterceptorSystem.Api/Dockerfile
+              environment:
+                - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=interceptor_db;Username=admin;Password=password123
+                - ASPNETCORE_ENVIRONMENT=Development
+                - Jwt__Key=ci-only-jwt-key-interceptor-system-32chars-min!!
+                - Jwt__Issuer=InterceptorSystem
+                - Jwt__Audience=InterceptorSystem
+                - Jwt__ExpiresInHours=24
+                - SMTP__HOST=mailhog
+                - SMTP__PORT=1025
+                - SMTP__USERNAME=
+                - SMTP__PASSWORD=
+                - SMTP__FROMADDRESS=noreply@interceptor.local
+                - SMTP__FROMNAME=Interceptor System (CI)
+                - SMTP__SECURESOCKET=None
+                - Meta__PhoneNumberId=ci-phone-id
+                - Meta__AccessToken=ci-access-token
+                - Meta__WebhookVerifyToken=ci-verify-token
+              depends_on:
+                db:
+                  condition: service_healthy
+              ports:
+                - "5010:8080"
+              networks:
+                - interceptor-network
+
+            frontend:
+              build:
+                context: ../../frontend
+                dockerfile: Dockerfile
+                target: development
+              environment:
+                - NODE_ENV=development
+              ports:
+                - "4200:4200"
+              networks:
+                - interceptor-network
+
+          networks:
+            interceptor-network:
+              driver: bridge
+          EOF
+
+      # -----------------------------------------------
+      # 3. Build e start de toda a stack
+      # -----------------------------------------------
+      - name: Build and start full stack
+        working-directory: backend/src
+        run: |
+          docker compose -f compose.ci.yml build --no-cache
+          docker compose -f compose.ci.yml up -d
+          echo "✅ Stack iniciada"
+
+      # -----------------------------------------------
+      # 4. Aguardar API estar saudável (healthcheck)
+      # -----------------------------------------------
+      - name: Wait for API to be healthy
+        run: |
+          echo "⏳ Aguardando API..."
+          for i in $(seq 1 30); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5010/health || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ API respondendo (tentativa $i)"
+              break
+            fi
+            echo "🔄 Tentativa $i/30 — Status: $STATUS. Aguardando 5s..."
+            sleep 5
+            if [ "$i" = "30" ]; then
+              echo "❌ API não respondeu após 150s. Logs:"
+              docker compose -f backend/src/compose.ci.yml logs api --tail=80
+              exit 1
+            fi
+          done
+
+      # -----------------------------------------------
+      # 5. Aguardar Frontend estar pronto
+      # -----------------------------------------------
+      - name: Wait for Frontend to be ready
+        run: |
+          echo "⏳ Aguardando Frontend (Angular dev server)..."
+          for i in $(seq 1 40); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Frontend respondendo (tentativa $i)"
+              break
+            fi
+            echo "🔄 Tentativa $i/40 — Status: $STATUS. Aguardando 5s..."
+            sleep 5
+            if [ "$i" = "40" ]; then
+              echo "❌ Frontend não respondeu após 200s. Logs:"
+              docker compose -f backend/src/compose.ci.yml logs frontend --tail=50
+              exit 1
+            fi
+          done
+
+      # -----------------------------------------------
+      # 6. Setup Node.js + instalar deps do frontend
+      # -----------------------------------------------
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies (para rodar Cypress host)
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      # -----------------------------------------------
+      # 7. Rodar Cypress E2E
+      # -----------------------------------------------
+      - name: Run Cypress E2E - Full CRUD Journey
+        working-directory: frontend
+        run: npx cypress run --e2e --spec "src/e2e/full-crud-journey.cy.ts" --browser electron
+        env:
+          CYPRESS_BASE_URL: http://localhost:4200
+
+      # -----------------------------------------------
+      # 8. Upload artefatos em caso de falha (debug)
+      # -----------------------------------------------
+      - name: Upload Cypress screenshots (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-${{ github.sha }}
+          path: frontend/cypress/screenshots/
+          retention-days: 5
+
+      - name: Upload Cypress videos (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-${{ github.sha }}
+          path: frontend/cypress/videos/
+          retention-days: 5
+
+      # -----------------------------------------------
+      # 9. Derrubar stack ao final (liberar recursos)
+      # -----------------------------------------------
+      - name: Shutdown stack
+        if: always()
+        working-directory: backend/src
+        run: docker compose -f compose.ci.yml down -v --remove-orphans
