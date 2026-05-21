@@ -9,7 +9,7 @@ import { TagService } from '../../../services/tag.service';
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { StatusContrato, CalculoValorTotalOutput, Tag, TipoEscala } from '../../../models/index';
 import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { of, forkJoin } from 'rxjs';
 import {
   buildCalculoValorTotalInput,
@@ -340,10 +340,11 @@ export class ContratoFormComponent implements OnInit {
   }
 
   updateCalculatedFields(): void {
-    const resumo = calcularResumoContrato(
-      (this.postosConfig.value || []) as PostoCalculoInput[],
-      TIPO_POSTO_CONFIGS,
-    );
+    const postosVal = this.postosConfig.value || [];
+    const resumo = calcularResumoContrato(postosVal as PostoCalculoInput[], TIPO_POSTO_CONFIGS);
+
+    const firstDiaria = postosVal.length > 0 ? postosVal[0].valorDiariaCobrada : this.form.get('valorDiariaCobrada')?.value;
+    const firstBeneficios = postosVal.length > 0 ? postosVal[0].valorBeneficiosExtrasMensal : this.form.get('valorBeneficiosExtrasMensal')?.value;
 
     // Atualiza campos calculados para compatibilidade com o backend
     if (resumo.postos.length > 0) {
@@ -351,8 +352,8 @@ export class ContratoFormComponent implements OnInit {
         {
           numeroDePostos: resumo.totalAlocacoes,
           numeroDePostosNoturnos: resumo.totalAlocacoesNoturnas,
-          valorDiariaCobrada: this.form.get('valorDiariaCobrada')?.value,
-          valorBeneficiosExtrasMensal: this.form.get('valorBeneficiosExtrasMensal')?.value,
+          valorDiariaCobrada: firstDiaria,
+          valorBeneficiosExtrasMensal: firstBeneficios,
         },
         { emitEvent: false },
       );
@@ -419,7 +420,14 @@ export class ContratoFormComponent implements OnInit {
             TIPO_POSTO_CONFIGS,
           );
 
-          return this.calculoService.calcularValorTotal(input);
+          return this.calculoService.calcularValorTotal(input).pipe(
+            catchError((err) => {
+              this.calculando.set(false);
+              this.erroCalculo.set(err.error?.error || 'Erro ao calcular valor total');
+              this.breakdown.set(null);
+              return of(null);
+            })
+          );
         }),
       )
       .subscribe({
@@ -660,18 +668,19 @@ export class ContratoFormComponent implements OnInit {
     const valorTotalMensal = this.breakdown()?.valorTotalMensal || 0;
 
     // Converter percentuais de 0-100 para 0-1
+    const rawValue = this.form.getRawValue();
     const formValue = {
-      ...this.form.value,
+      ...rawValue,
       tags: this.selectedTagIds().map((tagId) => ({
         tagId,
         valorDiaria: this.getTagRate(tagId),
       })),
       valorTotalMensal: valorTotalMensal,
-      percentualAdicionalNoturno: this.form.value.percentualAdicionalNoturno / 100,
-      percentualAdicionalFimSemana: this.form.value.percentualAdicionalFimSemana / 100,
-      percentualEncargosProvisoes: this.form.value.percentualImpostos / 100,
-      margemLucroPercentual: this.form.value.margemLucroPercentual / 100,
-      margemCoberturaFaltasPercentual: this.form.value.margemCoberturaFaltasPercentual / 100,
+      percentualAdicionalNoturno: rawValue.percentualAdicionalNoturno / 100,
+      percentualAdicionalFimSemana: rawValue.percentualAdicionalFimSemana / 100,
+      percentualEncargosProvisoes: rawValue.percentualImpostos / 100,
+      margemLucroPercentual: rawValue.margemLucroPercentual / 100,
+      margemCoberturaFaltasPercentual: rawValue.margemCoberturaFaltasPercentual / 100,
     };
 
     const request = this.isEdit()

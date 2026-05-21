@@ -232,7 +232,7 @@ public class ContratoAppService : IContratoAppService
 
     public async Task<IEnumerable<ContratoDtoOutput>> GetByClienteIdAsync(Guid clienteId, CancellationToken ct = default)
     {
-        var contratos = await _repository.GetAtivosByClienteIdAsync(clienteId, ct);
+        var contratos = await _repository.GetByClienteIdAsync(clienteId, ct);
         return contratos
             .Select(ContratoDtoOutput.FromEntity)
             .Where(dto => dto != null)
