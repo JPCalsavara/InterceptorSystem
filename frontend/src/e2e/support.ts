@@ -5,6 +5,22 @@ declare namespace Cypress {
   }
 }
 
+function generateCnpj(): string {
+  const rnd = (n: number) => Math.round(Math.random() * n);
+  const base = [rnd(9), rnd(9), rnd(9), rnd(9), rnd(9), rnd(9), rnd(9), rnd(9), 0, 0, 0, 1];
+  
+  const calcDigit = (b: number[], weights: number[]) => {
+    const sum = b.reduce((acc, val, i) => acc + val * weights[i], 0);
+    const rem = sum % 11;
+    return rem < 2 ? 0 : 11 - rem;
+  };
+  
+  const d1 = calcDigit(base, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  const d2 = calcDigit([...base, d1], [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  
+  return [...base, d1, d2].join('');
+}
+
 Cypress.Commands.add('login', (email, password) => {
   cy.visit('/login');
   cy.get('[data-cy="login-email"]').type(email, { force: true });
@@ -15,13 +31,14 @@ Cypress.Commands.add('login', (email, password) => {
 
 Cypress.Commands.add('createCliente', (cliente) => {
   cy.visit('/clientes/novo');
-  const nomeComGuto = `Empresa E2E ${Date.now()}`;
+  const nomeCliente = cliente.nome || `Empresa E2E ${Date.now()}`;
   
   // Interceptar a requisição para garantir sincronismo
   cy.intercept('POST', '**/api/clientes').as('createClienteReq');
 
-  cy.get('[data-cy="cliente-nome"]').type(nomeComGuto);
-  cy.get('[data-cy="cliente-cnpj"]').type(cliente.cnpj);
+  cy.get('[data-cy="cliente-nome"]').type(nomeCliente);
+  const cnpjUnico = cliente.cnpj || generateCnpj();
+  cy.get('[data-cy="cliente-cnpj"]').type(cnpjUnico);
   
   // Selecionar Localização (Obrigatório)
   cy.get('#estado').select('SP');
@@ -36,5 +53,5 @@ Cypress.Commands.add('createCliente', (cliente) => {
   });
 
   cy.url({ timeout: 15000 }).should('include', '/clientes');
-  cy.contains(nomeComGuto, { timeout: 15000 }).should('be.visible');
+  cy.contains(nomeCliente, { timeout: 15000 }).should('be.visible');
 });

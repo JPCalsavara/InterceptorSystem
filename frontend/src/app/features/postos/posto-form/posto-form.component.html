@@ -201,7 +201,7 @@
           <button type="button" class="btn-secondary" routerLink="/postos" [disabled]="loading()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()">
+          <button type="submit" class="btn-primary" [disabled]="loading()" data-testid="btn-save-posto">
             @if (loading()) {
               <span class="spinner-small"></span> Salvando...
             } @else {

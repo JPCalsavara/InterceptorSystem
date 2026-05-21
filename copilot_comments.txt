@@ -1,166 +1,115 @@
-frontend/cypress.config.ts
-Outdated
-      framework: "angular",
-      bundler: "webpack",
-    },
-    specPattern: "**/*.cy.ts",
-Copilot commented 23 minutes ago
+frontend/src/e2e/data-consistency.cy.ts
+    cy.url({ timeout: 15000 }).should('not.include', '/novo');
+    cy.url({ timeout: 15000 }).should('include', '/contratos');
+    cy.contains(contratoDesc).should('be.visible');
+    cy.contains(contratoDesc).should('exist');
+Copilot commented 18 minutes ago
 Copilot
 Copilot
 AI
-23 minutes ago
+18 minutes ago
 High
-The component test specPattern is too broad ("/*.cy.ts") and will also match existing E2E specs under src/e2e (e.g., src/e2e/critical-journeys-v2.cy.ts). This will make cypress run --component try to run E2E tests in component mode and likely fail. Restrict the component specPattern to where component specs live (e.g., src/app//.cy.ts or **/.component.cy.ts) and/or explicitly exclude src/e2e.
+Após atualizar a descrição para descricaoAtualizada e salvar, o contrato provavelmente será exibido com o texto atualizado. A asserção ainda procura contratoDesc, o que tende a falhar intermitentemente (ou sempre) dependendo da UI. Ajuste para validar a presença de descricaoAtualizada (ou capture o ID retornado no POST e valide via rota/detalhe).
 
-frontend/cypress.config.ts
-import { defineConfig } from "cypress";
-
-export default defineConfig({
-  allowCypressEnv: false,
-Copilot commented 24 minutes ago
-Copilot
-Copilot
-AI
-24 minutes ago
-Medium
-allowCypressEnv is not a standard Cypress config option and appears unused elsewhere in the repo. Keeping unknown config keys can be misleading; consider removing it unless it's required by a specific plugin/version and documented.
+This issue also appears on line 97 of the same file.
 
 Suggested changeset 1 (1)
-frontend/cypress.config.ts
+frontend/src/e2e/data-consistency.cy.ts
 Original file line number	Diff line number	Diff line change
- import { defineConfig } from "cypress";
- export default defineConfig({
-   allowCypressEnv: false,
-   e2e: {
-     baseUrl: "http://localhost:4201",
-     specPattern: "src/e2e/**/*.cy.{js,jsx,ts,tsx}",
-
-frontend/cypress.config.ts
-import { defineConfig } from "cypress";
-
-export default defineConfig({
-  allowCypressEnv: false,
-Copilot commented 24 minutes ago
+     cy.url({ timeout: 15000 }).should('not.include', '/novo');
+     cy.url({ timeout: 15000 }).should('include', '/contratos');
+     cy.contains(contratoDesc).should('exist');
+     cy.contains(descricaoAtualizada).should('exist');
+     // 3. Criar Posto
+     cy.visit('/postos/novo');
+Copilot uses AI. Check for mistakes.
+@JPCalsavara	Reply...
+frontend/src/e2e/data-consistency.cy.ts
+Comment on lines +112 to 116
+    cy.get('app-contrato-list').should('be.visible');
+    cy.wait('@calcularLista');
+    cy.get('.loading-indicator', { timeout: 15000 }).should('not.exist');
+    cy.wait(1000); // Dar um respiro final de renderização
+    // Encontrar o contrato na lista e ler o faturamento
+Copilot commented 18 minutes ago
 Copilot
 Copilot
 AI
-24 minutes ago
+18 minutes ago
 Medium
-allowCypressEnv is not a standard Cypress config option and appears unused elsewhere in the repo. Keeping unknown config keys can be misleading; consider removing it unless it's required by a specific plugin/version and documented.
+Há cy.wait(...) com valores fixos (1000/2000) introduzidos no teste. Isso contradiz a proposta de “waitings lógicos (não arbitrários)” e reintroduz flakiness/tempo desnecessário. Prefira sincronizar por alias de requests relevantes (ex: resumo financeiro + cálculos detalhados) ou por condições de UI determinísticas (ex: spinner/estado de carregamento específico do componente).
 
-Suggested changeset 1 (1)
-frontend/cypress.config.ts
-Original file line number	Diff line number	Diff line change
- import { defineConfig } from "cypress";
- export default defineConfig({
-   allowCypressEnv: false,
-   e2e: {
-     baseUrl: "http://localhost:4201",
-     specPattern: "src/e2e/**/*.cy.{js,jsx,ts,tsx}",
+This issue also appears in the following locations of the same file:
 
-frontend/src/app/pages/conta/conta.component.ts
-  sucesso(tipo: 'senha' | 'email'): boolean {
-    return tipo === 'senha' ? this._sucessoSenha() : this._sucessoEmail();
-  sucesso(tipo: 'email'): boolean {
-    return this._sucessoEmail();
-Copilot commented 24 minutes ago
+line 132
+line 154
+line 167
+Copilot uses AI. Check for mistakes.
+@JPCalsavara	Reply...
+frontend/src/e2e/data-consistency.cy.ts
+Comment on lines +136 to +139
+    cy.get('body').invoke('text').then((text) => {
+      cy.log('BODY TEXT:', text.substring(0, 500));
+    });
+
+Copilot commented 18 minutes ago
 Copilot
 Copilot
 AI
-24 minutes ago
+18 minutes ago
 Low
-sucesso() now accepts a tipo parameter but the implementation ignores it and always returns _sucessoEmail(). Consider removing the parameter and renaming to something like sucessoEmail() (or use the parameter) to avoid dead/unused API surface.
+Evite manter logs de diagnóstico (cy.log('BODY TEXT', ...)) no teste. Isso polui os artifacts do Cypress e pode mascarar problemas reais; mantenha apenas quando estiver atrás de um flag/condicional de debug.
 
 Suggested changeset 1 (1)
-frontend/src/app/pages/conta/conta.component.ts
+frontend/src/e2e/data-consistency.cy.ts
 Original file line number	Diff line number	Diff line change
-   _sucessoEmail = signal(false);
-   sucesso(tipo: 'email'): boolean {
-     return this._sucessoEmail();
-     switch (tipo) {
-       case 'email':
-         return this._sucessoEmail();
-     }
-   }
-   reenviarVerificacao(): void {
-
-frontend/src/app/pages/conta/components/conta-alterar-senha/conta-alterar-senha.component.ts
-    this._sucessoSenha.set(false);
-    this.salvandoSenha.set(true);
-
-    const empresaId = this.authService.currentUser()?.empresaId;
-Copilot commented 24 minutes ago
+     cy.wait(2000); // Aguardar cálculo estabilizar
+     // Validar no detalhe
+     cy.get('body').invoke('text').then((text) => {
+       cy.log('BODY TEXT:', text.substring(0, 500));
+     });
+     cy.get('.alert-error').should('not.exist');
+     cy.get('@faturamentoLista').then((faturamentoLista) => {
+Copilot uses AI. Check for mistakes.
+@JPCalsavara	Reply...
+frontend/src/app/shared/helpers/contrato-calculo.helper.ts
+Comment on lines +70 to +73
+function normalizarNumero(valor: any, fallback = 0): number {
+  if (valor === null || valor === undefined || valor === '') return fallback;
+  const num = typeof valor === 'string' ? parseFloat(valor.replace(',', '.')) : Number(valor);
+  return Number.isFinite(num) ? num : fallback;
+Copilot commented 18 minutes ago
 Copilot
 Copilot
 AI
-24 minutes ago
-Low
-empresaId is computed but never used. This is dead code and may trigger lint/TS unused-variable warnings; remove it or use it if needed for the request.
-
-Suggested changeset 1 (1)
-frontend/src/app/pages/conta/components/conta-alterar-senha/conta-alterar-senha.component.ts
-Original file line number	Diff line number	Diff line change
-     this._sucessoSenha.set(false);
-     this.salvandoSenha.set(true);
-     const empresaId = this.authService.currentUser()?.empresaId;
-     this.authService['http']
-       .put(`${this.authService['apiUrl'].replace('/auth', '/conta')}`, {
-         senhaAtual: this.senhaAtual,
-
-frontend/src/app/pages/conta/components/conta-alterar-senha/conta-alterar-senha.component.ts
-Comment on lines +206 to +210
-    this.authService['http']
-      .put(`${this.authService['apiUrl'].replace('/auth', '/conta')}`, {
-        senhaAtual: this.senhaAtual,
-        novaSenha: this.novaSenha,
-      })
-Copilot commented 24 minutes ago
-Copilot
-Copilot
-AI
-24 minutes ago
+18 minutes ago
 Medium
-This component reaches into AuthService private fields via bracket indexing (this.authService['http'] / ['apiUrl']). This breaks encapsulation and will be brittle if AuthService internals change. Prefer adding a public method on AuthService (or a dedicated ContaService) for password change and call it from the component.
+normalizarNumero foi ampliada para aceitar any, o que reduz a segurança de tipos e pode mascarar entradas inesperadas (ex: objetos/boolean) silenciosamente. Prefira unknown com narrowing explícito ou um union mais restrito (ex: number | string | null | undefined) e mantenha o comportamento de fallback sem perder tipagem.
 
-docs/ARCHITECTURE_MAP.md
-
-Este documento serve como mapa mental **base** para o agente de IA e desenvolvedores. Antes de propor qualquer alteração ou novo plano, consulte este mapa para garantir consistência estrutural.
-
-## 1. Backend (C# .NET 9) - Clean Architecture & CQRS
-Copilot commented 25 minutes ago
+Suggested changeset 1 (1)
+frontend/src/app/shared/helpers/contrato-calculo.helper.ts
+Copilot uses AI. Check for mistakes.
+@JPCalsavara	Reply...
+...d/src/InterceptorSystem.Application/BoundedContexts/Operacoes/Services/ContratoAppService.cs
+    {
+        var contratos = await _repository.GetAtivosByClienteIdAsync(clienteId, ct);
+        var contratos = await _repository.GetByClienteIdAsync(clienteId, ct);
+        return contratos
+Copilot commented 18 minutes ago
 Copilot
 Copilot
 AI
-25 minutes ago
+18 minutes ago
 Medium
-The section header says "Clean Architecture & CQRS", but the rest of the document (and this PR description) describes moving away from CQRS in favor of AppServices. Update this header (and any remaining CQRS mentions) to avoid contradicting the intended architecture guidance.
+Esta alteração troca GetAtivosByClienteIdAsync por GetByClienteIdAsync, fazendo o endpoint /api/clientes/{clienteId}/contratos retornar também contratos INATIVOS/FINALIZADOS. Como o frontend (ex: PostoForm) não filtra por status ao popular o select, isso pode permitir vincular Postos a contratos encerrados. Sugestão: filtrar aqui para retornar apenas contratos “vigentes” (ex: ATIVO/PENDENTE) ou criar um método de repositório específico para esse caso e manter o endpoint consistente.
 
 Suggested changeset 1 (1)
-docs/ARCHITECTURE_MAP.md
+backend/src/InterceptorSystem.Application/BoundedContexts/Operacoes/Services/ContratoAppService.cs
 Original file line number	Diff line number	Diff line change
- Este documento serve como mapa mental **base** para o agente de IA e desenvolvedores. Antes de propor qualquer alteração ou novo plano, consulte este mapa para garantir consistência estrutural.
- ## 1. Backend (C# .NET 9) - Clean Architecture & CQRS
- ## 1. Backend (C# .NET 9) - Clean Architecture & AppServices
- O backend está dividido rigorosamente em 4 camadas (`src/`):
-
-.agents/skills/create-endpoint/SKILL.md
----
-name: create-endpoint
-description: Guides the creation of a new Backend API endpoint following Clean Architecture and DDD standards.
-description: Guides the creation of a new Backend API endpoint following Clean Architecture, CQRS, and DDD standards.
-Copilot commented 25 minutes ago
-Copilot
-Copilot
-AI
-25 minutes ago
-Medium
-The front-matter description says the endpoint guide follows CQRS, but the body of this skill is AppService/vertical-slice oriented (and the PR description states CQRS was removed). Update the description to avoid conflicting guidance.
-
-Suggested changeset 1 (1)
-.agents/skills/create-endpoint/SKILL.md
-Original file line number	Diff line number	Diff line change
- ---
- name: create-endpoint
- description: Guides the creation of a new Backend API endpoint following Clean Architecture, CQRS, and DDD standards.
- description: Guides the creation of a new Backend API endpoint following Clean Architecture, vertical-slice/AppService, and DDD standards.
- ---
+     {
+         var contratos = await _repository.GetByClienteIdAsync(clienteId, ct);
+         return contratos
+             .Where(c => c.Status == StatusContrato.ATIVO || c.Status == StatusContrato.PENDENTE)
+             .Select(ContratoDtoOutput.FromEntity)
+             .Where(dto => dto != null)
+             .Select(dto => dto!);
