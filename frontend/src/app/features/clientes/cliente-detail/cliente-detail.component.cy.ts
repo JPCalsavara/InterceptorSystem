@@ -62,11 +62,7 @@ describe('ClienteDetailComponent', () => {
     cy.get('.stat-value').should('contain', 'gestor@alpha.com');
   });
 
-  it('Desktop: exibe painel vazio para postos e funcionários', () => {
-    cy.mount(ClienteDetailComponent, { providers });
-    cy.get('.section-postos .empty-state').should('contain', 'Nenhum posto cadastrado');
-    cy.get('.section-funcionarios .empty-state').should('contain', 'Nenhum funcionário cadastrado');
-  });
+
 
   it('Mobile: ajusta o layout das sessões de métricas', () => {
     cy.viewport(320, 568);

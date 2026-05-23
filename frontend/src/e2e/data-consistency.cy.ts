@@ -47,6 +47,8 @@ describe('Data Consistency Between List and Detail Views', () => {
     cy.get('select[formControlName="clienteId"]').select(testCliente.nome);
     cy.get('input[formControlName="dataInicio"]').clear().type('2026-01-01');
     cy.get('input[formControlName="dataFim"]').clear().type('2026-12-31');
+    cy.get('input[formControlName="numeroPostosFisicos"]').clear().type('1');
+    cy.get('select[data-cy="contrato-tipo-posto"]').first().select('ESCALA_12X36');
     cy.get('input[formControlName="valorDiariaCobrada"]').first().clear().type('250');
     
     // Aguardar o debouce e cálculo retornarem
@@ -57,11 +59,11 @@ describe('Data Consistency Between List and Detail Views', () => {
     
     cy.wait('@calcular');
     
-    // Aguardar que a resposta da API seja processada pelo Angular e o signal breakdown seja atualizado
-    cy.contains('.bk-group-total', 'R$').should('exist');
+    // Aguardar que o valor total não seja zero (ou seja, cálculo com 250 de diária)
+    cy.get('[data-cy="valor-total-mensal"]', { timeout: 10000 }).should('not.contain', '0,00');
     
     cy.intercept('POST', '**/api/contratos').as('createContrato');
-    cy.get('[data-testid="btn-save-contrato"]').click();
+    cy.get('[data-cy="btn-save-contrato"]').click();
     
     cy.wait('@createContrato');
 
@@ -100,22 +102,30 @@ describe('Data Consistency Between List and Detail Views', () => {
     
     cy.get('select[formControlName="tipoFuncionario"]').select('CLT');
     cy.get('select[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS');
-    cy.get('[data-testid="btn-save-funcionario"]').click();
+    cy.get('[data-cy="btn-save-funcionario"]').click();
 
     cy.url({ timeout: 15000 }).should('include', '/funcionarios');
 
     // ==========================================
     // Validação 1: Consistência de Contrato
     // ==========================================
-    cy.intercept('POST', '**/api/contratos/calculos/calcular-valor-total').as('calcularLista');
     cy.visit('/contratos');
     cy.get('app-contrato-list').should('be.visible');
-    cy.wait('@calcularLista');
-    cy.get('.loading-indicator', { timeout: 15000 }).should('not.exist');
+    
+    // Garantir que a lista carregou os contratos
+    cy.get('.contract-card').should('have.length.gt', 0);
+
     // Encontrar o contrato na lista e ler o faturamento
     cy.contains('.contract-card', descricaoAtualizada).within(() => {
+      // Ignorar o 0 inicial enquanto os cálculos assíncronos não terminam
+      cy.contains('.metric-label', 'Faturamento')
+        .siblings('.metric-value')
+        .should('not.have.text', 'R$ 0,00')
+        .and('not.have.text', 'R$0.00');
+
       cy.contains('.metric-label', 'Faturamento').then(($el) => {
-        const text = $el.siblings('.metric-value').text();
+        const text = $el.siblings('.metric-value').text().trim();
+        cy.log('FATURAMENTO LISTA: ' + text);
         cy.wrap(text).as('faturamentoLista');
       });
         

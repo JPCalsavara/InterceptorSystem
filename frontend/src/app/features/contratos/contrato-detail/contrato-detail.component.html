@@ -622,37 +622,11 @@
       </div>
 
       <!-- ROW 3: Postos de Trabalho -->
-      <div class="card card-postos">
-        <h2 class="card-title">Postos de Trabalho ({{ postos().length }})</h2>
-        @if (postos().length === 0) {
-          <p class="empty-state">Nenhum posto de trabalho vinculado ainda.</p>
-        } @else {
-          <div class="table-wrapper">
-            <table class="postos-table">
-              <thead>
-                <tr>
-                  <th>Posto</th>
-                  <th>Alocações</th>
-                  <th>Capacidade Ideal Cliente</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (posto of postos(); track posto.id) {
-                  <tr>
-                    <td class="horario">{{ posto.nome }} - {{ posto.cidade }}</td>
-                    <td>{{ getAlocacoesPorPosto(posto.id) }}</td>
-                    <td>{{ contrato()!.quantidadeFuncionarios }}</td>
-                    <td>
-                      <a [routerLink]="['/postos', posto.id]" class="link-detail">Ver detalhes</a>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        }
-      </div>
+      <app-contrato-postos
+        [postos]="postos()"
+        [alocacoes]="alocacoes()"
+        [quantidadeFuncionarios]="contrato()?.quantidadeFuncionarios || 0">
+      </app-contrato-postos>
     </div>
   </div>
 </div>

@@ -22,6 +22,8 @@ import {
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { forkJoin } from 'rxjs';
 import { DiariaListComponent } from '../../diarias/diaria-list/diaria-list.component';
+import { ClientePostosComponent } from '../components/cliente-postos/cliente-postos.component';
+import { ClienteFuncionariosComponent } from '../components/cliente-funcionarios/cliente-funcionarios.component';
 
 type PeriodoAnalise = 'mensal' | 'trimestral' | 'semestral' | 'anual';
 
@@ -44,7 +46,7 @@ interface ClienteTagResumo {
 @Component({
   selector: 'app-cliente-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, DiariaListComponent],
+  imports: [CommonModule, RouterLink, FormsModule, DiariaListComponent, ClientePostosComponent, ClienteFuncionariosComponent],
   templateUrl: './cliente-detail.component.html',
   styleUrl: './cliente-detail.component.scss',
 })

@@ -14,8 +14,8 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
   };
 
   const testCliente = {
-    nome: 'Empresa Teste E2E',
-    cnpj: '06990590000123',
+    nome: `Empresa Teste E2E ${Date.now()}`,
+    cnpj: '', // Generated in before
     email: 'contato@empresateste.com',
     telefone: '1133334444',
     endereco: 'Rua Teste, 123',
@@ -50,6 +50,12 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
     margemCoberturaFaltasPercentual: 10,
   };
 
+  before(() => {
+    // Generate valid mock CNPJ
+    const n = Math.floor(Math.random() * 99999999999999);
+    testCliente.cnpj = n.toString().padStart(14, '0');
+  });
+
   beforeEach(() => {
     cy.visit(baseUrl);
     cy.clearCookies();
@@ -62,12 +68,12 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
       cy.visit(`${baseUrl}/cadastro`);
 
       // 2. Preencher formulário de registro
-      cy.get('[data-testid="register-name"]').type('Novo Usuário');
-      cy.get('[data-testid="register-email"]').type(testUser.email);
-      cy.get('[data-testid="register-password"]').type(testUser.password);
+      cy.get('[data-cy="register-name"]').type('Novo Usuário');
+      cy.get('[data-cy="register-email"]').type(testUser.email);
+      cy.get('[data-cy="register-password"]').type(testUser.password);
       
       // 3. Submeter formulário (campos confirm password e terms removidos pois não existem no componente)
-      cy.get('[data-testid="register-submit"]').click();
+      cy.get('[data-cy="register-submit"]').click();
 
       // 4. Verificar redirecionamento para dashboard
       cy.url().should('include', '/dashboard');
@@ -78,11 +84,11 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
       cy.visit(`${baseUrl}/login`);
 
       // 2. Preencher credenciais
-      cy.get('[data-testid="login-email"]').type(testUser.email);
-      cy.get('[data-testid="login-password"]').type(testUser.password);
+      cy.get('[data-cy="login-email"]').type(testUser.email);
+      cy.get('[data-cy="login-password"]').type(testUser.password);
 
       // 3. Submeter login
-      cy.get('[data-testid="login-submit"]').click();
+      cy.get('[data-cy="login-submit"]').click();
 
       // 4. Verificar sucesso e redirecionamento
       cy.url().should('include', '/dashboard');
@@ -111,13 +117,13 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
       cy.visit(`${baseUrl}/contratos`);
 
       // 2. Clicar em "Novo Contrato"
-      cy.get('[data-testid="btn-new-contrato"]').click();
+      cy.get('[data-cy="btn-new-contrato"]').click();
 
       // 3. Preencher dados básicos
-      cy.get('[data-testid="contrato-titulo"]').type(`${testContrato.titulo} ${Date.now()}`);
+      cy.get('[data-cy="contrato-titulo"]').type(`${testContrato.titulo} ${Date.now()}`);
       
       // 4. Submeter contrato
-      cy.get('[data-testid="btn-save-contrato"]').click();
+      cy.get('[data-cy="btn-save-contrato"]').click();
     });
   });
 });
