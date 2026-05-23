@@ -612,6 +612,7 @@ export class DiariaListComponent implements OnInit {
 
   clearHighlight(): void {
     this.highlightedFilter.set([]);
+    this.dismissError();
   }
 
   /** Alterna o highlight ao clicar em um item da legenda */
@@ -627,15 +628,28 @@ export class DiariaListComponent implements OnInit {
     } else {
       this.highlightedFilter.set([...current, filter]);
     }
+
+    // Verificar se existe algum match com a nova combinação
+    if (this.highlightedFilter().length > 0) {
+      const hasMatch = this.monthData().some(cell => this.isDayHighlighted(cell));
+      if (!hasMatch) {
+        this.error.set('Nenhuma diária encontrada para esta combinação de filtros na legenda.');
+        setTimeout(() => this.dismissError(), 5000);
+      } else {
+        this.dismissError();
+      }
+    } else {
+      this.dismissError();
+    }
   }
 
-  /** Retorna true se a célula deve ser destacada (contém uma diária que dá match com os filtros) */
+  /** Retorna true se a célula deve ser destacada (contém uma diária que dá match com TODOS os filtros) */
   isDayHighlighted(cell: DayCell): boolean {
     const filters = this.highlightedFilter();
     if (filters.length === 0) return false;
 
     return cell.diarias.some((diaria) => {
-      return filters.some((filter) => {
+      return filters.every((filter) => {
         switch (filter.type) {
           case 'funcionario':
             return diaria.funcionarioId === filter.id;
