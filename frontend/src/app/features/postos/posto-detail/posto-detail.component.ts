@@ -17,11 +17,14 @@ import {
   StatusDiaria,
   TipoDiaria,
 } from '../../../models/index';
+import { PostoAlocacoesComponent } from '../components/posto-alocacoes/posto-alocacoes.component';
+import { PostoMetricasComponent } from '../components/posto-metricas/posto-metricas.component';
+import { PostoTiposComponent } from '../components/posto-tipos/posto-tipos.component';
 
 @Component({
   selector: 'app-posto-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PostoAlocacoesComponent, PostoMetricasComponent, PostoTiposComponent],
   templateUrl: './posto-detail.component.html',
   styleUrl: './posto-detail.component.scss',
 })

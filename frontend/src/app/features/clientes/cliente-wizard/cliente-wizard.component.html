@@ -143,6 +143,7 @@
                   class="form-input"
                   [class.error]="hasError('nome')"
                   placeholder="Ex: Cliente Horizonte Verde"
+                  data-cy="wizard-cliente-nome"
                 />
                 @if (hasError('nome')) {
                   <span class="error-message">{{ getErrorMessage('nome') }}</span>
@@ -161,6 +162,7 @@
                   placeholder="00.000.000/0000-00"
                   mask="00.000.000/0000-00"
                   maxlength="18"
+                  data-cy="wizard-cliente-cnpj"
                 />
                 @if (hasError('cnpj')) {
                   <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
@@ -199,6 +201,7 @@
                   formControlName="estado"
                   class="form-input"
                   [class.error]="hasError('estado')"
+                  data-cy="wizard-cliente-estado"
                 >
                   <option value="">Selecione o estado</option>
                   @for (uf of estados(); track uf) {
@@ -220,6 +223,7 @@
                   class="form-input"
                   [class.error]="hasError('cidade')"
                   [disabled]="!formCliente.get('estado')?.value"
+                  data-cy="wizard-cliente-cidade"
                 >
                   <option value="">
                     {{
@@ -319,6 +323,7 @@
                   [class.error]="hasError('quantidadeIdealPorTurno')"
                   min="1"
                   max="10"
+                  data-cy="wizard-cliente-ideal"
                 />
                 @if (hasError('quantidadeIdealPorTurno')) {
                   <span class="error-message">Mínimo 1 e Máximo 10</span>
@@ -336,6 +341,7 @@
                   formControlName="horarioTrocaTurno"
                   class="form-input"
                   [class.error]="hasError('horarioTrocaTurno')"
+                  data-cy="wizard-cliente-horario"
                 />
                 @if (hasError('horarioTrocaTurno')) {
                   <span class="error-message">Campo obrigatório</span>
@@ -373,7 +379,7 @@
             <!-- Checkbox para habilitar criação do contrato -->
             <div class="form-group checkbox-group">
               <label class="checkbox-label">
-                <input type="checkbox" formControlName="criarContrato" class="checkbox-input" />
+                <input type="checkbox" formControlName="criarContrato" class="checkbox-input" data-cy="wizard-criar-contrato" />
                 <span class="checkbox-text">Criar contrato neste momento</span>
               </label>
               <span class="help-text">Você pode criar o contrato depois se preferir</span>
@@ -416,6 +422,7 @@
                     "
                     placeholder="Ex: 1"
                     min="1"
+                    data-cy="wizard-numero-postos"
                   />
                   @if (
                     formContrato.get('numeroPostos')?.invalid &&
@@ -439,7 +446,7 @@
 
               <div class="form-group checkbox-group modo-config-group">
                 <label class="checkbox-label">
-                  <input type="checkbox" formControlName="modoPersonalizado" class="checkbox-input" />
+                  <input type="checkbox" formControlName="modoPersonalizado" class="checkbox-input" data-cy="wizard-modo-personalizado" />
                   <span class="checkbox-text">Modo personalizado (edição manual)</span>
                 </label>
                 @if (!isModoPersonalizado()) {
@@ -507,7 +514,7 @@
                       <label class="form-label"
                         >Tipo de Posto <span class="required">*</span></label
                       >
-                      <select formControlName="tipoPosto" class="form-input">
+                      <select formControlName="tipoPosto" class="form-input" [attr.data-cy]="'wizard-posto-tipo-' + $index">
                         @for (opt of tipoPostoOptions; track opt.value) {
                           <option [value]="opt.value">{{ opt.label }}</option>
                         }
@@ -1692,11 +1699,12 @@
           class="btn-next"
           (click)="nextStep()"
           [disabled]="!canGoNext() || loading()"
+          data-cy="wizard-next-step"
         >
           Próximo →
         </button>
       } @else {
-        <button type="button" class="btn-finish" (click)="onSubmit()" [disabled]="loading()">
+        <button type="button" class="btn-finish" (click)="onSubmit()" [disabled]="loading()" data-cy="wizard-submit">
           @if (loading()) {
             <span class="spinner-small"></span>
             Criando...

@@ -87,150 +87,20 @@
     </header>
 
     <!-- Métricas Principais -->
-    <section class="metrics-section">
-      <h2 class="section-title">Métricas do Posto</h2>
-      <div class="metrics-grid">
-        <div class="metric-card highlight">
-          <div class="metric-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              />
-            </svg>
-          </div>
-          <div class="metric-content">
-            <span class="metric-label">Alocações (Turnos)</span>
-            <span class="metric-value primary">{{ alocacoes().length }}</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="metric-content">
-            <span class="metric-label">Total de Diárias</span>
-            <span class="metric-value">{{ totalDiarias() }}</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="metric-content">
-            <span class="metric-label">Confirmadas</span>
-            <span class="metric-value success">{{ diariasConfirmadas() }}</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="metric-content">
-            <span class="metric-label">Total de Faltas</span>
-            <span class="metric-value alert">{{ totalFaltas() }}</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="metric-content">
-            <span class="metric-label">Canceladas</span>
-            <span class="metric-value">{{ diariasCanceladas() }}</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="metric-content">
-            <span class="metric-label">Taxa de Presença</span>
-            <span class="metric-value">{{ taxaPresenca() | number: '1.1-1' }}%</span>
-          </div>
-        </div>
-      </div>
-    </section>
+    <app-posto-metricas
+      [alocacoesLength]="alocacoes().length"
+      [totalDiarias]="totalDiarias()"
+      [diariasConfirmadas]="diariasConfirmadas()"
+      [totalFaltas]="totalFaltas()"
+      [diariasCanceladas]="diariasCanceladas()"
+      [taxaPresenca]="taxaPresenca()">
+    </app-posto-metricas>
 
     <!-- Lista de Alocações -->
-    <section class="alocacoes-section" aria-labelledby="alocacoes-title">
-      <div class="section-header">
-        <h2 id="alocacoes-title" class="section-title">Turnos (Alocações)</h2>
-      </div>
-      <ul class="alocacoes-grid" role="list">
-        <li *ngFor="let aloc of alocacoes(); trackBy: trackAloc" class="alocacao-card" role="listitem">
-          <header class="alocacao-header">
-            <span class="horario" aria-label="Horário">{{ aloc.horarioInicio.substring(0,5) }} - {{ aloc.horarioFim.substring(0,5) }}</span>
-            <span class="escala-badge" aria-label="Tipo de escala">{{ aloc.tipoEscala }}</span>
-          </header>
-          <div class="alocacao-body">
-            <div class="info-item">
-              <span class="label">Noturno:</span>
-              <span class="value" aria-label="Horário noturno">{{ aloc.temHorarioNoturno ? 'Sim' : 'Não' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Permite Dobra:</span>
-              <span class="value" aria-label="Permite dobrar escala">{{ aloc.permiteDobrarEscala ? 'Sim' : 'Não' }}</span>
-            </div>
-          </div>
-        </li>
-        <li *ngIf="alocacoes().length === 0" class="empty-state" role="listitem">
-          <p>Nenhuma alocação (turno) cadastrada para este posto.</p>
-        </li>
-      </ul>
-    </section>
+    <app-posto-alocacoes [alocacoes]="alocacoes()"></app-posto-alocacoes>
 
     <!-- Diárias por Tipo -->
-    <section class="tipos-section">
-      <h2 class="section-title">Distribuição por Tipo</h2>
-      <div class="tipos-grid">
-        @for (item of diariasPorTipo(); track item.tipo) {
-          <div class="tipo-card">
-            <div class="tipo-icon">{{ item.icon }}</div>
-            <div class="tipo-content">
-              <span class="tipo-label">{{ item.tipo }}</span>
-              <span class="tipo-count">{{ item.count }}</span>
-            </div>
-          </div>
-        }
-      </div>
-    </section>
+    <app-posto-tipos [diariasPorTipo]="diariasPorTipo()"></app-posto-tipos>
 
     <!-- Ranking de Funcionários -->
     @if (rankingFuncionarios().length > 0) {

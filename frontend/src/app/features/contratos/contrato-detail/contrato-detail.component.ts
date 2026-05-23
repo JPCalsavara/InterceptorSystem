@@ -20,11 +20,12 @@ import {
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { DiariaService } from '../../../services/diaria.service';
 import { buildCalculoValorTotalInput } from '../../../shared/helpers/contrato-calculo.helper';
+import { ContratoPostosComponent } from '../components/contrato-postos/contrato-postos.component';
 
 @Component({
   selector: 'app-contrato-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ContratoPostosComponent],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',
 })

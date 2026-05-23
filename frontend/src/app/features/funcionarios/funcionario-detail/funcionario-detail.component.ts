@@ -18,11 +18,13 @@ import {
   TipoEscala,
 } from '../../../models/index';
 import { AlocacaoService } from '../../../services/alocacao.service';
+import { FuncionarioMetricasComponent } from '../components/funcionario-metricas/funcionario-metricas.component';
+import { FuncionarioPostosComponent } from '../components/funcionario-postos/funcionario-postos.component';
 
 @Component({
   selector: 'app-funcionario-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FuncionarioMetricasComponent, FuncionarioPostosComponent],
   templateUrl: './funcionario-detail.component.html',
   styleUrl: './funcionario-detail.component.scss',
 })
