@@ -20,6 +20,9 @@ import {
 import { AlocacaoService } from '../../../services/alocacao.service';
 
 type ViewMode = 'daily' | 'weekly' | 'monthly';
+type LegendHighlight =
+  | { type: 'funcionario'; id: string }
+  | { type: 'falta' | 'substituicao' | 'dobra' };
 
 interface DayCell {
   date: Date;
@@ -65,6 +68,7 @@ export class DiariaListComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
+  highlightedFilter = signal<LegendHighlight[]>([]);
   editingDiariaId = signal<string | null>(null);
 
   isCronogramaView = computed(() => this.router.url.startsWith('/cronograma'));
@@ -604,5 +608,134 @@ export class DiariaListComponent implements OnInit {
 
   getFeriadoNome(dateStr: string): string | null {
     return this.feriadosService.getFeriadoNome(dateStr);
+  }
+
+  clearHighlight(): void {
+    this.highlightedFilter.set([]);
+    this.dismissError();
+  }
+
+  /** Alterna o highlight ao clicar em um item da legenda */
+  toggleLegendHighlight(filter: LegendHighlight): void {
+    const current = this.highlightedFilter();
+    const index = current.findIndex((f) =>
+      f.type === filter.type &&
+      (f.type === 'funcionario' && filter.type === 'funcionario' ? f.id === filter.id : true)
+    );
+
+    if (index >= 0) {
+      this.highlightedFilter.set(current.filter((_, i) => i !== index));
+    } else {
+      this.highlightedFilter.set([...current, filter]);
+    }
+
+    // Verificar se existe algum match com a nova combinação
+    const filters = this.highlightedFilter();
+    if (filters.length > 0) {
+      const hasMatch = this.monthData().some(cell => this.isDayHighlighted(cell));
+      if (!hasMatch) {
+        // Tenta achar em outro mês
+        const matchDateStr = this.findMatchingDate(filters);
+        if (matchDateStr) {
+          const [year, month, day] = matchDateStr.split('-');
+          const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+          this.currentDate.set(newDate);
+          this.setViewMode(this.viewMode());
+          
+          this.successMessage.set(`Navegado automaticamente para ${this.getMonthName(newDate)} de ${year} onde a combinação existe.`);
+          setTimeout(() => this.dismissSuccess(), 5000);
+          this.dismissError();
+        } else {
+          this.error.set('Nenhuma diária encontrada para esta combinação em nenhum mês.');
+          setTimeout(() => this.dismissError(), 5000);
+        }
+      } else {
+        this.dismissError();
+      }
+    } else {
+      this.dismissError();
+    }
+  }
+
+  /** Procura em todas as diárias carregadas a data mais próxima do mês atual que satisfaça os filtros */
+  private findMatchingDate(filters: LegendHighlight[]): string | null {
+    const allDiarias = this.diariasFiltradas();
+    const diariasByDate = new Map<string, Diaria[]>();
+    
+    for (const d of allDiarias) {
+      if (!diariasByDate.has(d.data)) {
+        diariasByDate.set(d.data, []);
+      }
+      diariasByDate.get(d.data)!.push(d);
+    }
+
+    const currentMs = this.currentDate().getTime();
+    let closestDateStr: string | null = null;
+    let minDiff = Infinity;
+
+    for (const [dateStr, diariasOfDate] of diariasByDate.entries()) {
+      const isMatch = filters.every((filter) => {
+        return diariasOfDate.some((diaria) => {
+          switch (filter.type) {
+            case 'funcionario': return diaria.funcionarioId === filter.id;
+            case 'falta': return diaria.statusDiaria === 'FALTA_REGISTRADA';
+            case 'substituicao': return diaria.tipoDiaria === 'SUBSTITUICAO';
+            case 'dobra': return diaria.tipoDiaria === 'DOBRA_PROGRAMADA';
+            default: return false;
+          }
+        });
+      });
+
+      if (isMatch) {
+        const [year, month, day] = dateStr.split('-');
+        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const diff = Math.abs(dateObj.getTime() - currentMs);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestDateStr = dateStr;
+        }
+      }
+    }
+    return closestDateStr;
+  }
+
+  /** Retorna true se a célula deve ser destacada (contém diárias que dão match com TODOS os filtros selecionados) */
+  isDayHighlighted(cell: DayCell): boolean {
+    const filters = this.highlightedFilter();
+    if (filters.length === 0) return false;
+
+    // Para cada filtro selecionado, deve existir pelo menos uma diária neste dia que o satisfaça
+    return filters.every((filter) => {
+      return cell.diarias.some((diaria) => {
+        switch (filter.type) {
+          case 'funcionario':
+            return diaria.funcionarioId === filter.id;
+          case 'falta':
+            return diaria.statusDiaria === 'FALTA_REGISTRADA';
+          case 'substituicao':
+            return diaria.tipoDiaria === 'SUBSTITUICAO';
+          case 'dobra':
+            return diaria.tipoDiaria === 'DOBRA_PROGRAMADA';
+          default:
+            return false;
+        }
+      });
+    });
+  }
+
+  /** Retorna true se a célula deve ser opacificada (não pertence ao highlight ativo) */
+  isDayDimmed(cell: DayCell): boolean {
+    const filters = this.highlightedFilter();
+    if (filters.length === 0) return false;
+    return !this.isDayHighlighted(cell);
+  }
+
+  /** Retorna true se o item da legenda está selecionado */
+  isLegendItemActive(filter: LegendHighlight): boolean {
+    const current = this.highlightedFilter();
+    return current.some((f) =>
+      f.type === filter.type &&
+      (f.type === 'funcionario' && filter.type === 'funcionario' ? f.id === filter.id : true)
+    );
   }
 }

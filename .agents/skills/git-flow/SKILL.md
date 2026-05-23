@@ -1,6 +1,6 @@
 ---
 name: git-flow
-description: Automatiza o fluxo de trabalho do Git no repositório. Cria novas branches a partir da main de acordo com o tipo de tarefa, faz commits semânticos em lotes, sobe as alterações para o remoto e abre um Pull Request (via GitHub CLI) com descrição baseada nas tarefas concluídas.
+description: Automatiza o fluxo de trabalho do Git no repositório. Cria novas branches a partir da main de acordo com o tipo de tarefa, faz commits semânticos em lotes, sobe as alterações para o remoto, abre Pull Requests (podendo atribuir revisores automáticos como o Copilot) e realiza loops iterativos para ler comentários de PR e corrigi-los automaticamente.
 ---
 
 # Git Flow Skill
@@ -12,6 +12,7 @@ Esta skill orienta o assistente a conduzir o versionamento de ponta a ponta:
 - Realização de commits usando **Conventional Commits**.
 - Push para o repositório remoto.
 - Criação de Pull Requests (PRs) no GitHub.
+- Leitura e resolução iterativa de comentários de Pull Requests (ex: apontamentos do GitHub Copilot).
 
 Use esta skill para padronizar o ciclo de vida das suas alterações no repositório.
 
@@ -78,9 +79,34 @@ Quando o trabalho estiver concluído, os testes estiverem passando, e o usuário
    - Refatorado a enum de Status.
    " --base main
    ```
+   *Dica de Automação:* Se o usuário quiser o Copilot como revisor automático logo na criação, adicione a flag: `--reviewer copilot` (ou as labels padrão do repositório para engatilhar workflows de IA).
+   
    *Nota: Se o comando `gh` não estiver instalado ou não estiver autenticado, instrua o usuário com o link para abrir o PR pelo navegador, que geralmente é exibido na saída do `git push`.*
 
 ---
+
+## PASSO 4 — Auto-Resolução de Reviews de PR (Loop Interativo)
+
+Quando o usuário pedir para analisar/resolver os comentários de um PR aberto (como apontamentos do Copilot ou SonarQube):
+
+1. **Baixe os comentários e diffs do PR atual usando o CLI:**
+   ```bash
+   gh pr view --comments > pr_comments_temp.txt
+   ```
+2. **Analise o Feedback:** Leia o arquivo e verifique quais comentários requerem alterações no código.
+3. **Execute o Plano de Correção:** Altere os arquivos apontados, utilize a skill `bug-workflow` se as alterações forem muito complexas.
+4. **Commit e Push:**
+   ```bash
+   git add .
+   git commit -m "fix(review): aplica feedbacks de code review"
+   git push origin <nome-da-branch>
+   ```
+5. **Responda/Resolva a Thread:**
+   Utilize o GitHub CLI para adicionar comentários na PR sinalizando que o review foi atendido:
+   ```bash
+   gh pr comment --body "Resolvido no último commit."
+   ```
+6. Limpe o arquivo de log gerado no Passo 1.
 
 ## Regras Críticas
 
