@@ -20,6 +20,9 @@ import {
 import { AlocacaoService } from '../../../services/alocacao.service';
 
 type ViewMode = 'daily' | 'weekly' | 'monthly';
+type LegendHighlight =
+  | { type: 'funcionario'; id: string }
+  | { type: 'falta' | 'substituicao' | 'dobra' };
 
 interface DayCell {
   date: Date;
@@ -65,6 +68,7 @@ export class DiariaListComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
+  highlightedFilter = signal<LegendHighlight | null>(null);
   editingDiariaId = signal<string | null>(null);
 
   isCronogramaView = computed(() => this.router.url.startsWith('/cronograma'));
@@ -604,5 +608,45 @@ export class DiariaListComponent implements OnInit {
 
   getFeriadoNome(dateStr: string): string | null {
     return this.feriadosService.getFeriadoNome(dateStr);
+  }
+
+  /** Alterna o highlight ao clicar em um item da legenda */
+  toggleLegendHighlight(filter: LegendHighlight): void {
+    const current = this.highlightedFilter();
+    const isSame =
+      current !== null &&
+      current.type === filter.type &&
+      (filter.type === 'funcionario' && current.type === 'funcionario'
+        ? current.id === (filter as { type: 'funcionario'; id: string }).id
+        : true);
+    this.highlightedFilter.set(isSame ? null : filter);
+  }
+
+  /** Retorna true se a diária deve ser opacificada (não pertence ao highlight ativo) */
+  isHighlightDimmed(diaria: Diaria): boolean {
+    const filter = this.highlightedFilter();
+    if (!filter) return false;
+
+    switch (filter.type) {
+      case 'funcionario':
+        return diaria.funcionarioId !== filter.id;
+      case 'falta':
+        return diaria.statusDiaria !== 'FALTA_REGISTRADA';
+      case 'substituicao':
+        return diaria.tipoDiaria !== 'SUBSTITUICAO';
+      case 'dobra':
+        return diaria.tipoDiaria !== 'DOBRA_PROGRAMADA';
+    }
+  }
+
+  /** Retorna true se o item da legenda está selecionado */
+  isLegendItemActive(filter: LegendHighlight): boolean {
+    const current = this.highlightedFilter();
+    if (!current) return false;
+    if (current.type !== filter.type) return false;
+    if (filter.type === 'funcionario' && current.type === 'funcionario') {
+      return current.id === filter.id;
+    }
+    return true;
   }
 }

@@ -485,30 +485,61 @@
   <!-- Monthly View (Calendar) -->
   @if (!loading() && viewMode() === 'monthly') {
     <div class="monthly-view">
-      <!-- Legenda -->
-      <div class="legend">
-        <h3>Legenda de Funcionários</h3>
+         <div class="legend">
+        <div class="legend-header">
+          <h3>Legenda de Funcionários</h3>
+          @if (highlightedFilter()) {
+            <button class="legend-clear-btn" (click)="highlightedFilter.set(null)" title="Limpar destaque">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+              Limpar
+            </button>
+          }
+        </div>
         <div class="legend-items">
           @for (item of funcionariosLegenda(); track item.funcionario.id) {
-            <div class="legend-item">
-              <span class="legend-number" [ngClass]="getLegendColorClass(item.funcionario.id)">{{
-                item.number
-              }}</span>
+            <div
+              class="legend-item"
+              [class.legend-item--active]="isLegendItemActive({ type: 'funcionario', id: item.funcionario.id })"
+              (click)="toggleLegendHighlight({ type: 'funcionario', id: item.funcionario.id })"
+              title="Clique para destacar {{ item.funcionario.nome }}"
+              style="cursor: pointer"
+            >
+              <span class="legend-number" [ngClass]="getLegendColorClass(item.funcionario.id)">{{ item.number }}</span>
               <span class="legend-name">{{ item.funcionario.nome }}</span>
             </div>
           }
         </div>
 
         <div class="legend-special">
-          <div class="legend-item">
+          <div
+            class="legend-item"
+            [class.legend-item--active]="isLegendItemActive({ type: 'falta' })"
+            (click)="toggleLegendHighlight({ type: 'falta' })"
+            title="Clique para destacar Faltas"
+            style="cursor: pointer"
+          >
             <span class="legend-number emp-falta">F</span>
             <span class="legend-name">Falta</span>
           </div>
-          <div class="legend-item">
+          <div
+            class="legend-item"
+            [class.legend-item--active]="isLegendItemActive({ type: 'substituicao' })"
+            (click)="toggleLegendHighlight({ type: 'substituicao' })"
+            title="Clique para destacar Substituições"
+            style="cursor: pointer"
+          >
             <span class="legend-number emp-substituicao">S</span>
             <span class="legend-name">Substituição</span>
           </div>
-          <div class="legend-item">
+          <div
+            class="legend-item"
+            [class.legend-item--active]="isLegendItemActive({ type: 'dobra' })"
+            (click)="toggleLegendHighlight({ type: 'dobra' })"
+            title="Clique para destacar Diárias Extra"
+            style="cursor: pointer"
+          >
             <span class="legend-number emp-dobra">E</span>
             <span class="legend-name">Diária Extra</span>
           </div>
@@ -540,6 +571,8 @@
                     <span
                       class="funcionario-number"
                       [ngClass]="getDiariaMonthlyClass(diaria)"
+                      [class.dimmed]="isHighlightDimmed(diaria)"
+                      [class.highlighted]="highlightedFilter() !== null && !isHighlightDimmed(diaria)"
                       [title]="
                         getFuncionarioNome(diaria.funcionarioId) +
                         ' - ' +
