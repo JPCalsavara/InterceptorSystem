@@ -565,6 +565,7 @@
               [ngClass]="getDayCellClasses(cell)"
               [class.dimmed]="isDayDimmed(cell)"
               [class.highlighted]="isDayHighlighted(cell)"
+              [class.is-today]="cell.dateStr === getToday()"
             >
               <div class="cell-date" [title]="getFeriadoNome(cell.dateStr) ?? ''">
                 {{ cell.date.getDate() }}

@@ -685,6 +685,23 @@
       position: relative;
     }
 
+    &.is-today {
+      border: 1px solid var(--primary-color);
+      background: color-mix(in srgb, var(--primary-color) 5%, var(--bg-secondary));
+
+      .cell-date {
+        color: white;
+        background: var(--primary-color);
+        border-radius: 50%;
+        width: 1.75rem;
+        height: 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.25rem;
+      }
+    }
+
     .cell-date {
       font-weight: 600;
       color: var(--text-primary);
