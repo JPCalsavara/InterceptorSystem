@@ -630,17 +630,73 @@ export class DiariaListComponent implements OnInit {
     }
 
     // Verificar se existe algum match com a nova combinação
-    if (this.highlightedFilter().length > 0) {
+    const filters = this.highlightedFilter();
+    if (filters.length > 0) {
       const hasMatch = this.monthData().some(cell => this.isDayHighlighted(cell));
       if (!hasMatch) {
-        this.error.set('Nenhuma diária encontrada para esta combinação de filtros na legenda.');
-        setTimeout(() => this.dismissError(), 5000);
+        // Tenta achar em outro mês
+        const matchDateStr = this.findMatchingDate(filters);
+        if (matchDateStr) {
+          const [year, month, day] = matchDateStr.split('-');
+          const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+          this.currentDate.set(newDate);
+          this.setViewMode(this.viewMode());
+          
+          this.successMessage.set(`Navegado automaticamente para ${this.getMonthName(newDate)} de ${year} onde a combinação existe.`);
+          setTimeout(() => this.dismissSuccess(), 5000);
+          this.dismissError();
+        } else {
+          this.error.set('Nenhuma diária encontrada para esta combinação em nenhum mês.');
+          setTimeout(() => this.dismissError(), 5000);
+        }
       } else {
         this.dismissError();
       }
     } else {
       this.dismissError();
     }
+  }
+
+  /** Procura em todas as diárias carregadas a data mais próxima do mês atual que satisfaça os filtros */
+  private findMatchingDate(filters: LegendHighlight[]): string | null {
+    const allDiarias = this.diariasFiltradas();
+    const diariasByDate = new Map<string, Diaria[]>();
+    
+    for (const d of allDiarias) {
+      if (!diariasByDate.has(d.data)) {
+        diariasByDate.set(d.data, []);
+      }
+      diariasByDate.get(d.data)!.push(d);
+    }
+
+    const currentMs = this.currentDate().getTime();
+    let closestDateStr: string | null = null;
+    let minDiff = Infinity;
+
+    for (const [dateStr, diariasOfDate] of diariasByDate.entries()) {
+      const isMatch = filters.every((filter) => {
+        return diariasOfDate.some((diaria) => {
+          switch (filter.type) {
+            case 'funcionario': return diaria.funcionarioId === filter.id;
+            case 'falta': return diaria.statusDiaria === 'FALTA_REGISTRADA';
+            case 'substituicao': return diaria.tipoDiaria === 'SUBSTITUICAO';
+            case 'dobra': return diaria.tipoDiaria === 'DOBRA_PROGRAMADA';
+            default: return false;
+          }
+        });
+      });
+
+      if (isMatch) {
+        const [year, month, day] = dateStr.split('-');
+        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const diff = Math.abs(dateObj.getTime() - currentMs);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestDateStr = dateStr;
+        }
+      }
+    }
+    return closestDateStr;
   }
 
   /** Retorna true se a célula deve ser destacada (contém diárias que dão match com TODOS os filtros selecionados) */
