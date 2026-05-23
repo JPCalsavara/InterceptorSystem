@@ -68,7 +68,7 @@ export class DiariaListComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
-  highlightedFilter = signal<LegendHighlight | null>(null);
+  highlightedFilter = signal<LegendHighlight[]>([]);
   editingDiariaId = signal<string | null>(null);
 
   isCronogramaView = computed(() => this.router.url.startsWith('/cronograma'));
@@ -610,43 +610,61 @@ export class DiariaListComponent implements OnInit {
     return this.feriadosService.getFeriadoNome(dateStr);
   }
 
+  clearHighlight(): void {
+    this.highlightedFilter.set([]);
+  }
+
   /** Alterna o highlight ao clicar em um item da legenda */
   toggleLegendHighlight(filter: LegendHighlight): void {
     const current = this.highlightedFilter();
-    const isSame =
-      current !== null &&
-      current.type === filter.type &&
-      (filter.type === 'funcionario' && current.type === 'funcionario'
-        ? current.id === (filter as { type: 'funcionario'; id: string }).id
-        : true);
-    this.highlightedFilter.set(isSame ? null : filter);
+    const index = current.findIndex((f) =>
+      f.type === filter.type &&
+      (f.type === 'funcionario' && filter.type === 'funcionario' ? f.id === filter.id : true)
+    );
+
+    if (index >= 0) {
+      this.highlightedFilter.set(current.filter((_, i) => i !== index));
+    } else {
+      this.highlightedFilter.set([...current, filter]);
+    }
   }
 
-  /** Retorna true se a diária deve ser opacificada (não pertence ao highlight ativo) */
-  isHighlightDimmed(diaria: Diaria): boolean {
-    const filter = this.highlightedFilter();
-    if (!filter) return false;
+  /** Retorna true se a célula deve ser destacada (contém uma diária que dá match com os filtros) */
+  isDayHighlighted(cell: DayCell): boolean {
+    const filters = this.highlightedFilter();
+    if (filters.length === 0) return false;
 
-    switch (filter.type) {
-      case 'funcionario':
-        return diaria.funcionarioId !== filter.id;
-      case 'falta':
-        return diaria.statusDiaria !== 'FALTA_REGISTRADA';
-      case 'substituicao':
-        return diaria.tipoDiaria !== 'SUBSTITUICAO';
-      case 'dobra':
-        return diaria.tipoDiaria !== 'DOBRA_PROGRAMADA';
-    }
+    return cell.diarias.some((diaria) => {
+      return filters.some((filter) => {
+        switch (filter.type) {
+          case 'funcionario':
+            return diaria.funcionarioId === filter.id;
+          case 'falta':
+            return diaria.statusDiaria === 'FALTA_REGISTRADA';
+          case 'substituicao':
+            return diaria.tipoDiaria === 'SUBSTITUICAO';
+          case 'dobra':
+            return diaria.tipoDiaria === 'DOBRA_PROGRAMADA';
+          default:
+            return false;
+        }
+      });
+    });
+  }
+
+  /** Retorna true se a célula deve ser opacificada (não pertence ao highlight ativo) */
+  isDayDimmed(cell: DayCell): boolean {
+    const filters = this.highlightedFilter();
+    if (filters.length === 0) return false;
+    return !this.isDayHighlighted(cell);
   }
 
   /** Retorna true se o item da legenda está selecionado */
   isLegendItemActive(filter: LegendHighlight): boolean {
     const current = this.highlightedFilter();
-    if (!current) return false;
-    if (current.type !== filter.type) return false;
-    if (filter.type === 'funcionario' && current.type === 'funcionario') {
-      return current.id === filter.id;
-    }
-    return true;
+    return current.some((f) =>
+      f.type === filter.type &&
+      (f.type === 'funcionario' && filter.type === 'funcionario' ? f.id === filter.id : true)
+    );
   }
 }

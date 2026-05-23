@@ -670,6 +670,21 @@
       background: color-mix(in srgb, var(--warning-color) 18%, var(--bg-secondary));
     }
 
+    // Estado dimmed: opacidade baixa para os dias que não tem a pessoa/tipo quando tem highlight ativo
+    &.dimmed {
+      opacity: 0.3;
+      filter: saturate(0.2);
+    }
+
+    // Estado highlighted: destaque visual do dia que tem a pessoa/tipo filtrado
+    &.highlighted {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-color), 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: scale(1.03);
+      z-index: 2;
+      position: relative;
+    }
+
     .cell-date {
       font-weight: 600;
       color: var(--text-primary);
@@ -698,26 +713,6 @@
       &:hover {
         transform: scale(1.2);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      }
-
-      // Estado dimmed: opacidade baixa quando outro filtro está ativo
-      &.dimmed {
-        opacity: 0.15;
-        filter: saturate(0.2);
-        transform: scale(0.9);
-        pointer-events: none;
-      }
-
-      // Estado highlighted: destaque visual quando pertence ao filtro
-      &.highlighted {
-        transform: scale(1.15);
-        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor, 0 4px 10px rgba(0, 0, 0, 0.25);
-        z-index: 1;
-        position: relative;
-      }
-
-      &.highlighted:hover {
-        transform: scale(1.25);
       }
     }
   }
