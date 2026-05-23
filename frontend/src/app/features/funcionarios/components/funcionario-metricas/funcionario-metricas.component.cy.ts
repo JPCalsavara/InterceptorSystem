@@ -21,6 +21,6 @@ describe('FuncionarioMetricasComponent', () => {
     cy.get('.metric-card').should('have.length', 9);
     cy.get('.metric-value').contains('10');
     cy.get('.metric-value').contains('8');
-    cy.get('.metric-value').contains('80,0%');
+    cy.get('.metric-value').contains('80.0%');
   });
 });

@@ -17,6 +17,6 @@ describe('PostoMetricasComponent', () => {
     cy.get('.metric-value').contains('5');
     cy.get('.metric-value').contains('100');
     cy.get('.metric-value').contains('90');
-    cy.get('.metric-value').contains('90,0%');
+    cy.get('.metric-value').contains('90.0%');
   });
 });
