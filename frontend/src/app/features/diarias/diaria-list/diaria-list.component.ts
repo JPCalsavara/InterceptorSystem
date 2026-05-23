@@ -643,13 +643,14 @@ export class DiariaListComponent implements OnInit {
     }
   }
 
-  /** Retorna true se a célula deve ser destacada (contém uma diária que dá match com TODOS os filtros) */
+  /** Retorna true se a célula deve ser destacada (contém diárias que dão match com TODOS os filtros selecionados) */
   isDayHighlighted(cell: DayCell): boolean {
     const filters = this.highlightedFilter();
     if (filters.length === 0) return false;
 
-    return cell.diarias.some((diaria) => {
-      return filters.every((filter) => {
+    // Para cada filtro selecionado, deve existir pelo menos uma diária neste dia que o satisfaça
+    return filters.every((filter) => {
+      return cell.diarias.some((diaria) => {
         switch (filter.type) {
           case 'funcionario':
             return diaria.funcionarioId === filter.id;
