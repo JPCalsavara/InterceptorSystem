@@ -84,7 +84,9 @@ describe('InterceptorSystem E2E - Full CRUD & Deleção Cascata', () => {
       
       cy.intercept('POST', '**/api/auth/registrar').as('registerReq');
       cy.get('[data-cy="register-submit"]').click({ force: true });
-      cy.wait('@registerReq', { timeout: 10000 });
+      cy.wait('@registerReq', { timeout: 10000 }).then((int) => {
+        expect(int.response?.statusCode).to.be.oneOf([200, 201]);
+      });
 
       // Logar
       cy.visit(`${baseUrl}/login`);
@@ -236,6 +238,9 @@ describe('InterceptorSystem E2E - Full CRUD & Deleção Cascata', () => {
       });
       
       cy.wait('@deleteCliente').then((int) => {
+        if (int.response?.statusCode === 409) {
+           throw new Error('DELETE CLIENTE FAILED WITH 409! Response: ' + JSON.stringify(int.response?.body));
+        }
         expect(int.response?.statusCode).to.be.oneOf([200, 204]);
       });
       cy.contains('.card', testCliente.nome).should('not.exist');
