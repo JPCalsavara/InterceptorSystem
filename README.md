@@ -707,13 +707,16 @@ InterceptorSystem/
 ## 🧪 Testes
 
 ```bash
-# Todos os testes
+# Backend
 cd backend/src
 dotnet test
-# Apenas unitários
 dotnet test --filter "Category=Unit"
-# Apenas integração
-dotnet test --filter "Category=Integration"
+
+# Frontend (Testes Unitários / Componentes / E2E)
+cd frontend
+npm run test:ci       # Unitários via Vitest
+npm run test:component # Componentes UI (Cypress)
+npm run test:e2e      # Jornadas Críticas (Cypress E2E)
 ```
 
 | Módulo            | Testes Unitários | Testes de Integração |

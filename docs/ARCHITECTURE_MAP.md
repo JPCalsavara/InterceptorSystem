@@ -50,5 +50,7 @@ O frontend adota arquitetura baseada em features e Single-File Components. Local
 
 ## 3. Diretrizes Mestre do Sistema
 1. **Multi-Tenant System:** Tudo roda em volta da `EmpresaId`. O Frontend manda o JWT, o Interceptor do backend pega o `EmpresaId`, e o `AppDbContext` injeta isso silenciosamente nas queries e inserts. Nunca confie no `EmpresaId` vindo no corpo do Request HTTP.
-2. **Test Driven:** Se criou feature nova, precisa criar testes Cypress Component (para o UI/Responsivo) e xUnit (para cobrir 3 fluxos do Backend: Good, Edge, Bad).
+2. **Test Driven e E2E:** Se criou feature nova, precisa criar testes: 
+   - **Frontend:** Vitest para lógica, Cypress Component para UI isolada, e Cypress E2E (em `src/e2e/`) para validar a jornada completa (ex: full-crud-journey).
+   - **Backend:** xUnit para cobrir 3 fluxos: Good, Edge, Bad.
 3. **Falhas no Backend:** Erros sobem do Domínio como `DomainException`. O Middleware as pega e transforma em 400 com um JSON padronizado. O Frontend intercepta esse 400 e mostra um Toast bonitinho para o usuário.
