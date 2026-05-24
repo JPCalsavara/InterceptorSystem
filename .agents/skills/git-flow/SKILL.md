@@ -77,36 +77,39 @@ Quando o trabalho estiver concluído, os testes estiverem passando, e o usuário
    ## Alterações
    - Implementado debounce para evitar HTTP Flood.
    - Refatorado a enum de Status.
-   " --base main
+   " --base main --reviewer copilot
    ```
-   *Dica de Automação:* Se o usuário quiser o Copilot como revisor automático logo na criação, adicione a flag: `--reviewer copilot` (ou as labels padrão do repositório para engatilhar workflows de IA).
+   *(Sempre adicione o Copilot como reviewer usando `--reviewer copilot`, ou as labels padrão, para iniciar a revisão da IA).*
    
-   *Nota: Se o comando `gh` não estiver instalado ou não estiver autenticado, instrua o usuário com o link para abrir o PR pelo navegador, que geralmente é exibido na saída do `git push`.*
+   *Após a criação do PR, NÃO aguarde o usuário pedir: prossiga imediatamente e de forma autônoma para o PASSO 4, aguardando alguns segundos para que o Copilot gere os comentários.*
 
 ---
 
-## PASSO 4 — Auto-Resolução de Reviews de PR (Loop Interativo)
+## PASSO 4 — Auto-Resolução de Reviews de PR do Copilot (Loop Interativo)
 
-Quando o usuário pedir para analisar/resolver os comentários de um PR aberto (como apontamentos do Copilot ou SonarQube):
+Após abrir o PR e designar o Copilot, execute esta rotina autônoma de análise e resposta:
 
 1. **Baixe os comentários e diffs do PR atual usando o CLI:**
    ```bash
    gh pr view --comments > pr_comments_temp.txt
    ```
-2. **Analise o Feedback:** Leia o arquivo e verifique quais comentários requerem alterações no código.
-3. **Execute o Plano de Correção:** Altere os arquivos apontados, utilize a skill `bug-workflow` se as alterações forem muito complexas.
-4. **Commit e Push:**
+   *(Se o arquivo estiver vazio, aguarde 15-30 segundos e tente de novo, pois o Copilot demora um pouco para gerar os reviews).*
+2. **Avaliação Crítica do Feedback:** Leia o arquivo com atenção. Para cada sugestão do Copilot, julgue de forma autônoma se ela é **boa** ou **ruim** com base no contexto do projeto (ex: se ele sugere algo que fere a Clean Architecture, rejeite).
+3. **Execute o Plano de Correção:** Altere o código apenas para os comentários que julgar pertinentes e úteis.
+4. **Commit e Push das Correções:**
    ```bash
    git add .
-   git commit -m "fix(review): aplica feedbacks de code review"
+   git commit -m "fix(review): aplica melhorias sugeridas pelo code review"
    git push origin <nome-da-branch>
    ```
 5. **Responda/Resolva a Thread:**
-   Utilize o GitHub CLI para adicionar comentários na PR sinalizando que o review foi atendido:
+   Utilize o GitHub CLI para responder ao PR, **argumentando claramente** o que você fez para cada apontamento. Se aceitou a sugestão, diga o que alterou. Se rejeitou, explique o motivo técnico da recusa.
    ```bash
-   gh pr comment --body "Resolvido no último commit."
+   gh pr comment --body "### Resolução do Code Review
+   - **Comentário X:** Sugestão aceita. Adicionei o tratamento de nulidade.
+   - **Comentário Y:** Sugestão ignorada. A implementação sugerida quebra o contrato da interface \`IPort\` na Clean Architecture."
    ```
-6. Limpe o arquivo de log gerado no Passo 1.
+6. Limpe o arquivo de log gerado no Passo 1 (`rm pr_comments_temp.txt`).
 
 ## Regras Críticas
 
