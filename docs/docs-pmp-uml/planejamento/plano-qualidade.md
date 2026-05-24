@@ -30,7 +30,7 @@ Definir criterios de qualidade para produto e documentacao, sustentados por test
 
 ### 3.1 Baselines de qualidade observaveis
 
-- Baseline de testes automatizados informado no README: 204 testes (Backend) + >80 testes Frontend + Cypress
+- Baseline de cobertura validado via relatórios gerados automaticamente no CI (Backend + Frontend + Cypress)
 - Gate de CI: build backend + build frontend + docker build
 - Contratos de API validados por testes de integracao dos controllers
 
