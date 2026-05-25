@@ -58,6 +58,7 @@ docker compose up -d
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Testes](#-testes)
 - [Endpoints da API](#-endpoints-da-api)
+- [AI Service (Python)](#-ai-service-python)
 - [Próximos Passos](#️-próximos-passos)
 
 ---
@@ -77,6 +78,12 @@ docker compose up -d
 - **Gestão de contas SaaS** com planos de assinatura (FREE, BASIC, PRO)
 - **Notificações por e-mail** via SMTP (MailKit) — verificação, reset de senha, alteração de e-mail
 - **Integração WhatsApp** via Meta API — chatbot para substituição de diárias
+
+### AI Service (Python)
+
+- **Suporte Humanizado**: Recebe mensagens livres do WhatsApp e processa respostas via IA.
+- **RAG com LangChain**: Arquitetura pronta usando Google Gemini/OpenAI e banco vetorial ChromaDB.
+- **Isolamento de Processamento**: Container Python FastAPI que não bloqueia o fluxo transacional do backend C#.
 
 ### Frontend
 
@@ -663,6 +670,13 @@ InterceptorSystem/
 │       └── InterceptorSystem.Tests/
 │           ├── Unity/                 → Testes unitários por serviço
 │           └── Integration/           → WebApplicationFactory + PostgreSQL
+│
+├── ai-service/
+│   ├── core/                  → config.py (Pydantic Settings)
+│   ├── routers/               → support.py (Endpoints da API)
+│   ├── services/              → llm_service.py (Integração LangChain/Gemini)
+│   ├── main.py                → Ponto de entrada FastAPI
+│   └── requirements.txt       → Dependências (pip)
 │
 ├── frontend/
 │   ├── src/app/
