@@ -1,10 +1,11 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    openai_api_key: str = "sk-mock-key"
-    model_name: str = "gpt-4o-mini"
+    gemini_api_key: str = "mock-key"
+    model_name: str = "gemini-1.5-flash"
     
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()
