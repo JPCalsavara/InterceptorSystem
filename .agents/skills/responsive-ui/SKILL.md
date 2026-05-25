@@ -30,3 +30,12 @@ When building or reviewing frontend UI components, apply these responsive design
 ## 6. Testing Responsive Design
 - Always inspect the component in browser dev tools simulating mobile devices (like iPhone 12/13 or Pixel).
 - Verify that no horizontal scrolling occurs un-intentionally (`overflow-x: hidden` on body or containers often helps).
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.
+
+## Regras Críticas (Guardrails)
+- O output deve seguir os padrões arquiteturais de Clean Architecture, Single-File Components (no frontend) e Fail-Fast (no backend).
+- Mantenha o escopo isolado da tarefa.

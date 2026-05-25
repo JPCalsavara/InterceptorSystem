@@ -89,27 +89,25 @@ Quando o trabalho estiver concluído, os testes estiverem passando, e o usuário
 
 Após abrir o PR e designar o Copilot, execute esta rotina autônoma de análise e resposta:
 
-1. **Baixe os comentários e diffs do PR atual usando o CLI:**
-   ```bash
-   gh pr view --comments > pr_comments_temp.txt
-   ```
-   *(Se o arquivo estiver vazio, aguarde 15-30 segundos e tente de novo, pois o Copilot demora um pouco para gerar os reviews).*
-2. **Avaliação Crítica do Feedback:** Leia o arquivo com atenção. Para cada sugestão do Copilot, julgue de forma autônoma se ela é **boa** ou **ruim** com base no contexto do projeto (ex: se ele sugere algo que fere a Clean Architecture, rejeite).
-3. **Execute o Plano de Correção:** Altere o código apenas para os comentários que julgar pertinentes e úteis.
-4. **Commit e Push das Correções:**
+1. **Baixe os comentários e diffs do PR atual usando o CLI:** (ex: `gh api repos/{owner}/{repo}/pulls/{number}/comments`)
+2. **Avaliação Crítica e Resolução:** 
+   - Leia os comentários de revisão. Se eles indicarem problemas no código, lógicas erradas, bugs ou melhorias necessárias, **acione imediatamente a skill `bug-workflow`** para planejar e realizar a correção iterativa.
+   - Forneça os comentários do PR como contexto para o `bug-workflow`.
+3. **Commit e Push das Correções:**
+   - Após o `bug-workflow` terminar e as correções passarem, adicione e faça commit das alterações:
    ```bash
    git add .
-   git commit -m "fix(review): aplica melhorias sugeridas pelo code review"
+   git commit -m "fix(review): aplica melhorias sugeridas pelo code review do copilot"
    git push origin <nome-da-branch>
    ```
-5. **Responda/Resolva a Thread:**
-   Utilize o GitHub CLI para responder ao PR, **argumentando claramente** o que você fez para cada apontamento. Se aceitou a sugestão, diga o que alterou. Se rejeitou, explique o motivo técnico da recusa.
+4. **Responda/Resolva a Thread:**
+   - Como padrão **obrigatório**, utilize o GitHub CLI para adicionar um comentário no PR explicando detalhadamente o que você fez em resposta ao review.
+   - Resuma as ações tomadas com base no bot (ex: quais arquivos foram excluídos, lógicas corrigidas ou rejeitadas).
    ```bash
-   gh pr comment --body "### Resolução do Code Review
-   - **Comentário X:** Sugestão aceita. Adicionei o tratamento de nulidade.
-   - **Comentário Y:** Sugestão ignorada. A implementação sugerida quebra o contrato da interface \`IPort\` na Clean Architecture."
+   gh pr comment <number> --body "### Resolução do Code Review
+   - **Problema X:** Sugestão aceita e corrigida usando bug-workflow.
+   - **Problema Y:** Falso positivo, mantido o código original justificando o motivo técnico na issue."
    ```
-6. Limpe o arquivo de log gerado no Passo 1 (`rm pr_comments_temp.txt`).
 
 ## Regras Críticas
 
@@ -120,4 +118,9 @@ Antes de commitar, sempre confira se você não está incluindo arquivos tempor�
 Sempre verifique se a \`main\` está atualizada antes de derivar uma nova branch, para evitar resolver conflitos com históricos desatualizados.
 
 ### ⚠️ Validação antes do PR
-A skill \`git-flow\` trabalha em conjunto com a \`execute\`. Certifique-se de que os testes locais (`dotnet test` e `ng build`) passaram antes de sugerir ou automatizar a abertura do PR.
+A skill \`git-flow\` trabalha em conjunto com os workflows de desenvolvimento específicos (ex: \`bounded-context-workflow\`). Certifique-se de que os testes locais (`dotnet test` e `ng build`) passaram antes de sugerir ou automatizar a abertura do PR.
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.

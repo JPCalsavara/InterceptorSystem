@@ -37,3 +37,12 @@ Sempre que o usuário pedir um novo endpoint, você é obrigado a gerar ou atual
 ## 6. Validação do Fluxo
 - Se você criar a Entidade, mas não mapear no `AppDbContext` (DbSet e Configurations), a task **não está finalizada**.
 - Use a skill **generate-tests** na sequência para garantir cobertura.
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.
+
+## Regras Críticas (Guardrails)
+- O output deve seguir os padrões arquiteturais de Clean Architecture, Single-File Components (no frontend) e Fail-Fast (no backend).
+- Mantenha o escopo isolado da tarefa.

@@ -32,3 +32,12 @@ Follow these InterceptorSystem guidelines when creating Angular UI elements. We 
 - Gerencie estados de UI explicitamente (`isLoading`, `hasError`).
 - Mostre Skeleton Loaders ou Spinners enquanto dados chegam via Service.
 - Trate erros de API exibindo feedback amigável pro usuário (Toast/Snackbar).
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.
+
+## Regras Críticas (Guardrails)
+- O output deve seguir os padrões arquiteturais de Clean Architecture, Single-File Components (no frontend) e Fail-Fast (no backend).
+- Mantenha o escopo isolado da tarefa.

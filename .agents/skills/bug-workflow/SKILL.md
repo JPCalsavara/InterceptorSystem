@@ -99,3 +99,8 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
 1. **Pense antes de codar:** Em bugs, ler logs e mapear dependências demora mais que escrever código. Não pule a Fase 1.
 2. **Reprodução é a Prova:** A ausência de falha não garante que o bug foi corrigido, por isso a Fase 2 (Test First) é mandatória sempre que for tecnicamente possível.
 3. **Limite as saídas (Logs Curtos):** Ao testar ou compilar, NUNCA puxe o output inteiro pro seu contexto. Jogue os logs de erro num `.log` temporário, leia, anote o principal no `findings.md` e apague o log em seguida.
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.
