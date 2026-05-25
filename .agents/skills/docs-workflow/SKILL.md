@@ -55,3 +55,8 @@ Sempre que invocado para atualizar documentos, siga estas fases:
 ## Regras Críticas para Documentação
 1. **Mantenha a Formatação:** Ao substituir texto, tenha o máximo cuidado para não destruir a estrutura de tabelas Markdown ou quebrar links internos existentes.
 2. **Glossário e Contexto:** Lembre-se do contexto global de negócio da aplicação (ex: Nomes de clientes, siglas corporativas/universitárias) e **nunca** invente regras que não estejam alinhadas ao que foi validado com os Stakeholders.
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.

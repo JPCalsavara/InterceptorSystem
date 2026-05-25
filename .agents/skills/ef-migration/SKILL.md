@@ -66,3 +66,12 @@ dotnet ef migrations list \
 
 - After moving entities to `BoundedContexts/` folder, verify the generated migration does NOT include any `RenameTable` operations — EF uses `ToTable("Clientes")` from the configuration, which doesn't change when namespaces change.
 - If an unexpected `RenameTable` appears, check that `builder.ToTable(...)` is still present in the `IEntityTypeConfiguration`.
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.
+
+## Regras Críticas (Guardrails)
+- O output deve seguir os padrões arquiteturais de Clean Architecture, Single-File Components (no frontend) e Fail-Fast (no backend).
+- Mantenha o escopo isolado da tarefa.

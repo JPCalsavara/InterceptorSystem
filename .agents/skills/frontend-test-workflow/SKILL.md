@@ -1,5 +1,5 @@
 ---
-name: cypress-workflow
+name: frontend-test-workflow
 description: Orquestra o ciclo completo de criação e atualização de testes de Frontend (E2E e Componentes) usando Cypress. Passa pelas fases de Análise da UI, Planejamento (task_plan.md), Escrita iterativa dos testes, Validação (Cypress Headless), Versionamento e Code Review.
 ---
 
@@ -63,3 +63,8 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
 1. **Seletores Resilientes:** Use SEMPRE `cy.get('[data-cy="nome"]')`. Se não existir, edite o HTML para adicionar. Evite ao máximo testar acoplado a texto `cy.contains()` a menos que o texto seja a regra vital.
 2. **Aliases e Esperas:** Utilize `cy.intercept('GET', '/api/rota').as('getNome')` e `cy.wait('@getNome')` ao invés de usar esperas hardcoded arbitrárias tipo `cy.wait(3000)`.
 3. **Respeito ao Token (Token Efficiency):** NUNCA faça dump do log do Cypress no chat. Sempre leia as linhas de erro de dentro do arquivo redirecionado temporário.
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.

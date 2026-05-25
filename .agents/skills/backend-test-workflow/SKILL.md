@@ -1,5 +1,5 @@
 ---
-name: generate-tests
+name: backend-test-workflow
 description: Automatically generates Unit, Component, and E2E tests for both Backend (C#) and Frontend (Angular/Cypress) enforcing project standards and visual responsiveness.
 ---
 
@@ -50,3 +50,12 @@ Regras estritas para testes do .NET:
 - **AppServices**: São o alvo primário de testes de escrita/orquestração. Teste o Sucesso, o Not Found (lança KeyNotFoundException) e a Violação de Domínio (lança DomainException).
 - **Domain Entities & Value Objects**: Garanta que as mudanças de estado ocorram apenas por métodos comportamentais (ex: `AtualizarDados()`). Teste se entradas ruins (ex: CPF com 10 dígitos) disparam erro no VO imediatamente.
 - **Domain Events**: Sempre teste se a entidade emitiu o evento correto após uma ação importante (ex: `Assert.IsType<ClienteCreatedEvent>(cliente.DomainEvents.First());`).
+
+## Integrações
+- Delega commits e PRs para o **git-flow**.
+- Delega tratativas de erro para o **bug-workflow**.
+- (Se aplicável) Delega testes para **backend-test-workflow** ou **frontend-test-workflow**.
+
+## Regras Críticas (Guardrails)
+- O output deve seguir os padrões arquiteturais de Clean Architecture, Single-File Components (no frontend) e Fail-Fast (no backend).
+- Mantenha o escopo isolado da tarefa.
