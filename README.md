@@ -707,13 +707,18 @@ InterceptorSystem/
 ## 🧪 Testes
 
 ```bash
-# Todos os testes
+# Backend
 cd backend/src
 dotnet test
-# Apenas unitários
 dotnet test --filter "Category=Unit"
-# Apenas integração
-dotnet test --filter "Category=Integration"
+
+# Frontend (Testes Unitários / Componentes / E2E)
+cd frontend
+npm run test:ci       # Unitários via Vitest
+npm run test:component # Componentes UI (Cypress)
+
+# Nota: Para os testes E2E, garanta que a API e o Frontend (localhost:4200) estejam rodando:
+npm run test:e2e      # Jornadas Críticas (Cypress E2E)
 ```
 
 | Módulo            | Testes Unitários | Testes de Integração |
@@ -731,7 +736,9 @@ dotnet test --filter "Category=Integration"
 | Alocação | ✅ | ✅ |
 | WhatsApp Bot | ✅ | ✅ |
 
-## **Total: 204 testes automatizados (100% passando)**
+## **Total de Testes (Aproximação via CI)**
+- **Backend:** +200 testes automatizados
+- **Frontend:** Cobertura de componentes + E2E integrados ao fluxo CI
 
 ---
 

@@ -36,8 +36,9 @@ Inclui os dominios e funcionalidades em operacao:
 - Novo container Python no ambiente de infraestrutura para servicos auxiliares (pipeline de IA/visao e processamento de dados)
 - Novo caso de uso para captacao/coleta de curriculos (vigias, manutencao e funcoes relacionadas)
 - Novo caso de uso para leitura facial em totens de entrada e saida do condominio (controle de acesso)
-- Novo modulo de gestao de manutencao do condominio integrado ao contexto operacional
-- Novo modulo para moradores: recebimento de encomendas e reservas/alugueis de area gourmet
+- Novo módulo de gestão de manutenção do condomínio integrado ao contexto operacional
+- Novo módulo para moradores: recebimento de encomendas e reservas/aluguéis de área gourmet
+- Novo Dashboard de Analytics Global (visão administrativa para faturamento, custos, lucros, impactos de faltas e consolidação de usuários)
 
 ### 2.3 Priorizacao macro por foco de execucao
 

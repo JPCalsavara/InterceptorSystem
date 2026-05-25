@@ -23,13 +23,14 @@ Definir criterios de qualidade para produto e documentacao, sustentados por test
 
 ## 3. Evidencias usadas
 
-- Suite `InterceptorSystem.Tests` com testes unitarios e de integracao
-- Testes de endpoints administrativos e auth (incluindo cenarios 200/400/401/404/409)
+- Suite `InterceptorSystem.Tests` com testes unitários e de integração (Backend)
+- Suítes Cypress E2E e Component Tests em `frontend/src/e2e` e `frontend/src/app`
+- Testes de endpoints administrativos e auth (incluindo cenários 200/400/401/404/409)
 - CI com jobs de backend, frontend e docker build
 
 ### 3.1 Baselines de qualidade observaveis
 
-- Baseline de testes automatizados informado no README: 204 testes
+- Baseline de cobertura validado via relatórios gerados automaticamente no CI (Backend + Frontend + Cypress)
 - Gate de CI: build backend + build frontend + docker build
 - Contratos de API validados por testes de integracao dos controllers
 
