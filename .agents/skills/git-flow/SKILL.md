@@ -118,7 +118,7 @@ Antes de commitar, sempre confira se você não está incluindo arquivos tempor�
 Sempre verifique se a \`main\` está atualizada antes de derivar uma nova branch, para evitar resolver conflitos com históricos desatualizados.
 
 ### ⚠️ Validação antes do PR
-A skill \`git-flow\` trabalha em conjunto com a \`execute\`. Certifique-se de que os testes locais (`dotnet test` e `ng build`) passaram antes de sugerir ou automatizar a abertura do PR.
+A skill \`git-flow\` trabalha em conjunto com os workflows de desenvolvimento específicos (ex: \`bounded-context-workflow\`). Certifique-se de que os testes locais (`dotnet test` e `ng build`) passaram antes de sugerir ou automatizar a abertura do PR.
 
 ## Integrações
 - Delega commits e PRs para o **git-flow**.
