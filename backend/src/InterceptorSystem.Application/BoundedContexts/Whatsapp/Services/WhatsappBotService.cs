@@ -62,7 +62,7 @@ public class WhatsappBotService : IWhatsappBotService
             sessao = new SessaoWhatsapp(telefone, conta.ContaId);
             _sessoes.Add(sessao);
             await _sessoes.UnitOfWork.CommitAsync();
-            await EnviarListaClientesAsync(sessao, ct);
+            await EnviarOpcoesAcaoAsync(sessao, ct);
             return;
         }
 
@@ -84,6 +84,9 @@ public class WhatsappBotService : IWhatsappBotService
     {
         switch (sessao.Estado)
         {
+            case EstadoConversa.AguardandoAcao:
+                await ProcessarAcaoAsync(sessao, texto, ct);
+                break;
             case EstadoConversa.AguardandoCliente:
                 await ProcessarEscolhaClienteAsync(sessao, texto, ct);
                 break;
@@ -108,12 +111,37 @@ public class WhatsappBotService : IWhatsappBotService
                 var novaSessao = new SessaoWhatsapp(sessao.Telefone, sessao.ContaId);
                 _sessoes.Add(novaSessao);
                 await _sessoes.UnitOfWork.CommitAsync();
-                await EnviarListaClientesAsync(novaSessao, ct);
+                await EnviarOpcoesAcaoAsync(novaSessao, ct);
                 break;
         }
     }
 
     // -----------------------------------------------------------------------
+    private async Task EnviarOpcoesAcaoAsync(SessaoWhatsapp sessao, CancellationToken ct)
+    {
+        var sb = new StringBuilder("Olá! O que deseja fazer?\n\n");
+        sb.AppendLine("1. Substituição de funcionário em diária");
+        sb.AppendLine("2. Ajuda");
+        sb.AppendLine("\n0. Cancelar");
+        await _sender.EnviarTextoAsync(sessao.Telefone, sb.ToString(), ct);
+    }
+
+    private async Task ProcessarAcaoAsync(SessaoWhatsapp sessao, string texto, CancellationToken ct)
+    {
+        if (texto == "1")
+        {
+            await EnviarListaClientesAsync(sessao, ct);
+        }
+        else if (texto == "2")
+        {
+            await _sender.EnviarTextoAsync(sessao.Telefone, "Para substituir um funcionário, responda com 1 e siga as instruções. Em caso de dúvidas, contate o suporte.", ct);
+        }
+        else
+        {
+            await _sender.EnviarTextoAsync(sessao.Telefone, "Opção inválida. Digite 1 ou 2.", ct);
+        }
+    }
+
     private async Task EnviarListaClientesAsync(SessaoWhatsapp sessao,
         CancellationToken ct)
     {

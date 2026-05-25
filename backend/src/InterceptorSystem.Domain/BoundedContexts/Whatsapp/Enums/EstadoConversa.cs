@@ -2,6 +2,7 @@ namespace InterceptorSystem.Domain.BoundedContexts.Whatsapp.Enums;
 
 public enum EstadoConversa
 {
+    AguardandoAcao,
     AguardandoCliente,
     AguardandoPosto,
     AguardandoData,
