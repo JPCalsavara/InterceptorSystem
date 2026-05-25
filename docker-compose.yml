@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  ai-service:
+    build:
+      context: ./ai-service
+    container_name: interceptor_ai_service
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./ai-service:/app
+    # Conecte o C# e o BD na mesma rede posteriormente
+    # networks:
+    #   - interceptor-network
+
+# networks:
+#   interceptor-network:
+#     driver: bridge
