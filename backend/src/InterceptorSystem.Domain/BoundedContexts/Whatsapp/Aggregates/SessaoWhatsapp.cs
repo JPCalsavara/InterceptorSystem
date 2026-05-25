@@ -44,7 +44,7 @@ public class SessaoWhatsapp
         Id = Guid.NewGuid();
         Telefone = telefone;
         ContaId = contaId;
-        Estado = EstadoConversa.AguardandoCliente;
+        Estado = EstadoConversa.AguardandoAcao;
         CriadoEm = DateTime.UtcNow;
         UltimaAtividade = DateTime.UtcNow;
     }
