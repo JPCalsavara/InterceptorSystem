@@ -208,7 +208,7 @@
             <tbody>
               @for (diaria of diariasFiltradas(); track diaria.id) {
                 <tr
-                  [class.row-falta]="diaria.statusDiaria === 'FALTA_REGISTRADA'"
+                  [class.row-falta]="diaria.statusDiaria === 'FALTA_INJUSTIFICADA' || diaria.statusDiaria === 'FALTA_JUSTIFICADA'"
                   [class.row-cancelada]="diaria.statusDiaria === 'CANCELADA'"
                 >
                   <td>{{ formatDate(diaria.data) }}</td>

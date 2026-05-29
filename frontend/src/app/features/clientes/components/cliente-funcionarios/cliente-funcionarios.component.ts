@@ -241,7 +241,7 @@ export class ClienteFuncionariosComponent {
     return this.diarias().filter(
       (a) =>
         a.funcionarioId === funcionarioId &&
-        (a.statusDiaria === StatusDiaria.FALTA_REGISTRADA ||
+        (a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA ||
           a.statusDiaria === StatusDiaria.CANCELADA)
     ).length;
   }

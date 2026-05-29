@@ -145,7 +145,7 @@ export class PostoListComponent implements OnInit {
     const alocIds = this.alocacoes().filter(al => al.postoId === postoId).map(al => al.id);
     return this.diarias().filter(
       (a) =>
-        alocIds.includes(a.alocacaoId) && a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
+        alocIds.includes(a.alocacaoId) && a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA,
     ).length;
   }
 

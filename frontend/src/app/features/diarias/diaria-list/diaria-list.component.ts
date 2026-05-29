@@ -482,7 +482,8 @@ export class DiariaListComponent implements OnInit {
   }
 
   getDiariaMonthlyClass(diaria: Diaria): string {
-    if (diaria.statusDiaria === 'FALTA_REGISTRADA') return 'emp-falta';
+    if (diaria.statusDiaria === 'FALTA_INJUSTIFICADA') return 'emp-falta-injustificada';
+    if (diaria.statusDiaria === 'FALTA_JUSTIFICADA') return 'emp-falta-justificada';
     if (diaria.statusDiaria === 'CANCELADA') return 'emp-cancelada';
     if (diaria.tipoDiaria === 'SUBSTITUICAO') return 'emp-substituicao';
     if (diaria.tipoDiaria === 'DOBRA_PROGRAMADA') return 'emp-dobra';
@@ -524,7 +525,8 @@ export class DiariaListComponent implements OnInit {
     const labels: Record<StatusDiaria, string> = {
       CONFIRMADA: 'Confirmada',
       CANCELADA: 'Cancelamento',
-      FALTA_REGISTRADA: 'Falta',
+      FALTA_INJUSTIFICADA: 'Falta Injustificada',
+      FALTA_JUSTIFICADA: 'Falta Justificada',
     };
     return labels[status] || status;
   }
@@ -533,7 +535,8 @@ export class DiariaListComponent implements OnInit {
     const classes: Record<StatusDiaria, string> = {
       CONFIRMADA: 'badge-success',
       CANCELADA: 'badge-inactive',
-      FALTA_REGISTRADA: 'badge-warning',
+      FALTA_INJUSTIFICADA: 'badge-error',
+      FALTA_JUSTIFICADA: 'badge-warning',
     };
     return classes[status] || '';
   }
@@ -678,7 +681,7 @@ export class DiariaListComponent implements OnInit {
         return diariasOfDate.some((diaria) => {
           switch (filter.type) {
             case 'funcionario': return diaria.funcionarioId === filter.id;
-            case 'falta': return diaria.statusDiaria === 'FALTA_REGISTRADA';
+            case 'falta': return diaria.statusDiaria === 'FALTA_INJUSTIFICADA' || diaria.statusDiaria === 'FALTA_JUSTIFICADA';
             case 'substituicao': return diaria.tipoDiaria === 'SUBSTITUICAO';
             case 'dobra': return diaria.tipoDiaria === 'DOBRA_PROGRAMADA';
             default: return false;
@@ -711,7 +714,7 @@ export class DiariaListComponent implements OnInit {
           case 'funcionario':
             return diaria.funcionarioId === filter.id;
           case 'falta':
-            return diaria.statusDiaria === 'FALTA_REGISTRADA';
+            return diaria.statusDiaria === 'FALTA_INJUSTIFICADA' || diaria.statusDiaria === 'FALTA_JUSTIFICADA';
           case 'substituicao':
             return diaria.tipoDiaria === 'SUBSTITUICAO';
           case 'dobra':

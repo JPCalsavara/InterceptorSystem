@@ -171,7 +171,7 @@ export class ClienteDetailComponent implements OnInit {
     const total = this.diariasPeriodo().length;
     if (total === 0) return 0;
     const faltas = this.diariasPeriodo().filter(
-      (a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
+      (a) => a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA,
     ).length;
     return (faltas / total) * 100;
   });
@@ -227,7 +227,7 @@ export class ClienteDetailComponent implements OnInit {
     this.diariasPeriodo()
       .filter(
         (a) =>
-          a.statusDiaria === StatusDiaria.FALTA_REGISTRADA ||
+          a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA ||
           a.statusDiaria === StatusDiaria.CANCELADA,
       )
       .forEach((a) => {
@@ -357,7 +357,8 @@ export class ClienteDetailComponent implements OnInit {
     const labels = {
       [StatusDiaria.CONFIRMADA]: 'Confirmada',
       [StatusDiaria.CANCELADA]: 'Cancelada',
-      [StatusDiaria.FALTA_REGISTRADA]: 'Falta Registrada',
+      [StatusDiaria.FALTA_INJUSTIFICADA]: 'Falta Injustificada',
+      [StatusDiaria.FALTA_JUSTIFICADA]: 'Falta Justificada',
     };
     return labels[status] || 'Desconhecido';
   }
@@ -398,7 +399,8 @@ export class ClienteDetailComponent implements OnInit {
     const classes = {
       [StatusDiaria.CONFIRMADA]: 'badge-success',
       [StatusDiaria.CANCELADA]: 'badge-error',
-      [StatusDiaria.FALTA_REGISTRADA]: 'badge-warning',
+      [StatusDiaria.FALTA_INJUSTIFICADA]: 'badge-danger',
+      [StatusDiaria.FALTA_JUSTIFICADA]: 'badge-warning',
     };
     return classes[status] || '';
   }
@@ -436,7 +438,7 @@ export class ClienteDetailComponent implements OnInit {
     return this.diarias().filter(
       (a) =>
         a.funcionarioId === funcionarioId &&
-        (a.statusDiaria === StatusDiaria.FALTA_REGISTRADA ||
+        (a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA ||
           a.statusDiaria === StatusDiaria.CANCELADA),
     ).length;
   }
@@ -612,7 +614,7 @@ export class ClienteDetailComponent implements OnInit {
   });
 
   diariasFaltas = computed(() => {
-    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA)
+    return this.diariasPeriodo().filter((a) => a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA)
       .length;
   });
 

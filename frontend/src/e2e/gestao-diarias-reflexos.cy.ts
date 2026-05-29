@@ -146,7 +146,7 @@ describe('Gestão de Diárias e Reflexos', () => {
     cy.get('@diariaX').find('button.btn-edit').click({ force: true });
 
     // No modal, alterar o status para Falta
-    cy.get('[data-testid="diaria-status"]').select('FALTA_REGISTRADA', { force: true });
+    cy.get('[data-testid="diaria-status"]').select('FALTA_INJUSTIFICADA', { force: true });
     cy.get('[data-testid="btn-save-diaria"]').click({ force: true });
     cy.wait('@updateDiaria').its('response.statusCode').should('be.oneOf', [200, 204]);
 

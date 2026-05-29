@@ -57,7 +57,7 @@ export class PostoDetailComponent implements OnInit {
   );
 
   faltas = computed(() =>
-    this.diarias().filter((a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA),
+    this.diarias().filter((a) => a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA),
   );
 
   totalFaltas = computed(() => this.faltas().length);
@@ -280,7 +280,8 @@ export class PostoDetailComponent implements OnInit {
     const classes = {
       [StatusDiaria.CONFIRMADA]: 'badge-success',
       [StatusDiaria.CANCELADA]: 'badge-secondary',
-      [StatusDiaria.FALTA_REGISTRADA]: 'badge-danger',
+      [StatusDiaria.FALTA_INJUSTIFICADA]: 'badge-danger',
+      [StatusDiaria.FALTA_JUSTIFICADA]: 'badge-warning',
     };
     return classes[status] || 'badge-secondary';
   }
@@ -289,7 +290,8 @@ export class PostoDetailComponent implements OnInit {
     const labels = {
       [StatusDiaria.CONFIRMADA]: 'Confirmada',
       [StatusDiaria.CANCELADA]: 'Cancelada',
-      [StatusDiaria.FALTA_REGISTRADA]: 'Falta',
+      [StatusDiaria.FALTA_INJUSTIFICADA]: 'Falta Injustificada',
+      [StatusDiaria.FALTA_JUSTIFICADA]: 'Falta Justificada',
     };
     return labels[status] || 'Desconhecido';
   }

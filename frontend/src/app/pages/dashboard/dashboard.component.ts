@@ -241,7 +241,7 @@ export class DashboardComponent implements OnInit {
           (a) => a.statusDiaria === StatusDiaria.CONFIRMADA,
         ).length;
         const faltas = diariasFuncionario.filter(
-          (a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
+          (a) => a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA,
         ).length;
         const total = diariasFuncionario.length;
         const taxaPresenca = total > 0 ? Math.round((confirmadas / total) * 100) : 100;

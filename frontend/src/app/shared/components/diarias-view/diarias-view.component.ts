@@ -204,7 +204,7 @@ export class DiariasViewComponent {
   }
 
   getDiariaMonthlyClass(diaria: Diaria): string {
-    if (diaria.statusDiaria === 'FALTA_REGISTRADA') return 'emp-falta';
+    if (diaria.statusDiaria === 'FALTA_INJUSTIFICADA') return 'emp-falta';
     if (diaria.statusDiaria === 'CANCELADA') return 'emp-cancelada';
     if (diaria.tipoDiaria === 'SUBSTITUICAO') return 'emp-substituicao';
     const index = this.getFuncionarioLegendaIndex(diaria.funcionarioId);
@@ -244,7 +244,8 @@ export class DiariasViewComponent {
     const labels: Record<StatusDiaria, string> = {
       CONFIRMADA: 'Confirmada',
       CANCELADA: 'Cancelada',
-      FALTA_REGISTRADA: 'Falta',
+      FALTA_INJUSTIFICADA: 'Falta Injustificada',
+      FALTA_JUSTIFICADA: 'Falta Justificada',
     };
     return labels[status] || status;
   }
@@ -253,7 +254,8 @@ export class DiariasViewComponent {
     const classes: Record<StatusDiaria, string> = {
       CONFIRMADA: 'badge-success',
       CANCELADA: 'badge-inactive',
-      FALTA_REGISTRADA: 'badge-warning',
+      FALTA_INJUSTIFICADA: 'badge-danger',
+      FALTA_JUSTIFICADA: 'badge-warning',
     };
     return classes[status] || '';
   }

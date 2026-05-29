@@ -112,7 +112,8 @@ export class AlocacaoDetailComponent implements OnInit {
     const map = {
       [StatusDiaria.CONFIRMADA]: 'status-confirmada',
       [StatusDiaria.CANCELADA]: 'status-cancelada',
-      [StatusDiaria.FALTA_REGISTRADA]: 'status-falta'
+      [StatusDiaria.FALTA_INJUSTIFICADA]: 'status-falta',
+      [StatusDiaria.FALTA_JUSTIFICADA]: 'status-falta-justificada'
     };
     return map[status] || '';
   }
