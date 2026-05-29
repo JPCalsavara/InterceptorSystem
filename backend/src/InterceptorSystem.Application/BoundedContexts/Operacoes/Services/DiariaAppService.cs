@@ -56,6 +56,11 @@ public class DiariaAppService : IDiariaAppService
             input.TipoDiaria,
             tagIdResolvido);
 
+        if (input.DiariaSubstituidaId.HasValue && !string.IsNullOrEmpty(input.OrigemModificacao))
+        {
+            diaria.RegistrarRastreabilidadeSubstituicao(input.DiariaSubstituidaId.Value, input.OrigemModificacao);
+        }
+
         _repository.Add(diaria);
         await _repository.UnitOfWork.CommitAsync(ct);
 
@@ -166,12 +171,12 @@ public class DiariaAppService : IDiariaAppService
         return resultado;
     }
 
-    public async Task UpdateStatusAsync(Guid id, StatusDiaria novoStatus, CancellationToken ct = default)
+    public async Task UpdateStatusAsync(Guid id, StatusDiaria novoStatus, string? origem = null, CancellationToken ct = default)
     {
         var diaria = await _repository.GetByIdAsync(id, ct)
             ?? throw new KeyNotFoundException("Diária não encontrada.");
 
-        diaria.AtualizarStatus(novoStatus, diaria.TipoDiaria);
+        diaria.AtualizarStatus(novoStatus, diaria.TipoDiaria, origem);
         _repository.Update(diaria);
         await _repository.UnitOfWork.CommitAsync(ct);
     }
@@ -188,7 +193,7 @@ public class DiariaAppService : IDiariaAppService
                        ?? new Dictionary<Guid, string>();
 
         var totalConfirmadas = diarias.Count(d => d.StatusDiaria == StatusDiaria.CONFIRMADA);
-        var totalFaltas = diarias.Count(d => d.StatusDiaria == StatusDiaria.FALTA_REGISTRADA);
+        var totalFaltas = diarias.Count(d => d.StatusDiaria == StatusDiaria.FALTA_INJUSTIFICADA || d.StatusDiaria == StatusDiaria.FALTA_JUSTIFICADA);
         var totalCanceladas = diarias.Count(d => d.StatusDiaria == StatusDiaria.CANCELADA);
 
         var resumoByTag = diarias

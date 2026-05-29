@@ -14,8 +14,9 @@ public interface IOperacoesQueryPort
     Task<IReadOnlyList<SubstitutoResumo>> GetSubstitutosRankeadosAsync(Guid clienteId, DateOnly data, CancellationToken cancellationToken = default);
 
     Task CancelarDiariaAsync(Guid diariaId, CancellationToken cancellationToken = default);
+    Task RegistrarFaltaInjustificadaAsync(Guid diariaId, string origem, CancellationToken cancellationToken = default);
     Task<DiariaResumo?> GetDiariaByIdAsync(Guid diariaId, CancellationToken cancellationToken = default);
-    Task CriarDiariaSubstituicaoAsync(Guid funcionarioId, Guid alocacaoId, DateOnly data, CancellationToken cancellationToken = default);
+    Task CriarDiariaSubstituicaoAsync(Guid funcionarioId, Guid alocacaoId, DateOnly data, Guid diariaSubstituidaId, string origem, CancellationToken cancellationToken = default);
 }
 
 public record ClienteResumo(Guid Id, string Nome);

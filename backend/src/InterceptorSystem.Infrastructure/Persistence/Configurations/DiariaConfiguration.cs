@@ -18,6 +18,10 @@ public class DiariaConfiguration : IEntityTypeConfiguration<Diaria>
         builder.Property(d => d.StatusDiaria).IsRequired().HasConversion<string>();
         builder.Property(d => d.TipoDiaria).IsRequired().HasConversion<string>();
 
+        builder.Property(d => d.DiariaSubstituidaId).IsRequired(false);
+        builder.Property(d => d.OrigemModificacao).HasMaxLength(50).IsRequired(false);
+        builder.Property(d => d.DataHoraModificacao).IsRequired(false);
+
         builder.HasOne<Tag>()
             .WithMany()
             .HasForeignKey(d => d.TagId)

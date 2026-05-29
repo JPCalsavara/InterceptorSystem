@@ -330,18 +330,20 @@ public class WhatsappBotService : IWhatsappBotService
         await _sessoes.UnitOfWork.BeginTransactionAsync(ct);
         try
         {
-            // 1. Cancelar diária original
-            await _operacoes.CancelarDiariaAsync(sessao.DiariaIdParaSubstituir!.Value, ct);
+            // 1. Registrar Falta Injustificada na diária original
+            await _operacoes.RegistrarFaltaInjustificadaAsync(sessao.DiariaIdParaSubstituir!.Value, "WhatsApp Bot", ct);
 
             // 2. Obter AlocacaoId da diária original (Posto é localização, Alocação é o slot de turno)
             var diariaOriginal = await _operacoes.GetDiariaByIdAsync(sessao.DiariaIdParaSubstituir!.Value, ct)
                 ?? throw new InvalidOperationException("Diária original não encontrada para concluir substituição.");
 
-            // 3. Criar nova diária do tipo SUBSTITUICAO na mesma Alocação
+            // 3. Criar nova diária do tipo SUBSTITUICAO na mesma Alocação, rastreando a origem
             await _operacoes.CriarDiariaSubstituicaoAsync(
                 sessao.FuncionarioSubstitutoId!.Value,
                 diariaOriginal.AlocacaoId,
                 sessao.DataSelecionada!.Value,
+                sessao.DiariaIdParaSubstituir!.Value,
+                "WhatsApp Bot",
                 ct);
 
             sessao.TransicionarPara(EstadoConversa.Concluida);

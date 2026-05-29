@@ -15,6 +15,11 @@ public class Diaria : Entity, IAggregateRoot
     public StatusDiaria StatusDiaria { get; private set; }
     public TipoDiaria TipoDiaria { get; private set; }
 
+    // Rastreabilidade de Modificações (Ex: Substituição via WhatsApp/Bot)
+    public Guid? DiariaSubstituidaId { get; private set; }
+    public string? OrigemModificacao { get; private set; }
+    public DateTimeOffset? DataHoraModificacao { get; private set; }
+
     public Funcionario? Funcionario { get; private set; }
     public Alocacao? Alocacao { get; private set; }
 
@@ -49,7 +54,7 @@ public class Diaria : Entity, IAggregateRoot
         AddDomainEvent(new DiariaCreatedEvent(EmpresaId, Id));
     }
 
-    public void AtualizarStatus(StatusDiaria statusDiaria, TipoDiaria tipoDiaria)
+    public void AtualizarStatus(StatusDiaria statusDiaria, TipoDiaria tipoDiaria, string? origem = null)
     {
         Enforce(Enum.IsDefined(statusDiaria), "Status da diária é obrigatório.");
         Enforce(Enum.IsDefined(tipoDiaria), "Tipo de diária é obrigatório.");
@@ -57,7 +62,20 @@ public class Diaria : Entity, IAggregateRoot
         StatusDiaria = statusDiaria;
         TipoDiaria = tipoDiaria;
 
+        if (!string.IsNullOrEmpty(origem))
+        {
+            OrigemModificacao = origem;
+            DataHoraModificacao = DateTimeOffset.UtcNow;
+        }
+
         AddDomainEvent(new DiariaUpdatedEvent(EmpresaId, Id));
+    }
+
+    public void RegistrarRastreabilidadeSubstituicao(Guid diariaSubstituidaId, string origem)
+    {
+        DiariaSubstituidaId = diariaSubstituidaId;
+        OrigemModificacao = origem;
+        DataHoraModificacao = DateTimeOffset.UtcNow;
     }
 
     public void PrepararExclusao()

@@ -90,7 +90,12 @@ public class OperacoesQueryAdapter : IOperacoesQueryPort
 
     public async Task CancelarDiariaAsync(Guid diariaId, CancellationToken cancellationToken = default)
     {
-        await _diariaAppService.UpdateStatusAsync(diariaId, StatusDiaria.CANCELADA);
+        await _diariaAppService.UpdateStatusAsync(diariaId, StatusDiaria.CANCELADA, null, cancellationToken);
+    }
+
+    public async Task RegistrarFaltaInjustificadaAsync(Guid diariaId, string origem, CancellationToken cancellationToken = default)
+    {
+        await _diariaAppService.UpdateStatusAsync(diariaId, StatusDiaria.FALTA_INJUSTIFICADA, origem, cancellationToken);
     }
 
     public async Task<DiariaResumo?> GetDiariaByIdAsync(Guid diariaId, CancellationToken cancellationToken = default)
@@ -110,13 +115,15 @@ public class OperacoesQueryAdapter : IOperacoesQueryPort
             diaria.StatusDiaria);
     }
 
-    public async Task CriarDiariaSubstituicaoAsync(Guid funcionarioId, Guid alocacaoId, DateOnly data, CancellationToken cancellationToken = default)
+    public async Task CriarDiariaSubstituicaoAsync(Guid funcionarioId, Guid alocacaoId, DateOnly data, Guid diariaSubstituidaId, string origem, CancellationToken cancellationToken = default)
     {
         await _diariaAppService.CreateAsync(new CreateDiariaDtoInput(
             funcionarioId,
             alocacaoId,
             data,
             StatusDiaria.CONFIRMADA,
-            TipoDiaria.SUBSTITUICAO));
+            TipoDiaria.SUBSTITUICAO,
+            diariaSubstituidaId,
+            origem), cancellationToken);
     }
 }
