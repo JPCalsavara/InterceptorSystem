@@ -113,6 +113,8 @@ public record ContratoResumoFinanceiroDto(
     int TotalDiariasNormais,
     int TotalDiariasExtras,
     int TotalDiariasFimDeSemana,
+    decimal MediaSalarialDiurna,
+    decimal MediaSalarialNoturna,
     IReadOnlyList<ContratoResumoFinanceiroPostoDto> ProjecaoCustoPorPosto,
     IReadOnlyList<ContratoResumoFinanceiroAlocacaoDto> ProjecaoCustoPorAlocacao,
     IReadOnlyList<ContratoResumoFinanceiroFuncionarioDto> ProjecaoCustoPorFuncionario);

@@ -339,6 +339,8 @@ export interface ContratoResumoFinanceiro {
   totalDiariasNormais: number;
   totalDiariasExtras: number;
   totalDiariasFimDeSemana?: number;
+  mediaSalarialDiurna: number;
+  mediaSalarialNoturna: number;
   projecaoCustoPorPosto: ContratoResumoFinanceiroPosto[];
   projecaoCustoPorAlocacao: ContratoResumoFinanceiroAlocacao[];
   projecaoCustoPorFuncionario: ContratoResumoFinanceiroFuncionario[];

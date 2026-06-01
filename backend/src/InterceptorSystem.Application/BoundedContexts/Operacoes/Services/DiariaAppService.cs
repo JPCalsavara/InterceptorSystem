@@ -281,6 +281,14 @@ public class DiariaAppService : IDiariaAppService
             .OrderByDescending(g => g.CustoTotal)
             .ToList();
 
+        var diariasDiurnas = diarias.Where(d => d.Alocacao != null && !d.Alocacao.TemHorarioNoturno).ToList();
+        var totalFuncionariosDiurnos = diariasDiurnas.Select(d => d.FuncionarioId).Distinct().Count();
+        var mediaSalarialDiurna = totalFuncionariosDiurnos > 0 ? diariasDiurnas.Sum(d => d.ValorDiaria) / totalFuncionariosDiurnos : 0m;
+
+        var diariasNoturnas = diarias.Where(d => d.Alocacao != null && d.Alocacao.TemHorarioNoturno).ToList();
+        var totalFuncionariosNoturnos = diariasNoturnas.Select(d => d.FuncionarioId).Distinct().Count();
+        var mediaSalarialNoturna = totalFuncionariosNoturnos > 0 ? diariasNoturnas.Sum(d => d.ValorDiaria) / totalFuncionariosNoturnos : 0m;
+
         return new ContratoResumoFinanceiroDto(
             contratoId,
             ano,
@@ -291,6 +299,8 @@ public class DiariaAppService : IDiariaAppService
             totalDiariasNormais,
             totalDiariasExtras,
             totalDiariasFimDeSemana,
+            mediaSalarialDiurna,
+            mediaSalarialNoturna,
             projecaoPorPosto,
             projecaoPorAlocacao,
             projecaoPorFuncionario);
