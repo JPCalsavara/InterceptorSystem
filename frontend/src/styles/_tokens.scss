@@ -1,43 +1,47 @@
 :root {
   /* ==========================================================================
-     Primitive Colors (Blue Baby Palette)
+     Primitive Colors (Zinc/Premium Minimalist Palette)
      ========================================================================== */
-  --blue-50: #e1f5fe;
-  --blue-100: #e3f2fd;
-  --blue-200: #bbdefb;
-  --blue-300: #90caf9;
-  --blue-400: #64b5f6;
-  --blue-500: #2196f3;
-  --blue-600: #1976d2;
-  --blue-700: #1565c0;
-  --blue-800: #0d47a1;
-  --blue-900: #0a3d91;
+  --zinc-50: #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
+
+  /* Accent - Subtle Blue for highlights if needed */
+  --accent-blue: #0ea5e9;
 
   /* ==========================================================================
      Semantic Colors - Light Mode
      ========================================================================== */
-  --bg-primary: #e3f2fd;
-  --bg-secondary: #bbdefb;
-  --bg-tertiary: #90caf9;
-  --surface-card: #f5faff;
-  --surface-muted: #e1f5fe;
-  --text-primary: #0d47a1;
-  --text-secondary: #1565c0;
-  --text-tertiary: #1976d2;
-  --border-subtle: #bbdefb;
-  --border-strong: #90caf9;
+  --bg-primary: #fcfcfc;
+  --bg-secondary: #f4f4f5;
+  --bg-tertiary: #e4e4e7;
+  --surface-card: #ffffff;
+  --surface-muted: #fafafa;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-tertiary: #71717a;
+  --border-subtle: #e4e4e7;
+  --border-strong: #d4d4d8;
 
-  --primary-color: #2196f3;
-  --primary-dark: #1976d2;
+  --primary-color: #10b981;
+  --primary-dark: #059669;
 
-  /* Semantic action/feedback colors (pastel claro) */
-  --color-success: #4ade80;
+  /* Semantic action/feedback colors */
+  --color-success: #10b981;
   --color-success-bg: #ecfdf5;
-  --color-warning: #fbbf24;
+  --color-warning: #f59e0b;
   --color-warning-bg: #fffbeb;
-  --color-danger: #f87171;
+  --color-danger: #ef4444;
   --color-danger-bg: #fef2f2;
-  --color-info: #60a5fa;
+  --color-info: #3b82f6;
   --color-info-bg: #eff6ff;
 
   /* Compatibility aliases used by feature styles */
@@ -53,55 +57,55 @@
   --error-border: var(--color-danger);
   --error-ring: rgba(220, 38, 38, 0.18);
 
-  --card-bg: #f5faff;
+  --card-bg: #ffffff;
   --input-bg: #ffffff;
-  --border-color: #bbdefb;
-  --hover-bg: #e1f5fe;
-  --bg-hover: #e1f5fe;
-  --border-hover: #90caf9;
+  --border-color: #e4e4e7;
+  --hover-bg: #f4f4f5;
+  --bg-hover: #f4f4f5;
+  --border-hover: #d4d4d8;
 
   /* Navbar */
-  --navbar-bg: #e3f2fd;
-  --navbar-border: #bbdefb;
-  --theme-toggle-bg: #bbdefb;
-  --theme-toggle-color: #1565c0;
-  --theme-toggle-hover-bg: #90caf9;
-  --profile-hover-bg: #bbdefb;
-  --dropdown-bg: #f5faff;
-  --dropdown-border: #bbdefb;
-  --dropdown-item-hover: #e1f5fe;
-  --dropdown-divider: #bbdefb;
+  --navbar-bg: #ffffff;
+  --navbar-border: #e4e4e7;
+  --theme-toggle-bg: #f4f4f5;
+  --theme-toggle-color: #52525b;
+  --theme-toggle-hover-bg: #e4e4e7;
+  --profile-hover-bg: #f4f4f5;
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #e4e4e7;
+  --dropdown-item-hover: #f4f4f5;
+  --dropdown-divider: #e4e4e7;
 
   /* Sidebar */
-  --sidebar-bg: #e3f2fd;
-  --sidebar-border: #bbdefb;
-  --sidebar-text: #1565c0;
-  --sidebar-text-hover: #0d47a1;
-  --sidebar-hover: #bbdefb;
-  --sidebar-active-bg: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e4e4e7;
+  --sidebar-text: #52525b;
+  --sidebar-text-hover: #18181b;
+  --sidebar-hover: #f4f4f5;
+  --sidebar-active-bg: #18181b;
   --sidebar-active-text: #ffffff;
-  --sidebar-active-shadow: 0 4px 6px -1px color-mix(in srgb, var(--primary-color) 40%, transparent);
-  --sidebar-scrollbar: #90caf9;
-  --sidebar-scrollbar-hover: #64b5f6;
+  --sidebar-active-shadow: 0 4px 6px -1px rgba(24, 24, 27, 0.2);
+  --sidebar-scrollbar: #e4e4e7;
+  --sidebar-scrollbar-hover: #d4d4d8;
 
   /* Kanban Status */
-  --kanban-success-bg: linear-gradient(135deg, #c5f1d8 0%, #a7f3d0 100%);
+  --kanban-success-bg: #ecfdf5;
   --kanban-success-border: #10b981;
-  --kanban-warning-bg: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  --kanban-warning-bg: #fffbeb;
   --kanban-warning-border: #f59e0b;
-  --kanban-error-bg: linear-gradient(135deg, #ffd6d6 0%, #fecaca 100%);
+  --kanban-error-bg: #fef2f2;
   --kanban-error-border: #ef4444;
-  --kanban-info-bg: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  --kanban-info-bg: #eff6ff;
   --kanban-info-border: #3b82f6;
-  --kanban-neutral-bg: linear-gradient(135deg, var(--surface-muted) 0%, var(--border-subtle) 100%);
-  --kanban-neutral-border: #9ca3af;
+  --kanban-neutral-bg: #f4f4f5;
+  --kanban-neutral-border: #a1a1aa;
 
   /* ==========================================================================
-     Shadows, Spacing & Radii
+     Shadows, Spacing & Radii (Premium Adjustments)
      ========================================================================== */
-  --shadow-sm: 0 1px 2px rgba(13, 71, 161, 0.08);
-  --shadow-md: 0 4px 10px rgba(13, 71, 161, 0.12);
-  --shadow-lg: 0 12px 30px rgba(13, 71, 161, 0.16);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.08);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -116,11 +120,11 @@
   --space-20: 5rem;
   --space-24: 6rem;
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
   --radius-full: 9999px;
 }
 
@@ -128,29 +132,29 @@ body.dark-mode {
   /* ==========================================================================
      Semantic Colors - Dark Mode
      ========================================================================== */
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a1f2e;
-  --bg-tertiary: #252d3d;
-  --surface-card: #1e2738;
-  --surface-muted: #151b26;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-tertiary: #6e7681;
-  --border-subtle: #30363d;
-  --border-strong: #424a53;
+  --bg-primary: #09090b;
+  --bg-secondary: #18181b;
+  --bg-tertiary: #27272a;
+  --surface-card: #09090b;
+  --surface-muted: #18181b;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --border-subtle: #27272a;
+  --border-strong: #3f3f46;
 
-  --primary-color: #58a6ff;
-  --primary-dark: #4a8fd8;
+  --primary-color: #10b981;
+  --primary-dark: #34d399;
 
   /* Semantic action/feedback colors (dark mode) */
-  --color-success: #34d399;
-  --color-success-bg: #052e22;
-  --color-warning: #fbbf24;
-  --color-warning-bg: #3b2f08;
-  --color-danger: #f87171;
-  --color-danger-bg: #3f1517;
-  --color-info: #60a5fa;
-  --color-info-bg: #13253f;
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-info: #3b82f6;
+  --color-info-bg: rgba(59, 130, 246, 0.1);
 
   /* Compatibility aliases used by feature styles */
   --success-color: var(--color-success);
@@ -158,53 +162,53 @@ body.dark-mode {
   --warning-color: var(--color-warning);
   --warning-bg: var(--color-warning-bg);
   --danger-color: var(--color-danger);
-  --danger-color-dark: #ef4444;
+  --danger-color-dark: #f87171;
   --error-color: var(--color-danger);
   --error-text: var(--color-danger);
   --error-bg: var(--color-danger-bg);
   --error-border: var(--color-danger);
-  --error-ring: rgba(248, 113, 113, 0.24);
+  --error-ring: rgba(239, 68, 68, 0.24);
 
-  --card-bg: #1e2738;
-  --input-bg: #0d1117;
-  --border-color: #30363d;
-  --hover-bg: #252d3d;
+  --card-bg: #09090b;
+  --input-bg: #18181b;
+  --border-color: #27272a;
+  --hover-bg: #18181b;
 
   /* Navbar */
-  --navbar-bg: #161b22;
-  --navbar-border: #30363d;
-  --theme-toggle-bg: #21262d;
-  --theme-toggle-color: #8b949e;
-  --theme-toggle-hover-bg: #30363d;
-  --profile-hover-bg: #21262d;
-  --dropdown-bg: #161b22;
-  --dropdown-border: #30363d;
-  --dropdown-item-hover: #21262d;
-  --dropdown-divider: #30363d;
+  --navbar-bg: #09090b;
+  --navbar-border: #27272a;
+  --theme-toggle-bg: #18181b;
+  --theme-toggle-color: #a1a1aa;
+  --theme-toggle-hover-bg: #27272a;
+  --profile-hover-bg: #18181b;
+  --dropdown-bg: #09090b;
+  --dropdown-border: #27272a;
+  --dropdown-item-hover: #18181b;
+  --dropdown-divider: #27272a;
 
   /* Sidebar */
-  --sidebar-bg: #0d1117;
-  --sidebar-border: #21262d;
-  --sidebar-text: #8b949e;
-  --sidebar-text-hover: #c9d1d9;
-  --sidebar-hover: #161b22;
-  --sidebar-active-bg: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
-  --sidebar-active-text: #ffffff;
-  --sidebar-active-shadow: 0 4px 6px -1px rgba(88, 166, 255, 0.4);
-  --sidebar-scrollbar: #30363d;
-  --sidebar-scrollbar-hover: #424a53;
+  --sidebar-bg: #09090b;
+  --sidebar-border: #27272a;
+  --sidebar-text: #a1a1aa;
+  --sidebar-text-hover: #fafafa;
+  --sidebar-hover: #18181b;
+  --sidebar-active-bg: #fafafa;
+  --sidebar-active-text: #09090b;
+  --sidebar-active-shadow: 0 4px 6px -1px rgba(250, 250, 250, 0.2);
+  --sidebar-scrollbar: #27272a;
+  --sidebar-scrollbar-hover: #3f3f46;
 
   /* Kanban Status (Dark mode variants) */
-  --kanban-success-bg: linear-gradient(135deg, #0d4d2f 0%, #065f46 100%);
+  --kanban-success-bg: rgba(16, 185, 129, 0.1);
   --kanban-success-border: #059669;
-  --kanban-warning-bg: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  --kanban-warning-bg: rgba(245, 158, 11, 0.1);
   --kanban-warning-border: #d97706;
-  --kanban-error-bg: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  --kanban-error-bg: rgba(239, 68, 68, 0.1);
   --kanban-error-border: #dc2626;
-  --kanban-info-bg: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  --kanban-info-bg: rgba(59, 130, 246, 0.1);
   --kanban-info-border: #2563eb;
-  --kanban-neutral-bg: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  --kanban-neutral-border: #6b7280;
+  --kanban-neutral-bg: rgba(161, 161, 170, 0.1);
+  --kanban-neutral-border: #71717a;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);

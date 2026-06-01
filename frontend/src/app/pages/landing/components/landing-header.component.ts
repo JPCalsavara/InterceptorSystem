@@ -8,11 +8,13 @@ import { RouterLink } from '@angular/router';
   template: `
     <header class="landing-header" [class.header-hidden]="!isHeaderVisible()">
       <div class="header-container">
-        <img [src]="logoSrc()" alt="Interceptor Assessoria Inteligente" class="header-logo" />
+        <a routerLink="/">
+          <img [src]="logoSrc()" alt="Interceptor Assessoria Inteligente" class="header-logo" />
+        </a>
         <nav class="header-nav">
           <a href="#sobre" class="nav-link">Sobre</a>
           <a href="#servicos" class="nav-link">Serviços</a>
-          <a href="#sistema" class="nav-link hide-mobile">Sistema</a>
+          <a routerLink="/sistema" class="nav-link hide-mobile">Sistema</a>
           <a href="#numeros" class="nav-link hide-mobile">Números</a>
           <a href="#lideranca" class="nav-link hide-mobile">Liderança</a>
           <a href="#contato" class="nav-link hide-mobile">Contato</a>
@@ -57,7 +59,7 @@ import { RouterLink } from '@angular/router';
         <nav class="mobile-nav">
           <a href="#sobre" class="mobile-link" (click)="menuToggle.emit()">Sobre</a>
           <a href="#servicos" class="mobile-link" (click)="menuToggle.emit()">Serviços</a>
-          <a href="#sistema" class="mobile-link" (click)="menuToggle.emit()">Sistema</a>
+          <a routerLink="/sistema" class="mobile-link" (click)="menuToggle.emit()">Sistema</a>
           <a href="#numeros" class="mobile-link" (click)="menuToggle.emit()">Números</a>
           <a href="#lideranca" class="mobile-link" (click)="menuToggle.emit()">Liderança</a>
           <a href="#contato" class="mobile-link" (click)="menuToggle.emit()">Contato</a>

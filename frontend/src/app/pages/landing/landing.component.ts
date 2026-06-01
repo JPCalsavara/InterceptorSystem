@@ -13,14 +13,13 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ContatoService, ContatoInput } from '../../services/contato.service';
-
-// Components
 import { LandingHeaderComponent } from './components/landing-header.component';
+
 import { LandingHeroComponent } from './components/landing-hero.component';
 import { LandingAboutComponent } from './components/landing-about.component';
 import { LandingServicesComponent } from './components/landing-services.component';
-import { LandingSystemComponent } from './components/landing-system.component';
 import { LandingStatsComponent } from './components/landing-stats.component';
+import { LandingSystemPreviewComponent } from './components/landing-system-preview.component';
 import { LandingLeaderComponent } from './components/landing-leader.component';
 import { LandingCtaComponent } from './components/landing-cta.component';
 import { LandingContactComponent } from './components/landing-contact.component';
@@ -34,8 +33,8 @@ import { LandingFooterComponent } from './components/landing-footer.component';
     LandingHeroComponent,
     LandingAboutComponent,
     LandingServicesComponent,
-    LandingSystemComponent,
     LandingStatsComponent,
+    LandingSystemPreviewComponent,
     LandingLeaderComponent,
     LandingCtaComponent,
     LandingContactComponent,
@@ -55,7 +54,7 @@ import { LandingFooterComponent } from './components/landing-footer.component';
       <app-landing-about class="reveal-section" />
       <app-landing-services class="reveal-section" />
       <app-landing-stats class="reveal-section" />
-      <app-landing-system class="reveal-section" />
+      <app-landing-system-preview class="reveal-section" />
       <app-landing-leader class="reveal-section" />
       <app-landing-cta class="reveal-section" />
       

@@ -213,16 +213,14 @@ public class ClienteAppServiceTests
             "SP"
         );
 
-        _mockRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(cliente);
-        _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _mockRepo.Setup(r => r.DeleteDirectlyAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(1);
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
 
         // --- ACT ---
         await _service.DeleteAsync(clienteId);
 
         // --- ASSERT ---
-        _mockRepo.Verify(r => r.Remove(cliente), Times.Once);
-        _mockUow.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepo.Verify(r => r.DeleteDirectlyAsync(clienteId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "DeleteAsync - Deve lançar exceção quando cliente não existe")]
@@ -230,13 +228,13 @@ public class ClienteAppServiceTests
     {
         // --- ARRANGE ---
         var clienteId = Guid.NewGuid();
-        _mockRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
+        _mockRepo.Setup(r => r.DeleteDirectlyAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(0);
 
         // --- ACT & ASSERT ---
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(clienteId));
         Assert.Contains("Cliente não encontrado", exception.Message);
 
-        _mockRepo.Verify(r => r.Remove(It.IsAny<Cliente>()), Times.Never);
+        _mockRepo.Verify(r => r.DeleteDirectlyAsync(clienteId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "DeleteAsync - Deve funcionar com ID inválido sem quebrar")]
@@ -244,12 +242,12 @@ public class ClienteAppServiceTests
     {
         // --- ARRANGE ---
         var idInvalido = Guid.Empty;
-        _mockRepo.Setup(r => r.GetByIdAsync(idInvalido, It.IsAny<CancellationToken>())).ReturnsAsync((Cliente?)null);
+        _mockRepo.Setup(r => r.DeleteDirectlyAsync(idInvalido, It.IsAny<CancellationToken>())).ReturnsAsync(0);
 
         // --- ACT & ASSERT ---
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(idInvalido));
 
-        _mockRepo.Verify(r => r.Remove(It.IsAny<Cliente>()), Times.Never);
+        _mockRepo.Verify(r => r.DeleteDirectlyAsync(idInvalido, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "DeleteAsync - Deve lançar erro de negócio quando cliente possui vínculos")]
@@ -258,26 +256,18 @@ public class ClienteAppServiceTests
         // --- ARRANGE ---
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
-        var cliente = new Cliente(
-            empresaId,
-            "Cliente com Vinculo",
-            "11222333000181",
-            "São Paulo",
-            "SP"
-        );
 
-        _mockRepo.Setup(r => r.GetByIdAsync(clienteId, It.IsAny<CancellationToken>())).ReturnsAsync(cliente);
+        _mockRepo
+            .Setup(r => r.DeleteDirectlyAsync(clienteId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("FK_Contratos_Clientes"));
         _mockTenant.Setup(t => t.EmpresaId).Returns(empresaId);
-        _mockUow
-            .Setup(u => u.CommitAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new EntityInUseException("Cliente"));
 
         // --- ACT ---
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteAsync(clienteId));
 
         // --- ASSERT ---
-        Assert.Contains("Não é possível excluir este cliente", exception.Message);
-        _mockRepo.Verify(r => r.Remove(cliente), Times.Once);
+        Assert.Contains("Não é possível excluir este cliente porque existem registros vinculados", exception.Message);
+        _mockRepo.Verify(r => r.DeleteDirectlyAsync(clienteId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion

@@ -123,11 +123,11 @@ import { Component } from '@angular/core';
       font-size: var(--text-lg); color: var(--text-secondary); margin: 0;
     }
 
-    /* Bento grid - not 3 equal columns */
+    /* Bento grid - 4 columns for perfect 6-card asymmetry */
     .services-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: auto auto;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(140px, auto);
       gap: var(--space-5);
     }
 
@@ -156,14 +156,19 @@ import { Component } from '@angular/core';
     }
     .service-card:hover::before { width: 100%; }
 
-    /* Featured card spans 2 rows */
-    .service-card-featured {
+    /* Bento card spans */
+    .service-card:nth-child(1) {
+      grid-column: span 2;
       grid-row: span 2;
       background: linear-gradient(160deg, var(--bg-primary) 0%, color-mix(in srgb, var(--primary-color) 4%, var(--bg-primary)) 100%);
       border-color: color-mix(in srgb, var(--primary-color) 20%, var(--border-subtle));
     }
-    .service-card-featured h3 { font-size: var(--text-xl); }
-    .service-card-featured p { font-size: var(--text-base); line-height: 1.8; }
+    .service-card:nth-child(1) h3 { font-size: var(--text-xl); }
+    .service-card:nth-child(1) p { font-size: var(--text-base); line-height: 1.8; }
+
+    .service-card:nth-child(2) { grid-column: span 2; }
+    .service-card:nth-child(5) { grid-column: span 2; }
+    .service-card:nth-child(6) { grid-column: span 2; }
 
     .service-tag {
       display: inline-block;
@@ -193,12 +198,17 @@ import { Component } from '@angular/core';
 
     @media (max-width: 900px) {
       .services-grid { grid-template-columns: repeat(2, 1fr); }
-      .service-card-featured { grid-row: span 1; }
+      .service-card:nth-child(1),
+      .service-card:nth-child(2),
+      .service-card:nth-child(5),
+      .service-card:nth-child(6) { grid-column: span 2; }
+      .service-card:nth-child(1) { grid-row: span 1; }
     }
 
     @media (max-width: 600px) {
       .services { padding: 4rem 1.5rem; }
       .services-grid { grid-template-columns: 1fr; }
+      .service-card:nth-child(n) { grid-column: span 1; }
     }
   `],
 })
