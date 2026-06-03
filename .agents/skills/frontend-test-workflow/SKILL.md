@@ -29,14 +29,15 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
      - Validação de CSS/Responsividade (Mobile vs Desktop)
   3. Crie os três arquivos (`task_plan.md`, `findings.md`, `progress.md`) quebrando o objetivo em fases gerenciáveis.
 
-### FASE 2: Execução Step-by-Step (Skill Relacionada: `execute`)
+### FASE 2: Execução Incremental (Tracer Bullets)
 - **Se houver um plano com fases pendentes:**
   1. Crie uma nova branch via `git-flow` (ex: `test/cypress-fluxo-x`) se ainda não estiver nela.
-  2. Implemente a próxima fase do plano.
-  3. **Injeção de Seletores:** Modifique o arquivo `.html` do componente Angular e insira o atributo `data-cy="nome-da-acao"` nos elementos necessários (inputs, botões). **Não use classes do Tailwind ou estilos como seletores Cypress.**
-  4. **Criação do Teste:** Escreva o teste `.cy.ts` dentro da pasta `frontend/cypress/e2e/` ou `frontend/src/app/components/...`.
-  5. Após modificar os arquivos, registre no `progress.md` e marque ✅ no `task_plan.md`.
-  6. **Pare e valide** compilando ou pedindo continuação. Não tente fazer 10 testes na mesma resposta.
+  2. **Regra do TDD (Vertical Slicing):** Não tente escrever todos os testes e todo o código de uma vez. Escolha UM comportamento, escreva UM teste para ele.
+  3. **Injeção de Seletores:** Modifique o arquivo `.html` e insira o atributo `data-cy="nome-da-acao"` nos elementos necessários. **Não use classes do Tailwind.**
+  4. **Criação do Teste:** Escreva o teste na pasta correspondente. Execute-o no modo de teste ou compilação para vê-lo falhar (RED).
+  5. Ajuste a implementação até ele passar (GREEN). 
+  6. Repita para o próximo comportamento. Registre o andamento no `progress.md` e marque ✅ no `task_plan.md`.
+  7. **Pare e valide**. Não faça 10 testes na mesma iteração.
 
 ### FASE 3: Validação em Headless Mode (Skill Relacionada: `generate-tests`)
 - **Após implementar os scripts do Cypress:**

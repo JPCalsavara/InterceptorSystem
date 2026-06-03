@@ -7,10 +7,18 @@ description: Automatically generates Unit, Component, and E2E tests for both Bac
 
 When creating or updating tests, enforce the following InterceptorSystem standards across the stack.
 
-## 1. A Estratégia da Pirâmide de Testes (Por que precisamos de todos?)
-- **Backend Unit/Integration (xUnit)**: Garante que a regra de negócio, cálculos e banco de dados funcionam. Mas o backend não sabe se o botão na tela está clicável ou invisível.
-- **Frontend Component Tests (Cypress Component)**: Isola um componente de UI (ex: um botão ou card) e testa se ele está responsivo e quebrando o CSS corretamente em telas pequenas.
-- **Frontend E2E Tests (Cypress E2E)**: Simula o usuário real abrindo o navegador, navegando nas rotas, preenchendo formulários e vendo se a união (Front + Back) funciona. Se a API mudou o nome de um campo e quebrou o Frontend, apenas o E2E vai pegar isso.
+## 1. TDD e A Estratégia da Pirâmide de Testes
+**Anti-Pattern Crítico**: "Slices Horizontais". NUNCA escreva todos os testes primeiro e toda a implementação depois. Isso gera testes acoplados à implementação, e não ao comportamento.
+**Abordagem Correta (Tracer Bullets / Vertical Slicing)**: 
+  - Ciclo Incremental: Escreva UM teste focado em UM comportamento.
+  - Faça o teste falhar (RED).
+  - Escreva o mínimo de código na implementação para ele passar (GREEN).
+  - Só então Refatore (REFACTOR).
+
+Tipos de testes:
+- **Backend Unit/Integration (xUnit)**: Foco no comportamento real exposto através de interfaces públicas. Não faça mocks da implementação interna, mocke apenas dependências de IO/Externa.
+- **Frontend Component Tests (Cypress Component)**: Isola a UI para garantir acessibilidade e estado, sempre focando na especificação do comportamento visual.
+- **Frontend E2E Tests (Cypress E2E)**: A costura real do sistema simulando a jornada ponta-a-ponta do usuário.
 
 ---
 

@@ -20,16 +20,18 @@ A sessão é persistida em disco usando três arquivos:
 
 Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se existirem) e aja de acordo com a fase atual:
 
-### FASE 1: Investigação e Causa Raiz (Root Cause Analysis)
+### FASE 1: Diagnóstico e Construção de Feedback Loop
 - **Se não houver `task_plan.md`:** 
   1. Analise o relato do bug ou os logs fornecidos pelo usuário.
-  2. Faça uma busca no código (utilize `grep_search` e navegue pela hierarquia de arquivos) para encontrar o ponto de falha.
-  3. Crie o `findings.md` documentando claramente o **Porquê** o bug ocorre (ex: "Exceção de null pointer porque o DTO não mapeou o ID do relacionamento").
-  4. Crie o `task_plan.md` definindo os passos da correção. **Sempre adicione uma etapa obrigatória de "Adicionar/Atualizar Teste"**.
+  2. **[OBRIGATÓRIO]** Construa um loop de feedback rápido e determinístico antes de supor qualquer coisa (Teste de Integração, Curl script, Playwright, Bisection Harness). Acelere esse loop ao máximo. Se for não-determinístico (flaky), injete logs/stress até ele falhar confiavelmente.
+  3. Formule **3-5 hipóteses testáveis e falsificáveis** (Ex: "Se for cache, limpar cache antes fará passar"). Não pule essa etapa de ranking.
+  4. Instrumente variáveis isoladas para testar cada hipótese. Use `[DEBUG-tag]` nos logs para limpeza fácil depois.
+  5. Crie o `findings.md` documentando claramente o **Porquê** o bug ocorre.
+  6. Crie o `task_plan.md` definindo os passos da correção. **Sempre adicione uma etapa obrigatória de "Adicionar/Atualizar Teste (Seam Correto)"**.
 
 ### FASE 2: Reprodução e Prevenção (Test First)
 - **Antes de alterar o código de produção:**
-  1. Se aplicável, escreva um Teste Unitário ou de Integração que **reproduza o bug** (ele deve falhar inicialmente).
+  1. Transforme o reprodutor da Fase 1 em um Teste automatizado na camada ("seam") apropriada, onde o bug realmente vive. Se não houver costura, anote isso no findings.
   2. Utilize a skill `generate-tests` para te apoiar na criação deste teste baseado na estrutura existente.
   3. Rode o teste jogando a saída num log (`dotnet test > temp_test.log`). Leia o erro resumido, confirme que falha pelo mesmo motivo do bug relatado, apague o log temporário e registre o sucesso da reprodução no `progress.md`.
 
