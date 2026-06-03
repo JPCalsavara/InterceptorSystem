@@ -22,7 +22,7 @@ interface ChatMessage {
             <div class="header-info">
               <span class="bot-avatar">🤖</span>
               <div>
-                <h4>Assistente IA</h4>
+                <h4>Joseane (RH)</h4>
                 <p>Online</p>
               </div>
             </div>
@@ -38,6 +38,13 @@ interface ChatMessage {
                   {{ msg.text }}
                 </div>
                 <span class="timestamp">{{ msg.timestamp | date:'HH:mm' }}</span>
+              </div>
+            }
+            @if (messages().length === 1 && !isLoading()) {
+              <div class="quick-actions">
+                <button *ngFor="let q of defaultQuestions" (click)="sendQuickAction(q)">
+                  {{ q }}
+                </button>
               </div>
             }
             @if (isLoading()) {
@@ -284,6 +291,32 @@ interface ChatMessage {
       40% { transform: scale(1); }
     }
 
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+      padding: 0 var(--space-2);
+      align-items: flex-end;
+
+      button {
+        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: var(--space-2) var(--space-3);
+        border-radius: 12px;
+        font-size: var(--text-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: right;
+
+        &:hover {
+          background: var(--primary-color);
+          color: white;
+        }
+      }
+    }
+
     @media (max-width: 480px) {
       .chatbot-container {
         bottom: var(--space-4);
@@ -306,9 +339,16 @@ export class ChatbotWidgetComponent implements AfterViewChecked {
   isOpen = signal(false);
   isLoading = signal(false);
   messages = signal<ChatMessage[]>([
-    { text: 'Olá! Sou o assistente de IA do Interceptor. Como posso ajudar?', sender: 'bot', timestamp: new Date() }
+    { text: 'Olá! Meu nome é Joseane, sou sua assistente virtual de RH. Como posso ajudar você hoje?', sender: 'bot', timestamp: new Date() }
   ]);
   
+  defaultQuestions = [
+    'Como funciona o sistema de ponto?',
+    'Como envio meu atestado médico?',
+    'Quando é o fechamento da folha?',
+    'Preciso de uma substituição na minha diária'
+  ];
+
   newMessage = '';
   @ViewChild('scrollContainer') private scrollContainer?: ElementRef;
 
@@ -317,6 +357,11 @@ export class ChatbotWidgetComponent implements AfterViewChecked {
     if (this.isOpen()) {
       setTimeout(() => this.scrollToBottom(), 100);
     }
+  }
+
+  sendQuickAction(question: string) {
+    this.newMessage = question;
+    this.sendMessage();
   }
 
   sendMessage() {
