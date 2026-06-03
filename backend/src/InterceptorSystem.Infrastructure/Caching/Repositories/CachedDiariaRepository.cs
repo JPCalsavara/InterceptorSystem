@@ -128,4 +128,9 @@ public class CachedDiariaRepository : IDiariaRepository
     {
         return _decorated.GetDiariasByAlocacoesIdsAsync(alocacaoIds, ct);
     }
+
+    public Task<IEnumerable<Diaria>> GetHistoricoSubstituicoesAsync(CancellationToken ct = default)
+    {
+        return _decorated.GetHistoricoSubstituicoesAsync(ct);
+    }
 }

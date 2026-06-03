@@ -4,6 +4,8 @@ using InterceptorSystem.Application.BoundedContexts.Auth.Interfaces;
 using InterceptorSystem.Application.BoundedContexts.Auth.Services;
 using InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces;
 using InterceptorSystem.Application.BoundedContexts.Whatsapp.Services;
+using InterceptorSystem.Application.BoundedContexts.SystemAdmin.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.SystemAdmin.Services;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +37,8 @@ public static class DependencyInjection
 
         // WhatsApp Bot
         services.AddScoped<IWhatsappBotService, WhatsappBotService>();
+        services.AddScoped<IWhatsappAdminService, WhatsappAdminService>();
+        services.AddScoped<ISystemAdminAppService, SystemAdminAppService>();
 
         return services;
     }

@@ -11,6 +11,8 @@ using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using InterceptorSystem.Infrastructure.Adapters.Whatsapp;
 using InterceptorSystem.Infrastructure.Adapters.Whatsapp.Services;
 using InterceptorSystem.Infrastructure.Adapters.Whatsapp.BackgroundServices;
+using InterceptorSystem.Domain.BoundedContexts.SystemAdmin.Interfaces;
+using InterceptorSystem.Infrastructure.Adapters.SystemAdmin.Repositories;
 using InterceptorSystem.Infrastructure.Caching.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -76,6 +78,7 @@ public static class DependencyInjection
         services.AddScoped<IContaRepository, ContaRepository>();
         services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<ISystemAdminQueryPort, SystemAdminQueryPort>();
 
         // 3. Auth Services
         services.AddScoped<IJwtTokenService, JwtTokenService>();

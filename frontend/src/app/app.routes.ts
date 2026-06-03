@@ -260,6 +260,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'auditoria',
+        loadComponent: () =>
+          import('./features/auditoria/auditoria-page/auditoria-page.component').then(
+            (m) => m.AuditoriaPageComponent,
+          ),
+      },
+      {
+        path: 'system-admin',
+        loadComponent: () =>
+          import('./features/system-admin/system-admin-dashboard/system-admin-dashboard.component').then(
+            (m) => m.SystemAdminDashboardComponent,
+          ),
+      },
+      {
         path: 'diarias',
         children: [
           {

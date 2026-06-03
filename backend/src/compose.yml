@@ -1,4 +1,4 @@
-﻿services:
+services:
   # --- BANCO DE DADOS (Relacional/Core) ---
   db:
     image: postgres:15-alpine
@@ -71,6 +71,18 @@
     container_name: interceptor_frontend
     ports:
       - "4201:80" # Frontend exposto diretamente na porta 4201
+    networks:
+      - interceptor-network
+  # --- AI SERVICE (Python FastAPI) ---
+  ai_service:
+    build:
+      context: ../../ai-service
+      dockerfile: Dockerfile
+    container_name: interceptor_ai_service
+    env_file:
+      - ../../.env
+    ports:
+      - "8000:8000"
     networks:
       - interceptor-network
 

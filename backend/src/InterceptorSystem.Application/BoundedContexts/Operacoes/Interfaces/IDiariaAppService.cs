@@ -28,4 +28,7 @@ public interface IDiariaAppService
 
     /// <summary>Retorna resumo financeiro real de diárias confirmadas de um contrato em um período (mês/ano).</summary>
     Task<ContratoResumoFinanceiroDto> GetResumoFinanceiroContratoAsync(Guid contratoId, int ano, int mes, CancellationToken ct = default);
+
+    /// <summary>Retorna o histórico de substituições de diárias do tenant atual.</summary>
+    Task<IEnumerable<DiariaSubstituicaoDto>> GetHistoricoSubstituicoesAsync(CancellationToken ct = default);
 }

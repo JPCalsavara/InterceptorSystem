@@ -267,27 +267,42 @@ public class DiariaAppService : IDiariaAppService
             .OrderByDescending(g => g.CustoTotal)
             .ToList();
 
+        var contrato = await _contratoRepository.GetByIdAsync(contratoId, ct);
+        var beneficios = contrato?.ValorBeneficiosExtrasMensal ?? 0m;
+        var rawAdicNoturno = contrato?.PercentualAdicionalNoturno ?? 0m;
+        var adicNoturno = rawAdicNoturno > 1m ? rawAdicNoturno / 100m : rawAdicNoturno;
+
         var projecaoPorFuncionario = diarias
             .Where(d => d.Funcionario != null)
             .GroupBy(d => new { d.FuncionarioId, NomeFuncionario = d.Funcionario!.Nome })
-            .Select(g => new ContratoResumoFinanceiroFuncionarioDto(
-                g.Key.FuncionarioId,
-                g.Key.NomeFuncionario,
-                g.Count(),
-                g.Sum(d => d.ValorDiaria),
-                g.Count(d => d.TipoDiaria == TipoDiaria.REGULAR),
-                g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO),
-                g.Count(d => d.Data.DayOfWeek == DayOfWeek.Saturday || d.Data.DayOfWeek == DayOfWeek.Sunday)))
+            .Select(g => 
+            {
+                var temNoturno = g.Any(d => d.Alocacao != null && d.Alocacao.TemHorarioNoturno);
+                var sumDiarias = g.Sum(d => d.ValorDiaria);
+                if (temNoturno) sumDiarias *= (1 + adicNoturno);
+                return new ContratoResumoFinanceiroFuncionarioDto(
+                    g.Key.FuncionarioId,
+                    g.Key.NomeFuncionario,
+                    g.Count(),
+                    sumDiarias + beneficios,
+                    g.Count(d => d.TipoDiaria == TipoDiaria.REGULAR),
+                    g.Count(d => d.TipoDiaria == TipoDiaria.DOBRA_PROGRAMADA || d.TipoDiaria == TipoDiaria.SUBSTITUICAO),
+                    g.Count(d => d.Data.DayOfWeek == DayOfWeek.Saturday || d.Data.DayOfWeek == DayOfWeek.Sunday));
+            })
             .OrderByDescending(g => g.CustoTotal)
             .ToList();
 
         var diariasDiurnas = diarias.Where(d => d.Alocacao != null && !d.Alocacao.TemHorarioNoturno).ToList();
         var totalFuncionariosDiurnos = diariasDiurnas.Select(d => d.FuncionarioId).Distinct().Count();
-        var mediaSalarialDiurna = totalFuncionariosDiurnos > 0 ? diariasDiurnas.Sum(d => d.ValorDiaria) / totalFuncionariosDiurnos : 0m;
-
+        var mediaSalarialDiurna = totalFuncionariosDiurnos > 0 
+            ? (diariasDiurnas.Sum(d => d.ValorDiaria) / totalFuncionariosDiurnos) + beneficios 
+            : 0m;
+        
         var diariasNoturnas = diarias.Where(d => d.Alocacao != null && d.Alocacao.TemHorarioNoturno).ToList();
         var totalFuncionariosNoturnos = diariasNoturnas.Select(d => d.FuncionarioId).Distinct().Count();
-        var mediaSalarialNoturna = totalFuncionariosNoturnos > 0 ? diariasNoturnas.Sum(d => d.ValorDiaria) / totalFuncionariosNoturnos : 0m;
+        var mediaSalarialNoturna = totalFuncionariosNoturnos > 0 
+            ? ((diariasNoturnas.Sum(d => d.ValorDiaria) / totalFuncionariosNoturnos) * (1 + adicNoturno)) + beneficios 
+            : 0m;
 
         return new ContratoResumoFinanceiroDto(
             contratoId,
@@ -328,5 +343,44 @@ public class DiariaAppService : IDiariaAppService
         return melhorContratoTag != null
             ? (melhorContratoTag.ValorDiaria, melhorContratoTag.TagId)
             : (valorDiariaFallback, null);
+    }
+
+    public async Task<IEnumerable<DiariaSubstituicaoDto>> GetHistoricoSubstituicoesAsync(CancellationToken ct = default)
+    {
+        var diarias = await _repository.GetHistoricoSubstituicoesAsync(ct);
+        var result = new List<DiariaSubstituicaoDto>();
+
+        foreach (var diaria in diarias)
+        {
+            Guid? originalFuncionarioId = null;
+            string? originalFuncionarioNome = null;
+
+            if (diaria.DiariaSubstituidaId.HasValue)
+            {
+                var originalDiaria = await _repository.GetByIdAsync(diaria.DiariaSubstituidaId.Value, ct);
+                if (originalDiaria != null)
+                {
+                    var originalFunc = await _funcionarioRepository.GetByIdAsync(originalDiaria.FuncionarioId, ct);
+                    originalFuncionarioId = originalDiaria.FuncionarioId;
+                    originalFuncionarioNome = originalFunc?.Nome;
+                }
+            }
+
+            result.Add(new DiariaSubstituicaoDto(
+                diaria.Id,
+                diaria.Data,
+                diaria.FuncionarioId,
+                diaria.Funcionario?.Nome ?? "Desconhecido",
+                diaria.DiariaSubstituidaId,
+                originalFuncionarioId,
+                originalFuncionarioNome,
+                diaria.Alocacao?.PostoId ?? Guid.Empty,
+                diaria.Alocacao?.Posto?.Nome ?? "Desconhecido",
+                diaria.OrigemModificacao ?? "Manual",
+                diaria.DataHoraModificacao ?? diaria.CreatedAt
+            ));
+        }
+
+        return result;
     }
 }

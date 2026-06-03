@@ -101,6 +101,17 @@ public class DiariaRepository : IDiariaRepository
             .ToListAsync(ct);
     }
 
+    public async Task<IEnumerable<Diaria>> GetHistoricoSubstituicoesAsync(CancellationToken ct = default)
+    {
+        return await _context.Diarias
+            .Include(d => d.Funcionario)
+            .Include(d => d.Alocacao)
+            .ThenInclude(a => a!.Posto)
+            .Where(d => d.DiariaSubstituidaId != null)
+            .OrderByDescending(d => d.DataHoraModificacao)
+            .ToListAsync(ct);
+    }
+
     public void Add(Diaria entity) => _context.Diarias.Add(entity);
     public void Update(Diaria entity) => _context.Diarias.Update(entity);
     public void Remove(Diaria entity) => _context.Diarias.Remove(entity);

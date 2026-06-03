@@ -73,6 +73,10 @@ export class AuthService {
     return this.currentUser()?.emailVerificado ?? false;
   }
 
+  isAdmin(): boolean {
+    return this.currentUser()?.email === 'admin@gmail.com';
+  }
+
   atualizarEmailVerificado(emailVerificado: boolean): void {
     this.atualizarUser({ emailVerificado });
   }

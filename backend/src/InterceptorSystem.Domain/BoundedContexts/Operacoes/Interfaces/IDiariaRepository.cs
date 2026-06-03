@@ -13,4 +13,5 @@ public interface IDiariaRepository : IRepository<Diaria>
     Task<IEnumerable<Diaria>> GetByContratoIdAsync(Guid contratoId, DateOnly inicio, DateOnly fim, CancellationToken ct = default);
     Task<IEnumerable<Diaria>> GetResumoFinanceiroByContratoAsync(Guid contratoId, int ano, int mes, CancellationToken ct = default);
     Task<List<Diaria>> GetDiariasByAlocacoesIdsAsync(List<Guid> alocacaoIds, CancellationToken ct = default);
+    Task<IEnumerable<Diaria>> GetHistoricoSubstituicoesAsync(CancellationToken ct = default);
 }

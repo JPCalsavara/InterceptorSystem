@@ -362,3 +362,17 @@ export interface UpdateDiariaDto {
 
 // Cálculo de Contrato
 export * from './contrato-calculo.models';
+
+export interface DiariaSubstituicaoDto {
+  novaDiariaId: string;
+  data: string;
+  funcionarioSubstitutoId: string;
+  funcionarioSubstitutoNome: string;
+  diariaSubstituidaId?: string;
+  funcionarioOriginalId?: string;
+  funcionarioOriginalNome?: string;
+  postoId: string;
+  postoNome: string;
+  origemModificacao: string;
+  dataHoraModificacao: string;
+}

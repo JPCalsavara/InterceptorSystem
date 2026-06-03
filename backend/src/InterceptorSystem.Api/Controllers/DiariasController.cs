@@ -150,4 +150,12 @@ public class DiariasController : TenantControllerBase
         var result = await _service.GetResumoFinanceiroContratoAsync(contratoId, ano, mes, ct);
         return Ok(result);
     }
+
+    [HttpGet("substituicoes")]
+    [ProducesResponseType(typeof(IEnumerable<DiariaSubstituicaoDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSubstituicoes(CancellationToken ct = default)
+    {
+        var result = await _service.GetHistoricoSubstituicoesAsync(ct);
+        return Ok(result);
+    }
 }
