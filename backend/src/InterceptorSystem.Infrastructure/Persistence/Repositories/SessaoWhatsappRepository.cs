@@ -31,6 +31,14 @@ public class SessaoWhatsappRepository : InterceptorSystem.Domain.BoundedContexts
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<SessaoWhatsapp>> GetAllByTenantAsync(Guid contaId, CancellationToken ct = default)
+    {
+        return await _context.SessoesWhatsapp
+            .Where(s => s.ContaId == contaId)
+            .OrderByDescending(s => s.CriadoEm)
+            .ToListAsync(ct);
+    }
+
     public void Add(SessaoWhatsapp sessao)
     {
         _context.SessoesWhatsapp.Add(sessao);
