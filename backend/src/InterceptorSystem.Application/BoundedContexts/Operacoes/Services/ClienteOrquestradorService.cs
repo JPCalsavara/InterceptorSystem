@@ -179,7 +179,7 @@ public class ClienteOrquestradorService : IClienteOrquestradorService
     public Task<(bool Valido, string? MensagemErro)> ValidarCriacaoCompletaAsync(CreateClienteCompletoDtoInput input, CancellationToken ct = default)
     {
         var hoje = DateOnly.FromDateTime(DateTime.Today);
-        if (false)
+        if (input.Contrato.DataInicio < hoje)
             return Task.FromResult<(bool, string?)>((false, "Data de início do contrato não pode ser no passado."));
 
         if (input.Contrato.DataFim <= input.Contrato.DataInicio)
