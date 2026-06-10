@@ -16,7 +16,7 @@ const mockService = {
   getAll: () => of([{ id: '1', ativo: true, statusFuncionario: 'ATIVO', statusDiaria: 'CONFIRMADA', status: 'ATIVO' }]) 
 };
 
-const mockAuthService = { logout: () => {} };
+const mockAuthService = { logout: () => {}, isAdmin: () => true };
 
 describe('SidebarComponent', () => {
   const providers = [
@@ -37,7 +37,7 @@ describe('SidebarComponent', () => {
     cy.mount(SidebarComponent, { providers });
 
     cy.get('[data-cy="sidebar"]').should('not.have.class', 'collapsed');
-    cy.get('[data-cy="nav-item"]').should('have.length', 8);
+    cy.get('[data-cy="nav-item"]').should('have.length', 10);
     cy.get('.nav-badge').should('contain.text', '1');
   });
 
