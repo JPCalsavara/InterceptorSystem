@@ -17,6 +17,7 @@ public class ContratoAppServiceTests
 {
     private readonly Mock<IContratoRepository> _contratoRepo = new();
     private readonly Mock<IClienteRepository> _clienteRepo = new();
+    private readonly Mock<IFuncionarioRepository> _funcionarioRepo = new();
     private readonly Mock<IContratoTagService> _tagServiceMock = new();
     private readonly Mock<ICurrentTenantService> _tenantService = new();
     private readonly Mock<IContratoCalculoService> _calculoService = new();
@@ -34,7 +35,8 @@ public class ContratoAppServiceTests
             _tagServiceMock.Object,
             _tenantService.Object,
             _calculoService.Object,
-            _diariaService.Object);
+            _diariaService.Object,
+            _funcionarioRepo.Object);
     }
 
     [Fact]

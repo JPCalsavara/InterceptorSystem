@@ -120,7 +120,8 @@ export class DiariaDetailComponent implements OnInit {
     const labels: Record<StatusDiaria, string> = {
       CONFIRMADA: 'Confirmada',
       CANCELADA: 'Cancelada',
-      FALTA_REGISTRADA: 'Falta Registrada',
+      FALTA_INJUSTIFICADA: 'Falta Injustificada',
+      FALTA_JUSTIFICADA: 'Falta Justificada',
     };
     return labels[status] || status;
   }
@@ -129,7 +130,8 @@ export class DiariaDetailComponent implements OnInit {
     const classes: Record<StatusDiaria, string> = {
       CONFIRMADA: 'badge-success',
       CANCELADA: 'badge-inactive',
-      FALTA_REGISTRADA: 'badge-warning',
+      FALTA_INJUSTIFICADA: 'badge-danger',
+      FALTA_JUSTIFICADA: 'badge-warning',
     };
     return classes[status] || '';
   }

@@ -12,8 +12,8 @@ describe('LandingComponent', () => {
   it('Desktop: renderiza a hero section e features', () => {
     cy.mount(LandingComponent, { providers });
     cy.get('.hero-title').should('contain', 'Assessoria');
-    cy.get('.features-grid').should('exist');
-    cy.get('.feature-card').should('have.length.at.least', 6);
+    cy.get('.services-grid').should('exist');
+    cy.get('.service-card').should('have.length.at.least', 6);
   });
 
   it('Desktop: navegação smooth scroll', () => {

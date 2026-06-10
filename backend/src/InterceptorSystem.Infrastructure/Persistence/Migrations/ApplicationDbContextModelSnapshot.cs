@@ -330,11 +330,21 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.Property<DateOnly>("Data")
                         .HasColumnType("date");
 
+                    b.Property<DateTimeOffset?>("DataHoraModificacao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DiariaSubstituidaId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("EmpresaId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("FuncionarioId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("OrigemModificacao")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("StatusDiaria")
                         .IsRequired()
@@ -704,7 +714,7 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", "Cliente")
                         .WithMany("Contratos")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -758,12 +768,12 @@ namespace InterceptorSystem.Infrastructure.Persistence.Migrations
                     b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Cliente", "Cliente")
                         .WithMany("Funcionarios")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("InterceptorSystem.Domain.BoundedContexts.Operacoes.Aggregates.Contrato", "Contrato")
                         .WithMany("Funcionarios")
                         .HasForeignKey("ContratoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.OwnsOne("InterceptorSystem.Domain.SharedKernel.ValueObjects.Telefone", "Celular", b1 =>

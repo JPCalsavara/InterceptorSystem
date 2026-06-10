@@ -7,6 +7,7 @@ public interface ISessaoWhatsappRepository
 {
     Task<SessaoWhatsapp?> GetByTelefoneAsync(string telefone);
     Task<IEnumerable<SessaoWhatsapp>> GetExpiradas(int timeoutMinutos);
+    Task<IEnumerable<SessaoWhatsapp>> GetAllByTenantAsync(Guid contaId, CancellationToken ct = default);
     void Add(SessaoWhatsapp sessao);
     void Remove(SessaoWhatsapp sessao);
     IUnitOfWork UnitOfWork { get; }

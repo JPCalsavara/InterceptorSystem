@@ -21,11 +21,14 @@ public interface IDiariaAppService
     Task<IEnumerable<DiariaComFuncionarioDto>> GetByPostoEDataAsync(Guid postoId, DateOnly data, CancellationToken ct = default);
 
     /// <summary>Atualiza apenas o status de uma diária (ex: CANCELADA para substituição via bot).</summary>
-    Task UpdateStatusAsync(Guid id, StatusDiaria novoStatus, CancellationToken ct = default);
+    Task UpdateStatusAsync(Guid id, StatusDiaria novoStatus, string? origem = null, CancellationToken ct = default);
 
     /// <summary>Retorna resumo agregado das diárias de um contrato em um período (mês/ano), agrupado por tag.</summary>
     Task<DiariasContratoResumoDto> GetResumoByContratoAsync(Guid contratoId, int ano, int mes, CancellationToken ct = default);
 
     /// <summary>Retorna resumo financeiro real de diárias confirmadas de um contrato em um período (mês/ano).</summary>
     Task<ContratoResumoFinanceiroDto> GetResumoFinanceiroContratoAsync(Guid contratoId, int ano, int mes, CancellationToken ct = default);
+
+    /// <summary>Retorna o histórico de substituições de diárias do tenant atual.</summary>
+    Task<IEnumerable<DiariaSubstituicaoDto>> GetHistoricoSubstituicoesAsync(CancellationToken ct = default);
 }

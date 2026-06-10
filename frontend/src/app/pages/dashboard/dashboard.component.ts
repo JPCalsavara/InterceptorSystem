@@ -19,6 +19,7 @@ import {
   StatusFuncionario,
   ContratoResumoFinanceiro,
   CalculoValorTotalOutput,
+  DiariaSubstituicaoDto,
 } from '../../models/index';
 
 interface DashboardCard {
@@ -103,6 +104,7 @@ export class DashboardComponent implements OnInit {
   private contratoService = inject(ContratoService);
   private financeiroUiService = inject(ContratoFinanceiroUiService);
 
+  ultimasSubstituicoes = signal<DiariaSubstituicaoDto[]>([]);
   clientes = signal<Cliente[]>([]);
   funcionarios = signal<Funcionario[]>([]);
   postos = signal<Posto[]>([]);
@@ -241,7 +243,7 @@ export class DashboardComponent implements OnInit {
           (a) => a.statusDiaria === StatusDiaria.CONFIRMADA,
         ).length;
         const faltas = diariasFuncionario.filter(
-          (a) => a.statusDiaria === StatusDiaria.FALTA_REGISTRADA,
+          (a) => a.statusDiaria === StatusDiaria.FALTA_INJUSTIFICADA,
         ).length;
         const total = diariasFuncionario.length;
         const taxaPresenca = total > 0 ? Math.round((confirmadas / total) * 100) : 100;
@@ -358,7 +360,20 @@ export class DashboardComponent implements OnInit {
       this.loadPostos(),
       this.loadDiarias(),
       this.loadContratos(),
+      this.loadSubstituicoes(),
     ]).finally(() => this.loading.set(false));
+  }
+
+  loadSubstituicoes(): Promise<void> {
+    return new Promise((resolve) => {
+      this.diariaService.getSubstituicoes().subscribe({
+        next: (subs) => {
+          this.ultimasSubstituicoes.set(subs.slice(0, 5));
+          resolve();
+        },
+        error: () => resolve(),
+      });
+    });
   }
 
   loadClientes(): Promise<void> {

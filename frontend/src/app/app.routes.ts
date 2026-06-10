@@ -21,6 +21,11 @@ export const routes: Routes = [
       import('./pages/cadastro/cadastro.component').then((m) => m.CadastroComponent),
   },
   {
+    path: 'sistema',
+    loadComponent: () =>
+      import('./pages/sistema/sistema-page.component').then((m) => m.SistemaPageComponent),
+  },
+  {
     path: 'verificar-email',
     loadComponent: () =>
       import('./pages/verificar-email/verificar-email.component').then(
@@ -252,6 +257,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/perfil/perfil-page/perfil-page.component').then(
             (m) => m.PerfilPageComponent,
+          ),
+      },
+      {
+        path: 'auditoria',
+        loadComponent: () =>
+          import('./features/auditoria/auditoria-page/auditoria-page.component').then(
+            (m) => m.AuditoriaPageComponent,
+          ),
+      },
+      {
+        path: 'system-admin',
+        loadComponent: () =>
+          import('./features/system-admin/system-admin-dashboard/system-admin-dashboard.component').then(
+            (m) => m.SystemAdminDashboardComponent,
           ),
       },
       {

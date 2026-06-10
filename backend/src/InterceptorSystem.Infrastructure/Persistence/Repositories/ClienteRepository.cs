@@ -50,6 +50,18 @@ public class ClienteRepository : IClienteRepository
 
     public async Task<int> DeleteDirectlyAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        if (_context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            var entity = await _context.Clientes.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+            if (entity != null)
+            {
+                _context.Clientes.Remove(entity);
+                await _context.SaveChangesAsync(cancellationToken);
+                return 1;
+            }
+            return 0;
+        }
+        
         return await _context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM \"Clientes\" WHERE \"Id\" = {id}", cancellationToken);
     }
 }

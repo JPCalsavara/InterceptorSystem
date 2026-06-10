@@ -77,7 +77,7 @@ export class DiariaFormComponent implements OnInit, OnChanges {
   statusOptions = [
     { value: StatusDiaria.CONFIRMADA, label: 'Confirmada' },
     { value: StatusDiaria.CANCELADA, label: 'Cancelada' },
-    { value: StatusDiaria.FALTA_REGISTRADA, label: 'Falta Registrada' },
+    { value: StatusDiaria.FALTA_INJUSTIFICADA, label: 'Falta Injustificada' },
   ];
 
   tipoOptions = [

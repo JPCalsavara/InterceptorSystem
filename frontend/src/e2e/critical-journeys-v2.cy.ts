@@ -8,7 +8,7 @@
 describe('InterceptorSystem E2E - Critical User Journeys', () => {
   const baseUrl = Cypress.config().baseUrl || 'http://localhost:4200';
   const testUser = {
-    email: 'test@example.com',
+    email: `test_${Date.now()}@example.com`,
     password: 'TestPassword123!',
     username: 'test_user',
   };
@@ -51,9 +51,8 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
   };
 
   before(() => {
-    // Generate valid mock CNPJ
-    const n = Math.floor(Math.random() * 99999999999999);
-    testCliente.cnpj = n.toString().padStart(14, '0');
+    // CNPJ será gerado pelo custom command cy.createCliente
+    testCliente.cnpj = '';
   });
 
   beforeEach(() => {

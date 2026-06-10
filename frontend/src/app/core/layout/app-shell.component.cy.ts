@@ -16,7 +16,8 @@ const mockAuthService = {
   currentUser: () => ({ nomeEmpresa: 'Test Corp' }),
   logout: () => {},
   isAuthenticated: () => true,
-  isEmailVerificado: () => true
+  isEmailVerificado: () => true,
+  isAdmin: () => true
 };
 
 const mockService = { getAll: () => of([]) };

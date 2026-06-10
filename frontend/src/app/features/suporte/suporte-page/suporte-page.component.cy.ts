@@ -8,7 +8,7 @@ describe('SuportePageComponent', () => {
 
   it('Desktop: renderiza corretamente a página de suporte', () => {
     cy.mount(SuportePageComponent, { providers });
-    cy.get('h1').should('contain', 'Suporte'); 
+    cy.get('h1').should('contain', 'Operação Digital'); 
   });
 
   it('Desktop: navega por scroll', () => {

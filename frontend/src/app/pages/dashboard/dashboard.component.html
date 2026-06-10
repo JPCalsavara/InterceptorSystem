@@ -49,7 +49,55 @@
   }
 
   @if (!loading()) {
-    <div class="dashboard-main-grid">
+    @if (clientes().length === 0) {
+      <!-- ============================================================ -->
+      <!-- ONBOARDING HERO (EMPTY STATE)                                -->
+      <!-- ============================================================ -->
+      <div class="onboarding-wrapper">
+        <div class="onboarding-hero">
+          <div class="ob-badge">Bem-vindo ao InterceptorSystem</div>
+          <h2 class="ob-title">Sua operação em uma <span>única tela.</span></h2>
+          <p class="ob-subtitle">
+            Você ainda não possui clientes cadastrados. Para o sistema gerar contratos, escalas e faturamento, 
+            você precisa criar sua primeira estrutura.
+          </p>
+
+          <div class="ob-steps">
+            <div class="ob-step">
+              <div class="step-icon">1</div>
+              <h4>Assistente Completo</h4>
+              <p>O Wizard guia você na criação do Cliente, Contrato, Tags e Postos de uma só vez.</p>
+            </div>
+            <div class="ob-step">
+              <div class="step-icon">2</div>
+              <h4>Equipe</h4>
+              <p>Cadastre seus funcionários e atribua as Tags (cargos) a eles.</p>
+            </div>
+            <div class="ob-step">
+              <div class="step-icon">3</div>
+              <h4>Diárias</h4>
+              <p>O sistema cruzará a equipe com os postos automaticamente gerando seu faturamento.</p>
+            </div>
+          </div>
+
+          <div class="ob-actions">
+            <a routerLink="/clientes" [queryParams]="{ wizard: 'true' }" class="btn-primary btn-ob">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Começar com Criação Completa (Wizard)
+            </a>
+            <a routerLink="/suporte" class="btn-outline btn-ob">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.974 0-5.768-1.198-7.843-3.168m15.686 0a9.01 9.01 0 01-2.03 5.424M3.714 7.332A9.01 9.01 0 005.744 12.75" />
+              </svg>
+              Ler o Manual de Suporte
+            </a>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="dashboard-main-grid">
       <!-- Métricas Financeiras -->
       <section class="metricas-section">
         <div class="section-header">
@@ -147,15 +195,15 @@
         <div class="grafico-container card">
           <div class="grafico-legenda">
             <div class="legenda-item">
-              <span class="legenda-cor" style="background-color: #4caf50"></span>
+              <span class="legenda-cor" style="background-color: var(--color-success, #4caf50)"></span>
               <span class="legenda-texto">Faturamento</span>
             </div>
             <div class="legenda-item">
-              <span class="legenda-cor" style="background-color: #ff5722"></span>
+              <span class="legenda-cor" style="background-color: var(--color-warning, #ff5722)"></span>
               <span class="legenda-texto">Custo Operacional</span>
             </div>
             <div class="legenda-item">
-              <span class="legenda-cor" style="background-color: #2196f3"></span>
+              <span class="legenda-cor" style="background-color: var(--color-info, #2196f3)"></span>
               <span class="legenda-texto">Lucro Projetado</span>
             </div>
           </div>
@@ -565,6 +613,45 @@
           </div>
         </section>
       }
+
+      <!-- Últimas Substituições -->
+      @if (ultimasSubstituicoes().length > 0) {
+        <section class="alertas-section">
+          <div class="page-header">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              class="icon"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+            </svg>
+            <h1>Últimas Trocas de Diárias</h1>
+          </div>
+          <div class="alertas-list" style="grid-template-columns: 1fr;">
+            @for (sub of ultimasSubstituicoes(); track sub.novaDiariaId) {
+              <div class="alerta-card" style="border-left: 4px solid var(--primary-color);">
+                <div class="alerta-header">
+                  <div class="alerta-info">
+                    <h4 class="alerta-titulo">{{ sub.postoNome }} - {{ sub.data | date:'dd/MM/yyyy' }}</h4>
+                    <p class="alerta-valor">Original: {{ sub.funcionarioOriginalNome || '-' }} &rarr; Substituto: {{ sub.funcionarioSubstitutoNome }}</p>
+                  </div>
+                  <div class="alerta-dias">
+                    <span class="dias-label" style="text-transform: none;">Origem: <strong>{{ sub.origemModificacao }}</strong></span>
+                  </div>
+                </div>
+                <div class="alerta-footer">
+                  <span class="alerta-data">Modificado em: {{ sub.dataHoraModificacao | date:'dd/MM/yyyy HH:mm' }}</span>
+                  <a [routerLink]="['/auditoria']" class="alerta-link">Ver todas →</a>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
     </div>
+    }
   }
 </div>

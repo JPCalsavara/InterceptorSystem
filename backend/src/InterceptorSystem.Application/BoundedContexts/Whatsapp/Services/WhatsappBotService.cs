@@ -17,6 +17,7 @@ public class WhatsappBotService : IWhatsappBotService
     private readonly ICurrentTenantService _tenantService;
     private readonly IOperacoesQueryPort _operacoes;
     private readonly IWhatsappMessageSender _sender;
+    private readonly IAiSupportPort _aiSupport;
     private readonly int _sessaoTimeoutMinutos;
 
     public WhatsappBotService(
@@ -25,6 +26,7 @@ public class WhatsappBotService : IWhatsappBotService
         ICurrentTenantService tenantService,
         IOperacoesQueryPort operacoes,
         IWhatsappMessageSender sender,
+        IAiSupportPort aiSupport,
         IConfiguration configuration)
     {
         _sessoes = sessoes;
@@ -32,6 +34,7 @@ public class WhatsappBotService : IWhatsappBotService
         _tenantService = tenantService;
         _operacoes = operacoes;
         _sender = sender;
+        _aiSupport = aiSupport;
         _sessaoTimeoutMinutos = int.Parse(
             configuration["WhatsappBot:SessaoTimeoutMinutos"] ?? "15");
     }
@@ -121,7 +124,7 @@ public class WhatsappBotService : IWhatsappBotService
     {
         var sb = new StringBuilder("Olá! O que deseja fazer?\n\n");
         sb.AppendLine("1. Substituição de funcionário em diária");
-        sb.AppendLine("2. Ajuda");
+        sb.AppendLine("\nPara qualquer outro assunto, suporte ou envio de atestados, basta digitar a sua dúvida abaixo para a nossa IA!");
         sb.AppendLine("\n0. Cancelar");
         await _sender.EnviarTextoAsync(sessao.Telefone, sb.ToString(), ct);
     }
@@ -132,13 +135,11 @@ public class WhatsappBotService : IWhatsappBotService
         {
             await EnviarListaClientesAsync(sessao, ct);
         }
-        else if (texto == "2")
-        {
-            await _sender.EnviarTextoAsync(sessao.Telefone, "Para substituir um funcionário, responda com 1 e siga as instruções. Em caso de dúvidas, contate o suporte.", ct);
-        }
         else
         {
-            await _sender.EnviarTextoAsync(sessao.Telefone, "Opção inválida. Digite 1 ou 2.", ct);
+            // Qualquer input diferente de 1 cai no fallback inteligente do AI Service (Python FastAPI)
+            var respostaAi = await _aiSupport.ProcessSupportMessageAsync(sessao.Telefone, sessao.ContaId, texto, ct);
+            await _sender.EnviarTextoAsync(sessao.Telefone, respostaAi, ct);
         }
     }
 
@@ -329,18 +330,20 @@ public class WhatsappBotService : IWhatsappBotService
         await _sessoes.UnitOfWork.BeginTransactionAsync(ct);
         try
         {
-            // 1. Cancelar diária original
-            await _operacoes.CancelarDiariaAsync(sessao.DiariaIdParaSubstituir!.Value, ct);
+            // 1. Registrar Falta Injustificada na diária original
+            await _operacoes.RegistrarFaltaInjustificadaAsync(sessao.DiariaIdParaSubstituir!.Value, "WhatsApp Bot", ct);
 
             // 2. Obter AlocacaoId da diária original (Posto é localização, Alocação é o slot de turno)
             var diariaOriginal = await _operacoes.GetDiariaByIdAsync(sessao.DiariaIdParaSubstituir!.Value, ct)
                 ?? throw new InvalidOperationException("Diária original não encontrada para concluir substituição.");
 
-            // 3. Criar nova diária do tipo SUBSTITUICAO na mesma Alocação
+            // 3. Criar nova diária do tipo SUBSTITUICAO na mesma Alocação, rastreando a origem
             await _operacoes.CriarDiariaSubstituicaoAsync(
                 sessao.FuncionarioSubstitutoId!.Value,
                 diariaOriginal.AlocacaoId,
                 sessao.DataSelecionada!.Value,
+                sessao.DiariaIdParaSubstituir!.Value,
+                "WhatsApp Bot",
                 ct);
 
             sessao.TransicionarPara(EstadoConversa.Concluida);

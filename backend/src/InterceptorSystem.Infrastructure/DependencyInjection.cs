@@ -9,7 +9,10 @@ using InterceptorSystem.Infrastructure.Adapters.Email;
 using InterceptorSystem.Infrastructure.Persistence.Contexts;
 using InterceptorSystem.Infrastructure.Persistence.Repositories;
 using InterceptorSystem.Infrastructure.Adapters.Whatsapp;
+using InterceptorSystem.Infrastructure.Adapters.Whatsapp.Services;
 using InterceptorSystem.Infrastructure.Adapters.Whatsapp.BackgroundServices;
+using InterceptorSystem.Domain.BoundedContexts.SystemAdmin.Interfaces;
+using InterceptorSystem.Infrastructure.Adapters.SystemAdmin.Repositories;
 using InterceptorSystem.Infrastructure.Caching.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -75,6 +78,7 @@ public static class DependencyInjection
         services.AddScoped<IContaRepository, ContaRepository>();
         services.AddScoped<ITokenVerificacaoRepository, TokenVerificacaoRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<ISystemAdminQueryPort, SystemAdminQueryPort>();
 
         // 3. Auth Services
         services.AddScoped<IJwtTokenService, JwtTokenService>();
@@ -89,6 +93,12 @@ public static class DependencyInjection
         services.AddScoped<IOperacoesQueryPort, OperacoesQueryAdapter>();
         services.AddScoped<IWhatsappMessageSender, MetaWhatsappMessageSender>();
         services.AddHttpClient<MetaWhatsappMessageSender>();
+
+        services.AddHttpClient<IAiSupportPort, AiSupportService>(client => 
+        {
+            var aiUrl = configuration["AiServiceUrl"] ?? "http://localhost:8000";
+            client.BaseAddress = new Uri(aiUrl);
+        });
 
         // Register WhatsApp background cleanup service conditionally.
         // This allows disabling it in production until DB migrations are confirmed applied

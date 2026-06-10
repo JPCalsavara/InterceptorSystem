@@ -135,11 +135,17 @@ using (var scope = app.Services.CreateScope())
         {
             context.Database.Migrate();
         }
+
+        // Seeds
+        if (!builder.Environment.IsEnvironment("Testing"))
+        {
+            InterceptorSystem.Infrastructure.Persistence.Seed.AdminSeeder.SeedAsync(context).GetAwaiter().GetResult();
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro ao aplicar as migrações do banco de dados.");
+        logger.LogError(ex, "Ocorreu um erro ao aplicar as migrações ou seeds do banco de dados.");
     }
 }
 

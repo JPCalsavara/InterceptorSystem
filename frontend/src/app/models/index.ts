@@ -28,7 +28,8 @@ export enum TipoEscala {
 export enum StatusDiaria {
   CONFIRMADA = 'CONFIRMADA',
   CANCELADA = 'CANCELADA',
-  FALTA_REGISTRADA = 'FALTA_REGISTRADA',
+  FALTA_INJUSTIFICADA = 'FALTA_INJUSTIFICADA',
+  FALTA_JUSTIFICADA = 'FALTA_JUSTIFICADA',
 }
 
 export enum TipoDiaria {
@@ -271,6 +272,9 @@ export interface Diaria {
   tagId?: string | null;
   statusDiaria: StatusDiaria;
   tipoDiaria: TipoDiaria;
+  diariaSubstituidaId?: string | null;
+  origemModificacao?: string | null;
+  dataHoraModificacao?: string | null;
   funcionario?: Funcionario;
   alocacao?: Alocacao;
 }
@@ -335,6 +339,8 @@ export interface ContratoResumoFinanceiro {
   totalDiariasNormais: number;
   totalDiariasExtras: number;
   totalDiariasFimDeSemana?: number;
+  mediaSalarialDiurna: number;
+  mediaSalarialNoturna: number;
   projecaoCustoPorPosto: ContratoResumoFinanceiroPosto[];
   projecaoCustoPorAlocacao: ContratoResumoFinanceiroAlocacao[];
   projecaoCustoPorFuncionario: ContratoResumoFinanceiroFuncionario[];
@@ -356,3 +362,17 @@ export interface UpdateDiariaDto {
 
 // Cálculo de Contrato
 export * from './contrato-calculo.models';
+
+export interface DiariaSubstituicaoDto {
+  novaDiariaId: string;
+  data: string;
+  funcionarioSubstitutoId: string;
+  funcionarioSubstitutoNome: string;
+  diariaSubstituidaId?: string;
+  funcionarioOriginalId?: string;
+  funcionarioOriginalNome?: string;
+  postoId: string;
+  postoNome: string;
+  origemModificacao: string;
+  dataHoraModificacao: string;
+}

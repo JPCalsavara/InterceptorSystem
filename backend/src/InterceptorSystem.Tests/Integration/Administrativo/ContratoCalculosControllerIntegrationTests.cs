@@ -129,7 +129,7 @@ public class ContratoCalculosControllerIntegrationTests : IClassFixture<CustomWe
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
         var content = await response.Content.ReadAsStringAsync();
-        Assert.Contains("maior que zero", content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("não pode ser negativo", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

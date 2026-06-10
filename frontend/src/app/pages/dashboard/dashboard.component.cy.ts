@@ -10,10 +10,10 @@ import { ContratoService } from '../../services/contrato.service';
 import { ContratoFinanceiroUiService } from '../../services/contrato-financeiro-ui.service';
 
 describe('DashboardComponent', () => {
-  const mockClienteService = { getAll: () => of([]) };
+  const mockClienteService = { getAll: () => of([{id: '1', nome: 'Cliente A', ativo: true}]) };
   const mockFuncionarioService = { getAll: () => of([]) };
   const mockPostoService = { getAll: () => of([]) };
-  const mockDiariaService = { getAll: () => of([]) };
+  const mockDiariaService = { getAll: () => of([]), getSubstituicoes: () => of([]) };
   const mockContratoService = { getAll: () => of([]) };
   const mockFinanceiroUiService = {
     carregarCalculosDetalhados$: () => of(new Map()),

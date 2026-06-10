@@ -353,7 +353,11 @@
         opacity: 0.65;
       }
 
-      &.status-falta_registrada {
+      &.status-falta_injustificada {
+        border-left-color: var(--error-color);
+      }
+
+      &.status-falta_justificada {
         border-left-color: var(--warning-color);
       }
 
@@ -805,9 +809,14 @@
 }
 
 // Estados especiais (prioridade sobre cor do funcionário)
-.emp-falta {
-  background: var(--error-color);
-  color: #fff;
+.emp-falta-injustificada {
+  background: var(--error-color) !important;
+  color: white !important;
+}
+
+.emp-falta-justificada {
+  background: var(--warning-color) !important;
+  color: white !important;
 }
 
 .emp-substituicao {

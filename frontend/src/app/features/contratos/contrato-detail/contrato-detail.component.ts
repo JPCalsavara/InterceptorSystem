@@ -313,52 +313,11 @@ export class ContratoDetailComponent implements OnInit {
   });
 
   salarioRealMedioDiurno = computed(() => {
-    const contrato = this.contrato();
-    if (!contrato) return 0;
-    
-    const alocsDiurnas = this.alocacoes().filter(a => !a.temHorarioNoturno);
-    if (alocsDiurnas.length === 0) return this.salarioRealMedio(); // fallback
-    
-    let sumSalaries = 0;
-    let countEmployees = 0;
-    
-    for (const a of alocsDiurnas) {
-      const diasMedio = this.getDiasMedio(a.tipoEscala);
-      const salarioBase = diasMedio * (contrato.valorDiariaCobrada || 0);
-      const beneficios = contrato.valorBeneficiosExtrasMensal || 0;
-      
-      const qtd = a.quantidadeFuncionarios || 1;
-      sumSalaries += (salarioBase + beneficios) * qtd;
-      countEmployees += qtd;
-    }
-    
-    if (countEmployees === 0) return this.salarioRealMedio();
-    return sumSalaries / countEmployees;
+    return this.resumoFinanceiro()?.mediaSalarialDiurna ?? 0;
   });
 
   salarioRealMedioNoturno = computed(() => {
-    const contrato = this.contrato();
-    if (!contrato) return 0;
-    
-    const alocsNoturnas = this.alocacoes().filter(a => a.temHorarioNoturno);
-    if (alocsNoturnas.length === 0) return this.salarioRealMedio(); // fallback
-    
-    let sumSalaries = 0;
-    let countEmployees = 0;
-    const adicNoturno = this.normalizarPercentualContrato(contrato.percentualAdicionalNoturno);
-    
-    for (const a of alocsNoturnas) {
-      const diasMedio = this.getDiasMedio(a.tipoEscala);
-      const salarioBase = diasMedio * (contrato.valorDiariaCobrada || 0) * (1 + adicNoturno);
-      const beneficios = contrato.valorBeneficiosExtrasMensal || 0;
-      
-      const qtd = a.quantidadeFuncionarios || 1;
-      sumSalaries += (salarioBase + beneficios) * qtd;
-      countEmployees += qtd;
-    }
-    
-    if (countEmployees === 0) return this.salarioRealMedio();
-    return sumSalaries / countEmployees;
+    return this.resumoFinanceiro()?.mediaSalarialNoturna ?? 0;
   });
 
   variacaoSalarioDiurnoPercent = computed(() =>

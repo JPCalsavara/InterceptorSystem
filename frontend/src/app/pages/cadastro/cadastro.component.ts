@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -15,7 +15,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
       <!-- Hero Section -->
       <header class="landing-header">
         <div class="header-container">
-          <img src="/logo-preta.png" alt="Interceptor System" class="header-logo" />
+          <img [src]="logoSrc()" alt="Interceptor System" class="header-logo" />
           <a
             routerLink="/login"
             class="btn-outline"
@@ -265,9 +265,9 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
       /* Header */
       .landing-header {
         border-bottom: 1px solid var(--border-subtle);
-        background: var(--surface-card);
-        padding: 0 var(--space-8);
-        height: 64px;
+        background: color-mix(in srgb, var(--surface-card) 85%, transparent);
+        padding: 0 2rem;
+        height: 72px;
         display: flex;
         align-items: center;
       }
@@ -306,7 +306,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
       }
 
       .header-logo {
-        height: 48px;
+        height: 7rem;
       }
 
       /* Main */
@@ -566,12 +566,14 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
     `,
   ],
 })
-export class CadastroComponent {
+export class CadastroComponent implements OnInit {
   private fb = new FormBuilder();
   form: FormGroup;
   erro = signal<string | null>(null);
   carregando = signal(false);
   mostrarSenha = signal(false);
+  isDarkMode = signal(false);
+  logoSrc = computed(() => this.isDarkMode() ? '/logo-branca.png' : '/logo-preta.png');
 
   constructor(
     private authService: AuthService,
@@ -586,6 +588,11 @@ export class CadastroComponent {
         [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)],
       ],
     });
+  }
+
+  ngOnInit(): void {
+    const saved = localStorage.getItem('theme');
+    this.isDarkMode.set(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches));
   }
 
   hasError(fieldName: string): boolean {

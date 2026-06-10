@@ -124,6 +124,12 @@ interface NavItem {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
                   </svg>
                 }
+                @case ('cog-6-tooth') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                }
               }
             </span>
 
@@ -186,23 +192,26 @@ interface NavItem {
   styles: [
     `
       .sidebar {
-        width: 260px;
+        width: 280px;
         height: calc(100vh - 64px);
-        background: var(--surface-card);
+        background: var(--bg-primary);
         border-right: 1px solid var(--border-subtle);
         position: fixed;
         top: 64px;
         left: 0;
         overflow-y: auto;
         padding: var(--space-6) var(--space-4);
-        transition:
-          width 0.25s ease,
-          background-color 0.3s ease,
-          border-color 0.3s ease;
+        transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        box-shadow: 4px 0 24px -10px rgba(0,0,0,0.03);
       }
 
       .sidebar.collapsed {
         width: 88px;
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
       }
 
       .nav {
@@ -233,45 +242,66 @@ interface NavItem {
         cursor: pointer;
         font-family: inherit;
         font-size: var(--text-sm);
+        transition: all 0.2s ease;
       }
 
       .btn-logout:hover {
-        background: #fee2e2 !important;
+        background: color-mix(in srgb, #dc2626 10%, transparent) !important;
         color: #dc2626 !important;
       }
 
       .nav-divider {
         height: 1px;
-        background: var(--border-subtle);
-        margin: var(--space-2) 0;
+        background: linear-gradient(to right, transparent, var(--border-subtle), transparent);
+        margin: var(--space-4) 0;
       }
 
       .nav-item {
         display: flex;
         align-items: center;
-        gap: var(--space-4);
+        gap: var(--space-3);
         padding: var(--space-3) var(--space-4);
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-xl);
         text-decoration: none;
         color: var(--text-secondary);
         font-weight: var(--fw-medium);
-        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+          opacity: 0;
+          transition: opacity 0.25s ease;
+          border-radius: inherit;
+        }
 
         &:hover {
-          background: var(--bg-tertiary);
-          color: var(--primary-color);
+          color: var(--text-primary);
+          transform: translateX(4px);
+          &::before { opacity: 0.5; }
+          .icon { color: var(--primary-color); }
         }
 
         &.active {
-          background: var(--bg-secondary);
-          color: var(--primary-color);
+          color: var(--sidebar-active-text);
           font-weight: var(--fw-semibold);
+          background: var(--sidebar-active-bg);
+          box-shadow: var(--sidebar-active-shadow);
+          border: 1px solid var(--border-subtle);
+
+          &::before { opacity: 0; }
+          .icon { color: var(--sidebar-active-text); }
         }
       }
 
       .sidebar.collapsed .nav-item {
         justify-content: center;
         padding: var(--space-3);
+        &:hover { transform: translateY(-2px); }
       }
 
       .icon {
@@ -283,6 +313,10 @@ interface NavItem {
         justify-content: center;
         width: 1.5rem;
         height: 1.5rem;
+        color: var(--text-muted);
+        transition: color 0.25s ease;
+        z-index: 1;
+
         svg {
           width: 100%;
           height: 100%;
@@ -291,6 +325,8 @@ interface NavItem {
 
       .label {
         font-size: var(--text-sm);
+        letter-spacing: -0.01em;
+        z-index: 1;
       }
 
       .sidebar.collapsed .label,
@@ -300,42 +336,46 @@ interface NavItem {
 
       .nav-badge {
         margin-left: auto;
-        background: var(--bg-tertiary);
-        color: var(--primary-dark);
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 0.15rem 0.6rem;
-        border-radius: 9999px;
+        background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+        color: var(--text-primary);
+        font-size: 0.7rem;
+        font-weight: var(--fw-bold);
+        padding: 0.2rem 0.5rem;
+        border-radius: var(--radius-full);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 10%, transparent);
+        z-index: 1;
+        transition: all 0.2s ease;
       }
 
       .nav-item.active .nav-badge {
-        background: var(--surface-card);
-        color: var(--primary-color);
+        background: var(--primary-color);
+        color: #fff;
+        box-shadow: none;
       }
 
       .collapse-toggle {
         margin-top: auto;
         width: 100%;
-        height: 40px;
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-md);
-        background: transparent;
+        height: 48px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-xl);
+        background: var(--surface-muted);
         color: var(--text-secondary);
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
         &:hover {
-          background: var(--bg-tertiary);
+          background: color-mix(in srgb, var(--primary-color) 10%, transparent);
           color: var(--primary-color);
-          border-color: var(--primary-color);
+          border-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
         }
 
         svg {
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
         }
       }
 
@@ -346,7 +386,7 @@ interface NavItem {
 
       /* Scrollbar customization */
       .sidebar::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
       }
 
       .sidebar::-webkit-scrollbar-track {
@@ -354,32 +394,26 @@ interface NavItem {
       }
 
       .sidebar::-webkit-scrollbar-thumb {
-        background: var(--border-strong);
-        border-radius: var(--radius-sm);
+        background: var(--border-subtle);
+        border-radius: var(--radius-full);
       }
 
       .sidebar::-webkit-scrollbar-thumb:hover {
-        background: var(--primary-color);
+        background: var(--primary-light);
       }
 
       @media (max-width: 768px) {
         .sidebar {
           transform: translateX(-100%);
-          transition:
-            transform 0.3s ease,
-            background-color 0.3s ease,
-            border-color 0.3s ease;
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 200;
-          width: 260px;
-          padding: var(--space-6) var(--space-4);
+          width: 280px;
         }
 
         .sidebar.collapsed {
-          width: 260px;
+          width: 280px;
         }
 
-        /* On mobile, always present full drawer content, even if desktop
-           collapsed state is persisted in localStorage. */
         .sidebar.collapsed .label {
           display: flex;
         }
@@ -395,6 +429,7 @@ interface NavItem {
 
         .sidebar.open {
           transform: translateX(0);
+          box-shadow: 10px 0 30px rgba(0,0,0,0.1);
         }
 
         .label {
@@ -408,6 +443,7 @@ interface NavItem {
         .nav-item {
           justify-content: flex-start;
           padding: var(--space-3) var(--space-4);
+          &:hover { transform: none; background: var(--bg-tertiary); }
         }
 
         .collapse-toggle {
@@ -448,9 +484,18 @@ export class SidebarComponent implements OnInit {
     { label: 'Alocações', route: '/alocacoes', icon: 'clock', countKey: 'alocacoes' },
     { label: 'Tags', route: '/tags', icon: 'tag', countKey: 'tags' },
     { label: 'Diárias', route: '/diarias', icon: 'calendar-days', countKey: 'diarias' },
+    { label: 'Auditoria', route: '/auditoria', icon: 'document-text' },
   ];
 
   ngOnInit() {
+    if (this.authService.isAdmin()) {
+      this.navItems.push({
+        label: 'Admin Global',
+        route: '/system-admin',
+        icon: 'cog-6-tooth',
+      });
+    }
+
     this.loadCounts();
     
     // Atualiza a sidebar de forma reativa quando entidades forem criadas, atualizadas ou deletadas

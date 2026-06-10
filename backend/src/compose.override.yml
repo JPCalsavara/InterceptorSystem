@@ -62,5 +62,10 @@ services:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true # Hot-reload no Docker
 
-
     # Comando já está no Dockerfile (npm start)
+
+  # --- AI SERVICE EM MODO DESENVOLVIMENTO ---
+  ai_service:
+    volumes:
+      - ../../ai-service:/app
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

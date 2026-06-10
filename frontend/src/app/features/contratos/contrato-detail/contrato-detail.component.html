@@ -127,14 +127,14 @@
               <div class="comparativo-row">
                 <div class="comparativo-pill comparativo-pill-simulado">
                   <span>Simulado</span>
-                  <strong>{{ salarioSimuladoDiurno() | currency: 'BRL' }}</strong>
+                  <strong data-cy="salario-diurno-simulado">{{ salarioSimuladoDiurno() | currency: 'BRL' }}</strong>
                 </div>
                 <div class="comparativo-pill comparativo-pill-real">
                   <span>Real (média)</span>
-                  <strong>{{ salarioRealMedioDiurno() | currency: 'BRL' }}</strong>
+                  <strong data-cy="salario-diurno-real">{{ salarioRealMedioDiurno() | currency: 'BRL' }}</strong>
                 </div>
               </div>
-              <div class="comparativo-variation">{{ variacaoSalarioDiurnoTexto() }}</div>
+              <div class="comparativo-variation" data-cy="variacao-salario-diurno">{{ variacaoSalarioDiurnoTexto() }}</div>
             </div>
 
             <div class="comparativo-card">
@@ -142,14 +142,14 @@
               <div class="comparativo-row">
                 <div class="comparativo-pill comparativo-pill-simulado">
                   <span>Simulado</span>
-                  <strong>{{ salarioSimuladoNoturno() | currency: 'BRL' }}</strong>
+                  <strong data-cy="salario-noturno-simulado">{{ salarioSimuladoNoturno() | currency: 'BRL' }}</strong>
                 </div>
                 <div class="comparativo-pill comparativo-pill-real">
                   <span>Real (média)</span>
-                  <strong>{{ salarioRealMedioNoturno() | currency: 'BRL' }}</strong>
+                  <strong data-cy="salario-noturno-real">{{ salarioRealMedioNoturno() | currency: 'BRL' }}</strong>
                 </div>
               </div>
-              <div class="comparativo-variation">{{ variacaoSalarioNoturnoTexto() }}</div>
+              <div class="comparativo-variation" data-cy="variacao-salario-noturno">{{ variacaoSalarioNoturnoTexto() }}</div>
             </div>
           </div>
         </div>

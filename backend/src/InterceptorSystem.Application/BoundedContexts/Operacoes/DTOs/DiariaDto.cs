@@ -8,7 +8,9 @@ public record CreateDiariaDtoInput(
     Guid AlocacaoId,
     DateOnly Data,
     StatusDiaria StatusDiaria,
-    TipoDiaria TipoDiaria);
+    TipoDiaria TipoDiaria,
+    Guid? DiariaSubstituidaId = null,
+    string? OrigemModificacao = null);
 
 public record UpdateDiariaDtoInput(
     StatusDiaria StatusDiaria,
@@ -22,7 +24,10 @@ public record DiariaDtoOutput(
     decimal ValorDiaria,
     Guid? TagId,
     StatusDiaria StatusDiaria,
-    TipoDiaria TipoDiaria)
+    TipoDiaria TipoDiaria,
+    Guid? DiariaSubstituidaId,
+    string? OrigemModificacao,
+    DateTimeOffset? DataHoraModificacao)
 {
     public static DiariaDtoOutput? FromEntity(Diaria? entity)
     {
@@ -35,7 +40,10 @@ public record DiariaDtoOutput(
             entity.ValorDiaria,
             entity.TagId,
             entity.StatusDiaria,
-            entity.TipoDiaria);
+            entity.TipoDiaria,
+            entity.DiariaSubstituidaId,
+            entity.OrigemModificacao,
+            entity.DataHoraModificacao);
     }
 }
 
@@ -105,6 +113,8 @@ public record ContratoResumoFinanceiroDto(
     int TotalDiariasNormais,
     int TotalDiariasExtras,
     int TotalDiariasFimDeSemana,
+    decimal MediaSalarialDiurna,
+    decimal MediaSalarialNoturna,
     IReadOnlyList<ContratoResumoFinanceiroPostoDto> ProjecaoCustoPorPosto,
     IReadOnlyList<ContratoResumoFinanceiroAlocacaoDto> ProjecaoCustoPorAlocacao,
     IReadOnlyList<ContratoResumoFinanceiroFuncionarioDto> ProjecaoCustoPorFuncionario);

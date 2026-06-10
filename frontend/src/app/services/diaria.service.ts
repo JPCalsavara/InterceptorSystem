@@ -9,6 +9,7 @@ import {
   UpdateDiariaDto,
   DiariasContratoResumo,
   ContratoResumoFinanceiro,
+  DiariaSubstituicaoDto,
 } from '../models/index';
 import { EntityCacheCoordinatorService } from './entity-cache-coordinator.service';
 
@@ -93,5 +94,9 @@ export class DiariaService {
         params: { ano: ano.toString(), mes: mes.toString() },
       },
     );
+  }
+
+  getSubstituicoes(): Observable<DiariaSubstituicaoDto[]> {
+    return this.http.get<DiariaSubstituicaoDto[]>(`${this.apiUrl}/substituicoes`);
   }
 }

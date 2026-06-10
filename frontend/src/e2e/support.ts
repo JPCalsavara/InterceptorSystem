@@ -41,8 +41,10 @@ Cypress.Commands.add('createCliente', (cliente) => {
   cy.get('[data-cy="cliente-cnpj"]').type(cnpjUnico);
   
   // Selecionar Localização (Obrigatório)
+  cy.get('#estado option').should('have.length.gt', 1);
   cy.get('#estado').select('SP');
   cy.get('#cidade', { timeout: 15000 }).should('not.be.disabled');
+  cy.get('#cidade option').should('have.length.gt', 1);
   cy.get('#cidade').select('São Paulo');
 
   cy.get('[data-cy="btn-save-cliente"]').click();

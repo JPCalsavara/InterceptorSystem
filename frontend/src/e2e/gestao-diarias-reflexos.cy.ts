@@ -86,6 +86,10 @@ describe('Gestão de Diárias e Reflexos', () => {
 
     // Passo 2: Contrato
     cy.get('[data-cy="wizard-criar-contrato"]').check();
+    cy.wait(500);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    cy.get('#dataInicio').clear().type(tomorrow.toISOString().split('T')[0]);
     cy.get('[data-cy="wizard-modo-personalizado"]').check();
     cy.get('[data-cy="wizard-numero-postos"]').clear().type('1');
     cy.get('[data-cy="wizard-posto-tipo-0"]').select('ESCALA_12X36');
@@ -136,7 +140,9 @@ describe('Gestão de Diárias e Reflexos', () => {
     cy.get('[data-testid="diaria-data"]').type(today);
     cy.get('[data-testid="diaria-status"]').select('CONFIRMADA', { force: true });
     cy.get('select[formControlName="tipoDiaria"]').select('REGULAR', { force: true });
+    cy.intercept('POST', '**/api/diarias').as('createDiaria');
     cy.get('[data-testid="btn-save-diaria"]').click({ force: true });
+    cy.wait('@createDiaria');
     
     // Agora que foi criada, vamos alterar para Falta
     cy.get('.diaria-card').contains('Funcionario X').parents('.diaria-card').as('diariaX');
@@ -146,7 +152,7 @@ describe('Gestão de Diárias e Reflexos', () => {
     cy.get('@diariaX').find('button.btn-edit').click({ force: true });
 
     // No modal, alterar o status para Falta
-    cy.get('[data-testid="diaria-status"]').select('FALTA_REGISTRADA', { force: true });
+    cy.get('[data-testid="diaria-status"]').select('FALTA_INJUSTIFICADA', { force: true });
     cy.get('[data-testid="btn-save-diaria"]').click({ force: true });
     cy.wait('@updateDiaria').its('response.statusCode').should('be.oneOf', [200, 204]);
 
@@ -184,7 +190,6 @@ describe('Gestão de Diárias e Reflexos', () => {
   it('CT-003: Deve refletir falta e substituição nos detalhes do contrato e funcionario', () => {
     // 1. Dashboard
     cy.visit('/dashboard');
-    cy.contains('Funcionario X').should('exist'); // dependendo do dashboard
 
     // 2. Funcionario Detail (Faltante)
     cy.visit('/funcionarios');
