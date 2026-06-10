@@ -82,6 +82,7 @@ describe('CadastroComponent - Cypress Component Test', () => {
     cy.viewport(1024, 768);
     mountCadastro();
 
+    cy.get('[data-cy="register-termos"]').check({ force: true });
     cy.get('[data-cy="register-submit"]').click();
 
     cy.get('.field-error').should('have.length.gte', 1);

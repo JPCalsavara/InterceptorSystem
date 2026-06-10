@@ -37,6 +37,7 @@ describe('Criação de Contratos com Vários Tipos de Posto (Wizard)', () => {
     cy.get('[data-cy="register-password"]').type(testUser.password, { force: true });
     
     cy.intercept('POST', '**/api/auth/registrar').as('registerReq');
+    cy.get('[data-cy="register-termos"]').check({ force: true });
     cy.get('[data-cy="register-submit"]').click({ force: true });
     cy.wait('@registerReq', { timeout: 10000 });
   });
