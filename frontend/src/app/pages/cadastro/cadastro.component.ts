@@ -248,7 +248,7 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
               <div class="form-group checkbox-group">
                 <label class="checkbox-label">
                   <input type="checkbox" formControlName="termos" data-cy="register-termos" />
-                  <span>Li e aceito os <a href="#" target="_blank">Termos de Uso</a> e a Política de Privacidade.</span>
+                  <span>Li e aceito os <a routerLink="/termos" target="_blank">Termos de Uso</a> e a Política de Privacidade.</span>
                 </label>
                 @if (hasError('termos')) {
                   <span class="field-error">{{ getErrorMessage('termos') }}</span>
