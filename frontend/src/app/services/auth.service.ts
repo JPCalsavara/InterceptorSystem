@@ -16,6 +16,10 @@ export interface LoginDto {
   senha: string;
 }
 
+export interface LoginGoogleDto {
+  idToken: string;
+}
+
 export interface AuthResult {
   empresaId: string;
   nomeEmpresa: string;
@@ -46,6 +50,12 @@ export class AuthService {
   login(dto: LoginDto): Observable<AuthResult> {
     return this.http
       .post<AuthResult>(`${this.apiUrl}/login`, dto)
+      .pipe(tap((result) => this.armazenarSessao(result)));
+  }
+
+  loginGoogle(dto: LoginGoogleDto): Observable<AuthResult> {
+    return this.http
+      .post<AuthResult>(`${this.apiUrl}/login/google`, dto)
       .pipe(tap((result) => this.armazenarSessao(result)));
   }
 
