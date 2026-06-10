@@ -21,6 +21,11 @@ export const routes: Routes = [
       import('./pages/cadastro/cadastro.component').then((m) => m.CadastroComponent),
   },
   {
+    path: 'termos',
+    loadComponent: () =>
+      import('./pages/termos-uso/termos-uso.component').then((m) => m.TermosUsoComponent),
+  },
+  {
     path: 'sistema',
     loadComponent: () =>
       import('./pages/sistema/sistema-page.component').then((m) => m.SistemaPageComponent),

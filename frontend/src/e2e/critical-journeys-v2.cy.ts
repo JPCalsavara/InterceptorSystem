@@ -72,6 +72,7 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
       cy.get('[data-cy="register-password"]').type(testUser.password);
       
       // 3. Submeter formulário (campos confirm password e terms removidos pois não existem no componente)
+      cy.get('[data-cy="register-termos"]').check({ force: true });
       cy.get('[data-cy="register-submit"]').click();
 
       // 4. Verificar redirecionamento para dashboard
