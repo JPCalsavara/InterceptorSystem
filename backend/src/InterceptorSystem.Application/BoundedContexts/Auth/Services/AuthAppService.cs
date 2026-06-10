@@ -19,6 +19,7 @@ public class AuthAppService : IAuthAppService
     private readonly ITokenVerificacaoRepository _tokenRepository;
     private readonly IConfiguration _configuration;
     private readonly IWhatsappMessageSender _whatsappSender;
+    private readonly IGoogleAuthService _googleAuthService;
 
     public AuthAppService(
         IContaRepository contaRepository,
@@ -27,7 +28,8 @@ public class AuthAppService : IAuthAppService
         IEmailService emailService,
         ITokenVerificacaoRepository tokenRepository,
         IConfiguration configuration,
-        IWhatsappMessageSender whatsappSender)
+        IWhatsappMessageSender whatsappSender,
+        IGoogleAuthService googleAuthService)
     {
         _contaRepository = contaRepository;
         _jwtTokenService = jwtTokenService;
@@ -36,6 +38,7 @@ public class AuthAppService : IAuthAppService
         _tokenRepository = tokenRepository;
         _configuration = configuration;
         _whatsappSender = whatsappSender;
+        _googleAuthService = googleAuthService;
     }
 
     public async Task<AuthResultDtoOutput> RegistrarAsync(RegistrarContaDtoInput input)
@@ -72,6 +75,32 @@ public class AuthAppService : IAuthAppService
 
         if (!conta.Ativo)
             throw new UnauthorizedAccessException("Esta conta está desativada.");
+
+        var token = _jwtTokenService.GerarToken(conta);
+        return new AuthResultDtoOutput(conta.Id, conta.NomeEmpresa, conta.Email.Valor, conta.Plano, token, conta.EmailVerificado);
+    }
+
+    public async Task<AuthResultDtoOutput> LoginComGoogleAsync(LoginGoogleDtoInput input)
+    {
+        var googleUser = await _googleAuthService.ValidarTokenAsync(input.IdToken);
+        
+        var conta = await _contaRepository.GetByEmailAsync(googleUser.Email);
+        
+        // Se a conta não existe, criamos uma nova ou retornamos erro? 
+        // Em um SaaS B2B, a conta raiz geralmente exige CNPJ. 
+        // Vamos retornar erro instruindo a criação da conta.
+        if (conta == null)
+            throw new UnauthorizedAccessException("Conta não encontrada com este e-mail. Por favor, registre-se primeiro.");
+
+        if (!conta.Ativo)
+            throw new UnauthorizedAccessException("Esta conta está desativada.");
+
+        // Se o email do Google for verificado, podemos assumir que o email da conta também foi
+        if (googleUser.EmailVerificado && !conta.EmailVerificado)
+        {
+            conta.MarcarEmailComoVerificado();
+            await _contaRepository.CommitAsync();
+        }
 
         var token = _jwtTokenService.GerarToken(conta);
         return new AuthResultDtoOutput(conta.Id, conta.NomeEmpresa, conta.Email.Valor, conta.Plano, token, conta.EmailVerificado);

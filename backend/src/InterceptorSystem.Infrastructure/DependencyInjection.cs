@@ -1,5 +1,6 @@
 using System.Reflection;
 using InterceptorSystem.Application.Common.Interfaces;
+using InterceptorSystem.Application.BoundedContexts.Auth.Interfaces;
 using InterceptorSystem.Application.BoundedContexts.Whatsapp.Interfaces;
 using InterceptorSystem.Domain.BoundedContexts.Operacoes.Interfaces;
 using InterceptorSystem.Domain.BoundedContexts.Auth.Interfaces;
@@ -82,6 +83,7 @@ public static class DependencyInjection
 
         // 3. Auth Services
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IGoogleAuthService, GoogleAuthService>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
         // 4. Email Service
