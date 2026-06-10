@@ -83,6 +83,7 @@ describe('InterceptorSystem E2E - Full CRUD & Deleção Cascata', () => {
       cy.get('[data-cy="register-password"]').type(testUser.password, { force: true });
       
       cy.intercept('POST', '**/api/auth/registrar').as('registerReq');
+      cy.get('[data-cy="register-termos"]').check({ force: true });
       cy.get('[data-cy="register-submit"]').click({ force: true });
       cy.wait('@registerReq', { timeout: 10000 }).then((int) => {
         expect(int.response?.statusCode).to.be.oneOf([200, 201]);

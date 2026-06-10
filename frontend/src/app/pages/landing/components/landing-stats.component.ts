@@ -36,10 +36,12 @@ import { Component } from '@angular/core';
   `,
   styles: [`
     .stats {
-      background: linear-gradient(135deg, var(--blue-800) 0%, var(--blue-700) 50%, var(--blue-600) 100%);
+      background: var(--zinc-950);
       padding: 5rem 2rem;
       position: relative;
       overflow: hidden;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
     }
     .stats::before {
       content: '';
@@ -64,8 +66,8 @@ import { Component } from '@angular/core';
     .stats-row {
       display: flex; align-items: center;
       width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: var(--zinc-900);
+      border: 1px solid var(--zinc-800);
       border-radius: var(--radius-2xl);
       overflow: hidden;
       backdrop-filter: blur(8px);
@@ -83,26 +85,26 @@ import { Component } from '@angular/core';
 
     .stat-div {
       width: 1px; height: 70px;
-      background: rgba(255, 255, 255, 0.18);
+      background: var(--zinc-800);
       flex-shrink: 0;
     }
 
     .stat-n {
       font-size: clamp(2.25rem, 4vw, 3.5rem);
       font-weight: var(--fw-extrabold);
-      color: white;
+      color: var(--primary-color);
       letter-spacing: -0.03em; line-height: 1;
     }
 
     .stat-l {
       font-size: var(--text-sm); font-weight: var(--fw-semibold);
-      color: rgba(255, 255, 255, 0.9);
+      color: var(--zinc-100);
       margin-top: var(--space-2);
     }
 
     .stat-d {
       font-size: var(--text-xs);
-      color: rgba(255, 255, 255, 0.55);
+      color: var(--zinc-400);
       margin-top: 2px;
     }
 

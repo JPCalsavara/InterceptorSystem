@@ -70,7 +70,8 @@ import { Component } from '@angular/core';
     .leadership-quote-area {
       display: flex; flex-direction: column;
       gap: var(--space-6); padding: var(--space-8);
-      background: linear-gradient(135deg, var(--blue-800) 0%, var(--blue-700) 100%);
+      background: var(--zinc-950);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-2xl);
       position: relative; overflow: hidden;
     }

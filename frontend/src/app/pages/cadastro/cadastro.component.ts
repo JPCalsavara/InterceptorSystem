@@ -245,7 +245,15 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
                 }
               </button>
 
-              <p class="terms">Ao criar sua conta, você concorda com nossos termos de uso.</p>
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="termos" data-cy="register-termos" />
+                  <span>Li e aceito os <a href="#" target="_blank">Termos de Uso</a> e a Política de Privacidade.</span>
+                </label>
+                @if (hasError('termos')) {
+                  <span class="field-error">{{ getErrorMessage('termos') }}</span>
+                }
+              </div>
             </form>
 
             <div class="register-footer">Já tem uma conta? <a routerLink="/login">Entrar</a></div>
@@ -526,10 +534,39 @@ import { cnpjValidator } from '../../shared/validators/br-documents.validators';
         }
       }
 
-      .terms {
-        font-size: var(--text-xs);
-        color: var(--text-tertiary);
-        text-align: center;
+      .checkbox-group {
+        margin-top: var(--space-2);
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        cursor: pointer;
+
+        input[type="checkbox"] {
+          margin-top: 3px;
+          width: 16px;
+          height: 16px;
+          accent-color: var(--primary-color);
+          cursor: pointer;
+        }
+
+        span {
+          font-size: var(--text-sm);
+          color: var(--text-secondary);
+          line-height: 1.5;
+          font-weight: var(--fw-regular);
+
+          a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: var(--fw-medium);
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
       }
 
       .register-footer {
@@ -587,6 +624,7 @@ export class CadastroComponent implements OnInit {
         '',
         [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)],
       ],
+      termos: [false, Validators.requiredTrue],
     });
   }
 
@@ -611,6 +649,7 @@ export class CadastroComponent implements OnInit {
     if (errors['email']) return 'E-mail inválido';
     if (errors['cnpjInvalid']) return 'CNPJ inválido (ex: 12.345.678/0001-90)';
     if (errors['pattern']) return 'A senha deve conter pelo menos 8 caracteres, 1 maiúscula e 1 número';
+    if (errors['requiredTrue']) return 'Você deve aceitar os termos de uso';
 
     return 'Campo inválido';
   }
