@@ -30,6 +30,19 @@ http://localhost/swagger
 
 ---
 
+## 🔑 Configurações de Integração
+
+O sistema depende de chaves externas para recursos avançados. Preencha seu `.env` ou `appsettings.json`:
+
+1. **Meta (WhatsApp)**: 
+   - Necessário para substituição de diárias. Requer: `PhoneNumberId`, `AccessToken` e `WebhookVerifyToken`.
+2. **Google OAuth2**:
+   - Necessário para o botão "Entrar com Google". Requer o `ClientId`.
+3. **SonarCloud (Qualidade)**:
+   - Necessário apenas para o CI/CD (GitHub Actions). Defina o `SONAR_TOKEN` nas secrets do repositório.
+
+---
+
 ## 🏗️ Estrutura do Projeto
 
 ```
