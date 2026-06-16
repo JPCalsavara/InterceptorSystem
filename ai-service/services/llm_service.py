@@ -1,5 +1,8 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from core.config import settings
+import json
+import os
+import anyio
 
 # Instância base do LLM usando a chave de ambiente do Gemini
 llm = ChatGoogleGenerativeAI(
@@ -7,6 +10,14 @@ llm = ChatGoogleGenerativeAI(
     model=settings.model_name,
     temperature=0.3
 )
+
+async def read_config():
+        # Carrega a base de conhecimento (RAG Simplificado)
+        kb_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'knowledge_base.json')        
+        async with await anyio.open_file(kb_path, 'r', encoding='utf-8') as f:
+            content = await f.read()
+            kb_data = json.loads(content)
+        return kb_data
 
 async def process_support_message(message: str, tenant_id: str) -> str:
     """
@@ -22,20 +33,11 @@ async def process_support_message(message: str, tenant_id: str) -> str:
     try:
         # TODO: Implementar busca no banco vetorial ChromaDB
         # documents = vector_store.similarity_search(message, filter={"tenant_id": tenant_id})
-        # context = "\n".join([doc.page_content for doc in documents])
+        kb_data = await read_config()
+        if kb_data is None:
+            raise Exception("Erro ao carregar a base de conhecimento local.")
+        rag_context = json.dumps(kb_data, ensure_ascii=False, indent=2)
         
-        import json
-        import os
-        
-        # Carrega a base de conhecimento (RAG Simplificado)
-        kb_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'knowledge_base.json')
-        try:
-            with open(kb_path, 'r', encoding='utf-8') as f:
-                kb_data = json.load(f)
-            rag_context = json.dumps(kb_data, ensure_ascii=False, indent=2)
-        except Exception:
-            rag_context = "Erro ao carregar a base de conhecimento local."
-
         # Guardrails e System Prompt unificados
         system_prompt = f"""Você é a Joseane, a IA assistente oficial do InterceptorSystem.
 Sua missão é ajudar gestores, supervisores e funcionários com dúvidas sobre regras de negócio e uso do sistema.
