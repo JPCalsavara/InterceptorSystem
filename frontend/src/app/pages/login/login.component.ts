@@ -402,9 +402,6 @@ declare var google: any;
   ],
 })
 export class LoginComponent implements OnInit {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private ngZone = inject(NgZone);
   private fb = new FormBuilder();
   form!: FormGroup;
   erro = signal<string | null>(null);
@@ -416,6 +413,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private ngZone: NgZone
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -458,7 +456,7 @@ export class LoginComponent implements OnInit {
 
     this.authService.login({ email, senha }).subscribe({
       next: () => this.router.navigate(['/dashboard']),
-      error: (err) => {
+      error: (err: any) => {
         this.carregando.set(false);
         const msg = err?.error?.mensagem;
         this.erro.set(msg ?? 'Erro ao entrar. Verifique seus dados.');
@@ -498,7 +496,7 @@ export class LoginComponent implements OnInit {
     if (response.credential) {
       this.authService.loginGoogle({ idToken: response.credential }).subscribe({
         next: () => this.router.navigate(['/dashboard']),
-        error: (err) => {
+        error: (err: any) => {
           this.carregando.set(false);
           const msg = err?.error?.mensagem;
           this.erro.set(msg ?? 'Erro ao autenticar com o Google.');
