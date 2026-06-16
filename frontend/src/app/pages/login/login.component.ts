@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
+import { NgZone } from '@angular/core';
+
+declare var google: any;
 
 @Component({
   selector: 'app-login',
@@ -398,8 +402,11 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class LoginComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private ngZone = inject(NgZone);
   private fb = new FormBuilder();
-  form: FormGroup;
+  form!: FormGroup;
   erro = signal<string | null>(null);
   carregando = signal(false);
   mostrarSenha = signal(false);
@@ -460,11 +467,46 @@ export class LoginComponent implements OnInit {
   }
 
   loginComGoogle(): void {
-    // Implementação temporária / pendente de biblioteca GSI (Google Sign-In)
-    // O correto seria: 
-    // 1. google.accounts.id.initialize({ client_id: '...', callback: this.handleGoogleCredentialResponse })
-    // 2. google.accounts.id.prompt() ou renderizar o botão oficial
-    
-    this.erro.set('O login com Google está sendo configurado. Requer integração de biblioteca cliente e Client ID no ambiente.');
+    this.carregando.set(true);
+    if (typeof google === 'undefined') {
+      this.erro.set('O Google Identity Services não pôde ser carregado. Verifique sua conexão.');
+      this.carregando.set(false);
+      return;
+    }
+
+    if (!environment.googleClientId || environment.googleClientId.startsWith('COLOQUE_SEU_CLIENT_ID')) {
+      this.erro.set('O Client ID do Google não está configurado no arquivo environment.ts.');
+      this.carregando.set(false);
+      return;
+    }
+
+    // Inicializa o prompt de login do Google
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: any) => this.ngZone.run(() => this.handleGoogleCredentialResponse(response))
+    });
+
+    google.accounts.id.prompt((notification: any) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        this.erro.set('O pop-up de login do Google foi bloqueado pelo navegador ou ignorado.');
+        this.carregando.set(false);
+      }
+    });
+  }
+
+  private handleGoogleCredentialResponse(response: any): void {
+    if (response.credential) {
+      this.authService.loginGoogle({ idToken: response.credential }).subscribe({
+        next: () => this.router.navigate(['/dashboard']),
+        error: (err) => {
+          this.carregando.set(false);
+          const msg = err?.error?.mensagem;
+          this.erro.set(msg ?? 'Erro ao autenticar com o Google.');
+        }
+      });
+    } else {
+      this.carregando.set(false);
+      this.erro.set('Falha ao obter credenciais do Google.');
+    }
   }
 }

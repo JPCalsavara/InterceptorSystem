@@ -53,6 +53,8 @@ services:
       - Meta__PhoneNumberId=${META__PHONENUMBERID:-dev-phone-id}
       - Meta__AccessToken=${META__ACCESSTOKEN:-dev-access-token}
       - Meta__WebhookVerifyToken=${META__WEBHOOKVERIFYTOKEN:-dev-verify-token}
+      # Google OAuth
+      - Authentication__Google__ClientId=${AUTHENTICATION__GOOGLE__CLIENTID:-}
     depends_on:
       db:
         condition: service_healthy
