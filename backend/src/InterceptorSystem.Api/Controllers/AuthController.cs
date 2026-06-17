@@ -53,6 +53,16 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("login/google")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResultDtoOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> LoginGoogle([FromBody] LoginGoogleDtoInput input, CancellationToken ct = default)
+    {
+        var result = await _authAppService.LoginComGoogleAsync(input);
+        return Ok(result);
+    }
+
     [HttpPost("email/confirmar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

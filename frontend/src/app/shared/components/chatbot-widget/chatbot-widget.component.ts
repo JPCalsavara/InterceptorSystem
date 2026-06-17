@@ -20,9 +20,9 @@ interface ChatMessage {
         <div class="chat-window">
           <div class="chat-header">
             <div class="header-info">
-              <span class="bot-avatar">🤖</span>
+              <span class="bot-avatar">👩‍💼</span>
               <div>
-                <h4>Joseane (RH)</h4>
+                <h4>Joseane (Assistente)</h4>
                 <p>Online</p>
               </div>
             </div>
@@ -339,14 +339,14 @@ export class ChatbotWidgetComponent implements AfterViewChecked {
   isOpen = signal(false);
   isLoading = signal(false);
   messages = signal<ChatMessage[]>([
-    { text: 'Olá! Meu nome é Joseane, sou sua assistente virtual de RH. Como posso ajudar você hoje?', sender: 'bot', timestamp: new Date() }
+    { text: 'Olá! Meu nome é Joseane, sou a assistente virtual do InterceptorSystem. Como posso ajudar você hoje?', sender: 'bot', timestamp: new Date() }
   ]);
   
   defaultQuestions = [
-    'Como funciona o sistema de ponto?',
-    'Como envio meu atestado médico?',
-    'Quando é o fechamento da folha?',
-    'Preciso de uma substituição na minha diária'
+    'Quais as regras para escala e diárias?',
+    'Como funciona o faturamento de contratos?',
+    'Como faço para registrar uma substituição?',
+    'Contratos vencidos fecham automaticamente?'
   ];
 
   newMessage = '';

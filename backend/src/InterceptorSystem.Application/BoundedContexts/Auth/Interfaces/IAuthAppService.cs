@@ -6,6 +6,7 @@ public interface IAuthAppService
 {
     Task<AuthResultDtoOutput> RegistrarAsync(RegistrarContaDtoInput input);
     Task<AuthResultDtoOutput> LoginAsync(LoginDtoInput input);
+    Task<AuthResultDtoOutput> LoginComGoogleAsync(LoginGoogleDtoInput input);
     Task<ContaPerfilDtoOutput> GetContaAsync(Guid empresaId);
     Task<ContaPerfilDtoOutput> AtualizarContaAsync(Guid empresaId, AtualizarContaDtoInput input);
     Task ConfirmarEmailAsync(ConfirmarTokenDtoInput input);

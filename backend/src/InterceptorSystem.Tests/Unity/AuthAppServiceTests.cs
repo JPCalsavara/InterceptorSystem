@@ -19,6 +19,7 @@ public class AuthAppServiceTests
     private readonly Mock<ITokenVerificacaoRepository> _tokenRepo = new();
     private readonly Mock<IConfiguration> _configuration = new();
     private readonly Mock<IWhatsappMessageSender> _whatsappSender = new();
+    private readonly Mock<IGoogleAuthService> _googleAuthService = new();
     private readonly AuthAppService _service;
 
     private const string SenhaPlana = "MinhaSenha123!";
@@ -44,7 +45,8 @@ public class AuthAppServiceTests
             _emailService.Object,
             _tokenRepo.Object,
             _configuration.Object,
-            _whatsappSender.Object
+            _whatsappSender.Object,
+            _googleAuthService.Object
         );
     }
 
@@ -517,5 +519,49 @@ public class AuthAppServiceTests
         Assert.StartsWith(frontendUrl, linkCapturado);
         Assert.Contains("verificar-email", linkCapturado);
         Assert.Contains("token=", linkCapturado);
+    }
+
+    [Fact]
+    public async Task LoginComGoogleAsync_ComContaInexistente_DeveLancarUnauthorizedAccessException()
+    {
+        // Arrange
+        var input = new LoginGoogleDtoInput("valid-id-token");
+        var googleUser = new GoogleUserDto { Email = "nao-existe@teste.com", EmailVerificado = true };
+
+        _googleAuthService.Setup(s => s.ValidarTokenAsync(input.IdToken))
+            .ReturnsAsync(googleUser);
+
+        _contaRepo.Setup(r => r.GetByEmailAsync(googleUser.Email))
+            .ReturnsAsync((Conta?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.LoginComGoogleAsync(input));
+    }
+
+    [Fact]
+    public async Task LoginComGoogleAsync_ComContaExistenteEAtiva_DeveRetornarToken()
+    {
+        // Arrange
+        var input = new LoginGoogleDtoInput("valid-id-token");
+        var googleUser = new GoogleUserDto { Email = "teste@teste.com", EmailVerificado = true };
+        var conta = new Conta("teste@teste.com", SenhaHash, "Empresa Google");
+
+        _googleAuthService.Setup(s => s.ValidarTokenAsync(input.IdToken))
+            .ReturnsAsync(googleUser);
+
+        _contaRepo.Setup(r => r.GetByEmailAsync(googleUser.Email))
+            .ReturnsAsync(conta);
+
+        _jwtService.Setup(s => s.GerarToken(conta))
+            .Returns(TokenFake);
+
+        // Act
+        var result = await _service.LoginComGoogleAsync(input);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(TokenFake, result.Token);
+        Assert.Equal("teste@teste.com", result.Email);
+        Assert.True(result.EmailVerificado); // Assuming googleUser.EmailVerificado is true and updates the account
     }
 }

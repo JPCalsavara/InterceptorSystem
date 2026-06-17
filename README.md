@@ -629,6 +629,31 @@ npm start
 # http://localhost:4200
 ```
 
+### Integrações e APIs Externas (Setup Manual)
+
+Para rodar o projeto localmente com todas as funcionalidades, você precisará preencher as variáveis do `appsettings.json` ou do `.env`:
+
+#### 1. WhatsApp Bot (Meta API Oficial)
+O chatbot de substituições usa a API oficial do WhatsApp (Cloud API).
+- Crie um App no **Meta for Developers**.
+- Configure um Webhook apontando para `/api/webhook/whatsapp`.
+- Obtenha o `PhoneNumberId`, `AccessToken` (permanente) e defina um `WebhookVerifyToken`.
+- Adicione na sessão `"Meta"` do `appsettings.json`.
+
+#### 2. Autenticação B2B com Google OAuth2
+O login único com Google (SSO) requer o ID do Cliente do Google Cloud.
+- Acesse o **Google Cloud Console** e crie uma credencial OAuth 2.0 (Aplicativo Web).
+- Autorize as origens (ex: `http://localhost:4200`).
+- Adicione a chave gerada no `appsettings.json` em `"Authentication:Google:ClientId"`.
+- A API `/api/auth/login/google` usará o `Google.Apis.Auth` para validar o token e liberar o JWT da aplicação.
+
+#### 3. Qualidade de Código (SonarQube/SonarCloud)
+Os testes e a qualidade do código são analisados automaticamente via GitHub Actions.
+- Acesse o **SonarCloud** e gere um Token para o seu repositório.
+- Vá no seu GitHub em `Settings > Secrets and variables > Actions`.
+- Crie a secret `SONAR_TOKEN` com o token gerado.
+- O arquivo `.github/workflows/sonar.yml` cuidará do resto a cada Pull Request.
+
 ---
 
 ## 📁 Estrutura de Pastas

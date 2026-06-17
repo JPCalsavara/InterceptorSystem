@@ -1,0 +1,35 @@
+{
+  "system_info": {
+    "name": "InterceptorSystem",
+    "type": "SaaS de gestão operacional para empresas de segurança patrimonial",
+    "core_features": [
+      "Dashboard: Visão financeira e status geral.",
+      "Clientes e Contratos: Gerencia dados dos clientes e define margens de lucro. Contratos vencidos mudam de status automaticamente.",
+      "Postos e Funcionários: Postos têm turnos de 12 horas. Funcionários devem ter CPF único.",
+      "Diárias: Permite gerenciar a alocação (escala). Visualização em lista, semanal ou calendário."
+    ]
+  },
+  "business_rules": [
+    "Substituições podem ser feitas pelo sistema ou automaticamente pelo bot do WhatsApp.",
+    "Funcionários não podem trabalhar dias seguidos sem descanso obrigatório, exceto quando marcado como 'Dobra Programada'.",
+    "O faturamento dos contratos é calculado com base nas Tags: Custo Total × (1 + Margens)."
+  ],
+  "faq": [
+    {
+      "question": "Como funciona o sistema de ponto?",
+      "answer": "O sistema gerencia alocações através de Diárias. A presença é confirmada diretamente no Posto ou via bot do WhatsApp."
+    },
+    {
+      "question": "Como envio meu atestado médico?",
+      "answer": "Atestados devem ser entregues diretamente à supervisão ou anexados pelo painel do funcionário na aba 'Documentos', justificando a falta na diária."
+    },
+    {
+      "question": "Quando é o fechamento da folha?",
+      "answer": "O fechamento da folha e dos contratos ocorre no último dia útil do mês, baseado nas diárias efetivamente realizadas e faltas registradas."
+    },
+    {
+      "question": "Preciso de uma substituição na minha diária",
+      "answer": "Para solicitar substituição, você pode acionar o bot do WhatsApp digitando 'Substituir' ou o supervisor pode alocar outro funcionário pelo painel de Diárias."
+    }
+  ]
+}
