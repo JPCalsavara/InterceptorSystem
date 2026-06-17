@@ -44,7 +44,7 @@ Inclui os dominios e funcionalidades em operacao:
 
 | Prioridade | Frente                        | Objetivo da entrega                                                   | Complexidade estimada |
 | ---------- | ----------------------------- | --------------------------------------------------------------------- | --------------------- |
-| P1         | Core Operacional (fechamento) | Concluir modulo Core e reduzir pendencias estruturais                 | Alta                  |
+| P1         | Core Operacional (fechamento) | **Concluído** - Modulo Core operando com fluxos compostos validados E2E | Alta                  |
 | P1         | Saida Financeira              | Consolidar fluxo de saida/relatorio financeiro e regras de fechamento | Alta                  |
 | P1         | Captacao de Curriculos        | Disponibilizar intake, triagem inicial e armazenamento padrao         | Media                 |
 | P1         | Leitura de Totem (Face)       | Validar fluxo de entrada/saida com rastreabilidade e auditoria        | Alta                  |
@@ -108,7 +108,7 @@ Inclui os dominios e funcionalidades em operacao:
 | Item README                                                     | Plano que governa                                              |
 | --------------------------------------------------------------- | -------------------------------------------------------------- |
 | DDD com 3 Bounded Contexts                                      | `plano-integracao.md`, `plano-qualidade.md`                    |
-| CRUD + fluxos compostos (`clientes-completos`, `diarias/batch`) | `plano-escopo.md`, `plano-qualidade.md`                        |
+| CRUD + fluxos compostos (`clientes-completos`, `diarias/batch`) | Validado 100% via Cypress E2E (`simulacao-visual.cy.ts`)       |
 | Auth/SaaS/Conta                                                 | `plano-integracao.md`, `plano-riscos.md`                       |
 | WhatsApp Bot + webhooks                                         | `plano-integracao.md`, `plano-riscos.md`                       |
 | Docker Compose + CI/CD                                          | `plano-cronograma.md`, `plano-custos.md`, `plano-qualidade.md` |
