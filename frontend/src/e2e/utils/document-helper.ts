@@ -1,5 +1,9 @@
 export const generateValidCNPJ = () => {
-    const randomDigit = () => Math.floor(Math.random() * 9);
+    const randomDigit = () => {
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        return array[0] % 9;
+    };
     const n = Array.from({ length: 12 }, randomDigit);
     const mod = (arr: number[], pesos: number[]) => {
       const soma = arr.reduce((acc, curr, i) => acc + curr * pesos[i], 0);
@@ -12,7 +16,11 @@ export const generateValidCNPJ = () => {
 };
 
 export const generateValidCPF = () => {
-    const randomDigit = () => Math.floor(Math.random() * 9);
+    const randomDigit = () => {
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        return array[0] % 9;
+    };
     const n = Array.from({ length: 9 }, randomDigit);
     const mod = (arr: number[], pesos: number[]) => {
       const soma = arr.reduce((acc, curr, i) => acc + curr * pesos[i], 0);

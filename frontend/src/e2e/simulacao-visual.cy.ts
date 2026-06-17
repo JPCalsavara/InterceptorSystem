@@ -58,49 +58,22 @@ describe('Simulação Visual - Criação Completa e Diárias em Lote', () => {
     cy.get('[data-cy="wizard-next-step"]').click();
 
     // PASSO 3: Funcionários
-    // Adiciona o primeiro funcionário (Turno A)
-    cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
-    cy.get('.funcionario-card').eq(0).within(() => {
-      cy.get('[formControlName="nome"]').type('Carlos Vigilante');
-      cy.get('[formControlName="cpf"]').type(generateValidCPF());
-      cy.get('[formControlName="celular"]').type('11999999999');
-      cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
-      cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
-      cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
-    });
+    const adicionarFuncionario = (index: number, nome: string, celular: string) => {
+      cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
+      cy.get('.funcionario-card').eq(index).within(() => {
+        cy.get('[formControlName="nome"]').type(nome);
+        cy.get('[formControlName="cpf"]').type(generateValidCPF());
+        cy.get('[formControlName="celular"]').type(celular);
+        cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
+        cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
+        cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
+      });
+    };
 
-    // Adiciona o segundo funcionário (Turno A)
-    cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
-    cy.get('.funcionario-card').eq(1).within(() => {
-      cy.get('[formControlName="nome"]').type('Roberto Segurança');
-      cy.get('[formControlName="cpf"]').type(generateValidCPF());
-      cy.get('[formControlName="celular"]').type('11977777777');
-      cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
-      cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
-      cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
-    });
-
-    // Adiciona o terceiro funcionário (Turno B - Folguista)
-    cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
-    cy.get('.funcionario-card').eq(2).within(() => {
-      cy.get('[formControlName="nome"]').type('Marcos Folguista');
-      cy.get('[formControlName="cpf"]').type(generateValidCPF());
-      cy.get('[formControlName="celular"]').type('11988888888');
-      cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
-      cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
-      cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
-    });
-
-    // Adiciona o quarto funcionário (Turno B - Folguista)
-    cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
-    cy.get('.funcionario-card').eq(3).within(() => {
-      cy.get('[formControlName="nome"]').type('Lucas Cobertura');
-      cy.get('[formControlName="cpf"]').type(generateValidCPF());
-      cy.get('[formControlName="celular"]').type('11966666666');
-      cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
-      cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
-      cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
-    });
+    adicionarFuncionario(0, 'Carlos Vigilante', '11999999999');
+    adicionarFuncionario(1, 'Roberto Segurança', '11977777777');
+    adicionarFuncionario(2, 'Marcos Folguista', '11988888888');
+    adicionarFuncionario(3, 'Lucas Cobertura', '11966666666');
 
     // Finaliza o Wizard
     cy.intercept('POST', '**/api/clientes-completos').as('createClienteCompleto');
