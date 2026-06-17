@@ -12,7 +12,7 @@ Esta skill orienta o assistente a conduzir o versionamento de ponta a ponta:
 - Realização de commits usando **Conventional Commits**.
 - Push para o repositório remoto.
 - Criação de Pull Requests (PRs) no GitHub.
-- Leitura e resolução iterativa de comentários de Pull Requests (ex: apontamentos do GitHub Copilot).
+- Leitura e resolução iterativa de comentários de Pull Requests (ex: apontamentos do GitHub Copilot e análise do SonarQube).
 
 Use esta skill para padronizar o ciclo de vida das suas alterações no repositório.
 
@@ -79,25 +79,28 @@ Quando o trabalho estiver concluído, os testes estiverem passando, e o usuário
    - Refatorado a enum de Status.
    " --base main --reviewer copilot
    ```
-   *(Sempre adicione o Copilot como reviewer usando `--reviewer copilot`, ou as labels padrão, para iniciar a revisão da IA).*
+   *(Sempre adicione o Copilot como reviewer usando `--reviewer copilot`, ou as labels padrão, para iniciar a revisão da IA. O SonarQube/SonarCloud, se configurado via CI, executará automaticamente).*
    
-   *Após a criação do PR, NÃO aguarde o usuário pedir: prossiga imediatamente e de forma autônoma para o PASSO 4, aguardando alguns segundos para que o Copilot gere os comentários.*
+   *Após a criação do PR, NÃO aguarde o usuário pedir: prossiga imediatamente e de forma autônoma para o PASSO 4, aguardando alguns segundos para que o Copilot e as análises do SonarQube gerem os comentários/resultados.*
 
 ---
 
-## PASSO 4 — Auto-Resolução de Reviews de PR do Copilot (Loop Interativo)
+## PASSO 4 — Auto-Resolução de Reviews de PR (Copilot e SonarQube)
 
 Após abrir o PR e designar o Copilot, execute esta rotina autônoma de análise e resposta:
 
-1. **Baixe os comentários e diffs do PR atual usando o CLI:** (ex: `gh api repos/{owner}/{repo}/pulls/{number}/comments`)
+1. **Verifique o Status do CI e Baixe Comentários:**
+   - Verifique se os checks do SonarQube passaram (`gh pr checks`).
+   - Baixe os comentários e diffs do PR atual usando o CLI: (ex: `gh api repos/{owner}/{repo}/pulls/{number}/comments`). Isso trará tanto os apontamentos do Copilot quanto os "Code Smells/Vulnerabilities" do SonarQube.
+   - Caso o SonarQube não poste comentários mas reprove o check, baixe o log (`gh run view --log`) para identificar a falha.
 2. **Avaliação Crítica e Resolução:** 
-   - Leia os comentários de revisão. Se eles indicarem problemas no código, lógicas erradas, bugs ou melhorias necessárias, **acione imediatamente a skill `bug-workflow`** para planejar e realizar a correção iterativa.
-   - Forneça os comentários do PR como contexto para o `bug-workflow`.
+   - Leia os comentários de revisão (Copilot ou Sonar). Se eles indicarem problemas no código, lógicas erradas, bugs ou melhorias necessárias, **acione imediatamente a skill `bug-workflow`** para planejar e realizar a correção iterativa.
+   - Forneça os comentários/logs como contexto para o `bug-workflow`.
 3. **Commit e Push das Correções:**
    - Após o `bug-workflow` terminar e as correções passarem, adicione e faça commit das alterações:
    ```bash
    git add .
-   git commit -m "fix(review): aplica melhorias sugeridas pelo code review do copilot"
+   git commit -m "fix(review): aplica melhorias sugeridas pelo code review (Copilot/Sonar)"
    git push origin <nome-da-branch>
    ```
 4. **Responda/Resolva a Thread:**

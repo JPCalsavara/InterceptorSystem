@@ -1,8 +1,9 @@
+import { getSafeTestPassword, registerTestUser } from './utils/flow-helper';
 describe('Data Consistency Between List and Detail Views', () => {
   const baseUrl = Cypress.config('baseUrl') || 'http://localhost:4200';
   const testUser = {
     email: 'test@example.com',
-    password: 'TestPassword123!',
+    password: getSafeTestPassword(),
   };
 
   const testCliente = {

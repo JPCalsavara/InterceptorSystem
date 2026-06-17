@@ -25,6 +25,7 @@ Definir criterios de qualidade para produto e documentacao, sustentados por test
 
 - Suite `InterceptorSystem.Tests` com testes unitários e de integração (Backend)
 - Suítes Cypress E2E e Component Tests em `frontend/src/e2e` e `frontend/src/app`
+- Simulação Visual Completa e2e (`simulacao-visual.cy.ts`) atestando a fluidez do Wizard e Diárias Múltiplas
 - Testes de endpoints administrativos e auth (incluindo cenários 200/400/401/404/409)
 - CI com jobs de backend, frontend e docker build
 

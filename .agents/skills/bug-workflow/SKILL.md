@@ -22,7 +22,7 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
 
 ### FASE 1: Diagnóstico e Construção de Feedback Loop
 - **Se não houver `task_plan.md`:** 
-  1. Analise o relato do bug ou os logs fornecidos pelo usuário.
+  1. Analise o relato do bug ou os logs fornecidos pelo usuário (isso inclui logs e comentários de CI gerados pelo GitHub Copilot ou **SonarQube** / SonarCloud).
   2. **[OBRIGATÓRIO]** Construa um loop de feedback rápido e determinístico antes de supor qualquer coisa (Teste de Integração, Curl script, Playwright, Bisection Harness). Acelere esse loop ao máximo. Se for não-determinístico (flaky), injete logs/stress até ele falhar confiavelmente.
   3. Formule **3-5 hipóteses testáveis e falsificáveis** (Ex: "Se for cache, limpar cache antes fará passar"). Não pule essa etapa de ranking.
   4. Instrumente variáveis isoladas para testar cada hipótese. Use `[DEBUG-tag]` nos logs para limpeza fácil depois.
@@ -92,7 +92,7 @@ Sempre que iniciar ou retomar o fluxo, leia os arquivos de memória acima (se ex
   1. Faça commit das alterações utilizando prefixo `fix(escopo): ...`.
   2. Dê `git push` na branch atual.
   3. Abra o Pull Request (via GitHub CLI `gh pr create`) descrevendo a "Causa Raiz" (busque no `findings.md`) e a "Solução Aplicada".
-  4. Rode a skill `code-review` no diff da branch para ter certeza de que a correção não introduziu vulnerabilidades.
+  4. Rode a skill `code-review` no diff da branch para ter certeza de que a correção não introduziu vulnerabilidades. Em seguida, verifique via `gh pr checks` se o SonarQube e os testes do CI aprovaram a alteração.
   5. Limpe os arquivos temporários movendo-os para `docs/history/tasks/` como post-mortem do bug.
 
 ---

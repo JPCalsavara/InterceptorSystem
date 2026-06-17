@@ -249,7 +249,7 @@ import { LayoutStateService } from '../services/layout-state.service';
   styles: [
     `
       .navbar {
-        height: 64px;
+        height: 72px;
         background: var(--surface-card);
         border-bottom: 1px solid var(--border-subtle);
         display: flex;
