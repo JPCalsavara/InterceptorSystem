@@ -1,3 +1,4 @@
+import { getSafeTestPassword, registerTestUser } from './utils/flow-helper';
 /**
  * E2E Tests for InterceptorSystem - Critical User Journeys
  *
@@ -9,7 +10,7 @@ describe('InterceptorSystem E2E - Critical User Journeys', () => {
   const baseUrl = Cypress.config().baseUrl || 'http://localhost:4200';
   const testUser = {
     email: `test_${Date.now()}@example.com`,
-    password: 'TestPassword123!',
+    password: getSafeTestPassword(),
     username: 'test_user',
   };
 

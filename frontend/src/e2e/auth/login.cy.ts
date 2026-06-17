@@ -1,3 +1,4 @@
+import { getSafeTestPassword, registerTestUser } from '../utils/flow-helper';
 import { generateValidCNPJ, generateValidCPF } from '../utils/document-helper';
 describe('Autenticação - Login (E2E)', () => {
   const baseUrl = Cypress.config().baseUrl || 'http://localhost:4200';
@@ -5,7 +6,7 @@ describe('Autenticação - Login (E2E)', () => {
   
   const testUser = {
     email: `teste_${timestamp}@example.com`,
-    password: 'TestPassword123!',
+    password: getSafeTestPassword(),
     username: `Teste_${timestamp}`,
   };
 

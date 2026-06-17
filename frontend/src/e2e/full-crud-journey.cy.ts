@@ -1,3 +1,4 @@
+import { getSafeTestPassword, registerTestUser } from './utils/flow-helper';
 import { generateValidCNPJ, generateValidCPF } from './utils/document-helper';
 /**
  * E2E Tests for InterceptorSystem - Full CRUD & Cascading Delete
@@ -12,7 +13,7 @@ describe('InterceptorSystem E2E - Full CRUD & Deleção Cascata', () => {
   
   const testUser = {
     email: `admin_${timestamp}@example.com`,
-    password: 'TestPassword123!',
+    password: getSafeTestPassword(),
     username: `Admin_${timestamp}`,
   };
 

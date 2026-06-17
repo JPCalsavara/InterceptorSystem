@@ -1,9 +1,10 @@
+import { getSafeTestPassword, registerTestUser, fillWizardClienteStep } from './utils/flow-helper';
 import { generateValidCNPJ, generateValidCPF } from './utils/document-helper';
 describe('Gestão de Diárias e Reflexos', () => {
   const timestamp = Date.now();
   const testUser = {
     email: `admin_${timestamp}@example.com`,
-    password: 'TestPassword123!',
+    password: getSafeTestPassword(),
     username: `Admin_${timestamp}`,
   };
 
@@ -11,25 +12,7 @@ describe('Gestão de Diárias e Reflexos', () => {
   let validCPF1 = '';
   let validCPF2 = '';
 
-  before(() => {
-    validCNPJ = generateValidCNPJ();
-    validCPF1 = generateValidCPF();
-    validCPF2 = generateValidCPF();
-    
-    cy.clearCookies();
-    cy.window().then((win) => win.localStorage.clear());
-    
-    // 1. Registrar
-    cy.visit('/cadastro');
-    cy.get('[data-cy="register-name"]').type(testUser.username, { force: true });
-    cy.get('[data-cy="cnpj"]').type(validCNPJ, { force: true });
-    cy.get('[data-cy="register-email"]').type(testUser.email, { force: true });
-    cy.get('[data-cy="register-password"]').type(testUser.password, { force: true });
-    cy.intercept('POST', '**/api/auth/registrar').as('registerReq');
-    cy.get('[data-cy="register-termos"]').check({ force: true });
-    cy.get('[data-cy="register-submit"]').click({ force: true });
-    cy.wait('@registerReq', { timeout: 10000 });
-  });
+  before(() => { validCNPJ = generateValidCNPJ(); validCPF1 = generateValidCPF(); validCPF2 = generateValidCPF(); registerTestUser(testUser, validCNPJ); });
 
   beforeEach(() => {
     cy.login(testUser.email, testUser.password);
@@ -44,14 +27,7 @@ describe('Gestão de Diárias e Reflexos', () => {
     cy.visit('/clientes/criar-completo');
 
     // Passo 1: Cliente
-    cy.get('[data-cy="wizard-cliente-nome"]').type('Cliente Diarias Test');
-    cy.get('[data-cy="wizard-cliente-cnpj"]').type(generateValidCNPJ());
-    cy.get('[data-cy="wizard-cliente-estado"]').select('SP');
-    cy.wait('@getMunicipios');
-    cy.get('[data-cy="wizard-cliente-cidade"]').select('São Paulo');
-    cy.get('[data-cy="wizard-cliente-ideal"]').clear().type('2');
-    cy.get('[data-cy="wizard-cliente-horario"]').type('06:00');
-    cy.get('[data-cy="wizard-next-step"]').click();
+    fillWizardClienteStep('Cliente Diarias Test', validCNPJ);
 
     // Passo 2: Contrato
     cy.get('[data-cy="wizard-criar-contrato"]').check();
