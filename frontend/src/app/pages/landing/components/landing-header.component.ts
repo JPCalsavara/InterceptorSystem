@@ -72,13 +72,13 @@ import { RouterLink } from '@angular/router';
     }
   `,
   styles: [`
-    :host { --header-height: 72px; display: contents; }
+    :host { --header-height: 80px; display: contents; }
     svg { width: 1em; height: 1em; }
 
     .landing-header {
       border-bottom: 1px solid var(--border-subtle);
       background: color-mix(in srgb, var(--surface-card) 85%, transparent);
-      padding: 0 2rem;
+      padding: 2rem 2rem;
       height: var(--header-height);
       display: flex;
       align-items: center;
