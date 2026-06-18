@@ -90,7 +90,7 @@
                   data-cy="wizard-cliente-estado"
                 >
                   <option value="">Selecione o estado</option>
-                  @for (uf of estados(); track uf) {
+                  @for (uf of estados; track uf) {
                     <option [value]="uf">{{ uf }}</option>
                   }
                 </select>
@@ -118,7 +118,7 @@
                         : 'Selecione um estado antes'
                     }}
                   </option>
-                  @for (cidade of cidadesDisponiveis(); track cidade) {
+                  @for (cidade of cidadesDisponiveis; track cidade) {
                     <option [value]="cidade">{{ cidade }}</option>
                   }
                 </select>
@@ -237,4 +237,3 @@
             </div>
           </div>
         </form>
-      </div>
