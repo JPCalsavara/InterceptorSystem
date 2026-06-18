@@ -30,16 +30,13 @@ import {
   TipoEscala,
   Tag,
 } from '../../../models/index';
-import {
-  TipoPosto,
-  TIPO_POSTO_CONFIGS,
-  TIPO_POSTO_OPTIONS,
-} from '../../contratos/contrato-form/contrato-form.component';
+import { TipoPosto, TIPO_POSTO_CONFIGS, TIPO_POSTO_OPTIONS } from '../../contratos/contrato-form/contrato-form.component';
+import { WizardStepClienteComponent } from './components/wizard-step-cliente/wizard-step-cliente.component';
 
 @Component({
   selector: 'app-cliente-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, TagPickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, TagPickerComponent, WizardStepClienteComponent],
   templateUrl: './cliente-wizard.component.html',
   styleUrls: ['./cliente-wizard.component.scss'],
 })
