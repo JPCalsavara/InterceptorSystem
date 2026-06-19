@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
@@ -25,7 +25,7 @@ import { NgxMaskDirective } from 'ngx-mask';
         <input
           [id]="id"
           [type]="type"
-          [formControlName]="controlName"
+          [formControlName]="controlName!"
           [placeholder]="placeholder"
           [attr.step]="step"
           [attr.min]="min"
@@ -36,7 +36,7 @@ import { NgxMaskDirective } from 'ngx-mask';
           [class.error]="hasError"
           class="form-input"
         />
-      } @else {
+      } @else if (controlName) {
         <input
           [id]="id"
           [type]="type"
@@ -48,6 +48,22 @@ import { NgxMaskDirective } from 'ngx-mask';
           [attr.maxlength]="maxlength"
           [attr.data-cy]="dataCy"
           [class.error]="hasError"
+          class="form-input"
+        />
+      } @else {
+        <input
+          [id]="id"
+          [type]="type"
+          [value]="value"
+          (input)="onInputChange($event)"
+          [placeholder]="placeholder"
+          [attr.step]="step"
+          [attr.min]="min"
+          [attr.max]="max"
+          [attr.maxlength]="maxlength"
+          [attr.data-cy]="dataCy"
+          [class.error]="hasError"
+          [disabled]="disabled"
           class="form-input"
         />
       }
@@ -63,7 +79,10 @@ import { NgxMaskDirective } from 'ngx-mask';
   styleUrls: ['./form-input.component.scss']
 })
 export class FormInputComponent {
-  @Input({ required: true }) controlName!: string;
+  @Input() controlName?: string;
+  @Input() value: any = '';
+  @Output() valueChange = new EventEmitter<any>();
+  @Input() disabled = false;
   @Input() label = '';
   @Input() id = `input-${Math.random().toString(36).substr(2, 9)}`;
   @Input() type = 'text';
@@ -81,7 +100,12 @@ export class FormInputComponent {
   private controlContainer = inject(ControlContainer, { optional: true });
 
   get control() {
+    if (!this.controlName) return null;
     return this.controlContainer?.control?.get(this.controlName);
+  }
+
+  onInputChange(event: Event) {
+    this.valueChange.emit((event.target as HTMLInputElement).value);
   }
 
   get hasError(): boolean {
