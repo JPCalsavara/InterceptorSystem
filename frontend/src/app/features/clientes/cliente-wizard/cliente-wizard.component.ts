@@ -1,3 +1,4 @@
+import { FormInputComponent } from "../../../shared/components/form-input/form-input.component";
 import { SvgIconComponent } from "./svg/svg-icon.component";
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -37,7 +38,7 @@ import { WizardStepClienteComponent } from './components/wizard-step-cliente/wiz
 @Component({
   selector: 'app-cliente-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, TagPickerComponent, WizardStepClienteComponent, SvgIconComponent],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, TagPickerComponent, WizardStepClienteComponent, SvgIconComponent, FormInputComponent],
   templateUrl: './cliente-wizard.component.html',
   styleUrls: ['./cliente-wizard.component.scss'],
 })
