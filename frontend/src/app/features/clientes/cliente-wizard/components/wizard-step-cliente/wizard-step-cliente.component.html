@@ -18,42 +18,28 @@
             </h3>
             <div class="form-row">
               <!-- Nome -->
-              <div class="form-group">
-                <label for="nome" class="form-label">
-                  Nome do Cliente <span class="required">*</span>
-                </label>
-                <input
-                  id="nome"
-                  type="text"
-                  formControlName="nome"
-                  class="form-input"
-                  [class.error]="hasError('nome')"
-                  placeholder="Ex: Cliente Horizonte Verde"
-                  data-cy="wizard-cliente-nome"
-                />
-                @if (hasError('nome')) {
-                  <span class="error-message">{{ getErrorMessage('nome') }}</span>
-                }
-              </div>
+              <app-form-input
+                id="nome"
+                controlName="nome"
+                label="Nome do Cliente"
+                type="text"
+                placeholder="Ex: Cliente Horizonte Verde"
+                [required]="true"
+                dataCy="wizard-cliente-nome"
+              ></app-form-input>
 
               <!-- CNPJ -->
-              <div class="form-group">
-                <label for="cnpj" class="form-label"> CNPJ <span class="required">*</span> </label>
-                <input
-                  id="cnpj"
-                  type="text"
-                  formControlName="cnpj"
-                  class="form-input"
-                  [class.error]="hasError('cnpj')"
-                  placeholder="00.000.000/0000-00"
-                  mask="00.000.000/0000-00"
-                  maxlength="18"
-                  data-cy="wizard-cliente-cnpj"
-                />
-                @if (hasError('cnpj')) {
-                  <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
-                }
-              </div>
+              <app-form-input
+                id="cnpj"
+                controlName="cnpj"
+                label="CNPJ"
+                type="text"
+                placeholder="00.000.000/0000-00"
+                mask="00.000.000/0000-00"
+                maxlength="18"
+                [required]="true"
+                dataCy="wizard-cliente-cnpj"
+              ></app-form-input>
             </div>
 
             <h3 class="section-title">
@@ -146,38 +132,24 @@
             </h3>
             <!-- Email Gestor e Telefone Emergência -->
             <div class="form-row">
-              <div class="form-group">
-                <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
-                <input
-                  id="emailGestor"
-                  type="email"
-                  formControlName="emailGestor"
-                  class="form-input"
-                  [class.error]="hasError('emailGestor')"
-                  placeholder="gestor@cliente.com.br"
-                />
-                @if (hasError('emailGestor')) {
-                  <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
-                }
-              </div>
+              <app-form-input
+                id="emailGestor"
+                controlName="emailGestor"
+                label="E-mail do Gestor"
+                type="email"
+                placeholder="gestor@cliente.com.br"
+              ></app-form-input>
 
-              <div class="form-group">
-                <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
-                <input
-                  id="telefoneEmergencia"
-                  type="tel"
-                  formControlName="telefoneEmergencia"
-                  class="form-input"
-                  [class.error]="hasError('telefoneEmergencia')"
-                  placeholder="(11) 98765-4321"
-                  mask="(00) 0000-0000||(00) 00000-0000"
-                  maxlength="15"
-                />
-                @if (hasError('telefoneEmergencia')) {
-                  <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
-                }
-                <span class="help-text">Digite apenas números</span>
-              </div>
+              <app-form-input
+                id="telefoneEmergencia"
+                controlName="telefoneEmergencia"
+                label="Telefone de Emergência"
+                type="tel"
+                placeholder="(11) 98765-4321"
+                mask="(00) 0000-0000||(00) 00000-0000"
+                maxlength="15"
+                helpText="Digite apenas números"
+              ></app-form-input>
             </div>
 
             <h3 class="section-title">
@@ -197,43 +169,29 @@
               Operação e Turnos
             </h3>
             <div class="form-row">
-              <div class="form-group">
-                <label for="quantidadeIdealPorTurno" class="form-label">
-                  Quantidade Ideal de Funcionários por Turno <span class="required">*</span>
-                </label>
-                <input
-                  id="quantidadeIdealPorTurno"
-                  type="number"
-                  formControlName="quantidadeIdealPorTurno"
-                  class="form-input"
-                  [class.error]="hasError('quantidadeIdealPorTurno')"
-                  min="1"
-                  max="10"
-                  data-cy="wizard-cliente-ideal"
-                />
-                @if (hasError('quantidadeIdealPorTurno')) {
-                  <span class="error-message">Mínimo 1 e Máximo 10</span>
-                }
-                <span class="help-text">Equipe almejada por turno no cliente</span>
-              </div>
+              <app-form-input
+                id="quantidadeIdealPorTurno"
+                controlName="quantidadeIdealPorTurno"
+                label="Quantidade Ideal de Funcionários por Turno"
+                type="number"
+                min="1"
+                max="10"
+                [required]="true"
+                dataCy="wizard-cliente-ideal"
+                helpText="Equipe almejada por turno no cliente"
+                customErrorMessage="Mínimo 1 e Máximo 10"
+              ></app-form-input>
 
-              <div class="form-group">
-                <label for="horarioTrocaTurno" class="form-label">
-                  Horário de Troca de Turno <span class="required">*</span>
-                </label>
-                <input
-                  id="horarioTrocaTurno"
-                  type="time"
-                  formControlName="horarioTrocaTurno"
-                  class="form-input"
-                  [class.error]="hasError('horarioTrocaTurno')"
-                  data-cy="wizard-cliente-horario"
-                />
-                @if (hasError('horarioTrocaTurno')) {
-                  <span class="error-message">Campo obrigatório</span>
-                }
-                <span class="help-text">Em que horário os turnos normalmente viram</span>
-              </div>
+              <app-form-input
+                id="horarioTrocaTurno"
+                controlName="horarioTrocaTurno"
+                label="Horário de Troca de Turno"
+                type="time"
+                [required]="true"
+                dataCy="wizard-cliente-horario"
+                helpText="Em que horário os turnos normalmente viram"
+                customErrorMessage="Campo obrigatório"
+              ></app-form-input>
             </div>
           </div>
         </form>

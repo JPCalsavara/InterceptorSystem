@@ -136,7 +136,7 @@ import { CommonModule } from '@angular/common';
       }
       .metrics-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
         gap: var(--space-4);
       }
       .metric-card {

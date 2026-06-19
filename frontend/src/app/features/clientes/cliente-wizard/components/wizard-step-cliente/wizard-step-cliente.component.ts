@@ -1,12 +1,13 @@
 import { Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormInputComponent } from "../../../../../shared/components/form-input/form-input.component";
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-wizard-step-cliente',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, FormInputComponent],
   templateUrl: './wizard-step-cliente.component.html',
   styleUrls: ['./wizard-step-cliente.component.scss'],
 })
