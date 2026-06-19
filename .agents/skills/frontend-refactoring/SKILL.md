@@ -26,11 +26,13 @@ Esta skill orquestra a refatoração de código Frontend (Angular) já existente
    - Remova interfaces e tipagens exportadas de dentro dos arquivos `.ts` dos componentes.
    - Crie arquivos únicos para cada entidade/interface necessária.
    - O nome do arquivo deve obrigatoriamente seguir o padrão `t_<nome_da_entidade>.ts` (por exemplo: `t_cliente.ts`, `t_posto.ts`, `t_dashboard.ts`).
-5. **Componentização:** Caso o componente original seja muito grande ou possua múltiplas responsabilidades, divida-o em componentes menores (Dumb/Presentational components), mantendo a mesma estrutura de diretórios e separação de TS/HTML/SCSS.
-6. **Revisão e Versionamento:** Após a refatoração, acione as skills de review frontend (`frontend-ui-review`, `frontend-logic-review`) para certificar que os sinais, responsividade e injeções continuam funcionando, e conclua com a submissão via `git-flow`.
+5. **Extração de Padrões Repetitivos na UI:** Analise o documento HTML em busca de blocos que repetem as mesmas tags e classes (ex: `<div class="form-group"> <label>...</label> <input> </div>`). Extraia essas estruturas comuns para Componentes Genéricos e reutilizáveis (ex: `app-form-input`), injetando os valores via `@Input` ou contexto (ex: `ControlContainer`).
+6. **Componentização:** Caso o componente original seja muito grande ou possua múltiplas responsabilidades, divida-o em componentes menores (Dumb/Presentational components), mantendo a mesma estrutura de diretórios e separação de TS/HTML/SCSS.
+7. **Revisão e Versionamento:** Após a refatoração, acione as skills de review frontend (`frontend-ui-review`, `frontend-logic-review`) para certificar que os sinais, responsividade e injeções continuam funcionando, e conclua com a submissão via `git-flow`.
 
 ## Regras Críticas (Guardrails)
 - **Zero Inline:** NUNCA utilize `template: \`...\`` ou `styles: [...]` no decorator `@Component`. A separação em 3 arquivos é lei.
 - **SVGs Isolados:** Nenhum SVG gigante pode ficar poluindo o arquivo HTML principal. Eles devem residir na pasta `/svg`.
 - **Arquivos de Tipo Unificados:** Nenhuma interface genérica de domínio pode ficar dentro do componente. Elas devem estar isoladas em seus arquivos `t_<entidade>.ts`.
+- **DRY em Templates:** Não permita blocos imensos de formulários com tags idênticas se repetindo. Se houver padrão (tags de class iguais), abstraia em um componente genérico reutilizável.
 - **Manutenção de Funcionalidade:** A refatoração é estritamente estrutural e arquitetural, não devendo alterar as lógicas de negócio preexistentes sem o consentimento do usuário.
