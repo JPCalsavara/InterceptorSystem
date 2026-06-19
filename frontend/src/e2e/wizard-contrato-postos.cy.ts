@@ -19,7 +19,6 @@ describe('Criação de Contratos com Vários Tipos de Posto (Wizard)', () => {
     cy.intercept('GET', '**/api/clientes').as('getClientes');
     cy.intercept('GET', '**/api/tags').as('getTags');
     cy.intercept('GET', '**/api/v1/localidades/estados*').as('getEstados');
-    cy.intercept('GET', '**/api/v1/localidades/estados/*/municipios*').as('getMunicipios');
     cy.intercept('POST', '**/api/clientes-completos').as('createClienteCompleto');
     cy.intercept('POST', '**/api/contratos/calculos/calcular-valor-total').as('calcTotal');
   });

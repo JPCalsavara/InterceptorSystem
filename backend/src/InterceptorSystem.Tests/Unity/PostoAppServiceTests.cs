@@ -121,7 +121,7 @@ public class PostoAppServiceTests
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua Velha", "100", null, "São Paulo", "SP");
+        var posto = new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua Velha", "100", null, "São Paulo", "SP");
 
         var input = new UpdatePostoInput("Portaria B", "13010-111", "Rua Nova", "456", "Bloco A", "Campinas", "SP");
 
@@ -172,7 +172,7 @@ public class PostoAppServiceTests
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+        var posto = new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
         _mockUow.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
@@ -210,7 +210,7 @@ public class PostoAppServiceTests
         var empresaId = Guid.NewGuid();
         var clienteId = Guid.NewGuid();
         var postoId = Guid.NewGuid();
-        var posto = new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
+        var posto = new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua X", "10", null, "São Paulo", "SP");
 
         _mockRepo.Setup(r => r.GetByIdAsync(postoId, It.IsAny<CancellationToken>())).ReturnsAsync(posto);
 
@@ -252,9 +252,9 @@ public class PostoAppServiceTests
         var clienteId = Guid.NewGuid();
         var postos = new List<Posto>
         {
-            new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua A", "10", null, "São Paulo", "SP"),
-            new Posto(clienteId, empresaId, "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP"),
-            new Posto(clienteId, empresaId, "Portaria C", "13010-111", "Rua C", "30", null, "Campinas", "SP")
+            new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua A", "10", null, "São Paulo", "SP"),
+            new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP"),
+            new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria C", "13010-111", "Rua C", "30", null, "Campinas", "SP")
         };
 
         _mockRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(postos);
@@ -294,8 +294,8 @@ public class PostoAppServiceTests
         var clienteId = Guid.NewGuid();
         var postos = new List<Posto>
         {
-            new Posto(clienteId, empresaId, "Portaria A", "01310-100", "Rua A", "10", null, "São Paulo", "SP"),
-            new Posto(clienteId, empresaId, "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP")
+            new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria A", "01310-100", "Rua A", "10", null, "São Paulo", "SP"),
+            new Posto(empresaId, clienteId, Guid.NewGuid(), "Portaria B", "01310-101", "Rua B", "20", null, "São Paulo", "SP")
         };
 
         _mockRepo.Setup(r => r.GetByClienteIdAsync(clienteId, CancellationToken.None)).ReturnsAsync(postos);

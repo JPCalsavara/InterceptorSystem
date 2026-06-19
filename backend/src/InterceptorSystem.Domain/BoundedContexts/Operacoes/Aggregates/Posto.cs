@@ -25,6 +25,7 @@ public class Posto : Entity, IAggregateRoot
     protected Posto() { }
 
     public Posto(
+        Guid empresaId,
         Guid clienteId,
         Guid contratoId,
         string nome,
@@ -35,6 +36,7 @@ public class Posto : Entity, IAggregateRoot
         string cidade,
         string estado)
     {
+        EmpresaId = empresaId;
         Enforce(clienteId != Guid.Empty, "O Posto deve pertencer a um Cliente.");
         Enforce(contratoId != Guid.Empty, "O Posto deve pertencer a um Contrato.");
         Enforce(!string.IsNullOrWhiteSpace(nome), "Nome é obrigatório.");

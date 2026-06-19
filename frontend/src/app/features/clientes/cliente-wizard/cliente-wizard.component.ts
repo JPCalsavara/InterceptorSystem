@@ -62,8 +62,6 @@ export class ClienteWizardComponent implements OnInit {
   formContrato!: FormGroup;
   formFuncionarios!: FormGroup;
 
-  estados = signal<string[]>([]);
-  cidadesDisponiveis = signal<string[]>([]);
   tags = signal<Tag[]>([]);
   selectedTagIds = signal<string[]>([]);
   tagRateById = signal<Record<string, number>>({});
@@ -259,10 +257,7 @@ export class ClienteWizardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.buildForms();
-    this.setupQuantidadeIdealRespect();
     this.setupAutoCalculo();
-    this.carregarEstados();
     this.loadTags();
   }
 
@@ -343,11 +338,7 @@ export class ClienteWizardComponent implements OnInit {
     return field.invalid && field.touched;
   }
 
-  carregarEstados(): void {
-    this.ibgeService.getEstados().subscribe((estadosObj) => {
-      this.estados.set(estadosObj.map((e) => e.sigla));
-    });
-  }
+
 
   setupAutoCalculo(): void {
     // Observar mudanças no formContrato e formCliente para recalcular via API
@@ -464,7 +455,6 @@ export class ClienteWizardComponent implements OnInit {
       emailGestor: ['', [Validators.email]],
       telefoneEmergencia: ['', [telefoneValidator]],
     });
-    this.setupLocationWatcher();
 
     // Etapa 2: Contrato (opcional)
     this.formContrato = this.fb.group({
@@ -498,32 +488,7 @@ export class ClienteWizardComponent implements OnInit {
     this.setupPostosConfigWatcher();
   }
 
-  private setupLocationWatcher(): void {
-    const estadoControl = this.formCliente.get('estado');
-    const cidadeControl = this.formCliente.get('cidade');
 
-    estadoControl?.valueChanges.subscribe((uf: string) => {
-      const estado = String(uf ?? '').toUpperCase();
-      if (estadoControl.value !== estado) {
-        estadoControl.setValue(estado, { emitEvent: false });
-      }
-
-      if (estado) {
-        this.ibgeService.getMunicipiosPorEstado(estado).subscribe((municipios) => {
-          const cidadesDoEstado = municipios.map((m) => m.nome);
-          this.cidadesDisponiveis.set(cidadesDoEstado);
-
-          const cidadeAtual = String(cidadeControl?.value ?? '');
-          if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
-            cidadeControl?.setValue('');
-          }
-        });
-      } else {
-        this.cidadesDisponiveis.set([]);
-        cidadeControl?.setValue('');
-      }
-    });
-  }
 
   createPostoConfigGroup(
     tipo: TipoPosto | string = TipoPosto.ESCALA_12X36,

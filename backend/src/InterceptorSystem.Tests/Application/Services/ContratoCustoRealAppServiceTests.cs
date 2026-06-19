@@ -55,7 +55,7 @@ namespace InterceptorSystem.Tests.Application.Services
                 DateOnly.FromDateTime(DateTime.Today.AddMonths(1)),
                 StatusContrato.ATIVO);
 
-            var posto = new Posto(clienteId, contrato.Id, "Posto Teste", "12345678", "Rua X", "123", null, "Cidade", "SP");
+            var posto = new Posto(empresaId, clienteId, contrato.Id, "Posto Teste", "12345678", "Rua X", "123", null, "Cidade", "SP");
             
             var alocacao1 = new Alocacao(posto.Id, contrato.Id, empresaId, new TimeSpan(6, 0, 0), new TimeSpan(18, 0, 0), TipoEscala.DOZE_POR_TRINTA_SEIS, true, 2);
             var alocacao2 = new Alocacao(posto.Id, contrato.Id, empresaId, new TimeSpan(18, 0, 0), new TimeSpan(6, 0, 0), TipoEscala.DOZE_POR_TRINTA_SEIS, true, 3);

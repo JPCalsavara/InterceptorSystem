@@ -31,6 +31,7 @@ public class PostoAppService : IPostoAppService
             throw new InvalidOperationException("Cliente não encontrado.");
 
         var posto = new Posto(
+            empresaId,
             input.ClienteId,
             input.ContratoId,
             input.Nome,
