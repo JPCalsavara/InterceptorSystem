@@ -37,9 +37,9 @@ describe('Simulação Visual - Criação Completa e Diárias em Lote', () => {
     const adicionarFuncionario = (index: number, nome: string, celular: string) => {
       cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
       cy.get('.funcionario-card').eq(index).within(() => {
-        cy.get('[formControlName="nome"]').type(nome);
-        cy.get('[formControlName="cpf"]').type(generateValidCPF());
-        cy.get('[formControlName="celular"]').type(celular);
+        cy.get('input[id^="nome-"]').type(nome);
+        cy.get('input[id^="cpf-"]').type(generateValidCPF());
+        cy.get('input[id^="celular-"]').type(celular);
         cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
         cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
         cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
@@ -52,7 +52,7 @@ describe('Simulação Visual - Criação Completa e Diárias em Lote', () => {
     adicionarFuncionario(3, 'Lucas Cobertura', '11966666666');
 
     // Finaliza o Wizard
-    cy.intercept('POST', '**/api/clientes-completos').as('createClienteCompleto');
+    cy.intercept('POST', '**/api/clientes-completos', (req) => { req.continue(); Cypress.backend("writeFile", {contents: JSON.stringify(req.body, null, 2), filePath: "payload.json"}); }).as('createClienteCompleto');
     cy.get('[data-cy="wizard-submit"]').click();
     cy.wait('@createClienteCompleto', { timeout: 15000 });
     

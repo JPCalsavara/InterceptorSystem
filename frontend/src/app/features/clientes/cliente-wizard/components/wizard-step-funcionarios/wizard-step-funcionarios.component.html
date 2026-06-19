@@ -1,0 +1,226 @@
+      <div class="step-content">
+        <h2>
+          <app-svg-icon name="icon-3733" style="width: 1.2em; height: 1.2em"></app-svg-icon>
+          Funcionários (Opcional)
+        </h2>
+
+        <form [formGroup]="formFuncionarios" class="form-container">
+          <div class="form-card">
+            <!-- Info sobre importação automática -->
+            <div class="info-banner">
+              <app-svg-icon name="icon-7213"></app-svg-icon>
+              <div>
+                <strong>
+                  <app-svg-icon name="icon-1744" style="width: 1em; height: 1em; vertical-align: middle"></app-svg-icon>
+                  Dados Importados Automaticamente
+                </strong>
+                <p>
+                  O cliente e contrato criados nos passos anteriores serão associados
+                  automaticamente aos funcionários.
+                </p>
+              </div>
+            </div>
+
+            <!-- Lista de Funcionários -->
+            <div class="funcionarios-section">
+              <div class="section-header">
+                <h3 class="section-title">
+                  <app-svg-icon name="icon-3492" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                  Lista de Funcionários
+                </h3>
+                <button type="button" class="btn-secondary" (click)="addFuncionario()">
+                  <app-svg-icon name="icon-709"></app-svg-icon>
+                  Adicionar Funcionário
+                </button>
+              </div>
+
+              @if (funcionarios.length === 0) {
+                <div class="empty-state">
+                  <app-svg-icon name="icon-8289"></app-svg-icon>
+                  <p>Nenhum funcionário adicionado ainda</p>
+                  <span>Clique em "Adicionar Funcionário" para começar ou pule esta etapa</span>
+                </div>
+              }
+
+              <div formArrayName="funcionarios">
+                @for (func of funcionarios.controls; track $index; let i = $index) {
+                  <div class="funcionario-card" [formGroupName]="i">
+                    <div class="card-header">
+                      <h4>Funcionário #{{ i + 1 }}</h4>
+                      <button
+                        type="button"
+                        class="btn-remove"
+                        (click)="removeFuncionario(i)"
+                        title="Remover funcionário"
+                      >
+                        <app-svg-icon name="icon-1380"></app-svg-icon>
+                      </button>
+                    </div>
+
+                    <!-- Dados Pessoais -->
+                    <h5 class="subsection-title">Dados Pessoais</h5>
+
+                    <app-form-input
+                      [id]="'nome-' + i"
+                      controlName="nome"
+                      label="Nome Completo"
+                      type="text"
+                      placeholder="Ex: João da Silva Santos"
+                      [required]="true"
+                      customErrorMessage="Nome completo é obrigatório (mín. 3 caracteres)"
+                    ></app-form-input>
+
+                    <div class="form-row">
+                      <app-form-input
+                        [id]="'cpf-' + i"
+                        controlName="cpf"
+                        label="CPF"
+                        type="text"
+                        placeholder="000.000.000-00"
+                        mask="000.000.000-00"
+                        maxlength="14"
+                        [required]="true"
+                      ></app-form-input>
+
+                      <app-form-input
+                        [id]="'celular-' + i"
+                        controlName="celular"
+                        label="Celular"
+                        type="text"
+                        placeholder="(00) 00000-0000"
+                        mask="(00) 0000-0000||(00) 00000-0000"
+                        maxlength="15"
+                      ></app-form-input>
+                    </div>
+
+                    <!-- Dados Profissionais -->
+                    <h5 class="subsection-title">Dados Profissionais</h5>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label [for]="'tipoFuncionario-' + i" class="form-label">
+                          Tipo de Funcionário <span class="required">*</span>
+                        </label>
+                        <select
+                          [id]="'tipoFuncionario-' + i"
+                          formControlName="tipoFuncionario"
+                          class="form-input"
+                          [class.error]="
+                            func.get('tipoFuncionario')?.invalid &&
+                            func.get('tipoFuncionario')?.touched
+                          "
+                        >
+                          <option value="">Selecione</option>
+                          <option value="CLT">CLT (Regime CLT)</option>
+                          <option value="TERCEIRIZADO">Terceirizado</option>
+                          <option value="FREELANCER">Freelancer</option>
+                        </select>
+                        @if (
+                          func.get('tipoFuncionario')?.invalid &&
+                          func.get('tipoFuncionario')?.touched
+                        ) {
+                          <span class="error-message">Tipo de funcionário é obrigatório</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label [for]="'tipoEscala-' + i" class="form-label">
+                          Escala de Trabalho <span class="required">*</span>
+                        </label>
+                        <select
+                          [id]="'tipoEscala-' + i"
+                          formControlName="tipoEscala"
+                          class="form-input"
+                          [class.error]="
+                            func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched
+                          "
+                        >
+                          <option value="">Selecione</option>
+                          <option value="DOZE_POR_TRINTA_SEIS">
+                            12x36 (12h trabalho, 36h descanso)
+                          </option>
+                          <option value="SEMANAL_COMERCIAL">
+                            Semanal Comercial (5x2, 44h/semana)
+                          </option>
+                          <option value="OITO_HORAS_SEIS_POR_DOIS">
+                            8h (6x2, 8h trabalho diário, 2 folgas)
+                          </option>
+                        </select>
+                        @if (func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched) {
+                          <span class="error-message">Escala de trabalho é obrigatória</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label [for]="'statusFuncionario-' + i" class="form-label">
+                        Status <span class="required">*</span>
+                      </label>
+                      <select
+                        [id]="'statusFuncionario-' + i"
+                        formControlName="statusFuncionario"
+                        class="form-input"
+                        [class.error]="
+                          func.get('statusFuncionario')?.invalid &&
+                          func.get('statusFuncionario')?.touched
+                        "
+                      >
+                        <option value="">Selecione</option>
+                        <option value="ATIVO">Ativo</option>
+                        <option value="FERIAS">Férias</option>
+                        <option value="AFASTADO">Afastado</option>
+                        <option value="DEMITIDO">Demitido</option>
+                      </select>
+                      @if (
+                        func.get('statusFuncionario')?.invalid &&
+                        func.get('statusFuncionario')?.touched
+                      ) {
+                        <span class="error-message">Status é obrigatório</span>
+                      }
+                    </div>
+
+                    <!-- Valores Calculados Automaticamente (Info) -->
+                    <div class="auto-calculated-info">
+                      <app-svg-icon name="icon-7213"></app-svg-icon>
+                      <p>
+                        <strong>Valores salariais serão calculados automaticamente</strong> com base
+                        no contrato vigente do cliente
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Resumo -->
+            @if (funcionarios.length > 0) {
+              <div class="summary-card">
+                <h4>
+                  <app-svg-icon name="icon-8752" style="width: 1em; height: 1em; vertical-align: middle"></app-svg-icon>
+                  Resumo
+                </h4>
+                <div class="summary-grid">
+                  <div class="summary-item">
+                    <span class="label">Total de Funcionários:</span>
+                    <span class="value">{{ funcionarios.length }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">Funcionários Ativos:</span>
+                    <span class="value success">
+                      {{ contarFuncionariosPorStatus('ATIVO') }}
+                    </span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">CLT:</span>
+                    <span class="value">{{ contarFuncionariosPorTipo('CLT') }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="label">Terceirizados:</span>
+                    <span class="value">{{ contarFuncionariosPorTipo('TERCEIRIZADO') }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </form>
+      </div>

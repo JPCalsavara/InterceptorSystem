@@ -1,0 +1,692 @@
+      <div class="step-content">
+        <h2>
+          <app-svg-icon name="icon-5303" style="width: 1.2em; height: 1.2em"></app-svg-icon>
+          Contrato (Opcional)
+        </h2>
+
+        <form [formGroup]="formContrato" class="form-container">
+          <div class="form-card">
+            <!-- Checkbox para habilitar criação do contrato -->
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="criarContrato" class="checkbox-input" data-cy="wizard-criar-contrato" />
+                <span class="checkbox-text">Criar contrato neste momento</span>
+              </label>
+              <span class="help-text">Você pode criar o contrato depois se preferir</span>
+            </div>
+
+            @if (formContrato.get('criarContrato')?.value) {
+              <!-- Descrição -->
+              <div class="form-group">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea
+                  id="descricao"
+                  formControlName="descricao"
+                  class="form-input"
+                  [class.error]="
+                    formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched
+                  "
+                  rows="3"
+                  placeholder="Ex: Contrato de prestação de serviços de vigilância"
+                ></textarea>
+                @if (
+                  formContrato.get('descricao')?.invalid && formContrato.get('descricao')?.touched
+                ) {
+                  <span class="error-message">Descrição é obrigatória</span>
+                }
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="numeroPostos" class="form-label">
+                    Quantidade Base de Tipos de Posto <span class="required">*</span>
+                  </label>
+                  <input
+                    id="numeroPostos"
+                    type="number"
+                    formControlName="numeroPostos"
+                    class="form-input"
+                    [class.error]="
+                      formContrato.get('numeroPostos')?.invalid &&
+                      formContrato.get('numeroPostos')?.touched
+                    "
+                    placeholder="Ex: 1"
+                    min="1"
+                    data-cy="wizard-numero-postos"
+                  />
+                  @if (
+                    formContrato.get('numeroPostos')?.invalid &&
+                    formContrato.get('numeroPostos')?.touched
+                  ) {
+                    <span class="error-message">Quantidade de postos é obrigatória</span>
+                  }
+                  @if (!isModoPersonalizado()) {
+                    <span class="help-text"
+                      >No modo automático, a lista final de postos pode aumentar para respeitar
+                      {{ getQuantidadeIdealPorTurno() }} pessoa(s) por turno.</span
+                    >
+                  } @else {
+                    <span class="help-text"
+                      >No modo personalizado, você controla manualmente a configuração de cada
+                      posto.</span
+                    >
+                  }
+                </div>
+              </div>
+
+              <div class="form-group checkbox-group modo-config-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="modoPersonalizado" class="checkbox-input" data-cy="wizard-modo-personalizado" />
+                  <span class="checkbox-text">Modo personalizado (edição manual)</span>
+                </label>
+                @if (!isModoPersonalizado()) {
+                  <span class="help-text"
+                    >Modo automático ativo: o wizard replica tipos para aproximar a política do
+                    cliente ({{ getQuantidadeIdealPorTurno() }} por turno).</span
+                  >
+                } @else {
+                  <span class="help-text"
+                    >Modo personalizado ativo: divergências com a política serão exibidas como
+                    aviso.</span
+                  >
+                }
+              </div>
+
+              @if (isModoPersonalizado() && getDivergenciasQuantidadeIdeal().length > 0) {
+                <div class="alert alert-warning ideal-warning">
+                  <div>
+                    <div class="error-title">Divergência com quantidade ideal por turno</div>
+                    <div class="error-message">
+                      A política do cliente está em {{ getQuantidadeIdealPorTurno() }} pessoa(s)
+                      por turno, mas há posto(s) configurado(s) com valor diferente.
+                    </div>
+                    <div class="warning-list">
+                      @for (item of getDivergenciasQuantidadeIdeal(); track item.index) {
+                        <div>
+                          Posto {{ item.index + 1 }}: atual {{ item.atual }} / ideal {{ item.ideal }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Valores Base -->
+              <h3 class="section-title">
+                <app-svg-icon name="icon-5993" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                Configurações por Posto e Alocações
+              </h3>
+
+              <div formArrayName="postosConfig">
+                @for (postoCtrl of postosConfig.controls; track $index) {
+                  <div
+                    [formGroupName]="$index"
+                    class="form-card"
+                    style="margin-bottom: 20px; background: rgba(0, 0, 0, 0.02)"
+                  >
+                    <h4 class="section-title" style="margin-top: 0">
+                      Configuração do Posto {{ $index + 1 }}
+                    </h4>
+
+                    <div class="form-group">
+                      <label class="form-label"
+                        >Tipo de Posto <span class="required">*</span></label
+                      >
+                      <select formControlName="tipoPosto" class="form-input" [attr.data-cy]="'wizard-posto-tipo-' + $index">
+                        @for (opt of tipoPostoOptions; track opt.value) {
+                          <option [value]="opt.value">{{ opt.label }}</option>
+                        }
+                      </select>
+                      <span class="help-text"
+                        >Selecione a escala para auto-preencher turnos, funcionários e
+                        noturno.</span
+                      >
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label class="form-label">
+                          Qtd. Alocações (Turnos) <span class="required">*</span>
+                        </label>
+                        @if (isPostoPersonalizado($index)) {
+                          <input
+                            type="number"
+                            formControlName="quantidadeAlocacoes"
+                            class="form-input"
+                            placeholder="Ex: 2"
+                            min="1"
+                          />
+                        } @else {
+                          <div class="form-input calculated-field">
+                            {{ postoCtrl.get('quantidadeAlocacoes')?.value }}
+                            <span
+                              class="help-text"
+                              style="margin: 0; display: inline; margin-left: 8px"
+                              >travado pelo tipo</span
+                            >
+                          </div>
+                        }
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">
+                          Funcionários por Alocação <span class="required">*</span>
+                        </label>
+                        @if (isPostoPersonalizado($index)) {
+                          <input
+                            type="number"
+                            formControlName="quantidadeFuncionariosPorAlocacao"
+                            class="form-input"
+                            placeholder="Ex: 1"
+                            min="1"
+                          />
+                        } @else {
+                          <div class="form-input calculated-field">
+                            {{ postoCtrl.get('quantidadeFuncionariosPorAlocacao')?.value }}
+                            <span
+                              class="help-text"
+                              style="margin: 0; display: inline; margin-left: 8px"
+                              >travado pelo tipo</span
+                            >
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label class="form-label">Aloc. Noturnas</label>
+                        @if (isPostoPersonalizado($index)) {
+                          <input
+                            type="number"
+                            formControlName="alocacoesNoturnas"
+                            class="form-input"
+                            min="0"
+                          />
+                        } @else {
+                          <div class="form-input calculated-field">
+                            {{ postoCtrl.get('alocacoesNoturnas')?.value }}
+                            <span
+                              class="help-text"
+                              style="margin: 0; display: inline; margin-left: 8px"
+                              >travado pelo tipo</span
+                            >
+                          </div>
+                        }
+                      </div>
+
+                      <app-form-input
+                        controlName="valorDiariaCobrada"
+                        label="Valor Diária por Funcionário (R$)"
+                        type="number"
+                        placeholder="Ex: 100.00"
+                        step="0.01"
+                        min="0.01"
+                        [required]="true"
+                      ></app-form-input>
+
+                      <div class="form-group">
+                        <label class="form-label">
+                          Benefícios Extras Mensais (R$) <span class="required">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          formControlName="valorBeneficiosExtrasMensal"
+                          class="form-input"
+                          placeholder="Ex: 350.00"
+                          step="0.01"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+
+                    <div
+                      style="
+                        margin-top: 8px;
+                        display: flex;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                        font-size: 0.825rem;
+                        color: var(--text-secondary);
+                      "
+                    >
+                      <span>
+                        <strong>{{
+                          (postoCtrl.get('quantidadeAlocacoes')?.value || 0) *
+                            (postoCtrl.get('quantidadeFuncionariosPorAlocacao')?.value || 0)
+                        }}</strong>
+                        funcionários neste posto
+                      </span>
+                      @if ((postoCtrl.get('alocacoesNoturnas')?.value || 0) > 0) {
+                        <span>
+                          🌙 {{ postoCtrl.get('alocacoesNoturnas')?.value }} turno(s) noturno(s)
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="form-row" style="margin-bottom: 24px">
+                <div class="form-group">
+                  <label class="form-label">Total de Funcionários Estimados Por Dia</label>
+                  <input
+                    type="number"
+                    [value]="quantidadeTotalFuncionarios()"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text"> Calculado: postos × turnos × func/turno </span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Total Alocações Noturnas</label>
+                  <input
+                    type="number"
+                    [value]="totalAlocacoesNoturnas()"
+                    class="form-input calculated-field"
+                    readonly
+                    disabled
+                  />
+                  <span class="help-text"> Soma das alocações noturnas de todos os postos </span>
+                </div>
+              </div>
+
+              <h3 class="section-title">Tags do Contrato</h3>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 16px;
+                "
+              >
+                <p class="form-label">Gerencie as funções disponíveis para este contrato</p>
+                <button type="button" class="btn-primary btn-sm" (click)="openCreateTag()">
+                  + Nova Tag
+                </button>
+              </div>
+
+              <app-tag-picker
+                [tags]="tags()"
+                [selectedIds]="selectedTagIds()"
+                [disabled]="loading()"
+                [label]="'Seleção de tags do contrato'"
+                [helperText]="
+                  'Selecione as funções que fazem parte do contrato e informe o valor da diária para cada uma.'
+                "
+                (selectionChange)="onContratoTagsChange($event)"
+              />
+
+              @if (selectedTags().length > 0) {
+                <div class="tag-rates-grid">
+                  @for (tag of selectedTags(); track tag.id) {
+                    <div class="tag-rate-card">
+                      <div class="tag-rate-title">
+                        <strong>{{ tag.nome }}</strong>
+                        @if (tag.descricao) {
+                          <small>{{ tag.descricao }}</small>
+                        }
+                        <small>Valor base: {{ tag.valor | currency: 'BRL' }}</small>
+                        @if (getTagPercentualAcima(tag, getTagRate(tag.id))) {
+                          <small>{{ getTagPercentualAcima(tag, getTagRate(tag.id)) }}</small>
+                        }
+                      </div>
+                      <app-form-input
+                        [id]="'wizard-tag-rate-' + tag.id"
+                        label="Valor Diária da Tag (R$)"
+                        type="number"
+                        [value]="getTagRate(tag.id)"
+                        (valueChange)="onTagRateChange(tag.id, $event)"
+                        min="0"
+                        step="0.01"
+                        [disabled]="loading()"
+                      ></app-form-input>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Percentuais e Margens -->
+              <h3 class="section-title">
+                <app-svg-icon name="icon-8752" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                Percentuais e Margens
+              </h3>
+
+              <div class="form-row">
+                <app-form-input
+                  id="percentualAdicionalNoturno"
+                  controlName="percentualAdicionalNoturno"
+                  label="Adicional Noturno (%)"
+                  type="number"
+                  placeholder="Ex: 20.00"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  [required]="true"
+                  helpText="Adicional obrigatório por CLT (Art. 73). Mínimo legal: 20%"
+                ></app-form-input>
+
+                <app-form-input
+                  id="percentualImpostos"
+                  controlName="percentualImpostos"
+                  label="Encargos e Provisões (%)"
+                  type="number"
+                  placeholder="Ex: 15.00"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  [required]="true"
+                  helpText="INSS, FGTS, PIS, etc. Recomendado: 15%"
+                ></app-form-input>
+              </div>
+
+              <div class="form-row">
+                <app-form-input
+                  id="margemLucroPercentual"
+                  controlName="percentualMargemLucro"
+                  label="Margem de Lucro (%)"
+                  type="number"
+                  placeholder="Ex: 15.00"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  [required]="true"
+                  helpText="Percentual de lucro desejado. Mercado: 10-20%"
+                ></app-form-input>
+
+                <app-form-input
+                  id="margemCoberturaFaltasPercentual"
+                  controlName="percentualMargemFaltas"
+                  label="Margem Cobertura de Faltas (%)"
+                  type="number"
+                  placeholder="Ex: 10.00"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  [required]="true"
+                  helpText="Reserva para cobrir faltas e substituições. Recomendado: 8-12%"
+                ></app-form-input>
+              </div>
+
+              <!-- Período do Contrato -->
+              <h3 class="section-title">
+                <app-svg-icon name="icon-4571" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                Período do Contrato
+              </h3>
+
+              <div class="form-row">
+                <app-form-input
+                  id="dataInicio"
+                  controlName="dataInicio"
+                  label="Data de Início"
+                  type="date"
+                  [required]="true"
+                ></app-form-input>
+
+                <app-form-input
+                  id="mesesDuracao"
+                  controlName="mesesDuracao"
+                  label="Duração (meses)"
+                  type="number"
+                  placeholder="Ex: 6"
+                  min="1"
+                  max="60"
+                  step="1"
+                  [required]="true"
+                  helpText="Duração do contrato em meses (1-60)"
+                ></app-form-input>
+              </div>
+
+              <div class="form-group">
+                <label for="dataFim" class="form-label">
+                  Data de Término (Calculada)
+                  @if (calcularDataFim()) {
+                    <span class="duration-badge">
+                      <app-svg-icon name="icon-4571" style="width: 0.875em; height: 0.875em"></app-svg-icon>
+                      {{ calcularDuracaoMeses() }}
+                    </span>
+                  }
+                </label>
+                <div class="calculated-value">
+                  <span class="value-display">{{ calcularDataFim() }}</span>
+                  <span class="help-text"
+                    >Calculada automaticamente: Data início + Duração em meses</span
+                  >
+                </div>
+              </div>
+
+              <!-- Breakdown de Custos (Resumo Visual) -->
+              <div class="breakdown-section">
+                <h3 class="section-title">
+                  <app-svg-icon name="icon-8752" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                  Resumo Financeiro Mensal
+                </h3>
+
+                <!-- Loading State -->
+                @if (calculando()) {
+                  <div class="loading-state">
+                    <span class="spinner"></span>
+                    <span>Calculando valores...</span>
+                  </div>
+                }
+
+                <!-- Error State -->
+                @if (erroCalculo()) {
+                  <div class="alert alert-error">
+                    <app-svg-icon name="icon-7300"></app-svg-icon>
+                    <div>
+                      <div class="error-title">Erro ao calcular valores</div>
+                      <div class="error-message">{{ erroCalculo() }}</div>
+                      <button
+                        class="retry-button"
+                        (click)="formContrato.updateValueAndValidity({ emitEvent: true })"
+                      >
+                        Tentar Novamente
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- Breakdown Grid (only show when successful) -->
+                @if (breakdown() && !calculando() && !erroCalculo()) {
+                <div class="breakdown-grid">
+                  <div class="breakdown-card">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <app-svg-icon name="icon-3733" style="width: 1.5rem; height: 1.5rem"></app-svg-icon>
+                      </span>
+                      <span class="label">Funcionários</span>
+                    </div>
+                    <div class="breakdown-value">{{ quantidadeTotalFuncionarios() || 0 }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('numeroPostos')?.value || 0 }} postos físicos configurados
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <app-svg-icon name="icon-5993" style="width: 1.5rem; height: 1.5rem"></app-svg-icon>
+                      </span>
+                      <span class="label">Custo Base Real</span>
+                    </div>
+                    <div class="breakdown-value">{{ custoOperacional() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      Salários + Benefícios + Encargos Trabalhistas (65%) + Encargos e Provisões
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card success">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <app-svg-icon name="icon-2248" style="width: 1.5rem; height: 1.5rem"></app-svg-icon>
+                      </span>
+                      <span class="label">Lucro Bruto</span>
+                    </div>
+                    <div class="breakdown-value">{{ margemLucro() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('percentualMargemLucro')?.value || 0 }}% sobre o custo
+                    </div>
+                  </div>
+
+                  <div class="breakdown-card warning">
+                    <div class="breakdown-header">
+                      <span class="icon">
+                        <app-svg-icon name="icon-503" style="width: 1.5rem; height: 1.5rem"></app-svg-icon>
+                      </span>
+                      <span class="label">Cobertura Faltas</span>
+                    </div>
+                    <div class="breakdown-value">{{ margemFaltas() | currency: 'BRL' }}</div>
+                    <div class="breakdown-detail">
+                      {{ formContrato.get('percentualMargemFaltas')?.value || 0 }}% de segurança
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-value">
+                  <div class="total-label">
+                    <app-svg-icon name="icon-5993" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                    Faturamento Total Mensal
+                  </div>
+                  <div class="total-amount">{{ faturamentoMensal() | currency: 'BRL' }}</div>
+                  <div class="total-detail">Valor cobrado mensalmente do cliente</div>
+                </div>
+
+                <!-- Estimativa por escala -->
+                @if (formContrato.get('valorDiariaCobrada')?.value) {
+                  <div class="escala-estimate">
+                    <h4 class="escala-estimate-title">
+                      <app-svg-icon name="icon-5981" style="width: 1.1em; height: 1.1em; vertical-align: middle"></app-svg-icon>
+                      Custo estimado por funcionário / mês
+                    </h4>
+                    <div class="escala-estimate-cards">
+                      <div class="escala-card">
+                        <div class="escala-icon">
+                          <app-svg-icon name="icon-1894" style="width: 1.5rem; height: 1.5rem"></app-svg-icon>
+                        </div>
+                        <div class="escala-label">12×36</div>
+                        <div class="escala-days">~15 dias</div>
+                        <div class="escala-value">{{ custoEstimado12x36() | currency: 'BRL' }}</div>
+                      </div>
+                      <div class="escala-card">
+                        <div class="escala-icon">
+                          <app-svg-icon name="icon-5890" style="width: 1.5rem; height: 1.5rem"></app-svg-icon>
+                        </div>
+                        <div class="escala-label">5×2</div>
+                        <div class="escala-days">~22 dias</div>
+                        <div class="escala-value">{{ custoEstimado5x2() | currency: 'BRL' }}</div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              }
+              </div>
+
+              <div class="required-note">
+                <span class="required">*</span> Campos obrigatórios para criar o contrato
+              </div>
+            }
+          </div>
+        </form>
+      </div>
+    <!-- Modal de Criação de Tag -->
+    @if (showTagModal()) {
+      <div class="modal-overlay" (click)="closeTagModal()">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Nova Tag / Função</h2>
+            <button type="button" class="modal-close" (click)="closeTagModal()">
+              <app-svg-icon name="icon-8273"></app-svg-icon>
+            </button>
+          </div>
+
+          @if (tagFormSuccess()) {
+            <div class="alert alert-success" style="margin: 16px">
+              <app-svg-icon name="icon-8996"></app-svg-icon>
+              {{ tagFormSuccess() }}
+            </div>
+          }
+
+          @if (tagFormError()) {
+            <div class="alert alert-error" style="margin: 16px">
+              <app-svg-icon name="icon-7300"></app-svg-icon>
+              {{ tagFormError() }}
+            </div>
+          }
+
+          <form [formGroup]="tagForm" (ngSubmit)="saveTag()" class="modal-body">
+            <div class="form-group">
+              <label for="tag-nome" class="form-label">
+                Nome da Tag <span class="required">*</span>
+              </label>
+              <input
+                id="tag-nome"
+                type="text"
+                formControlName="nome"
+                class="form-input"
+                [class.error]="hasTagError('nome')"
+                placeholder="Ex: Supervisor, Vigilante, Porteiro"
+                [disabled]="savingTag()"
+              />
+              @if (hasTagError('nome')) {
+                <span class="error-message">{{ getTagErrorMessage('nome') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="tag-valor" class="form-label">
+                Valor Base (R$) <span class="required">*</span>
+              </label>
+              <input
+                id="tag-valor"
+                type="number"
+                formControlName="valor"
+                class="form-input"
+                [class.error]="hasTagError('valor')"
+                placeholder="Ex: 120.00"
+                step="0.01"
+                min="0"
+                [disabled]="savingTag()"
+              />
+              @if (hasTagError('valor')) {
+                <span class="error-message">{{ getTagErrorMessage('valor') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="tag-descricao" class="form-label"> Descrição (Opcional) </label>
+              <textarea
+                id="tag-descricao"
+                formControlName="descricao"
+                class="form-input"
+                placeholder="Ex: Supervisor de segurança com experiência em gerenciamento de equipes"
+                rows="3"
+                [disabled]="savingTag()"
+              ></textarea>
+              @if (hasTagError('descricao')) {
+                <span class="error-message">{{ getTagErrorMessage('descricao') }}</span>
+              }
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="closeTagModal()"
+                [disabled]="savingTag()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="tagForm.invalid || savingTag()"
+              >
+                {{ savingTag() ? 'Salvando...' : 'Criar Tag' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
