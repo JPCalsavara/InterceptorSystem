@@ -37,9 +37,9 @@ describe('Simulação Visual - Criação Completa e Diárias em Lote', () => {
     const adicionarFuncionario = (index: number, nome: string, celular: string) => {
       cy.get('button.btn-secondary').contains('Adicionar Funcionário').click();
       cy.get('.funcionario-card').eq(index).within(() => {
-        cy.get('[formControlName="nome"]').type(nome);
-        cy.get('[formControlName="cpf"]').type(generateValidCPF());
-        cy.get('[formControlName="celular"]').type(celular);
+        cy.get('input[id^="nome-"]').type(nome);
+        cy.get('input[id^="cpf-"]').type(generateValidCPF());
+        cy.get('input[id^="celular-"]').type(celular);
         cy.get('[formControlName="tipoFuncionario"]').select('CLT'); // CLT
         cy.get('[formControlName="tipoEscala"]').select('DOZE_POR_TRINTA_SEIS'); // 12x36
         cy.get('[formControlName="statusFuncionario"]').select('ATIVO'); // ATIVO
@@ -52,7 +52,7 @@ describe('Simulação Visual - Criação Completa e Diárias em Lote', () => {
     adicionarFuncionario(3, 'Lucas Cobertura', '11966666666');
 
     // Finaliza o Wizard
-    cy.intercept('POST', '**/api/clientes-completos').as('createClienteCompleto');
+    cy.intercept('POST', '**/api/clientes-completos', (req) => { req.continue(); Cypress.backend("writeFile", {contents: JSON.stringify(req.body, null, 2), filePath: "payload.json"}); }).as('createClienteCompleto');
     cy.get('[data-cy="wizard-submit"]').click();
     cy.wait('@createClienteCompleto', { timeout: 15000 });
     
@@ -82,57 +82,31 @@ describe('Simulação Visual - Criação Completa e Diárias em Lote', () => {
 
     // Preencher as datas - Removido pois o batch pega do contrato
 
-    
+    const gerarDiariaFuncionario = (index: number, isTrabalha: boolean) => {
+      cy.get('[formControlName="funcionarioId"]').find('option').eq(index).then($opt => {
+          cy.get('[formControlName="funcionarioId"]').select($opt.val() as string);
+      });
+
+      const value = isTrabalha ? 'TRABALHA' : 'FOLGA';
+      cy.get(`input[type="radio"][value="${value}"]`).check({ force: true });
+
+      cy.intercept('POST', '**/api/diarias/lote').as(`postDiarias${index}`);
+      cy.get('button[type="submit"]').contains('Gerar Diárias').click();
+      cy.wait(`@postDiarias${index}`, { timeout: 10000 });
+      cy.wait(1000);
+    };
+
     // Selecionar primeiro funcionário (Turno A) e lançar
-    cy.get('[formControlName="funcionarioId"]').find('option').eq(1).then($opt => {
-        cy.get('[formControlName="funcionarioId"]').select($opt.val() as string);
-    });
-
-    // Dia de partida (Turno A)
-    cy.get('input[type="radio"][value="TRABALHA"]').check({ force: true });
-
-    cy.intercept('POST', '**/api/diarias/lote').as('postDiarias1');
-    cy.get('button[type="submit"]').contains('Gerar Diárias').click();
-    cy.wait('@postDiarias1', { timeout: 10000 });
-    cy.wait(1000);
+    gerarDiariaFuncionario(1, true);
 
     // Selecionar segundo funcionário (Turno A) e lançar
-    cy.get('[formControlName="funcionarioId"]').find('option').eq(2).then($opt => {
-        cy.get('[formControlName="funcionarioId"]').select($opt.val() as string);
-    });
-    
-    // Dia de partida (Turno A) - Garante que está como trabalha
-    cy.get('input[type="radio"][value="TRABALHA"]').check({ force: true });
-
-    cy.intercept('POST', '**/api/diarias/lote').as('postDiarias2');
-    cy.get('button[type="submit"]').contains('Gerar Diárias').click();
-    cy.wait('@postDiarias2', { timeout: 10000 });
-    cy.wait(1000);
+    gerarDiariaFuncionario(2, true);
 
     // Selecionar terceiro funcionário (Turno B) e lançar
-    cy.get('[formControlName="funcionarioId"]').find('option').eq(3).then($opt => {
-        cy.get('[formControlName="funcionarioId"]').select($opt.val() as string);
-    });
-
-    // Dia de partida para FOLGA (Turno B)
-    cy.get('input[type="radio"][value="FOLGA"]').check({ force: true });
-
-    cy.intercept('POST', '**/api/diarias/lote').as('postDiarias3');
-    cy.get('button[type="submit"]').contains('Gerar Diárias').click();
-    cy.wait('@postDiarias3', { timeout: 10000 });
-    cy.wait(1000);
+    gerarDiariaFuncionario(3, false);
 
     // Selecionar quarto funcionário (Turno B) e lançar
-    cy.get('[formControlName="funcionarioId"]').find('option').eq(4).then($opt => {
-        cy.get('[formControlName="funcionarioId"]').select($opt.val() as string);
-    });
-
-    // Dia de partida para FOLGA (Turno B)
-    cy.get('input[type="radio"][value="FOLGA"]').check();
-
-    cy.intercept('POST', '**/api/diarias/lote').as('postDiarias4');
-    cy.get('button[type="submit"]').contains('Gerar Diárias').click();
-    cy.wait('@postDiarias4', { timeout: 10000 });
+    gerarDiariaFuncionario(4, false);
 
     // Ir para a tela de diárias para visualizar
     cy.visit('/diarias');

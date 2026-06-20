@@ -36,8 +36,8 @@ public static class AdminSeeder
                     INSERT INTO ""Contratos"" (""Id"", ""EmpresaId"", ""ClienteId"", ""Descricao"", ""ValorTotalMensal"", ""ValorDiariaCobrada"", ""PercentualAdicionalNoturno"", ""PercentualAdicionalFimSemana"", ""ValorBeneficiosExtrasMensal"", ""PercentualEncargosProvisoes"", ""NumeroDePostos"", ""MargemLucroPercentual"", ""MargemCoberturaFaltasPercentual"", ""DataInicio"", ""DataFim"", ""Status"")
                     VALUES ({contratoId}, {adminConta.Id}, {clienteId}, 'Contrato Base SP', 50000, 150, 0.20, 0.10, 500, 0.70, 2, 0.10, 0.05, '2023-01-01', '2028-01-01', 0);
 
-                    INSERT INTO ""Postos"" (""Id"", ""ClienteId"", ""ContratoId"", ""Nome"", ""Cep"", ""Endereco"", ""Numero"", ""Cidade"", ""Estado"")
-                    VALUES ({postoId}, {clienteId}, {contratoId}, 'Portaria Principal', '01000000', 'Av Paulista', '100', 'São Paulo', 'SP');
+                    INSERT INTO ""Postos"" (""Id"", ""EmpresaId"", ""ClienteId"", ""ContratoId"", ""Nome"", ""Cep"", ""Endereco"", ""Numero"", ""Cidade"", ""Estado"")
+                    VALUES ({postoId}, {adminConta.Id}, {clienteId}, {contratoId}, 'Portaria Principal', '01000000', 'Av Paulista', '100', 'São Paulo', 'SP');
 
                     INSERT INTO ""Funcionarios"" (""Id"", ""EmpresaId"", ""ClienteId"", ""ContratoId"", ""Nome"", ""Cpf"", ""Celular"", ""StatusFuncionario"", ""TipoEscala"", ""TipoFuncionario"")
                     VALUES ({func1Id}, {adminConta.Id}, {clienteId}, {contratoId}, 'João Vigilante', '05807073010', '11999999999', 0, 0, 0);

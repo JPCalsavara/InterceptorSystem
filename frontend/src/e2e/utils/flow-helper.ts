@@ -34,6 +34,7 @@ export const getSafeTestPassword = () => {
 export const fillWizardClienteStep = (nome: string, validCNPJ: string) => {
     cy.get('[data-cy="wizard-cliente-nome"]').type(nome);
     cy.get('[data-cy="wizard-cliente-cnpj"]').type(validCNPJ);
+    cy.intercept('GET', '**/api/v1/localidades/estados/*/municipios*').as('getMunicipios');
     cy.get('[data-cy="wizard-cliente-estado"]').select('SP');
     cy.wait('@getMunicipios');
     cy.get('[data-cy="wizard-cliente-cidade"]').select('São Paulo');

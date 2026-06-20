@@ -38,12 +38,13 @@ describe('ClienteWizardComponent', () => {
     
     // Passo 1 - Preenche dados básicos
     cy.get('h1').should('contain', 'Novo Cliente Completo');
-    cy.get('[formControlName="nome"]').type('Cliente Horizon');
-    cy.get('[formControlName="cnpj"]').type('33069150000100');
+    // app-form-input renders <input id="nome"> — use id or data-cy selectors
+    cy.get('[data-cy="wizard-cliente-nome"] input, input#nome').type('Cliente Horizon');
+    cy.get('[data-cy="wizard-cliente-cnpj"] input, input#cnpj').type('33069150000100');
     cy.get('[formControlName="estado"]').select('SP');
     cy.get('[formControlName="cidade"]').should('not.be.disabled').select('São Paulo');
-    cy.get('[formControlName="quantidadeIdealPorTurno"]').clear().type('2');
-    cy.get('[formControlName="horarioTrocaTurno"]').clear().type('06:00');
+    cy.get('[data-cy="wizard-cliente-ideal"] input, input#quantidadeIdealPorTurno').clear().type('2');
+    cy.get('[data-cy="wizard-cliente-horario"] input, input#horarioTrocaTurno').clear().type('06:00');
 
     // Clica no próximo (we have to find the next button in the footer)
     // Looking at common wizard structure, the next button is usually 'Próximo' or similar
