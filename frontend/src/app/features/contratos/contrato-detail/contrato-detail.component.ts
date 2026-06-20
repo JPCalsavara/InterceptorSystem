@@ -509,10 +509,24 @@ export class ContratoDetailComponent implements OnInit {
 
     const resumo = this.resumoFinanceiro();
     const diariasTotaisMes = (resumo?.totalDiariasNormais || 0) + (resumo?.totalDiariasExtras || 0);
-    const diariasNoturnasMes =
+
+    // Bug 1: diariasNoturnasMes do resumo (pode ser 0 se alocações não têm temHorarioNoturno=true)
+    let diariasNoturnasMes: number =
       resumo?.projecaoCustoPorAlocacao
         ?.filter((a) => a.temHorarioNoturno)
-        .reduce((acc, item) => acc + (item.totalDiarias || 0), 0) || 0;
+        .reduce((acc, item) => acc + (item.totalDiarias || 0), 0) ?? 0;
+
+    // Fallback: se o resumo não detectou noturnas mas há alocações noturnas cadastradas,
+    // inferir a proporção a partir da estrutura de alocações do contrato.
+    if (diariasNoturnasMes === 0 && diariasTotaisMes > 0 && contrato.percentualAdicionalNoturno) {
+      const alocacoes = this.alocacoes();
+      const totalAlocs = alocacoes.length;
+      const noturnasAlocs = alocacoes.filter((a) => a.temHorarioNoturno).length;
+      if (totalAlocs > 0 && noturnasAlocs > 0) {
+        diariasNoturnasMes = Math.round(diariasTotaisMes * (noturnasAlocs / totalAlocs));
+      }
+    }
+
     const diariasFdsMes = Math.max(0, resumo?.totalDiariasFimDeSemana || 0);
     const diariasFeriadosMes = 0; // Feriados não são calculados neste fluxo
     const funcionarios = this.funcionariosCliente() || contrato.quantidadeFuncionarios || 1;
@@ -601,10 +615,47 @@ export class ContratoDetailComponent implements OnInit {
     });
   }
 
+  /**
+   * Conta dias úteis (seg-sex) e de fim de semana entre dois dates (inclusive).
+   */
+  private contarDiasNoIntervalo(inicio: Date, fim: Date): { uteis: number; fimDeSemana: number } {
+    let uteis = 0;
+    let fimDeSemana = 0;
+    const d = new Date(inicio.getTime());
+    d.setHours(0, 0, 0, 0);
+    const fimNorm = new Date(fim.getTime());
+    fimNorm.setHours(23, 59, 59, 999);
+    while (d <= fimNorm) {
+      const dow = d.getDay();
+      if (dow === 0 || dow === 6) fimDeSemana++;
+      else uteis++;
+      d.setDate(d.getDate() + 1);
+    }
+    return { uteis, fimDeSemana };
+  }
+
   private buildSimulacaoInput(contrato: Contrato): SimulacaoFinanceiraMensalInput {
     const numeroDePostos = Math.max(1, contrato.numeroDePostos || 1);
     const funcionariosContrato = Math.max(1, contrato.quantidadeFuncionarios || 1);
     const alocacoesPorPosto = 2;
+
+    // Bug 2: quando o contrato inicia no mês corrente após o dia 1,
+    // pro-rata os dias úteis para que o simulado use o mesmo período que o relatório real.
+    const hoje = new Date();
+    const dataInicio = new Date(contrato.dataInicio);
+    let diasUteisMes: number | undefined;
+    let diasFimSemanaMes: number | undefined;
+
+    if (
+      dataInicio.getFullYear() === hoje.getFullYear() &&
+      dataInicio.getMonth() === hoje.getMonth() &&
+      dataInicio.getDate() > 1
+    ) {
+      const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0); // último dia do mês
+      const { uteis, fimDeSemana } = this.contarDiasNoIntervalo(dataInicio, fimMes);
+      diasUteisMes = Math.max(1, uteis);
+      diasFimSemanaMes = fimDeSemana;
+    }
 
     return {
       valorDiaria: contrato.valorDiariaCobrada || 0,
@@ -618,6 +669,8 @@ export class ContratoDetailComponent implements OnInit {
       alocacoesPorPosto,
       funcionariosPorAlocacao: Math.max(1, Math.ceil(funcionariosContrato / alocacoesPorPosto)),
       diasTrabalhadosPorFuncionarioMes: this.DIARIAS_POR_FUNCIONARIO_MES_BASE,
+      diasUteisMes,
+      diasFimSemanaMes,
       valorBeneficioMensalPorFuncionario: contrato.valorBeneficiosExtrasMensal || 0,
       percentualEncargosProvisoes: this.normalizarPercentualContrato(
         contrato.percentualEncargosProvisoes,

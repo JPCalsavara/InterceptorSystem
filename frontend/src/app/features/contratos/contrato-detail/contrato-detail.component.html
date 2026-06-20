@@ -218,10 +218,10 @@
       <div class="card card-col2-rows12">
         <h2 class="card-title">Relatório Simulado</h2>
         @if (simulacaoBreakdown() && !calculando() && !erroCalculo()) {
-          <div class="bk-group">
+          <div class="bk-group" data-cy="simulado-etapa1">
             <div class="bk-group-header bk-custo">
               <span class="bk-group-label">Etapa 1: Operação (Diárias)</span>
-              <span class="bk-group-total">{{
+              <span class="bk-group-total" data-cy="simulado-total-diarias">{{
                 simulacaoBreakdown()!.diariasTotaisMes | number: '1.0-0'
               }}</span>
             </div>
@@ -247,7 +247,7 @@
                     >considerando {{ diasUteisMesSimulado() }} dias úteis</span
                   >
                 </span>
-                <span class="bk-item-value">{{
+                <span class="bk-item-value" data-cy="simulado-diarias-uteis">{{
                   simulacaoBreakdown()!.diariasUteisMes | number: '1.0-0'
                 }}</span>
               </div>
@@ -258,7 +258,7 @@
                     >considerando {{ diasFimSemanaMesSimulado() }} dias de fim de semana</span
                   >
                 </span>
-                <span class="bk-item-value">{{
+                <span class="bk-item-value" data-cy="simulado-diarias-fds">{{
                   simulacaoBreakdown()!.diariasFimSemanaMes | number: '1.0-0'
                 }}</span>
               </div>
@@ -303,10 +303,10 @@
             </div>
           </div>
 
-          <div class="bk-group">
+          <div class="bk-group" data-cy="simulado-etapa2">
             <div class="bk-group-header bk-custo">
               <span class="bk-group-label">Etapa 2: Custo Total</span>
-              <span class="bk-group-total">{{ custoTotalFinalSimulado() | currency: 'BRL' }}</span>
+              <span class="bk-group-total" data-cy="simulado-custo-total">{{ custoTotalFinalSimulado() | currency: 'BRL' }}</span>
             </div>
             <div class="bk-items">
               <div class="bk-item bk-item-summary">
@@ -433,7 +433,7 @@
 
               <div class="bk-group-header bk-receita bk-emphasis">
                 <span class="bk-group-label">Etapa 3: Faturamento Simulado</span>
-                <span class="bk-group-total">{{ faturamentoSimulado() | currency: 'BRL' }}</span>
+                <span class="bk-group-total" data-cy="simulado-faturamento">{{ faturamentoSimulado() | currency: 'BRL' }}</span>
               </div>
             </div>
           </div>
@@ -478,7 +478,7 @@
           <div class="bk-group">
             <div class="bk-group-header bk-receita bk-emphasis">
               <span class="bk-group-label"> Faturamento do Contrato</span>
-              <span class="bk-group-total">{{ faturamentoRealFechado() | currency: 'BRL' }}</span>
+              <span class="bk-group-total" data-cy="real-faturamento">{{ faturamentoRealFechado() | currency: 'BRL' }}</span>
             </div>
           </div>
 
@@ -486,7 +486,7 @@
           <div class="bk-group">
             <div class="bk-group-header bk-custo bk-emphasis">
               <span class="bk-group-label"> Custo Total com Impostos</span>
-              <span class="bk-group-total"
+              <span class="bk-group-total" data-cy="real-custo-total"
                 >- {{ custoTotalComImpostoReal() | currency: 'BRL' }}</span
               >
             </div>
@@ -517,7 +517,7 @@
                     >{{ breakdown()!.diariasNoturnasMes | number: '1.0-0' }} diárias noturnas</span
                   >
                 </span>
-                <span class="bk-item-value">{{
+                <span class="bk-item-value" data-cy="real-adicional-noturno">{{
                   breakdown()!.custoAdicionalNoturno | currency: 'BRL'
                 }}</span>
               </div>
