@@ -8,8 +8,8 @@
           <div class="form-card">
             <!-- Checkbox para habilitar criação do contrato -->
             <div class="form-group checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" formControlName="criarContrato" class="checkbox-input" data-cy="wizard-criar-contrato" />
+              <label class="checkbox-label" for="wizard-criar-contrato">
+                <input id="wizard-criar-contrato" type="checkbox" formControlName="criarContrato" class="checkbox-input" data-cy="wizard-criar-contrato" />
                 <span class="checkbox-text">Criar contrato neste momento</span>
               </label>
               <span class="help-text">Você pode criar o contrato depois se preferir</span>
@@ -75,8 +75,8 @@
               </div>
 
               <div class="form-group checkbox-group modo-config-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" formControlName="modoPersonalizado" class="checkbox-input" data-cy="wizard-modo-personalizado" />
+                <label class="checkbox-label" for="wizard-modo-personalizado">
+                  <input id="wizard-modo-personalizado" type="checkbox" formControlName="modoPersonalizado" class="checkbox-input" data-cy="wizard-modo-personalizado" />
                   <span class="checkbox-text">Modo personalizado (edição manual)</span>
                 </label>
                 @if (!isModoPersonalizado()) {
@@ -129,10 +129,10 @@
                     </h4>
 
                     <div class="form-group">
-                      <label class="form-label"
+                      <label class="form-label" [for]="'wizard-posto-tipo-' + $index"
                         >Tipo de Posto <span class="required">*</span></label
                       >
-                      <select formControlName="tipoPosto" class="form-input" [attr.data-cy]="'wizard-posto-tipo-' + $index">
+                      <select [id]="'wizard-posto-tipo-' + $index" formControlName="tipoPosto" class="form-input" [attr.data-cy]="'wizard-posto-tipo-' + $index">
                         @for (opt of tipoPostoOptions; track opt.value) {
                           <option [value]="opt.value">{{ opt.label }}</option>
                         }
@@ -145,11 +145,12 @@
 
                     <div class="form-row">
                       <div class="form-group">
-                        <label class="form-label">
+                        <label class="form-label" [for]="'wizard-posto-qtd-aloc-' + $index">
                           Qtd. Alocações (Turnos) <span class="required">*</span>
                         </label>
                         @if (isPostoPersonalizado($index)) {
                           <input
+                            [id]="'wizard-posto-qtd-aloc-' + $index"
                             type="number"
                             formControlName="quantidadeAlocacoes"
                             class="form-input"
@@ -168,11 +169,12 @@
                         }
                       </div>
                       <div class="form-group">
-                        <label class="form-label">
+                        <label class="form-label" [for]="'wizard-posto-qtd-func-' + $index">
                           Funcionários por Alocação <span class="required">*</span>
                         </label>
                         @if (isPostoPersonalizado($index)) {
                           <input
+                            [id]="'wizard-posto-qtd-func-' + $index"
                             type="number"
                             formControlName="quantidadeFuncionariosPorAlocacao"
                             class="form-input"
@@ -194,9 +196,10 @@
 
                     <div class="form-row">
                       <div class="form-group">
-                        <label class="form-label">Aloc. Noturnas</label>
+                        <label class="form-label" [for]="'wizard-posto-aloc-noturnas-' + $index">Aloc. Noturnas</label>
                         @if (isPostoPersonalizado($index)) {
                           <input
+                            [id]="'wizard-posto-aloc-noturnas-' + $index"
                             type="number"
                             formControlName="alocacoesNoturnas"
                             class="form-input"
@@ -225,10 +228,11 @@
                       ></app-form-input>
 
                       <div class="form-group">
-                        <label class="form-label">
+                        <label class="form-label" [for]="'wizard-posto-valor-beneficios-' + $index">
                           Benefícios Extras Mensais (R$) <span class="required">*</span>
                         </label>
                         <input
+                          [id]="'wizard-posto-valor-beneficios-' + $index"
                           type="number"
                           formControlName="valorBeneficiosExtrasMensal"
                           class="form-input"
@@ -268,8 +272,9 @@
 
               <div class="form-row" style="margin-bottom: 24px">
                 <div class="form-group">
-                  <label class="form-label">Total de Funcionários Estimados Por Dia</label>
+                  <label class="form-label" for="wizard-total-funcionarios">Total de Funcionários Estimados Por Dia</label>
                   <input
+                    id="wizard-total-funcionarios"
                     type="number"
                     [value]="quantidadeTotalFuncionarios()"
                     class="form-input calculated-field"
@@ -279,8 +284,9 @@
                   <span class="help-text"> Calculado: postos × turnos × func/turno </span>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Total Alocações Noturnas</label>
+                  <label class="form-label" for="wizard-total-alocacoes-noturnas">Total Alocações Noturnas</label>
                   <input
+                    id="wizard-total-alocacoes-noturnas"
                     type="number"
                     [value]="totalAlocacoesNoturnas()"
                     class="form-input calculated-field"
