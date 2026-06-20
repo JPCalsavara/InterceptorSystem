@@ -84,7 +84,7 @@ export class FormInputComponent {
   @Output() valueChange = new EventEmitter<any>();
   @Input() disabled = false;
   @Input() label = '';
-  @Input() id = `input-${Math.random().toString(36).substr(2, 9)}`;
+  @Input() id = `input-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
   @Input() type = 'text';
   @Input() placeholder = '';
   @Input() step?: string;
