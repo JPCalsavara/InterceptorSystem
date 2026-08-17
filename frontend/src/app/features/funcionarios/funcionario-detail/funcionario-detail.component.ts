@@ -17,14 +17,17 @@ import {
   TipoDiaria,
   TipoEscala,
 } from '../../../models/index';
+import { calcularValorDiariaEstimada } from '../../../shared/helpers/contrato-calculo.helper';
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { FuncionarioMetricasComponent } from '../components/funcionario-metricas/funcionario-metricas.component';
 import { FuncionarioPostosComponent } from '../components/funcionario-postos/funcionario-postos.component';
+import { ListagemOcorrenciasComponent } from '../../../shared/components/listagem-ocorrencias/listagem-ocorrencias';
+import { OcorrenciaItem } from '../../../shared/components/listagem-ocorrencias/t_ocorrencia';
 
 @Component({
   selector: 'app-funcionario-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FuncionarioMetricasComponent, FuncionarioPostosComponent],
+  imports: [CommonModule, RouterLink, FuncionarioMetricasComponent, FuncionarioPostosComponent, ListagemOcorrenciasComponent],
   templateUrl: './funcionario-detail.component.html',
   styleUrl: './funcionario-detail.component.scss',
 })
@@ -267,6 +270,26 @@ export class FuncionarioDetailComponent implements OnInit {
     return labels[status] || 'Desconhecido';
   }
 
+  // Ocorrências mapeadas para o componente compartilhado
+  ocorrenciasFaltas = computed<OcorrenciaItem[]>(() => {
+    return this.faltas().map(falta => ({
+      id: falta.id,
+      data: this.formatDate(falta.data),
+      descricaoSecundaria: this.getPostoNome(falta.alocacaoId),
+      valor: this.contrato()?.valorDiariaCobrada,
+      isDanger: true
+    }));
+  });
+
+  ocorrenciasCanceladas = computed<OcorrenciaItem[]>(() => {
+    return this.diariasCanceladas().map(cancelada => ({
+      id: cancelada.id,
+      data: this.formatDate(cancelada.data),
+      descricaoSecundaria: this.getPostoNome(cancelada.alocacaoId),
+      valor: this.contrato()?.valorDiariaCobrada
+    }));
+  });
+
   getTipoLabel(tipo: TipoDiaria): string {
     const labels = {
       [TipoDiaria.REGULAR]: 'Regular',
@@ -276,33 +299,21 @@ export class FuncionarioDetailComponent implements OnInit {
     return labels[tipo] || tipo;
   }
 
-  private calcularProporcaoNoturna(alocacaoId: string): number {
-    const aloc = this.alocacoes().find(a => a.id === alocacaoId);
-    if (!aloc) return 0;
-    return aloc.temHorarioNoturno ? 1.0 : 0; // Simplificado: se tem horário noturno, aplica bônus total ou proporcional?
-    // O backend agora tem a lógica real, no frontend podemos simplificar ou ler do backend.
-  }
-
   // Calcula o valor de uma única diária (bônus FDS + adicional noturno proporcional)
   calcularValorDiaria(diaria: Diaria): number {
     const contrato = this.contrato();
     if (!contrato) return 0;
 
-    let valor = contrato.valorDiariaCobrada || 0;
-    const data = new Date(diaria.data + 'T12:00:00');
-    const diaSemana = data.getDay();
+    const aloc = this.alocacoes().find(a => a.id === diaria.alocacaoId);
+    const temNoturno = !!aloc?.temHorarioNoturno;
 
-    if (diaSemana === 0)
-      valor *= 2.0; // +100% domingo
-    else if (diaSemana === 6) valor *= 1.5; // +50% sábado
-
-    const proporcaoNoturna = this.calcularProporcaoNoturna(diaria.alocacaoId);
-    if (proporcaoNoturna > 0) {
-      // Adicional proporcional às horas noturnas reais (CLT Art. 73)
-      valor *= 1 + proporcaoNoturna * (contrato.percentualAdicionalNoturno || 0);
-    }
-
-    return valor;
+    return calcularValorDiariaEstimada(
+      diaria.data,
+      contrato.valorDiariaCobrada || 0,
+      contrato.percentualAdicionalNoturno,
+      contrato.percentualAdicionalFimSemana,
+      temNoturno
+    );
   }
 
   // Breakdown noturno do mês selecionado (apenas diárias confirmadas)
@@ -330,11 +341,13 @@ export class FuncionarioDetailComponent implements OnInit {
 
       totalBase += base;
 
-      const proporcao = this.calcularProporcaoNoturna(aloc.alocacaoId);
-      const adicional = base * proporcao * (contrato.percentualAdicionalNoturno || 0);
+      const alocRef = this.alocacoes().find(a => a.id === aloc.alocacaoId);
+      const temNoturno = !!alocRef?.temHorarioNoturno;
+      
+      const adicional = temNoturno ? base * (contrato.percentualAdicionalNoturno || 0) : 0;
       totalAdicional += adicional;
 
-      if (proporcao > 0) countNoturnas++;
+      if (temNoturno) countNoturnas++;
       else countDiurnas++;
     }
 

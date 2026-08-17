@@ -7,6 +7,7 @@ import { FuncionarioService } from '../../../services/funcionario.service';
 import { PostoService } from '../../../services/posto.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 import {
   Funcionario,
   Posto,
@@ -24,7 +25,7 @@ import { AlocacaoService } from '../../../services/alocacao.service';
 @Component({
   selector: 'app-diaria-batch-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FormSelectComponent],
   templateUrl: './diaria-batch-form.component.html',
   styleUrl: './diaria-batch-form.component.scss', // Corrigido de styleUrls para styleUrl
 })
@@ -52,6 +53,31 @@ export class DiariaBatchFormComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
+
+  clienteOptions = computed(() =>
+    this.clientes().map(c => ({ value: c.id, label: c.nome }))
+  );
+
+  contratoOptions = computed(() =>
+    this.contratos().map(c => ({
+      value: c.id,
+      label: `${c.descricao} (${new Date(c.dataInicio + 'T12:00:00').toLocaleDateString()} - ${new Date(c.dataFim + 'T12:00:00').toLocaleDateString()})`
+    }))
+  );
+
+  alocacaoOptions = computed(() =>
+    this.alocacoes().map(a => ({
+      value: a.id,
+      label: `${a.horarioInicio.substring(0, 5)} - ${a.horarioFim.substring(0, 5)} (${a.tipoEscala})`
+    }))
+  );
+
+  funcionarioOptions = computed(() =>
+    this.funcionarios().map(f => ({
+      value: f.id,
+      label: `${f.nome} (Escala: ${f.tipoEscala})`
+    }))
+  );
 
   getSummary(): string {
     const contrato = this.contratos().find((c) => c.id === this.form.get('contratoId')?.value);
@@ -269,17 +295,6 @@ export class DiariaBatchFormComponent implements OnInit {
     Object.keys(this.form.controls).forEach((key) => this.form.get(key)?.markAsTouched());
   }
 
-  hasError(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
-    return !!(field?.invalid && (field.touched || this.submitted()));
-  }
-
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
-    if (!field?.errors || (!field.touched && !this.submitted())) return '';
-    if (field.errors['required']) return 'Este campo é obrigatório.';
-    return 'Campo inválido.';
-  }
 
   private handleError(message: string, error: any): void {
     this.error.set(message);

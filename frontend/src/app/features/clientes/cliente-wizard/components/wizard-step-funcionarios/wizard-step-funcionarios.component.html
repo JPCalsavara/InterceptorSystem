@@ -97,87 +97,30 @@
                     <h5 class="subsection-title">Dados Profissionais</h5>
 
                     <div class="form-row">
-                      <div class="form-group">
-                        <label [for]="'tipoFuncionario-' + i" class="form-label">
-                          Tipo de Funcionário <span class="required">*</span>
-                        </label>
-                        <select
-                          [id]="'tipoFuncionario-' + i"
-                          formControlName="tipoFuncionario"
-                          class="form-input"
-                          [class.error]="
-                            func.get('tipoFuncionario')?.invalid &&
-                            func.get('tipoFuncionario')?.touched
-                          "
-                        >
-                          <option value="">Selecione</option>
-                          <option value="CLT">CLT (Regime CLT)</option>
-                          <option value="TERCEIRIZADO">Terceirizado</option>
-                          <option value="FREELANCER">Freelancer</option>
-                        </select>
-                        @if (
-                          func.get('tipoFuncionario')?.invalid &&
-                          func.get('tipoFuncionario')?.touched
-                        ) {
-                          <span class="error-message">Tipo de funcionário é obrigatório</span>
-                        }
-                      </div>
+                      <app-form-select
+                        [id]="'tipoFuncionario-' + i"
+                        controlName="tipoFuncionario"
+                        label="Tipo de Funcionário"
+                        [required]="true"
+                        [options]="tipoFuncionarioOptions"
+                      ></app-form-select>
 
-                      <div class="form-group">
-                        <label [for]="'tipoEscala-' + i" class="form-label">
-                          Escala de Trabalho <span class="required">*</span>
-                        </label>
-                        <select
-                          [id]="'tipoEscala-' + i"
-                          formControlName="tipoEscala"
-                          class="form-input"
-                          [class.error]="
-                            func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched
-                          "
-                        >
-                          <option value="">Selecione</option>
-                          <option value="DOZE_POR_TRINTA_SEIS">
-                            12x36 (12h trabalho, 36h descanso)
-                          </option>
-                          <option value="SEMANAL_COMERCIAL">
-                            Semanal Comercial (5x2, 44h/semana)
-                          </option>
-                          <option value="OITO_HORAS_SEIS_POR_DOIS">
-                            8h (6x2, 8h trabalho diário, 2 folgas)
-                          </option>
-                        </select>
-                        @if (func.get('tipoEscala')?.invalid && func.get('tipoEscala')?.touched) {
-                          <span class="error-message">Escala de trabalho é obrigatória</span>
-                        }
-                      </div>
+                      <app-form-select
+                        [id]="'tipoEscala-' + i"
+                        controlName="tipoEscala"
+                        label="Escala de Trabalho"
+                        [required]="true"
+                        [options]="tipoEscalaOptions"
+                      ></app-form-select>
                     </div>
 
-                    <div class="form-group">
-                      <label [for]="'statusFuncionario-' + i" class="form-label">
-                        Status <span class="required">*</span>
-                      </label>
-                      <select
-                        [id]="'statusFuncionario-' + i"
-                        formControlName="statusFuncionario"
-                        class="form-input"
-                        [class.error]="
-                          func.get('statusFuncionario')?.invalid &&
-                          func.get('statusFuncionario')?.touched
-                        "
-                      >
-                        <option value="">Selecione</option>
-                        <option value="ATIVO">Ativo</option>
-                        <option value="FERIAS">Férias</option>
-                        <option value="AFASTADO">Afastado</option>
-                        <option value="DEMITIDO">Demitido</option>
-                      </select>
-                      @if (
-                        func.get('statusFuncionario')?.invalid &&
-                        func.get('statusFuncionario')?.touched
-                      ) {
-                        <span class="error-message">Status é obrigatório</span>
-                      }
-                    </div>
+                    <app-form-select
+                      [id]="'statusFuncionario-' + i"
+                      controlName="statusFuncionario"
+                      label="Status"
+                      [required]="true"
+                      [options]="statusFuncionarioOptions"
+                    ></app-form-select>
 
                     <!-- Valores Calculados Automaticamente (Info) -->
                     <div class="auto-calculated-info">

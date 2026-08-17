@@ -58,12 +58,12 @@ describe('PostoFormComponent', () => {
     cy.get('h1').should('contain', 'Novo Posto');
     
     // Seleciona Cliente e depois Contrato
-    cy.get('select[formControlName="clienteId"]').select('c1');
-    cy.get('select[formControlName="contratoId"]').select('ct1');
+    cy.get('select#clienteId').select('c1');
+    cy.get('select#contratoId').select('ct1');
     
-    cy.get('input[formControlName="nome"]').type('Nova Portaria');
-    cy.get('input[formControlName="cep"]').type('01000000');
-    cy.get('input[formControlName="numero"]').type('123');
+    cy.get('input#nome').type('Nova Portaria');
+    cy.get('input#cep').type('01000000');
+    cy.get('input#numero').type('123');
   });
 
   it('Desktop: exibe mensagens de erro ao tentar enviar vazio', () => {

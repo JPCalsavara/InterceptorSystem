@@ -26,91 +26,44 @@
     <div class="form-card">
       <h3 class="section-title">Seleção Principal</h3>
 
-      <div class="form-group">
-        <label for="clienteId" class="form-label">Cliente <span class="required">*</span></label>
-        <select
+      <div class="form-row">
+        <app-form-select
           id="clienteId"
-          formControlName="clienteId"
-          class="form-input"
-          [class.error]="hasError('clienteId')"
-        >
-          <option value="">Selecione um cliente</option>
-          @for (cond of clientes(); track cond.id) {
-            <option [value]="cond.id">{{ cond.nome }}</option>
-          }
-        </select>
-        @if (hasError('clienteId')) {
-          <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
-        }
+          controlName="clienteId"
+          label="Cliente"
+          [required]="true"
+          [options]="clienteOptions()"
+        ></app-form-select>
+        <div class="form-group"></div>
       </div>
 
       <div class="form-row">
-        <div class="form-group">
-          <label for="contratoId" class="form-label"
-            >Contrato <span class="required">*</span></label
-          >
-          <select
-            id="contratoId"
-            formControlName="contratoId"
-            class="form-input"
-            [class.error]="hasError('contratoId')"
-          >
-            <option value="">Selecione um contrato</option>
-            @for (contrato of contratos(); track contrato.id) {
-              <option [value]="contrato.id">
-                {{ contrato.descricao }} ({{ contrato.dataInicio | date: 'dd/MM/yy' }} -
-                {{ contrato.dataFim | date: 'dd/MM/yy' }})
-              </option>
-            }
-          </select>
-          @if (hasError('contratoId')) {
-            <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
-          }
-        </div>
+        <app-form-select
+          id="contratoId"
+          controlName="contratoId"
+          label="Contrato"
+          [required]="true"
+          [options]="contratoOptions()"
+        ></app-form-select>
 
-        <div class="form-group">
-          <label for="alocacaoId" class="form-label"
-            >Turno (Alocação) <span class="required">*</span></label
-          >
-          <select
-            id="alocacaoId"
-            formControlName="alocacaoId"
-            class="form-input"
-            [class.error]="hasError('alocacaoId')"
-          >
-            <option value="">Selecione um turno</option>
-            @for (aloc of alocacoes(); track aloc.id) {
-              <option [value]="aloc.id">
-                {{ aloc.horarioInicio.substring(0, 5) }} - {{ aloc.horarioFim.substring(0, 5) }} ({{
-                  aloc.tipoEscala
-                }})
-              </option>
-            }
-          </select>
-          @if (hasError('alocacaoId')) {
-            <span class="error-message">{{ getErrorMessage('alocacaoId') }}</span>
-          }
-        </div>
+        <app-form-select
+          id="alocacaoId"
+          controlName="alocacaoId"
+          label="Turno (Alocação)"
+          [required]="true"
+          [options]="alocacaoOptions()"
+        ></app-form-select>
       </div>
 
-      <div class="form-group">
-        <label for="funcionarioId" class="form-label"
-          >Funcionário <span class="required">*</span></label
-        >
-        <select
+      <div class="form-row">
+        <app-form-select
           id="funcionarioId"
-          formControlName="funcionarioId"
-          class="form-input"
-          [class.error]="hasError('funcionarioId')"
-        >
-          <option value="">Selecione um funcionário</option>
-          @for (func of funcionarios(); track func.id) {
-            <option [value]="func.id">{{ func.nome }} (Escala: {{ func.tipoEscala }})</option>
-          }
-        </select>
-        @if (hasError('funcionarioId')) {
-          <span class="error-message">{{ getErrorMessage('funcionarioId') }}</span>
-        }
+          controlName="funcionarioId"
+          label="Funcionário"
+          [required]="true"
+          [options]="funcionarioOptions()"
+        ></app-form-select>
+        <div class="form-group"></div>
       </div>
 
       @if (selectedFuncionarioEscala() === 'DOZE_POR_TRINTA_SEIS') {

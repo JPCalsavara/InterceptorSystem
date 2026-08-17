@@ -264,39 +264,17 @@
 
     <!-- Detalhamento de Faltas -->
     @if (totalFaltas() > 0) {
-      <section class="faltas-section">
-        <h2 class="section-title">Detalhamento de Faltas</h2>
-        <div class="faltas-container">
-          <div class="faltas-summary">
-            <div class="summary-card">
-              <h3>Resumo de Faltas</h3>
-              <div class="summary-content">
-                <div class="summary-item total">
-                  <span class="summary-label">Total de Faltas Registradas:</span>
-                  <span class="summary-value danger">{{ totalFaltas() }}</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-label">% do Total de Diárias:</span>
-                  <span class="summary-value"
-                    >{{ (totalFaltas() / totalDiarias()) * 100 | number: '1.1-1' }}%</span
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="faltas-list">
-            <h4>Histórico de Faltas</h4>
-            @for (falta of faltas(); track falta.id) {
-              <div class="falta-item">
-                <div class="falta-date">{{ formatDate(falta.data) }}</div>
-                <div class="falta-funcionario">{{ getFuncionarioNome(falta.funcionarioId) }}</div>
-                <div class="falta-tipo">{{ getTipoLabel(falta.tipoDiaria) }}</div>
-              </div>
-            }
-          </div>
-        </div>
-      </section>
+      <app-listagem-ocorrencias
+        titulo="Detalhamento de Faltas"
+        resumoTitulo="Resumo de Faltas"
+        labelQuantidade="Total de Faltas Registradas:"
+        [quantidade]="totalFaltas()"
+        [mostrarFinanceiro]="false"
+        extraItemLabel="% do Total de Diárias:"
+        [extraItemValue]="((totalFaltas() / totalDiarias()) * 100 | number: '1.1-1') + '%'"
+        historicoTitulo="Histórico de Faltas"
+        [itens]="ocorrenciasFaltas()"
+      ></app-listagem-ocorrencias>
     }
   }
 </div>

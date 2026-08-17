@@ -1,0 +1,63 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+    
+    .required {
+      color: var(--danger-color);
+    }
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    &.error {
+      border-color: var(--danger-color);
+      
+      &:focus {
+        box-shadow: 0 0 0 3px var(--danger-light);
+      }
+    }
+
+    &:disabled {
+      background-color: var(--bg-color);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+  }
+
+  .error-message {
+    color: var(--danger-color);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .help-text {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+}

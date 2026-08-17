@@ -41,169 +41,85 @@
 
       <div class="form-row">
         <!-- Cliente -->
-        <div class="form-group">
-          <label for="clienteId" class="form-label">
-            Cliente <span class="required">*</span>
-          </label>
-          <select
-            id="clienteId"
-            formControlName="clienteId"
-            class="form-input"
-            [class.error]="hasError('clienteId')"
-          >
-            <option value="">Selecione um cliente</option>
-            @for (cond of clientes(); track cond.id) {
-              <option [value]="cond.id">{{ cond.nome }}</option>
-            }
-          </select>
-          @if (hasError('clienteId')) {
-            <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
-          }
-        </div>
+        <app-form-select
+          controlName="clienteId"
+          label="Cliente"
+          [required]="true"
+          [options]="clientes()"
+          valueKey="id"
+          labelKey="nome"
+        ></app-form-select>
 
         <!-- Contrato -->
-        <div class="form-group">
-          <label for="contratoId" class="form-label">
-            Contrato <span class="required">*</span>
-          </label>
-          <select
-            id="contratoId"
-            formControlName="contratoId"
-            class="form-input"
-            [class.error]="hasError('contratoId')"
-            [disabled]="!form.get('clienteId')?.value"
-          >
-            <option value="">Selecione um contrato</option>
-            @for (cont of contratos(); track cont.id) {
-              <option [value]="cont.id">{{ cont.descricao }}</option>
-            }
-          </select>
-          @if (hasError('contratoId')) {
-            <span class="error-message">{{ getErrorMessage('contratoId') }}</span>
-          }
-          @if (form.get('clienteId')?.value && contratos().length === 0) {
-            <span class="help-text warning">Nenhum contrato ativo para este cliente.</span>
-          }
-        </div>
+        <app-form-select
+          controlName="contratoId"
+          label="Contrato"
+          [required]="true"
+          [options]="contratos()"
+          valueKey="id"
+          labelKey="descricao"
+          [disabled]="!form.get('clienteId')?.value"
+          [helpText]="(form.get('clienteId')?.value && contratos().length === 0) ? 'Nenhum contrato ativo para este cliente.' : ''"
+        ></app-form-select>
       </div>
 
-      <div class="form-group">
-        <label for="nome" class="form-label"> Nome Completo <span class="required">*</span> </label>
-        <input
-          id="nome"
-          type="text"
-          formControlName="nome"
-          data-cy="funcionario-nome"
-          class="form-input"
-          [class.error]="hasError('nome')"
-          placeholder="Ex: João Silva Santos"
-        />
-        @if (hasError('nome')) {
-          <span class="error-message">{{ getErrorMessage('nome') }}</span>
-        }
-      </div>
+      <app-form-input
+        controlName="nome"
+        label="Nome Completo"
+        [required]="true"
+        dataCy="funcionario-nome"
+        placeholder="Ex: João Silva Santos"
+      ></app-form-input>
 
       <div class="form-row">
-        <div class="form-group">
-          <label for="cpf" class="form-label"> CPF <span class="required">*</span> </label>
-          <input
-            id="cpf"
-            type="text"
-            formControlName="cpf"
-            data-cy="funcionario-cpf"
-            class="form-input"
-            [class.error]="hasError('cpf')"
-            placeholder="000.000.000-00"
-            mask="000.000.000-00"
-            maxlength="14"
-          />
-          @if (hasError('cpf')) {
-            <span class="error-message">{{ getErrorMessage('cpf') }}</span>
-          }
-        </div>
+        <app-form-input
+          controlName="cpf"
+          label="CPF"
+          [required]="true"
+          dataCy="funcionario-cpf"
+          placeholder="000.000.000-00"
+          mask="000.000.000-00"
+          maxlength="14"
+        ></app-form-input>
 
-        <div class="form-group">
-          <label for="celular" class="form-label"> Celular <span class="required">*</span> </label>
-          <input
-            id="celular"
-            type="text"
-            formControlName="celular"
-            data-cy="funcionario-telefone"
-            class="form-input"
-            [class.error]="hasError('celular')"
-            placeholder="(00) 00000-0000"
-            mask="(00) 0000-0000||(00) 00000-0000"
-            maxlength="15"
-          />
-          @if (hasError('celular')) {
-            <span class="error-message">{{ getErrorMessage('celular') }}</span>
-          }
-        </div>
+        <app-form-input
+          controlName="celular"
+          label="Celular"
+          [required]="true"
+          dataCy="funcionario-telefone"
+          placeholder="(00) 00000-0000"
+          mask="(00) 0000-0000||(00) 00000-0000"
+          maxlength="15"
+        ></app-form-input>
       </div>
 
       <h3 class="section-title">Informações Profissionais</h3>
 
       <div class="form-row">
-        <div class="form-group">
-          <label for="tipoFuncionario" class="form-label">
-            Tipo de Contrato <span class="required">*</span>
-          </label>
-          <select
-            id="tipoFuncionario"
-            formControlName="tipoFuncionario"
-            data-cy="funcionario-tipo"
-            class="form-input"
-            [class.error]="hasError('tipoFuncionario')"
-          >
-            @for (opt of tipoOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
-          @if (hasError('tipoFuncionario')) {
-            <span class="error-message">{{ getErrorMessage('tipoFuncionario') }}</span>
-          }
-        </div>
+        <app-form-select
+          controlName="tipoFuncionario"
+          label="Tipo de Contrato"
+          [required]="true"
+          dataCy="funcionario-tipo"
+          [options]="tipoOptions"
+        ></app-form-select>
 
-        <div class="form-group">
-          <label for="tipoEscala" class="form-label">
-            Escala de Trabalho <span class="required">*</span>
-          </label>
-          <select
-            id="tipoEscala"
-            formControlName="tipoEscala"
-            data-cy="funcionario-tipo-escala"
-            class="form-input"
-            [class.error]="hasError('tipoEscala')"
-          >
-            @for (opt of escalaOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
-          @if (hasError('tipoEscala')) {
-            <span class="error-message">{{ getErrorMessage('tipoEscala') }}</span>
-          }
-        </div>
+        <app-form-select
+          controlName="tipoEscala"
+          label="Escala de Trabalho"
+          [required]="true"
+          dataCy="funcionario-tipo-escala"
+          [options]="escalaOptions"
+        ></app-form-select>
       </div>
 
       <div class="form-row">
-        <div class="form-group">
-          <label for="statusFuncionario" class="form-label">
-            Status <span class="required">*</span>
-          </label>
-          <select
-            id="statusFuncionario"
-            formControlName="statusFuncionario"
-            class="form-input"
-            [class.error]="hasError('statusFuncionario')"
-          >
-            @for (opt of statusOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
-          @if (hasError('statusFuncionario')) {
-            <span class="error-message">{{ getErrorMessage('statusFuncionario') }}</span>
-          }
-        </div>
+        <app-form-select
+          controlName="statusFuncionario"
+          label="Status"
+          [required]="true"
+          [options]="statusOptions"
+        ></app-form-select>
       </div>
 
       <!-- Tags Section -->

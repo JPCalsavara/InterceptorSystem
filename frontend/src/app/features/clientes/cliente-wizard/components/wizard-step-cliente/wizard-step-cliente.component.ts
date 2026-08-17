@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormInputComponent } from "../../../../../shared/components/form-input/form-input.component";
+import { FormSelectComponent } from "../../../../../shared/components/form-select/form-select.component";
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
 import { IbgeService } from '../../../../../services/ibge.service';
@@ -8,15 +9,15 @@ import { IbgeService } from '../../../../../services/ibge.service';
 @Component({
   selector: 'app-wizard-step-cliente',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, FormInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, FormInputComponent, FormSelectComponent],
   templateUrl: './wizard-step-cliente.component.html',
   styleUrls: ['./wizard-step-cliente.component.scss'],
 })
 export class WizardStepClienteComponent implements OnInit {
   @Input({ required: true }) formCliente!: FormGroup;
 
-  estados = signal<string[]>([]);
-  cidadesDisponiveis = signal<string[]>([]);
+  estados = signal<{value: string, label: string}[]>([]);
+  cidadesDisponiveis = signal<{value: string, label: string}[]>([]);
 
   private ibgeService = inject(IbgeService);
 
@@ -27,7 +28,7 @@ export class WizardStepClienteComponent implements OnInit {
 
   private carregarEstados(): void {
     this.ibgeService.getEstados().subscribe((estadosObj) => {
-      this.estados.set(estadosObj.map((e) => e.sigla));
+      this.estados.set(estadosObj.map((e) => ({ value: e.sigla, label: e.sigla })));
     });
   }
 
@@ -44,7 +45,7 @@ export class WizardStepClienteComponent implements OnInit {
       if (estado) {
         this.ibgeService.getMunicipiosPorEstado(estado).subscribe((municipios) => {
           const cidadesDoEstado = municipios.map((m) => m.nome);
-          this.cidadesDisponiveis.set(cidadesDoEstado);
+          this.cidadesDisponiveis.set(cidadesDoEstado.map(c => ({ value: c, label: c })));
 
           const cidadeAtual = String(cidadeControl?.value ?? '');
           if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
@@ -58,26 +59,4 @@ export class WizardStepClienteComponent implements OnInit {
     });
   }
 
-  hasError(fieldName: string): boolean {
-    const field = this.formCliente.get(fieldName);
-    if (!field) return false;
-    return field.invalid && field.touched;
-  }
-
-  getErrorMessage(fieldName: string): string {
-    const field = this.formCliente.get(fieldName);
-    if (!field || !field.errors || !field.touched) {
-      return '';
-    }
-
-    const errors = field.errors;
-
-    if (errors['required']) return 'Este campo é obrigatório';
-    if (errors['cnpjInvalido']) return 'CNPJ inválido';
-    if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
-    if (errors['email']) return 'E-mail inválido';
-
-    return 'Campo inválido';
-  }
 }

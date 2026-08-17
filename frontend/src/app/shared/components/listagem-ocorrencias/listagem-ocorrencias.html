@@ -1,0 +1,49 @@
+<section class="faltas-section">
+  <h2 class="section-title">{{ titulo }}</h2>
+  <div class="faltas-container">
+    <div class="faltas-summary">
+      <div class="summary-card">
+        <h3>{{ resumoTitulo }}</h3>
+        <div class="summary-content">
+          <div class="summary-item" [class.total]="!mostrarFinanceiro && !extraItemLabel">
+            <span class="summary-label">{{ labelQuantidade }}</span>
+            <span class="summary-value" [class.danger]="!mostrarFinanceiro">{{ quantidade }}</span>
+          </div>
+
+          @if (extraItemLabel && extraItemValue) {
+            <div class="summary-item" [class.total]="!mostrarFinanceiro">
+              <span class="summary-label">{{ extraItemLabel }}</span>
+              <span class="summary-value">{{ extraItemValue }}</span>
+            </div>
+          }
+          
+          @if (mostrarFinanceiro) {
+            <div class="summary-item">
+              <span class="summary-label">Valor da Diária:</span>
+              <span class="summary-value">{{ formatCurrency(valorDiaria) }}</span>
+            </div>
+            <div class="summary-item total">
+              <span class="summary-label">{{ labelPenalidade }}</span>
+              <span class="summary-value danger">{{ formatCurrency(valorPenalidade) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="faltas-list">
+      <h4>{{ historicoTitulo }}</h4>
+      @for (item of itens; track item.id) {
+        <div class="falta-item">
+          <div class="falta-date">{{ item.data }}</div>
+          <div class="falta-posto">{{ item.descricaoSecundaria }}</div>
+          @if (mostrarFinanceiro && item.valor !== undefined) {
+            <div class="falta-valor">
+              {{ formatCurrency(item.valor) }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { NgxMaskDirective } from 'ngx-mask';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
@@ -16,11 +15,13 @@ import {
   StatusContrato,
   Tag,
 } from '../../../models';
+import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 
 @Component({
   selector: 'app-funcionario-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective, TagPickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TagPickerComponent, FormInputComponent, FormSelectComponent],
   templateUrl: './funcionario-form.component.html',
   styleUrl: './funcionario-form.component.scss',
 })
@@ -213,28 +214,6 @@ export class FuncionarioFormComponent implements OnInit {
     Object.keys(this.form.controls).forEach((key) => {
       this.form.get(key)?.markAsTouched();
     });
-  }
-
-  hasError(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
-    return field ? field.invalid && (field.touched || this.submitted()) : false;
-  }
-
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
-    if (!field || !field.errors || (!field.touched && !this.submitted())) {
-      return '';
-    }
-
-    const errors = field.errors;
-
-    if (errors['required']) return 'Este campo é obrigatório';
-    if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
-    if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['cpfInvalid']) return 'CPF inválido (verifique o formato e os dígitos)';
-    if (errors['celularInvalid']) return 'Celular deve conter 10 ou 11 dígitos';
-
-    return 'Campo inválido';
   }
 
   onTagSelectionChange(tagIds: string[]): void {

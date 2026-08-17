@@ -17,14 +17,17 @@ import {
   StatusDiaria,
   TipoDiaria,
 } from '../../../models/index';
+import { calcularValorDiariaEstimada } from '../../../shared/helpers/contrato-calculo.helper';
 import { PostoAlocacoesComponent } from '../components/posto-alocacoes/posto-alocacoes.component';
 import { PostoMetricasComponent } from '../components/posto-metricas/posto-metricas.component';
 import { PostoTiposComponent } from '../components/posto-tipos/posto-tipos.component';
+import { ListagemOcorrenciasComponent } from '../../../shared/components/listagem-ocorrencias/listagem-ocorrencias';
+import { OcorrenciaItem } from '../../../shared/components/listagem-ocorrencias/t_ocorrencia';
 
 @Component({
   selector: 'app-posto-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, PostoAlocacoesComponent, PostoMetricasComponent, PostoTiposComponent],
+  imports: [CommonModule, RouterLink, PostoAlocacoesComponent, PostoMetricasComponent, PostoTiposComponent, ListagemOcorrenciasComponent],
   templateUrl: './posto-detail.component.html',
   styleUrl: './posto-detail.component.scss',
 })
@@ -96,6 +99,15 @@ export class PostoDetailComponent implements OnInit {
       { tipo: 'Dobra Programada', count: tipos.get(TipoDiaria.DOBRA_PROGRAMADA) || 0, icon: 'D' },
       { tipo: 'Substituição', count: tipos.get(TipoDiaria.SUBSTITUICAO) || 0, icon: 'S' },
     ];
+  });
+
+  ocorrenciasFaltas = computed<OcorrenciaItem[]>(() => {
+    return this.faltas().map(falta => ({
+      id: falta.id,
+      data: this.formatDate(falta.data),
+      descricaoSecundaria: `${this.getFuncionarioNome(falta.funcionarioId)} • ${this.getTipoLabel(falta.tipoDiaria)}`,
+      isDanger: true
+    }));
   });
 
   // Ranking de funcionários por diárias confirmadas
@@ -231,18 +243,16 @@ export class PostoDetailComponent implements OnInit {
     const contrato = this.contrato();
     if (!contrato) return 0;
 
-    let valor = contrato.valorDiariaCobrada || 0;
-    const data = new Date(diaria.data + 'T12:00:00');
-    const diaSemana = data.getDay();
+    const aloc = this.alocacoes().find(a => a.id === diaria.alocacaoId);
+    const temNoturno = !!aloc?.temHorarioNoturno;
 
-    if (diaSemana === 0) valor *= 2.0;       // +100% domingo
-    else if (diaSemana === 6) valor *= 1.5;  // +50% sábado
-
-    if (this.diariaRecebeBonus(diaria)) {
-      valor *= 1 + (contrato.percentualAdicionalNoturno || 0);
-    }
-
-    return valor;
+    return calcularValorDiariaEstimada(
+      diaria.data,
+      contrato.valorDiariaCobrada || 0,
+      contrato.percentualAdicionalNoturno,
+      contrato.percentualAdicionalFimSemana,
+      temNoturno && this.recebeBonusContrato()
+    );
   }
 
   // ── Month navigation ──

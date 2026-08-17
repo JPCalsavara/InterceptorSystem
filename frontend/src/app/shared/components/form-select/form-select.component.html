@@ -1,0 +1,45 @@
+<div class="form-group">
+  @if (label) {
+    <label class="form-label" [for]="id">
+      {{ label }} @if (required) { <span class="required">*</span> }
+    </label>
+  }
+  
+  @if (controlName) {
+    <select
+      [id]="id"
+      [formControlName]="controlName"
+      [attr.formControlName]="controlName"
+      [attr.data-cy]="dataCy"
+      [class.error]="hasError"
+      class="form-select"
+    >
+      <option value="" disabled selected>Selecione uma opção</option>
+      @for (option of options; track option[valueKey]) {
+        <option [value]="option[valueKey]">{{ option[labelKey] }}</option>
+      }
+    </select>
+  } @else {
+    <select
+      [id]="id"
+      [value]="value"
+      (change)="onSelectChange($event)"
+      [attr.data-cy]="dataCy"
+      [class.error]="hasError"
+      [disabled]="disabled"
+      class="form-select"
+    >
+      <option value="" disabled selected>Selecione uma opção</option>
+      @for (option of options; track option[valueKey]) {
+        <option [value]="option[valueKey]">{{ option[labelKey] }}</option>
+      }
+    </select>
+  }
+
+  @if (hasError) {
+    <span class="error-message">{{ errorMessage }}</span>
+  }
+  @if (helpText && !hasError) {
+    <span class="help-text">{{ helpText }}</span>
+  }
+</div>

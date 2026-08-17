@@ -215,100 +215,34 @@
 
     <!-- Detalhes de Faltas -->
     @if (totalFaltas() > 0) {
-      <section class="faltas-section">
-        <h2 class="section-title">Detalhamento de Faltas</h2>
-        <div class="faltas-container">
-          <div class="faltas-summary">
-            <div class="summary-card">
-              <h3>Resumo Financeiro de Faltas</h3>
-              <div class="summary-content">
-                <div class="summary-item">
-                  <span class="summary-label">Total de Faltas:</span>
-                  <span class="summary-value">{{ totalFaltas() }}</span>
-                </div>
-                @if (contrato()) {
-                  <div class="summary-item">
-                    <span class="summary-label">Valor da Diária:</span>
-                    <span class="summary-value">{{
-                      formatCurrency(contrato()!.valorDiariaCobrada)
-                    }}</span>
-                  </div>
-                  <div class="summary-item total">
-                    <span class="summary-label">Prejuízo Total:</span>
-                    <span class="summary-value danger">{{
-                      formatCurrency(prejuizoPorFaltas())
-                    }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="faltas-list">
-            <h4>Histórico de Faltas</h4>
-            @for (falta of faltas(); track falta.id) {
-              <div class="falta-item">
-                <div class="falta-date">{{ formatDate(falta.data) }}</div>
-                <div class="falta-posto">{{ getPostoNome(falta.alocacaoId) }}</div>
-                @if (contrato()) {
-                  <div class="falta-valor">
-                    {{ formatCurrency(contrato()!.valorDiariaCobrada) }}
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-      </section>
+      <app-listagem-ocorrencias
+        titulo="Detalhamento de Faltas"
+        resumoTitulo="Resumo Financeiro de Faltas"
+        labelQuantidade="Total de Faltas:"
+        [quantidade]="totalFaltas()"
+        labelPenalidade="Prejuízo Total:"
+        [valorPenalidade]="prejuizoPorFaltas()"
+        [valorDiaria]="contrato()?.valorDiariaCobrada || 0"
+        [mostrarFinanceiro]="!!contrato()"
+        historicoTitulo="Histórico de Faltas"
+        [itens]="ocorrenciasFaltas()"
+      ></app-listagem-ocorrencias>
     }
 
     <!-- Detalhes de Cancelamentos -->
     @if (totalCanceladas() > 0) {
-      <section class="faltas-section">
-        <h2 class="section-title">Detalhamento de Cancelamentos</h2>
-        <div class="faltas-container">
-          <div class="faltas-summary">
-            <div class="summary-card">
-              <h3>Resumo de Cancelamentos</h3>
-              <div class="summary-content">
-                <div class="summary-item">
-                  <span class="summary-label">Total de Cancelamentos:</span>
-                  <span class="summary-value">{{ totalCanceladas() }}</span>
-                </div>
-                @if (contrato()) {
-                  <div class="summary-item">
-                    <span class="summary-label">Valor da Diária:</span>
-                    <span class="summary-value">{{
-                      formatCurrency(contrato()!.valorDiariaCobrada)
-                    }}</span>
-                  </div>
-                  <div class="summary-item total">
-                    <span class="summary-label">Multa Total:</span>
-                    <span class="summary-value danger">{{
-                      formatCurrency(multaPorCancelamentos())
-                    }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="faltas-list">
-            <h4>Histórico de Cancelamentos</h4>
-            @for (cancelada of diariasCanceladas(); track cancelada.id) {
-              <div class="falta-item">
-                <div class="falta-date">{{ formatDate(cancelada.data) }}</div>
-                <div class="falta-posto">{{ getPostoNome(cancelada.alocacaoId) }}</div>
-                @if (contrato()) {
-                  <div class="falta-valor">
-                    {{ formatCurrency(contrato()!.valorDiariaCobrada) }}
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-      </section>
+      <app-listagem-ocorrencias
+        titulo="Detalhamento de Cancelamentos"
+        resumoTitulo="Resumo de Cancelamentos"
+        labelQuantidade="Total de Cancelamentos:"
+        [quantidade]="totalCanceladas()"
+        labelPenalidade="Multa Total:"
+        [valorPenalidade]="multaPorCancelamentos()"
+        [valorDiaria]="contrato()?.valorDiariaCobrada || 0"
+        [mostrarFinanceiro]="!!contrato()"
+        historicoTitulo="Histórico de Cancelamentos"
+        [itens]="ocorrenciasCanceladas()"
+      ></app-listagem-ocorrencias>
     }
   }
 </div>

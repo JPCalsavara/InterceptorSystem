@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -16,11 +16,13 @@ import {
   UpdateAlocacaoDto,
 } from '../../../models/index';
 import { forkJoin } from 'rxjs';
+import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 
 @Component({
   selector: 'app-alocacao-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FormInputComponent, FormSelectComponent],
   templateUrl: './alocacao-form.component.html',
   styleUrl: './alocacao-form.component.scss',
 })
@@ -43,6 +45,18 @@ export class AlocacaoFormComponent implements OnInit {
   submitted = signal(false);
   isEditMode = signal(false);
   alocacaoId: string | null = null;
+
+  get clienteOptions() {
+    return this.clientes().map(c => ({ value: c.id, label: c.nome }));
+  }
+
+  get postoOptions() {
+    return this.filteredPostos().map(p => ({ value: p.id, label: p.nome }));
+  }
+
+  get contratoOptions() {
+    return this.filteredContratos().map(c => ({ value: c.id, label: c.descricao }));
+  }
 
   tipoEscalaOptions = [
     { value: TipoEscala.DOZE_POR_TRINTA_SEIS, label: '12x36' },
@@ -193,8 +207,4 @@ export class AlocacaoFormComponent implements OnInit {
     return this.contratos().filter((c) => c.clienteId === clienteId);
   }
 
-  hasError(name: string): boolean {
-    const ctrl = this.form.get(name);
-    return !!ctrl && ctrl.invalid && (ctrl.touched || this.submitted());
-  }
 }

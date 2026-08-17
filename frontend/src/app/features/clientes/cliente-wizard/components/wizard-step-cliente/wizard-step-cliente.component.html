@@ -64,54 +64,23 @@
               Localização
             </h3>
             <div class="form-row">
-              <div class="form-group">
-                <label for="estado" class="form-label">
-                  Estado (UF) <span class="required">*</span>
-                </label>
-                <select
-                  id="estado"
-                  formControlName="estado"
-                  class="form-input"
-                  [class.error]="hasError('estado')"
-                  data-cy="wizard-cliente-estado"
-                >
-                  <option value="">Selecione o estado</option>
-                  @for (uf of estados(); track uf) {
-                    <option [value]="uf">{{ uf }}</option>
-                  }
-                </select>
-                @if (hasError('estado')) {
-                  <span class="error-message">{{ getErrorMessage('estado') }}</span>
-                }
-              </div>
+              <app-form-select
+                controlName="estado"
+                label="Estado (UF)"
+                [required]="true"
+                dataCy="wizard-cliente-estado"
+                [options]="estados()"
+              ></app-form-select>
 
-              <div class="form-group">
-                <label for="cidade" class="form-label">
-                  Cidade <span class="required">*</span>
-                </label>
-                <select
-                  id="cidade"
-                  formControlName="cidade"
-                  class="form-input"
-                  [class.error]="hasError('cidade')"
-                  [disabled]="!formCliente.get('estado')?.value"
-                  data-cy="wizard-cliente-cidade"
-                >
-                  <option value="">
-                    {{
-                      formCliente.get('estado')?.value
-                        ? 'Selecione a cidade'
-                        : 'Selecione um estado antes'
-                    }}
-                  </option>
-                  @for (cidade of cidadesDisponiveis(); track cidade) {
-                    <option [value]="cidade">{{ cidade }}</option>
-                  }
-                </select>
-                @if (hasError('cidade')) {
-                  <span class="error-message">{{ getErrorMessage('cidade') }}</span>
-                }
-              </div>
+              <app-form-select
+                controlName="cidade"
+                label="Cidade"
+                [required]="true"
+                dataCy="wizard-cliente-cidade"
+                [options]="cidadesDisponiveis()"
+                [disabled]="!formCliente.get('estado')?.value"
+                [helpText]="formCliente.get('estado')?.value ? '' : 'Selecione um estado antes'"
+              ></app-form-select>
             </div>
 
             <h3 class="section-title">

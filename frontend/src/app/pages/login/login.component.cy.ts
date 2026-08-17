@@ -81,8 +81,8 @@ describe('LoginComponent - Cypress Component Test', () => {
 
     cy.get('[data-cy="login-submit"]').click();
 
-    cy.get('.field-error').should('have.length.gte', 1);
-    cy.get('.field-error').first().should('contain', 'obrigatório');
+    cy.get('.field-error, .error-message').should('have.length.gte', 1);
+    cy.get('.field-error, .error-message').first().should('contain', 'obrigatório');
   });
 
   it('Deve mostrar erro de email invalido ao digitar email malformado', () => {
@@ -90,7 +90,7 @@ describe('LoginComponent - Cypress Component Test', () => {
     mountLogin();
 
     cy.get('[data-cy="login-email"]').type('emailinvalido').blur();
-    cy.get('.field-error').should('contain', 'E-mail inválido');
+    cy.get('.field-error, .error-message').should('contain', 'mail inválido');
   });
 
   it('Deve alternar visibilidade da senha ao clicar no botao de toggle', () => {

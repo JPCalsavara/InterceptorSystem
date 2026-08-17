@@ -37,25 +37,15 @@
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
     <div class="form-card">
-      <div class="form-group">
-        <label for="clienteId" class="form-label"> Cliente <span class="required">*</span> </label>
-        <select
-          id="clienteId"
-          formControlName="clienteId"
-          data-cy="contrato-cliente"
-          class="form-input"
-          [class.error]="hasError('clienteId')"
-          [disabled]="isEdit()"
-        >
-          <option value="">Selecione um cliente</option>
-          @for (cond of clientes(); track cond.id) {
-            <option [value]="cond.id">{{ cond.nome }}</option>
-          }
-        </select>
-        @if (hasError('clienteId')) {
-          <span class="error-message">{{ getErrorMessage('clienteId') }}</span>
-        }
-      </div>
+      <app-form-select
+        id="clienteId"
+        controlName="clienteId"
+        dataCy="contrato-cliente"
+        label="Cliente"
+        [required]="true"
+        [options]="clienteOptions()"
+        [disabled]="isEdit()"
+      ></app-form-select>
 
       <div class="form-group">
         <label for="descricao" class="form-label">
@@ -489,23 +479,14 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="status" class="form-label"> Status <span class="required">*</span> </label>
-        <select
-          id="status"
-          formControlName="status"
-          data-cy="contrato-status"
-          class="form-input"
-          [class.error]="hasError('status')"
-        >
-          @for (opt of statusOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
-          }
-        </select>
-        @if (hasError('status')) {
-          <span class="error-message">{{ getErrorMessage('status') }}</span>
-        }
-      </div>
+      <app-form-select
+        id="status"
+        controlName="status"
+        dataCy="contrato-status"
+        label="Status"
+        [required]="true"
+        [options]="statusOptions"
+      ></app-form-select>
 
       <!-- Relatório Mensal -->
       @if (temBreakdown || calculando() || erroCalculo()) {
