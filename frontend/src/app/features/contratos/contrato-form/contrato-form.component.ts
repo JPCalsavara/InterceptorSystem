@@ -9,6 +9,7 @@ import { TagService } from '../../../services/tag.service';
 import { AlocacaoService } from '../../../services/alocacao.service';
 import { StatusContrato, CalculoValorTotalOutput, Tag, TipoEscala } from '../../../models/index';
 import { TagPickerComponent } from '../../../shared/components/tag-picker/tag-picker.component';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { of, forkJoin } from 'rxjs';
 import {
@@ -100,7 +101,7 @@ export const TIPO_POSTO_OPTIONS = Object.entries(TIPO_POSTO_CONFIGS).map(([value
 @Component({
   selector: 'app-contrato-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TagPickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TagPickerComponent, FormSelectComponent],
   templateUrl: './contrato-form.component.html',
   styleUrl: './contrato-form.component.scss',
 })
@@ -147,6 +148,10 @@ export class ContratoFormComponent implements OnInit {
     { value: StatusContrato.PENDENTE, label: 'Pendente' },
     { value: StatusContrato.FINALIZADO, label: 'Finalizado' },
   ];
+
+  clienteOptions = computed(() =>
+    this.clientes().map((c: any) => ({ value: c.id, label: c.nome }))
+  );
 
   ngOnInit(): void {
     this.loadClientes();

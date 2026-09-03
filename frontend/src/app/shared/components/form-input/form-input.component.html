@@ -1,0 +1,69 @@
+<div class="form-group">
+  @if (label) {
+    <label class="form-label" [for]="inputId">
+      {{ label }} @if (required) { <span class="required">*</span> }
+    </label>
+  }
+  
+  @if (mask) {
+    <input
+      [id]="inputId"
+      [type]="type"
+      [formControlName]="controlName!"
+      [attr.formControlName]="controlName"
+      [placeholder]="placeholder"
+      [attr.step]="step"
+      [attr.min]="min"
+      [attr.max]="max"
+      [attr.maxlength]="maxlength"
+      [attr.data-cy]="dataCy"
+      [mask]="mask"
+      [class.error]="hasError"
+      class="form-input"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+    />
+  } @else if (controlName) {
+    <input
+      [id]="inputId"
+      [type]="type"
+      [formControlName]="controlName"
+      [attr.formControlName]="controlName"
+      [placeholder]="placeholder"
+      [attr.step]="step"
+      [attr.min]="min"
+      [attr.max]="max"
+      [attr.maxlength]="maxlength"
+      [attr.data-cy]="dataCy"
+      [class.error]="hasError"
+      class="form-input"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+    />
+  } @else {
+    <input
+      [id]="inputId"
+      [type]="type"
+      [value]="value"
+      (input)="onInputChange($event)"
+      [placeholder]="placeholder"
+      [attr.step]="step"
+      [attr.min]="min"
+      [attr.max]="max"
+      [attr.maxlength]="maxlength"
+      [attr.data-cy]="dataCy"
+      [class.error]="hasError"
+      [disabled]="disabled"
+      class="form-input"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+    />
+  }
+
+  @if (hasError) {
+    <span class="error-message">{{ errorMessage }}</span>
+  }
+  @if (helpText && !hasError) {
+    <span class="help-text">{{ helpText }}</span>
+  }
+</div>

@@ -9,11 +9,13 @@ import {
   telefoneValidator,
 } from '../../../shared/validators/br-documents.validators';
 import { IbgeService } from '../../../services/ibge.service';
+import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 
 @Component({
   selector: 'app-cliente-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective, FormInputComponent, FormSelectComponent],
   templateUrl: './cliente-form.component.html',
   styleUrl: './cliente-form.component.scss',
 })
@@ -30,9 +32,9 @@ export class ClienteFormComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   submitted = signal(false);
-  estados = signal<string[]>([]);
+  estados = signal<{value: string, label: string}[]>([]);
   selectedEstado = signal('');
-  cidadesDisponiveis = signal<string[]>([]);
+  cidadesDisponiveis = signal<{value: string, label: string}[]>([]);
 
   ngOnInit(): void {
     this.buildForm();
@@ -49,7 +51,7 @@ export class ClienteFormComponent implements OnInit {
 
   carregarEstados(): void {
     this.ibgeService.getEstados().subscribe((estadosObj) => {
-      this.estados.set(estadosObj.map((e) => e.sigla));
+      this.estados.set(estadosObj.map((e) => ({ value: e.sigla, label: e.sigla })));
     });
   }
 
@@ -79,7 +81,7 @@ export class ClienteFormComponent implements OnInit {
       if (estado) {
         this.ibgeService.getMunicipiosPorEstado(estado).subscribe((municipios) => {
           const cidadesDoEstado = municipios.map((m) => m.nome);
-          this.cidadesDisponiveis.set(cidadesDoEstado);
+          this.cidadesDisponiveis.set(cidadesDoEstado.map(c => ({ value: c, label: c })));
 
           const cidadeAtual = String(cidadeControl?.value ?? '');
           if (cidadeAtual && !cidadesDoEstado.includes(cidadeAtual)) {
@@ -163,36 +165,6 @@ export class ClienteFormComponent implements OnInit {
     Object.keys(this.form.controls).forEach((key) => {
       this.form.get(key)?.markAsTouched();
     });
-  }
-
-  hasError(fieldName: string, errorType?: string): boolean {
-    const field = this.form.get(fieldName);
-    if (!field) return false;
-
-    if (errorType) {
-      return field.hasError(errorType) && (field.touched || this.submitted());
-    }
-
-    return field.invalid && (field.touched || this.submitted());
-  }
-
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
-    if (!field || !field.errors || (!field.touched && !this.submitted())) {
-      return '';
-    }
-
-    const errors = field.errors;
-
-    if (errors['required']) return 'Este campo é obrigatório';
-    if (errors['minlength']) return `Mínimo de ${errors['minlength'].requiredLength} caracteres`;
-    if (errors['maxlength']) return `Máximo de ${errors['maxlength'].requiredLength} caracteres`;
-    if (errors['cnpjInvalid']) return 'CNPJ inválido (verifique o formato e os dígitos)';
-    if (errors['cpfInvalid']) return 'CPF inválido (verifique o formato e os dígitos)';
-    if (errors['telefoneInvalid']) return 'Telefone inválido (ex: (11) 99999-9999)';
-    if (errors['email']) return 'Email inválido';
-
-    return 'Campo inválido';
   }
 
   cancel(): void {

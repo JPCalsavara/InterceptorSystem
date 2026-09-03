@@ -55,20 +55,20 @@ describe('AlocacaoFormComponent', () => {
     cy.get('h1').should('contain', 'Novo Turno');
     
     // Seleciona Cliente, depois Posto e Contrato
-    cy.get('select[formControlName="clienteId"]').select('c1');
-    cy.get('select[formControlName="postoId"]').select('p1');
-    cy.get('select[formControlName="contratoId"]').select('ct1');
+    cy.get('select#clienteId').select('c1');
+    cy.get('select#postoId').select('p1');
+    cy.get('select#contratoId').select('ct1');
     
-    cy.get('input[formControlName="horarioInicio"]').type('08:00');
-    cy.get('input[formControlName="horarioFim"]').type('18:00');
-    cy.get('select[formControlName="tipoEscala"]').select(TipoEscala.DOZE_POR_TRINTA_SEIS);
+    cy.get('input#horarioInicio').type('08:00');
+    cy.get('input#horarioFim').type('18:00');
+    cy.get('select#tipoEscala').select(TipoEscala.DOZE_POR_TRINTA_SEIS);
   });
 
   it('Desktop: exibe erros ao tentar enviar vazio', () => {
     cy.mount(AlocacaoFormComponent, { providers });
     // Limpa campos preenchidos por padrão
-    cy.get('input[formControlName="horarioInicio"]').clear();
-    cy.get('input[formControlName="horarioFim"]').clear();
+    cy.get('input#horarioInicio').clear();
+    cy.get('input#horarioFim').clear();
 
     cy.get('button[type="submit"]').click();
     cy.get('.error-message').should('have.length.greaterThan', 0);

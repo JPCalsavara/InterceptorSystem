@@ -73,85 +73,42 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
     <div class="form-card">
       <!-- Nome -->
-      <div class="form-group">
-        <label for="nome" class="form-label">
-          Nome do Cliente <span class="required">*</span>
-        </label>
-        <input
-          id="nome"
-          type="text"
-          formControlName="nome"
-          data-cy="cliente-nome"
-          class="form-input"
-          [class.error]="hasError('nome')"
-          placeholder="Ex: Cliente Horizonte Verde"
-        />
-        @if (hasError('nome')) {
-          <span class="error-message">{{ getErrorMessage('nome') }}</span>
-        }
-      </div>
+      <app-form-input
+        controlName="nome"
+        label="Nome do Cliente"
+        [required]="true"
+        dataCy="cliente-nome"
+        placeholder="Ex: Cliente Horizonte Verde"
+      ></app-form-input>
 
-      <div class="form-group">
-        <label for="cnpj" class="form-label"> CNPJ <span class="required">*</span> </label>
-        <input
-          id="cnpj"
-          type="text"
-          formControlName="cnpj"
-          data-cy="cliente-cnpj"
-          class="form-input"
-          [class.error]="hasError('cnpj')"
-          placeholder="12.345.678/0001-90"
-          mask="00.000.000/0000-00"
-          maxlength="18"
-        />
-        @if (hasError('cnpj')) {
-          <span class="error-message">{{ getErrorMessage('cnpj') }}</span>
-        }
-      </div>
+      <app-form-input
+        controlName="cnpj"
+        label="CNPJ"
+        [required]="true"
+        dataCy="cliente-cnpj"
+        placeholder="12.345.678/0001-90"
+        mask="00.000.000/0000-00"
+        maxlength="18"
+      ></app-form-input>
 
       <div class="form-row">
-        <div class="form-group">
-          <label for="estado" class="form-label">
-            Estado (UF) <span class="required">*</span>
-          </label>
-          <select
-            id="estado"
-            formControlName="estado"
-            data-cy="cliente-estado"
-            class="form-input"
-            [class.error]="hasError('estado')"
-          >
-            <option value="">Selecione o estado</option>
-            @for (uf of estados(); track uf) {
-              <option [value]="uf">{{ uf }}</option>
-            }
-          </select>
-          @if (hasError('estado')) {
-            <span class="error-message">{{ getErrorMessage('estado') }}</span>
-          }
-        </div>
+        <app-form-select
+          controlName="estado"
+          label="Estado (UF)"
+          [required]="true"
+          dataCy="cliente-estado"
+          [options]="estados()"
+        ></app-form-select>
 
-        <div class="form-group">
-          <label for="cidade" class="form-label"> Cidade <span class="required">*</span> </label>
-          <select
-            id="cidade"
-            formControlName="cidade"
-            data-cy="cliente-cidade"
-            class="form-input"
-            [class.error]="hasError('cidade')"
-            [disabled]="!selectedEstado()"
-          >
-            <option value="">
-              {{ selectedEstado() ? 'Selecione a cidade' : 'Selecione um estado antes' }}
-            </option>
-            @for (cidade of cidadesDisponiveis(); track cidade) {
-              <option [value]="cidade">{{ cidade }}</option>
-            }
-          </select>
-          @if (hasError('cidade')) {
-            <span class="error-message">{{ getErrorMessage('cidade') }}</span>
-          }
-        </div>
+        <app-form-select
+          controlName="cidade"
+          label="Cidade"
+          [required]="true"
+          dataCy="cliente-cidade"
+          [options]="cidadesDisponiveis()"
+          [disabled]="!selectedEstado()"
+          [helpText]="selectedEstado() ? '' : 'Selecione um estado antes'"
+        ></app-form-select>
       </div>
 
       <h3 class="section-title">
@@ -173,39 +130,23 @@
 
       <!-- Email Gestor e Telefone Emergência -->
       <div class="form-row">
-        <div class="form-group">
-          <label for="emailGestor" class="form-label"> E-mail do Gestor </label>
-          <input
-            id="emailGestor"
-            type="email"
-            formControlName="emailGestor"
-            data-cy="cliente-email"
-            class="form-input"
-            [class.error]="hasError('emailGestor')"
-            placeholder="gestor@cliente.com.br"
-          />
-          @if (hasError('emailGestor')) {
-            <span class="error-message">{{ getErrorMessage('emailGestor') }}</span>
-          }
-        </div>
+        <app-form-input
+          controlName="emailGestor"
+          type="email"
+          label="E-mail do Gestor"
+          dataCy="cliente-email"
+          placeholder="gestor@cliente.com.br"
+        ></app-form-input>
 
-        <div class="form-group">
-          <label for="telefoneEmergencia" class="form-label"> Telefone de Emergência </label>
-          <input
-            id="telefoneEmergencia"
-            type="tel"
-            formControlName="telefoneEmergencia"
-            data-cy="cliente-telefone"
-            class="form-input"
-            [class.error]="hasError('telefoneEmergencia')"
-            placeholder="(11) 98765-4321"
-            mask="(00) 0000-0000||(00) 00000-0000"
-            maxlength="15"
-          />
-          @if (hasError('telefoneEmergencia')) {
-            <span class="error-message">{{ getErrorMessage('telefoneEmergencia') }}</span>
-          }
-        </div>
+        <app-form-input
+          controlName="telefoneEmergencia"
+          type="tel"
+          label="Telefone de Emergência"
+          dataCy="cliente-telefone"
+          placeholder="(11) 98765-4321"
+          mask="(00) 0000-0000||(00) 00000-0000"
+          maxlength="15"
+        ></app-form-input>
       </div>
 
       <!-- Footer -->

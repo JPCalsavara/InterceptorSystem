@@ -85,8 +85,8 @@ describe('CadastroComponent - Cypress Component Test', () => {
     cy.get('[data-cy="register-termos"]').check({ force: true });
     cy.get('[data-cy="register-submit"]').click();
 
-    cy.get('.field-error').should('have.length.gte', 1);
-    cy.get('.field-error').first().should('contain', 'obrigatório');
+    cy.get('.field-error, .error-message').should('have.length.gte', 1);
+    cy.get('.field-error, .error-message').first().should('contain', 'obrigatório');
   });
 
   it('Deve mostrar erro de email invalido', () => {
@@ -94,7 +94,7 @@ describe('CadastroComponent - Cypress Component Test', () => {
     mountCadastro();
 
     cy.get('[data-cy="register-email"]').type('nao-e-email').blur();
-    cy.get('.field-error').should('contain', 'E-mail inválido');
+    cy.get('.field-error, .error-message').should('contain', 'mail inválido');
   });
 
   it('Deve mostrar erro de senha fraca (sem maiuscula ou numero)', () => {
@@ -102,7 +102,7 @@ describe('CadastroComponent - Cypress Component Test', () => {
     mountCadastro();
 
     cy.get('[data-cy="register-password"]').type('senhafraca').blur();
-    cy.get('.field-error').should('contain', 'pelo menos 8 caracteres');
+    cy.get('.field-error, .error-message').should('contain', 'pelo menos 8 caracteres');
   });
 
   it('Deve alternar visibilidade da senha ao clicar no toggle', () => {

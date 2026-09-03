@@ -8,10 +8,13 @@ import {
   EventEmitter,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 import { DiariaService } from '../../../services/diaria.service';
 import { FuncionarioService } from '../../../services/funcionario.service';
 import { PostoService } from '../../../services/posto.service';
@@ -30,7 +33,7 @@ import {
 @Component({
   selector: 'app-diaria-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormInputComponent, FormSelectComponent],
   templateUrl: './diaria-form.component.html',
   styleUrl: './diaria-form.component.scss',
 })
@@ -62,6 +65,14 @@ export class DiariaFormComponent implements OnInit, OnChanges {
   submitted = signal(false);
   isEditMode = signal(false);
   diariaId: string | null = null;
+
+  funcionarioOptions = computed(() =>
+    this.funcionarios().map((f) => ({ value: f.id, label: `${f.nome} - ${f.cpf}` }))
+  );
+
+  alocacaoOptions = computed(() =>
+    this.alocacoes().map((a) => ({ value: a.id, label: this.getAlocacaoLabel(a) }))
+  );
 
   get baseRoute(): string {
     return this.router.url.startsWith('/cronograma') ? '/cronograma' : '/diarias';
@@ -242,11 +253,6 @@ export class DiariaFormComponent implements OnInit, OnChanges {
         },
       });
     }
-  }
-
-  hasError(name: string): boolean {
-    const ctrl = this.form.get(name);
-    return !!ctrl && ctrl.invalid && (ctrl.touched || this.submitted());
   }
 
   dismissError(): void {

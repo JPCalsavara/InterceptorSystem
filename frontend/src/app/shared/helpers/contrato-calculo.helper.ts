@@ -226,3 +226,44 @@ export function computePostosByQuantidadeIdeal(
     }));
   });
 }
+
+/**
+ * Calcula o valor estimado de uma diária com base na data (fim de semana)
+ * e nas configurações da alocação (adicional noturno).
+ */
+export function calcularValorDiariaEstimada(
+  dataOriginal: string | Date,
+  valorBaseDiaria: number,
+  percentualNoturno: number | null | undefined,
+  percentualFimDeSemana: number | null | undefined,
+  temHorarioNoturno: boolean
+): number {
+  let valor = valorBaseDiaria;
+  
+  // Normalizar a data para o meio-dia UTC para evitar problemas de fuso horário
+  const data = typeof dataOriginal === 'string' 
+    ? new Date(dataOriginal.includes('T') ? dataOriginal : `${dataOriginal}T12:00:00`)
+    : dataOriginal;
+    
+  const diaSemana = data.getDay();
+  
+  // Adicional de Fim de Semana (padrão é 100% para domingo e 50% para sábado, 
+  // mas se o backend enviar algo diferente, usamos a lógica do sistema)
+  if (diaSemana === 0) {
+    // Domingo
+    const percDomingo = percentualFimDeSemana != null ? percentualFimDeSemana : 1.0; // 100%
+    valor *= (1 + percDomingo);
+  } else if (diaSemana === 6) {
+    // Sábado
+    const percSabado = percentualFimDeSemana != null ? percentualFimDeSemana / 2 : 0.5; // 50%
+    valor *= (1 + percSabado);
+  }
+
+  // Adicional Noturno
+  if (temHorarioNoturno) {
+    const percNoturno = percentualNoturno || 0;
+    valor *= (1 + percNoturno);
+  }
+
+  return valor;
+}

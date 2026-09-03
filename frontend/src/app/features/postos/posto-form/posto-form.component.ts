@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -8,11 +8,13 @@ import { ClienteService } from '../../../services/cliente.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { CepService } from '../../../services/cep.service';
 import { Cliente, Posto, Contrato } from '../../../models/index';
+import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-select/form-select.component';
 
 @Component({
   selector: 'app-posto-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FormInputComponent, FormSelectComponent],
   templateUrl: './posto-form.component.html',
   styleUrl: './posto-form.component.scss',
 })
@@ -34,6 +36,14 @@ export class PostoFormComponent implements OnInit {
   submitted = signal(false);
   isEditMode = signal(false);
   postoId: string | null = null;
+
+  clienteOptions = computed(() => 
+    this.clientes().map(c => ({ value: c.id, label: c.nome }))
+  );
+
+  contratoOptions = computed(() => 
+    this.contratos().map(c => ({ value: c.id, label: c.descricao }))
+  );
 
   ngOnInit(): void {
     this.postoId = this.route.snapshot.paramMap.get('id');
@@ -245,22 +255,4 @@ export class PostoFormComponent implements OnInit {
     cepControl.setErrors(Object.keys(rest).length ? rest : null);
   }
 
-  hasError(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
-    return field ? field.invalid && (field.touched || this.submitted()) : false;
-  }
-
-  getErrorMessage(fieldName: string): string {
-    const field = this.form.get(fieldName);
-    if (!field || !field.errors || (!field.touched && !this.submitted())) return '';
-    if (field.errors['required']) return 'Este campo é obrigatório';
-    if (field.errors['pattern']) {
-      if (fieldName === 'cep') return 'Informe um CEP válido no formato 00000-000';
-      if (fieldName === 'estado') return 'UF deve conter 2 letras';
-    }
-    if (field.errors['cepNotFound']) return 'CEP não encontrado';
-    if (field.errors['maxlength']) return 'Ultrapassou o limite de caracteres';
-    if (field.errors['minlength']) return 'Mínimo de caracteres não atingido';
-    return 'Campo inválido';
-  }
 }
