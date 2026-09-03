@@ -1,13 +1,13 @@
 <div class="form-group">
   @if (label) {
-    <label class="form-label" [for]="id">
+    <label class="form-label" [for]="inputId">
       {{ label }} @if (required) { <span class="required">*</span> }
     </label>
   }
   
   @if (controlName) {
     <select
-      [id]="id"
+      [id]="inputId"
       [formControlName]="controlName"
       [attr.formControlName]="controlName"
       [attr.data-cy]="dataCy"
@@ -21,7 +21,7 @@
     </select>
   } @else {
     <select
-      [id]="id"
+      [id]="inputId"
       [value]="value"
       (change)="onSelectChange($event)"
       [attr.data-cy]="dataCy"

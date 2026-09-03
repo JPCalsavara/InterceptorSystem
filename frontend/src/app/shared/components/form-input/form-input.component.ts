@@ -24,7 +24,7 @@ export class FormInputComponent {
   @Output() focusEvent = new EventEmitter<void>();
   @Input() disabled = false;
   @Input() label = '';
-  @Input() id = `input-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
+  @Input() inputId = `input-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
   @Input() type = 'text';
   @Input() placeholder = '';
   @Input() step?: string;

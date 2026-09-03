@@ -25,7 +25,7 @@ export class FormSelectComponent {
   @Output() valueChange = new EventEmitter<any>();
   @Input() disabled = false;
   @Input() label = '';
-  @Input() id = `select-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
+  @Input() inputId = `select-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
   @Input() options: SelectOption[] = [];
   @Input() required = false;
   @Input() dataCy?: string;
